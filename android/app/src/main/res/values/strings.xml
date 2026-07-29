@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tafseer e Namoona</string>
+    <string name="title_activity_main">Tafseer e Namoona</string>
+    <string name="package_name">com.tafseerenamoona.app</string>
+    <string name="custom_url_scheme">com.tafseerenamoona.app</string>
+</resources>

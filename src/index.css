@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-arabic: "Amiri", serif;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-stone-50 text-stone-900 transition-colors duration-300;
+  }
+  
+  .dark body {
+    @apply bg-stone-950 text-stone-100;
+  }
+}
