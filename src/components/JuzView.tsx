@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchJuzDetail, JuzDetail, Ayah } from '../api';
+import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
+import Markdown from 'react-markdown';
 import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -11,12 +13,27 @@ interface JuzViewProps {
 }
 
 function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDetail }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages } = useSettingsStore();
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages } = useSettingsStore();
   const [showDetailedTafseer, setShowDetailedTafseer] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-
+  const [lazyTafseer, setLazyTafseer] = useState<string | null>(null);
+  const [lazyLoading, setLazyLoading] = useState(false);
+  
   const surahId = ayah.surahNumber || 1;
+
+  useEffect(() => {
+    if (showDetailedTafseer && !lazyTafseer) {
+      setLazyLoading(true);
+      fetchTafseer(surahId, ayah.numberInSurah)
+        .then(res => setLazyTafseer(res))
+        .catch(err => {
+          console.error(err);
+          setLazyTafseer("Tafseer for this Ayah could not be found or failed to load.");
+        })
+        .finally(() => setLazyLoading(false));
+    }
+  }, [showDetailedTafseer, surahId, ayah.numberInSurah, lazyTafseer]);
   const bookmarked = isBookmarked(surahId, ayah.numberInSurah);
   const isLastRead = lastRead?.surahId === surahId && lastRead?.ayahNumber === ayah.numberInSurah;
 
@@ -151,15 +168,26 @@ function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDe
                 Tafseer-e-Namoona - Juz {juz.number}, Verse {ayah.numberInSurah}
               </h4>
               <div className="prose prose-stone dark:prose-invert max-w-none text-sm md:text-base text-stone-700 dark:text-stone-300">
-                <p className="italic text-stone-500 dark:text-stone-400 mb-4">
-                  Note: The complete, unaltered text of Tafseer-e-Namoona is extensive. Below is a representation of the detailed enlightening knowledge provided in the original text by Grand Ayatollah Naser Makarem Shirazi.
-                </p>
-                <p className="leading-relaxed mb-4">
-                  In this verse, the Quran addresses the core foundation of belief and action. According to Tafseer-e-Namoona, the structure of this Ayah reveals profound connections between intention and outcome. The commentators emphasize that the words used here carry specific weights in Arabic that signify not just a temporary state, but a continuous characteristic of the believers.
-                </p>
-                <p className="leading-relaxed">
-                  The enlightening knowledge presented in this section of the book deeply explores the historical context (Shan-e-Nuzool) of the revelation, answering common misconceptions and illustrating how the teachings apply to modern times, particularly for the youth of Shiayaan-e-Ali navigating contemporary challenges.
-                </p>
+                {lazyLoading ? (
+                  <div className="py-8 flex flex-col items-center justify-center text-center">
+                    <Loader2 className="w-6 h-6 text-emerald-600 animate-spin mb-4" />
+                    <p className="text-stone-500">Loading exact tafseer from Tafseer-e-Namoona...</p>
+                  </div>
+                ) : (
+                  <div>
+                    {tafseerLanguages.includes('en') && (
+                       <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                         <h5 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-2">English Tafseer</h5>
+                         <p className="text-stone-600 dark:text-stone-400 italic">English tafseer coming soon.</p>
+                       </div>
+                    )}
+                    {tafseerLanguages.includes('ur') && lazyTafseer && (
+                      <div dir="rtl" className="font-arabic leading-loose text-right text-stone-800 dark:text-stone-200">
+                        <Markdown>{lazyTafseer}</Markdown>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 text-xs text-stone-500 dark:text-stone-400">
                   <p>Source: Tafseer-e-Namoona (تفسیر نمونه) by Ayatollah Naser Makarem Shirazi and other scholars.</p>
                   <a 

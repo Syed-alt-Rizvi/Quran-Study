@@ -30,6 +30,7 @@ interface SettingsState {
   tafseerNotes: Record<string, string>;
   showTranslation: boolean;
   translationLanguages: ('en' | 'ur')[];
+  tafseerLanguages: ('en' | 'ur')[];
   readProgress: Record<number, number>; // Maps surahId to highest read ayahNumber
   reminderTime: string | null; // HH:MM format
   
@@ -39,6 +40,7 @@ interface SettingsState {
   setEnglishFont: (font: string) => void;
   toggleShowTranslation: () => void;
   toggleTranslationLanguage: (lang: 'en' | 'ur') => void;
+  toggleTafseerLanguage: (lang: 'en' | 'ur') => void;
   setHasSeenWelcome: (seen: boolean) => void;
   addBookmark: (bookmark: Bookmark) => void;
   removeBookmark: (surahId: number, ayahNumber: number) => void;
@@ -64,6 +66,7 @@ export const useSettingsStore = create<SettingsState>()(
       tafseerNotes: {},
       showTranslation: true,
       translationLanguages: ['en'],
+      tafseerLanguages: ['ur'],
       readProgress: {},
       reminderTime: null,
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
@@ -75,6 +78,11 @@ export const useSettingsStore = create<SettingsState>()(
         translationLanguages: state.translationLanguages.includes(lang)
           ? state.translationLanguages.filter(l => l !== lang)
           : [...state.translationLanguages, lang]
+      })),
+      toggleTafseerLanguage: (lang) => set((state) => ({
+        tafseerLanguages: state.tafseerLanguages.includes(lang)
+          ? state.tafseerLanguages.filter(l => l !== lang)
+          : [...state.tafseerLanguages, lang]
       })),
       setHasSeenWelcome: (seen) => set({ hasSeenWelcome: seen }),
       addBookmark: (bookmark) => set((state) => ({ 

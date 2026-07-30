@@ -9,8 +9,8 @@ import DuaScreen from './components/DuaScreen';
 import { AnimatePresence } from 'motion/react';
 
 export default function App() {
-  const { isDarkMode, hasSeenWelcome, setHasSeenWelcome, englishFont } = useSettingsStore();
-  const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome);
+  const { isDarkMode, englishFont } = useSettingsStore();
+  const [showWelcome, setShowWelcome] = useState(true);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,15 +25,42 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  useEffect(() => {
+    let appListener: any;
+    import('@capacitor/app').then(({ App }) => {
+      appListener = App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) {
+          setShowWelcome(true);
+          setIsExiting(false);
+        }
+      });
+    }).catch(() => {
+      // Ignore if capacitor is not available
+    });
+
+    return () => {
+      if (appListener) {
+        appListener.then((listener: any) => listener.remove());
+      }
+    };
+  }, []);
+
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
-    setHasSeenWelcome(true);
   };
 
-  const handleExitComplete = () => {
-    // In a real PWA/Android app, this might close the window/activity.
-    // For this web view, we'll just reset state to show Home.
-    setIsExiting(false);
+  const handleExitComplete = async () => {
+    try {
+      const { App: CapacitorApp } = await import('@capacitor/app');
+      await CapacitorApp.exitApp();
+    } catch (e) {
+      console.warn("Could not exit app using capacitor", e);
+      window.close();
+      // Fallback for web if window.close() is blocked
+      setTimeout(() => {
+        window.location.href = 'about:blank';
+      }, 100);
+    }
   };
 
   return (

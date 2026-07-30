@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchSurahDetail, SurahDetail, Ayah, fetchTafseer, TafseerItem } from '../api';
+import { fetchSurahDetail, SurahDetail, Ayah, TafseerItem } from '../api';
+import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
+import Markdown from 'react-markdown';
 import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -10,100 +12,26 @@ interface SurahViewProps {
   onBack: () => void;
 }
 
-function TafseerContent({ item, noteKeyPrefix }: { item: TafseerItem; noteKeyPrefix?: string }) {
-  const { tafseerNotes, saveTafseerNote } = useSettingsStore();
-  const [editingNoteFor, setEditingNoteFor] = useState<number | null>(null);
-  const [noteText, setNoteText] = useState('');
-
-  const handleSaveNote = (bIdx: number) => {
-    if (noteKeyPrefix) {
-      saveTafseerNote(`${noteKeyPrefix}-${bIdx}`, noteText);
-    }
-    setEditingNoteFor(null);
-  };
-
-  return (
-    <div className="space-y-8">
-      {item.tafseer.map((block, bIdx) => {
-        const currentNoteKey = noteKeyPrefix ? `${noteKeyPrefix}-${bIdx}` : null;
-        const savedNote = currentNoteKey ? tafseerNotes[currentNoteKey] : null;
-
-        return (
-          <div key={bIdx} className="relative group">
-            {block.header && (
-              <h5 className="font-bold text-stone-800 dark:text-stone-200 mb-3 text-lg font-serif">
-                {block.header}
-              </h5>
-            )}
-            <div className="space-y-4 leading-relaxed">
-              {block.paragraphs.map((p, pIdx) => (
-                <p key={pIdx}>{p}</p>
-              ))}
-            </div>
-
-            {/* Note taking section */}
-            {noteKeyPrefix && (
-              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800/50">
-                {editingNoteFor === bIdx ? (
-                  <div className="space-y-3">
-                    <textarea
-                      value={noteText}
-                      onChange={(e) => setNoteText(e.target.value)}
-                      placeholder="Write your notes here..."
-                      className="w-full p-3 text-sm rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-900/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-y min-h-[100px] dark:text-stone-200"
-                    />
-                    <div className="flex justify-end gap-2">
-                      <button 
-                        onClick={() => setEditingNoteFor(null)}
-                        className="px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 dark:hover:text-stone-300"
-                      >
-                        Cancel
-                      </button>
-                      <button 
-                        onClick={() => handleSaveNote(bIdx)}
-                        className="px-3 py-1.5 text-xs font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                      >
-                        Save Note
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-start justify-between gap-4">
-                    {savedNote ? (
-                      <div className="flex-1 bg-yellow-50/50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-100 dark:border-yellow-900/30">
-                        <div className="flex items-center gap-2 mb-2 text-yellow-800 dark:text-yellow-500 text-xs font-bold uppercase tracking-wider">
-                          <FileText size={14} />
-                          Your Note
-                        </div>
-                        <p className="text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap">{savedNote}</p>
-                      </div>
-                    ) : <div />}
-                    
-                    <button
-                      onClick={() => {
-                        setNoteText(savedNote || '');
-                        setEditingNoteFor(bIdx);
-                      }}
-                      className={`text-xs font-medium px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition-opacity ${savedNote ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                    >
-                      {savedNote ? 'Edit Note' : '+ Add Note'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function AyahCard({ ayah, surah, tafseerItem }: { key?: string | number; ayah: Ayah; surah: SurahDetail; tafseerItem?: TafseerItem | null }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages } = useSettingsStore();
+function AyahCard({ ayah, surah }: { key?: string | number; ayah: Ayah; surah: SurahDetail }) {
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages } = useSettingsStore();
   const [showDetailedTafseer, setShowDetailedTafseer] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [lazyTafseer, setLazyTafseer] = useState<string | null>(null);
+  const [lazyLoading, setLazyLoading] = useState(false);
+
+  useEffect(() => {
+    if (showDetailedTafseer && !lazyTafseer) {
+      setLazyLoading(true);
+      fetchTafseer(surah.number, ayah.numberInSurah)
+        .then(res => setLazyTafseer(res))
+        .catch(err => {
+          console.error(err);
+          setLazyTafseer("Tafseer for this Ayah could not be found or failed to load.");
+        })
+        .finally(() => setLazyLoading(false));
+    }
+  }, [showDetailedTafseer, surah.number, ayah.numberInSurah, lazyTafseer]);
 
   const bookmarked = isBookmarked(surah.number, ayah.numberInSurah);
   const isLastRead = lastRead?.surahId === surah.number && lastRead?.ayahNumber === ayah.numberInSurah;
@@ -262,12 +190,24 @@ function AyahCard({ ayah, surah, tafseerItem }: { key?: string | number; ayah: A
                 Tafseer-e-Namoona Discussion
               </h4>
               <div className="prose prose-stone dark:prose-invert max-w-none text-sm md:text-base text-stone-700 dark:text-stone-300">
-                {tafseerItem ? (
-                  <TafseerContent item={tafseerItem} noteKeyPrefix={`${surah.number}-${ayah.numberInSurah}`} />
-                ) : (
+                {lazyLoading ? (
                   <div className="py-8 flex flex-col items-center justify-center text-center">
                     <Loader2 className="w-6 h-6 text-emerald-600 animate-spin mb-4" />
-                    <p className="text-stone-500">Loading exact tafseer or none found for this specific verse...</p>
+                    <p className="text-stone-500">Loading exact tafseer from Tafseer-e-Namoona...</p>
+                  </div>
+                ) : (
+                  <div>
+                    {tafseerLanguages.includes('en') && (
+                       <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                         <h5 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-2">English Tafseer</h5>
+                         <p className="text-stone-600 dark:text-stone-400 italic">English tafseer coming soon.</p>
+                       </div>
+                    )}
+                    {tafseerLanguages.includes('ur') && lazyTafseer && (
+                      <div dir="rtl" className="font-arabic leading-loose text-right text-stone-800 dark:text-stone-200">
+                        <Markdown>{lazyTafseer}</Markdown>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -281,9 +221,7 @@ function AyahCard({ ayah, surah, tafseerItem }: { key?: string | number; ayah: A
 
 export default function SurahView({ surahId, onBack }: SurahViewProps) {
   const [surah, setSurah] = useState<SurahDetail | null>(null);
-  const [tafseerData, setTafseerData] = useState<TafseerItem[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tafseerLoading, setTafseerLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'text' | 'tafseer'>('text');
   const { fontSize } = useSettingsStore();
 
@@ -309,18 +247,6 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         setLoading(false);
       })
       .catch(console.error);
-      
-    // Fetch tafseer data in parallel
-    setTafseerLoading(true);
-    fetchTafseer(surahId)
-      .then(data => {
-        setTafseerData(data);
-        setTafseerLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load tafseer", err);
-        setTafseerLoading(false);
-      });
   }, [surahId]);
 
   if (loading || !surah) {
@@ -386,23 +312,11 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         {activeTab === 'text' ? (
           <div className="space-y-12">
             {surah.ayahs.map((ayah) => {
-              let matchedTafseer = null;
-              if (tafseerData) {
-                const normAyah = normalizeArabic(ayah.text);
-                matchedTafseer = tafseerData.find(item => 
-                  item.verses.some(v => {
-                    const normV = normalizeArabic(v);
-                    return normV.includes(normAyah.substring(0, 20)) || normAyah.includes(normV.substring(0, 20));
-                  })
-                );
-              }
-              
               return (
                 <AyahCard 
                   key={ayah.numberInSurah} 
                   ayah={ayah} 
                   surah={surah} 
-                  tafseerItem={matchedTafseer} 
                 />
               );
             })}
@@ -418,36 +332,9 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               <div className="prose prose-stone dark:prose-invert max-w-none">
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl mb-6 border border-emerald-200 dark:border-emerald-800">
                   <p className="text-sm text-emerald-800 dark:text-emerald-300 font-medium m-0">
-                    This section contains the direct, unaltered version of Tafseer-e-Namoona from the official source, providing enlightening knowledge without abridgment.
+                    To view the Tafseer-e-Namoona, please read the Ayahs and open the Tafseer from the specific Ayah card.
                   </p>
                 </div>
-                
-                {tafseerLoading ? (
-                  <div className="flex justify-center py-12">
-                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                  </div>
-                ) : tafseerData ? (
-                  <div className="space-y-12 mt-8">
-                    {tafseerData.map((item, index) => (
-                      <div key={index} className="border-b border-stone-200 dark:border-stone-800 pb-12 last:border-0">
-                        {item.verses.length > 0 && (
-                          <div className="bg-stone-50 dark:bg-stone-950 p-6 rounded-2xl mb-8">
-                            {item.verses.map((verse, vIdx) => (
-                              <p key={vIdx} className="font-arabic text-right text-2xl leading-loose text-stone-900 dark:text-stone-100 mb-4 last:mb-0">
-                                {verse}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                        <TafseerContent item={item} noteKeyPrefix={`${surah.number}-full-${index}`} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-stone-500">
-                    Failed to load detailed tafseer.
-                  </div>
-                )}
               </div>
             </div>
           </div>

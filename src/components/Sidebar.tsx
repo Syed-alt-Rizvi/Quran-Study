@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Moon, Sun, Type, Info, Bookmark, Pilcrow } from 'lucide-react';
+import { X, Moon, Sun, Type, Info, Bookmark, Pilcrow, BookOpen } from 'lucide-react';
 import { useSettingsStore } from '../store';
 
 interface SidebarProps {
@@ -15,6 +15,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     englishFont, setEnglishFont,
     showTranslation, toggleShowTranslation,
     translationLanguages, toggleTranslationLanguage,
+    tafseerLanguages, toggleTafseerLanguage,
     reminderTime, setReminderTime,
     bookmarks, removeBookmark 
   } = useSettingsStore();
@@ -162,6 +163,28 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* Tafseer Language Toggle */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-stone-700 dark:text-stone-300 mb-2">
+                  <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-medium">Tafseer Language</span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => toggleTafseerLanguage('en')}
+                    className={`flex-1 p-3 rounded-xl border text-sm font-medium transition-colors ${tafseerLanguages.includes('en') ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400' : 'bg-white border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400'}`}
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => toggleTafseerLanguage('ur')}
+                    className={`flex-1 p-3 rounded-xl border text-sm font-medium transition-colors ${tafseerLanguages.includes('ur') ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400' : 'bg-white border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400'}`}
+                  >
+                    Urdu
+                  </button>
+                </div>
               </div>
 
               {/* Daily Reminder */}
