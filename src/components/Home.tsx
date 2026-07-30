@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchSurahs, SurahMeta } from '../api';
-import { Search, BookOpen, Settings, LogOut } from 'lucide-react';
+import { Search, BookOpen, Settings, LogOut } from "lucide-react";
+import DynamicBanner from "./DynamicBanner";
 import { useSettingsStore } from '../store';
 
 interface HomeProps {
@@ -102,27 +103,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
           </div>
         </div>
       </header>
+      <main className="max-w-3xl mx-auto px-4 py-6">
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-        {/* Hadith Banner */}
-        <div className="mb-8 p-6 bg-emerald-700 dark:bg-emerald-900 rounded-2xl relative overflow-hidden shadow-lg border border-emerald-600 dark:border-emerald-800">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-emerald-600/30 dark:bg-emerald-800/30 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-emerald-800/30 dark:bg-emerald-950/30 rounded-full blur-3xl"></div>
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <h4 className="text-emerald-100 font-semibold uppercase tracking-widest text-xs mb-3">Hadith al-Thaqalayn</h4>
-            <p className="font-arabic text-3xl md:text-5xl text-white leading-loose mb-6 drop-shadow-md" style={{ fontFamily: "'Thuluth', 'Amiri Quran', serif" }}>
-              إِنِّي تَارِكٌ فِيكُمْ الثَّقَلَيْنِ كِتَابَ اللَّهِ وَعِتْرَتِي أَهْلَ بَيْتِي
-            </p>
-            <p className="text-emerald-50 text-sm md:text-base leading-relaxed max-w-xl mx-auto mb-3">
-              "Indeed, I am leaving among you two weighty things: the Book of Allah and my progeny, the members of my household."
-            </p>
-            <div className="bg-emerald-800/50 dark:bg-emerald-950/50 px-4 py-1.5 rounded-full backdrop-blur-sm">
-              <p className="text-xs text-emerald-200 font-medium tracking-wide">
-                Sahih Muslim 2408 • Sahih Bukhari (Concept)
-              </p>
-            </div>
-          </div>
-        </div>
+        <DynamicBanner />
 
         <div className="relative mb-8">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">

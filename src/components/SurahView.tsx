@@ -172,7 +172,7 @@ function AyahCard({ ayah, surah }: { key?: string | number; ayah: Ayah; surah: S
         className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-500 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
       >
         <BookOpen size={16} />
-        {showDetailedTafseer ? 'Hide Detailed Tafseer-e-Namoona' : 'Read Detailed Tafseer-e-Namoona'}
+        {showDetailedTafseer ? 'Hide Tafseer' : 'Tafseer'}
         {showDetailedTafseer ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
 
