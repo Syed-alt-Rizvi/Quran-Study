@@ -222,7 +222,6 @@ function AyahCard({ ayah, surah }: { key?: string | number; ayah: Ayah; surah: S
 export default function SurahView({ surahId, onBack }: SurahViewProps) {
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'text' | 'tafseer'>('text');
   const { fontSize } = useSettingsStore();
 
   const normalizeArabic = (text: string) => {
@@ -272,29 +271,6 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
             <p className="text-xs text-stone-500 font-arabic">{surah.name}</p>
           </div>
         </div>
-        
-        <div className="max-w-3xl mx-auto mt-4 flex gap-2">
-          <button
-            onClick={() => setActiveTab('text')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeTab === 'text'
-                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 shadow-sm'
-                : 'text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
-            }`}
-          >
-            Arabic & Translation
-          </button>
-          <button
-            onClick={() => setActiveTab('tafseer')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeTab === 'tafseer'
-                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 shadow-sm'
-                : 'text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
-            }`}
-          >
-            Detailed Tafseer
-          </button>
-        </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
@@ -309,7 +285,6 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
           </div>
         )}
 
-        {activeTab === 'text' ? (
           <div className="space-y-12">
             {surah.ayahs.map((ayah) => {
               return (
@@ -321,24 +296,6 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               );
             })}
           </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 shadow-sm border border-stone-200 dark:border-stone-800">
-              <h3 className="text-xl font-bold text-stone-900 dark:text-stone-100 mb-6 flex items-center gap-3">
-                <BookOpen className="text-emerald-600 dark:text-emerald-500" />
-                Tafseer-e-Namoona Discussion
-              </h3>
-              
-              <div className="prose prose-stone dark:prose-invert max-w-none">
-                <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl mb-6 border border-emerald-200 dark:border-emerald-800">
-                  <p className="text-sm text-emerald-800 dark:text-emerald-300 font-medium m-0">
-                    To view the Tafseer-e-Namoona, please read the Ayahs and open the Tafseer from the specific Ayah card.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Citation Box at the bottom */}
         <div className="mt-16 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-6">
