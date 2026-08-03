@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { fetchJuzDetail, JuzDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
@@ -257,10 +258,10 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
         <div className="space-y-12">
           {juz.ayahs.map((ayah, index) => {
             const isNewSurah = index === 0 || ayah.surahNumber !== juz.ayahs[index - 1].surahNumber;
-            const isSurahStart = isNewSurah && ayah.numberInSurah === 1;
+            const isSurahStart = ayah.numberInSurah === 1;
 
             return (
-              <React.Fragment key={`${ayah.surahNumber}-${ayah.numberInSurah}-${index}`}>
+              <div key={`${ayah.surahNumber}-${ayah.numberInSurah}-${index}`}>
                 {isNewSurah && (
                   <div className="text-center my-12 pt-8">
                     {index > 0 && <hr className="mb-12 border-stone-200 dark:border-stone-800" />}
@@ -278,7 +279,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
                   </div>
                 )}
                 <AyahCard ayah={ayah} juz={juz} />
-              </React.Fragment>
+              </div>
             );
           })}
         </div>
