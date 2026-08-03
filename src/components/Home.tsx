@@ -18,7 +18,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'surah' | 'juz'>('surah');
   
-  const { readProgress } = useSettingsStore();
+  const { readProgress, lastRead } = useSettingsStore();
 
   useEffect(() => {
     fetchSurahs()
@@ -106,6 +106,21 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       <main className="max-w-3xl mx-auto px-4 py-6">
 
         <DynamicBanner />
+        {lastRead && (
+          <div className="mb-8 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">Continue Reading</p>
+              <h3 className="font-semibold text-stone-900 dark:text-stone-100">{lastRead.surahName || ('Surah ' + lastRead.surahId)} &bull; Ayah {lastRead.ayahNumber}</h3>
+            </div>
+            <button 
+              onClick={() => onSelectSurah(lastRead.surahId)} 
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl transition-colors"
+            >
+              Resume
+            </button>
+          </div>
+        )}
+
 
         <div className="relative mb-8">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">

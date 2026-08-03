@@ -35,7 +35,7 @@ export const fetchSurahs = async (): Promise<SurahMeta[]> => {
   const response = await fetch('https://api.alquran.cloud/v1/surah');
   if (!response.ok) throw new Error('Failed to fetch surahs');
   const data = await response.json();
-  surahMetaCache.push(...data.data);
+  if (surahMetaCache.length === 0) { surahMetaCache.push(...data.data); }
   return data.data;
 };
 

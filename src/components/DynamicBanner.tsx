@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Sparkles, Quote } from 'lucide-react';
 
 const BANNERS = [
   {
@@ -47,42 +48,57 @@ export default function DynamicBanner() {
   const current = BANNERS[currentIndex];
 
   return (
-    <div className="mb-8 p-6 bg-emerald-700 dark:bg-emerald-900 rounded-2xl relative overflow-hidden shadow-lg border border-emerald-600 dark:border-emerald-800">
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-emerald-600/30 dark:bg-emerald-800/30 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-emerald-800/30 dark:bg-emerald-950/30 rounded-full blur-3xl"></div>
+    <div className="mb-8 p-6 md:p-10 bg-gradient-to-br from-emerald-800 to-teal-900 dark:from-emerald-900 dark:to-teal-950 rounded-[2rem] relative overflow-hidden shadow-2xl shadow-emerald-900/20 border border-emerald-500/20">
+      {/* Decorative Ornaments */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-400/5 rounded-full blur-3xl -ml-20 -mb-20"></div>
       
-      <div className="relative z-10 flex flex-col items-center text-center h-[280px] md:h-[220px] justify-center">
+      {/* Subtle Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+      
+      <div className="relative z-10 flex flex-col items-center text-center min-h-[300px] md:min-h-[240px] justify-center">
+        <Quote className="absolute top-0 left-0 text-white/10 w-24 h-24 -mt-4 -ml-4" />
+        
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center w-full"
+            initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="flex flex-col items-center w-full relative z-10"
           >
-            <h4 className="text-emerald-100 font-semibold uppercase tracking-widest text-xs mb-4">{current.title}</h4>
-            <p className="font-arabic text-2xl md:text-4xl text-white leading-loose mb-5 drop-shadow-md" style={{ fontFamily: "'Thuluth', 'Amiri Quran', serif" }}>
+            <div className="flex items-center gap-2 mb-6">
+              <Sparkles className="w-4 h-4 text-emerald-300/80" />
+              <h4 className="text-emerald-100/90 font-medium tracking-[0.2em] text-xs uppercase font-serif">
+                {current.title}
+              </h4>
+              <Sparkles className="w-4 h-4 text-emerald-300/80" />
+            </div>
+            
+            <p className="font-arabic text-3xl md:text-5xl text-white leading-loose mb-6 drop-shadow-lg" style={{ fontFamily: "'Thuluth', 'Amiri Quran', serif", textShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
               {current.arabic}
             </p>
-            <p className="text-emerald-50 text-sm md:text-base leading-relaxed max-w-xl mx-auto mb-4">
+            
+            <p className="text-emerald-50/90 font-serif italic text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
               {current.translation}
             </p>
-            <div className="bg-emerald-800/50 dark:bg-emerald-950/50 px-4 py-1.5 rounded-full backdrop-blur-sm mt-auto">
-              <p className="text-xs text-emerald-200 font-medium tracking-wide">
+            
+            <div className="bg-black/20 px-5 py-2 rounded-full border border-white/10 backdrop-blur-md mt-auto">
+              <p className="text-xs text-emerald-100/70 font-medium tracking-wide uppercase">
                 {current.citation}
               </p>
             </div>
           </motion.div>
         </AnimatePresence>
         
-        <div className="absolute bottom-0 flex gap-2 pt-2">
+        <div className="absolute bottom-0 flex gap-3 pt-4">
           {BANNERS.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                i === currentIndex ? 'bg-emerald-300 w-4' : 'bg-emerald-500/50 hover:bg-emerald-400'
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                i === currentIndex ? 'bg-white w-6 opacity-100' : 'bg-white/30 hover:bg-white/50 opacity-50'
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

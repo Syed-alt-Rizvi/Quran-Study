@@ -1,20 +1,16 @@
 import { Capacitor } from '@capacitor/core';
 import { CapacitorHttp } from '@capacitor/core';
 
+export interface TafseerContent {
+  ur: string;
+  en: string;
+}
+
 // In-memory cache
-const memoryCache: Record<string, string> = {};
+const memoryCache: Record<string, TafseerContent> = {};
 
-export interface TafseerTopic {
-  title: string;
-  details: string;
-}
-
-export interface AyahTafseer {
-  topics: TafseerTopic[];
-}
-
-export async function fetchTafseer(surahNumber: number, ayahNumber: number): Promise<string> {
-  const cacheKey = `tafseer_${surahNumber}_${ayahNumber}`;
+export async function fetchTafseer(surahNumber: number, ayahNumber: number): Promise<TafseerContent> {
+  const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v3`;
   
   // 1. Check in-memory cache
   if (memoryCache[cacheKey]) {
@@ -24,8 +20,13 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
   // 2. Check localStorage
   const localData = localStorage.getItem(cacheKey);
   if (localData) {
-    memoryCache[cacheKey] = localData;
-    return localData;
+    try {
+      const parsed = JSON.parse(localData);
+      memoryCache[cacheKey] = parsed;
+      return parsed;
+    } catch (e) {
+      // ignore
+    }
   }
   
   // 3. Fetch HTML
@@ -50,13 +51,39 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
   let fullPayload = "";
   for (let i = 1; i < parts.length; i++) {
     const part = parts[i];
-    const endIdx = part.indexOf('])');
-    if (endIdx > 0) {
-      const jsonStr = part.substring(0, endIdx + 1);
+    const startIdx = part.indexOf('[');
+    if (startIdx === -1) continue;
+    
+    let parsed = null;
+    let bracketCount = 0;
+    let inString = false;
+    let escape = false;
+    let endIdx = -1;
+    
+    for (let j = startIdx; j < part.length; j++) {
+      const char = part[j];
+      if (!inString) {
+        if (char === '[') bracketCount++;
+        else if (char === ']') {
+          bracketCount--;
+          if (bracketCount === 0) {
+            endIdx = j;
+            break;
+          }
+        } else if (char === '"') inString = true;
+      } else {
+        if (escape) escape = false;
+        else if (char === '\\') escape = true;
+        else if (char === '"') inString = false;
+      }
+    }
+    
+    if (endIdx !== -1) {
       try {
-        const arr = JSON.parse(jsonStr);
-        if (Array.isArray(arr) && arr.length > 1 && typeof arr[1] === 'string') {
-          fullPayload += arr[1];
+        const jsonStr = part.substring(startIdx, endIdx + 1);
+        parsed = JSON.parse(jsonStr);
+        if (parsed && Array.isArray(parsed) && typeof parsed[1] === 'string') {
+          fullPayload += parsed[1];
         }
       } catch (e) {
         // ignore
@@ -91,7 +118,7 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
 
   const ayahRegex = /"ayat_number":(\d+)[\s\S]*?"tafseer_topics":\[([\s\S]*?)\]/g;
   let ayahMatch;
-  let foundTafseer = "";
+  let foundTafseer: TafseerContent | null = null;
   
   // We can parse and cache ALL ayahs for this surah to save network calls
   while ((ayahMatch = ayahRegex.exec(fullPayload)) !== null) {
@@ -99,26 +126,51 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
     const topicsStr = "[" + ayahMatch[2] + "]";
     try {
       const topics = JSON.parse(topicsStr);
-      let combinedText = "";
+      let combinedUrdu = "";
+      let combinedEnglish = "";
+
       for (const topic of topics) {
-        let details = topic.details;
-        if (details && details.startsWith('$')) {
-          details = resolveRef(details) || details;
+        // URDU
+        let detailsUr = topic.details || topic.details_ur;
+        if (detailsUr && detailsUr.startsWith('$')) {
+          detailsUr = resolveRef(detailsUr) || detailsUr;
         }
-        if (details && details.trim().length > 0) {
-          // Combine title and details
-          combinedText += `**${topic.title}**\n\n${details}\n\n`;
+        let titleUr = topic.title || topic.title_ur;
+        if (titleUr && titleUr.startsWith('$')) {
+          titleUr = resolveRef(titleUr) || titleUr;
+        }
+        
+        if (detailsUr && detailsUr.trim().length > 0) {
+          combinedUrdu += `**${titleUr}**\n\n${detailsUr}\n\n`;
+        }
+
+        // ENGLISH
+        let detailsEn = topic.details_en;
+        if (detailsEn && detailsEn.startsWith('$')) {
+          detailsEn = resolveRef(detailsEn) || detailsEn;
+        }
+        let titleEn = topic.title_en;
+        if (titleEn && titleEn.startsWith('$')) {
+          titleEn = resolveRef(titleEn) || titleEn;
+        }
+        
+        if (detailsEn && detailsEn.trim().length > 0) {
+          combinedEnglish += `**${titleEn}**\n\n${detailsEn}\n\n`;
         }
       }
       
-      const cleanText = combinedText.trim();
-      if (cleanText) {
-        const aKey = `tafseer_${surahNumber}_${currentAyah}`;
-        memoryCache[aKey] = cleanText;
-        localStorage.setItem(aKey, cleanText);
+      const cleanUrdu = combinedUrdu.trim();
+      const cleanEnglish = combinedEnglish.trim();
+      
+      if (cleanUrdu || cleanEnglish) {
+        const aKey = `tafseer_${surahNumber}_${currentAyah}_v3`;
+        const content: TafseerContent = { ur: cleanUrdu, en: cleanEnglish };
+        
+        memoryCache[aKey] = content;
+        localStorage.setItem(aKey, JSON.stringify(content));
         
         if (currentAyah === ayahNumber) {
-          foundTafseer = cleanText;
+          foundTafseer = content;
         }
       }
     } catch (e) {
@@ -129,7 +181,7 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
   if (foundTafseer) {
     return foundTafseer;
   }
-
+  
   throw new Error("Tafseer not found for this Ayah.");
 }
 

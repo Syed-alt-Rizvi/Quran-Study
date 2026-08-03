@@ -17,7 +17,7 @@ function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDe
   const [showDetailedTafseer, setShowDetailedTafseer] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [lazyTafseer, setLazyTafseer] = useState<string | null>(null);
+  const [lazyTafseer, setLazyTafseer] = useState<any>(null);
   const [lazyLoading, setLazyLoading] = useState(false);
   
   const surahId = ayah.surahNumber || 1;
@@ -74,7 +74,7 @@ function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDe
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      className={`group relative p-4 rounded-2xl transition-colors ${isLastRead ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30' : ''}`}
+      className={`group relative p-6 border-b border-stone-200/70 dark:border-stone-800/70 last:border-0 transition-colors ${isLastRead ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}`}
       onPointerDown={handlePressStart}
       onPointerUp={handlePressEnd}
       onPointerLeave={handlePressEnd}
@@ -95,7 +95,7 @@ function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDe
             <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Last Read</span>
           )}
         </div>
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           {!isLastRead && (
             <button
               onClick={handleMarkAsRead}
@@ -173,17 +173,22 @@ function AyahCard({ ayah, juz }: { key?: string | number; ayah: Ayah; juz: JuzDe
                     <Loader2 className="w-6 h-6 text-emerald-600 animate-spin mb-4" />
                     <p className="text-stone-500">Loading exact tafseer from Tafseer-e-Namoona...</p>
                   </div>
+                ) : typeof lazyTafseer === 'string' ? (
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl">
+                    {lazyTafseer}
+                  </div>
                 ) : (
                   <div>
-                    {tafseerLanguages.includes('en') && (
+                    {tafseerLanguages.includes('en') && lazyTafseer?.en && (
                        <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
                          <h5 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-2">English Tafseer</h5>
-                         <p className="text-stone-600 dark:text-stone-400 italic">English tafseer coming soon.</p>
+                         <Markdown>{lazyTafseer.en}</Markdown>
                        </div>
                     )}
-                    {tafseerLanguages.includes('ur') && lazyTafseer && (
+                    {tafseerLanguages.includes('ur') && lazyTafseer?.ur && (
                       <div dir="rtl" className="font-arabic leading-loose text-right text-stone-800 dark:text-stone-200">
-                        <Markdown>{lazyTafseer}</Markdown>
+                        <h5 dir="ltr" className="font-semibold text-emerald-800 dark:text-emerald-300 mb-2 text-left">Urdu Tafseer</h5>
+                        <Markdown>{lazyTafseer.ur}</Markdown>
                       </div>
                     )}
                   </div>
@@ -243,7 +248,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
           </button>
           <div className="flex-1 text-center pr-10">
             <h1 className="font-bold text-lg text-stone-900 dark:text-stone-100">Juz {juz.number}</h1>
-            <p className="text-xs text-stone-500 font-arabic">الجزء {juz.number}</p>
+            <p className="text-xs text-stone-500 font-arabic">الجزء {juz.number} • {juz.ayahs.length} Ayahs</p>
           </div>
         </div>
       </header>
