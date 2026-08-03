@@ -1,5 +1,10 @@
 {
-	"appId": "com.tafseerenamoona.app",
-	"appName": "Tafseer e Namoona",
-	"webDir": "dist"
+	"appId": "com.shiaquran.app",
+	"appName": "Quran Study",
+	"webDir": "dist",
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	}
 }

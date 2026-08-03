@@ -25,11 +25,10 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
-var cheerio = __toESM(require("cheerio"), 1);
 async function startServer() {
   const app = (0, import_express.default)();
   const PORT = 3e3;
-  app.get("/api/tafseer/surah/:id", async (req, res) => {
+  app.get("/api/tafseer/proxy/:id", async (req, res) => {
     try {
       const id = req.params.id;
       const fetchRes = await fetch(`https://www.tafseerenamoona.net/surahs/${id}`);
@@ -37,53 +36,7 @@ async function startServer() {
         return res.status(fetchRes.status).json({ error: "Failed to fetch from tafseerenamoona.net" });
       }
       const html = await fetchRes.text();
-      const $ = cheerio.load(html);
-      const items = [];
-      let currentVerses = [];
-      let currentTafseerBlocks = [];
-      const elements = $('div[dir="rtl"], h3[dir="ltr"], p[dir="ltr"]');
-      let currentTafseerHeader = null;
-      let currentTafseerContent = [];
-      elements.each((i, el) => {
-        const tagName = el.tagName.toLowerCase();
-        if (tagName === "div" && $(el).css("font-family")?.includes("Noto Naskh")) {
-          if (currentVerses.length > 0 && currentTafseerBlocks.length > 0) {
-            items.push({
-              verses: currentVerses,
-              tafseer: currentTafseerBlocks
-            });
-            currentVerses = [];
-            currentTafseerBlocks = [];
-          }
-          currentVerses.push($(el).text().trim());
-        } else if (tagName === "h3") {
-          if (currentTafseerHeader) {
-            currentTafseerBlocks.push({
-              header: currentTafseerHeader,
-              paragraphs: currentTafseerContent
-            });
-          }
-          currentTafseerHeader = $(el).text().replace(/^[0-9\.]+/, "").trim();
-          currentTafseerContent = [];
-        } else if (tagName === "p") {
-          if (currentTafseerHeader) {
-            currentTafseerContent.push($(el).text().trim());
-          }
-        }
-      });
-      if (currentTafseerHeader) {
-        currentTafseerBlocks.push({
-          header: currentTafseerHeader,
-          paragraphs: currentTafseerContent
-        });
-      }
-      if (currentVerses.length > 0) {
-        items.push({
-          verses: currentVerses,
-          tafseer: currentTafseerBlocks
-        });
-      }
-      res.json({ data: items });
+      res.send(html);
     } catch (e) {
       console.error(e);
       res.status(500).json({ error: e.message });
