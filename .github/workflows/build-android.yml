@@ -41,6 +41,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.14.3'
+          cache-disabled: true
         
       - name: Build APK
         working-directory: ./android
@@ -49,5 +50,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Shia-Quran-App.apk
+          name: Quran-Study-App.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
