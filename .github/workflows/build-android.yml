@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -37,13 +37,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      - name: Make gradlew executable
-        working-directory: ./android
-        run: chmod +x gradlew
-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        
       - name: Build APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
