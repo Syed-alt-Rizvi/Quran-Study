@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Moon, Sun, Type, Info, Bookmark, Pilcrow, BookOpen } from 'lucide-react';
+import { X, Moon, Sun, Type, Info, Bookmark, Pilcrow, BookOpen, Heart } from 'lucide-react';
 import { useSettingsStore } from '../store';
 
 interface SidebarProps {
@@ -328,6 +328,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               </div>
             </div>
+            {/* Help Developer Section */}
+            <div className="p-6 bg-violet-50 dark:bg-violet-900/10 border-t border-violet-100 dark:border-violet-900/30">
+              <div className="bg-violet-100 dark:bg-violet-900/30 p-4 rounded-2xl mb-4 border border-violet-200 dark:border-violet-800/50 text-center shadow-sm">
+                <p className="text-sm text-violet-800 dark:text-violet-300 font-medium leading-relaxed">
+                  Help the developer building more such amazing apps for the community. Positive change needs effort. jazakallah
+                </p>
+              </div>
+              <a 
+                href="upi://pay?pa=9906275833@superyes&pn=Developer" 
+                className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 active:bg-violet-800 text-white p-4 rounded-2xl font-semibold shadow-md transition-all active:scale-[0.98]"
+              >
+                <Heart size={20} className="fill-current" />
+                <span>Help</span>
+              </a>
+            </div>
+
           </motion.div>
         </>
       )}
