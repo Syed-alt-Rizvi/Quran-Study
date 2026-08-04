@@ -10,7 +10,7 @@ export interface TafseerContent {
 const memoryCache: Record<string, TafseerContent> = {};
 
 export async function fetchTafseer(surahNumber: number, ayahNumber: number): Promise<TafseerContent> {
-  const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v3`;
+  const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v6`;
   
   // 1. Check in-memory cache
   if (memoryCache[cacheKey]) {
@@ -91,90 +91,138 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
     }
   }
 
-  let encodedFullPayload: Uint8Array | null = null;
+  const textNodes: Record<string, string> = {};
+  const encodedFullPayload = new TextEncoder().encode(fullPayload);
+  const regex = /([0-9a-zA-Z]+):T([0-9a-fA-F]+),/g;
+  let match;
+  let currentByteOffset = 0;
+  let lastStringIndex = 0;
+  
+  while ((match = regex.exec(fullPayload)) !== null) {
+    const id = match[1];
+    const len = parseInt(match[2], 16);
+    
+    const chunk = fullPayload.substring(lastStringIndex, regex.lastIndex);
+    currentByteOffset += new TextEncoder().encode(chunk).length;
+    lastStringIndex = regex.lastIndex;
+    
+    if (currentByteOffset + len <= encodedFullPayload.length) {
+      textNodes[id] = new TextDecoder('utf-8').decode(encodedFullPayload.slice(currentByteOffset, currentByteOffset + len));
+    }
+  }
 
   const resolveRef = (ref: string) => {
-    const id = ref.substring(1);
-    const prefix = `\n${id}:T`;
-    const startIdx = fullPayload.indexOf(prefix);
-    if (startIdx !== -1) {
-      const commaIdx = fullPayload.indexOf(',', startIdx);
-      if (commaIdx !== -1) {
-        const hexLen = fullPayload.substring(startIdx + prefix.length, commaIdx);
-        const len = parseInt(hexLen, 16);
-        if (!isNaN(len)) {
-          // Next.js text lengths are in UTF-8 bytes. 
-          if (!encodedFullPayload) {
-            encodedFullPayload = new TextEncoder().encode(fullPayload);
-          }
-          const byteStartOffset = new TextEncoder().encode(fullPayload.substring(0, commaIdx + 1)).length;
-          const slicedBytes = encodedFullPayload.slice(byteStartOffset, byteStartOffset + len);
-          return new TextDecoder('utf-8').decode(slicedBytes);
-        }
-      }
+    if (!ref) return null;
+    if (ref.startsWith('$')) {
+      const id = ref.substring(1);
+      return textNodes[id] || null;
     }
-    return null;
+    return ref;
   };
 
-  const ayahRegex = /"ayat_number":(\d+)[\s\S]*?"tafseer_topics":\[([\s\S]*?)\]/g;
-  let ayahMatch;
   let foundTafseer: TafseerContent | null = null;
   
-  // We can parse and cache ALL ayahs for this surah to save network calls
-  while ((ayahMatch = ayahRegex.exec(fullPayload)) !== null) {
-    const currentAyah = parseInt(ayahMatch[1], 10);
-    const topicsStr = "[" + ayahMatch[2] + "]";
-    try {
-      const topics = JSON.parse(topicsStr);
-      let combinedUrdu = "";
-      let combinedEnglish = "";
-
-      for (const topic of topics) {
-        // URDU
-        let detailsUr = topic.details || topic.details_ur;
-        if (detailsUr && detailsUr.startsWith('$')) {
-          detailsUr = resolveRef(detailsUr) || detailsUr;
-        }
-        let titleUr = topic.title || topic.title_ur;
-        if (titleUr && titleUr.startsWith('$')) {
-          titleUr = resolveRef(titleUr) || titleUr;
-        }
-        
-        if (detailsUr && detailsUr.trim().length > 0) {
-          combinedUrdu += `**${titleUr}**\n\n${detailsUr}\n\n`;
-        }
-
-        // ENGLISH
-        let detailsEn = topic.details_en;
-        if (detailsEn && detailsEn.startsWith('$')) {
-          detailsEn = resolveRef(detailsEn) || detailsEn;
-        }
-        let titleEn = topic.title_en;
-        if (titleEn && titleEn.startsWith('$')) {
-          titleEn = resolveRef(titleEn) || titleEn;
-        }
-        
-        if (detailsEn && detailsEn.trim().length > 0) {
-          combinedEnglish += `**${titleEn}**\n\n${detailsEn}\n\n`;
-        }
+  // Custom parser to properly extract tafseer_topics array without breaking on inner brackets
+  let searchIdx = 0;
+  while (true) {
+    const ayatNumIdx = fullPayload.indexOf('"ayat_number":', searchIdx);
+    if (ayatNumIdx === -1) break;
+    
+    const numStart = ayatNumIdx + 14;
+    let numEnd = numStart;
+    while (numEnd < fullPayload.length && /[0-9]/.test(fullPayload[numEnd])) {
+      numEnd++;
+    }
+    const currentAyah = parseInt(fullPayload.substring(numStart, numEnd), 10);
+    
+    const topicsKeyIdx = fullPayload.indexOf('"tafseer_topics":', numEnd);
+    if (topicsKeyIdx === -1) break;
+    
+    const arrayStartIdx = fullPayload.indexOf('[', topicsKeyIdx);
+    if (arrayStartIdx === -1) {
+      searchIdx = topicsKeyIdx + 17;
+      continue;
+    }
+    
+    let bracketCount = 0;
+    let inString = false;
+    let escape = false;
+    let arrayEndIdx = -1;
+    
+    for (let j = arrayStartIdx; j < fullPayload.length; j++) {
+      const char = fullPayload[j];
+      if (!inString) {
+        if (char === '[') bracketCount++;
+        else if (char === ']') {
+          bracketCount--;
+          if (bracketCount === 0) {
+            arrayEndIdx = j;
+            break;
+          }
+        } else if (char === '"') inString = true;
+      } else {
+        if (escape) escape = false;
+        else if (char === '\\') escape = true;
+        else if (char === '"') inString = false;
       }
-      
-      const cleanUrdu = combinedUrdu.trim();
-      const cleanEnglish = combinedEnglish.trim();
-      
-      if (cleanUrdu || cleanEnglish) {
-        const aKey = `tafseer_${surahNumber}_${currentAyah}_v3`;
-        const content: TafseerContent = { ur: cleanUrdu, en: cleanEnglish };
+    }
+    
+    searchIdx = arrayEndIdx !== -1 ? arrayEndIdx : arrayStartIdx + 1;
+    
+    if (arrayEndIdx !== -1) {
+      const topicsStr = fullPayload.substring(arrayStartIdx, arrayEndIdx + 1);
+      try {
+        const topics = JSON.parse(topicsStr);
+        let combinedUrdu = "";
+        let combinedEnglish = "";
         
-        memoryCache[aKey] = content;
-        localStorage.setItem(aKey, JSON.stringify(content));
-        
-        if (currentAyah === ayahNumber) {
-          foundTafseer = content;
+        for (const topic of topics) {
+          // URDU
+          let detailsUr = topic.details || topic.details_ur;
+          detailsUr = resolveRef(detailsUr);
+          let titleUr = topic.title || topic.title_ur;
+          titleUr = resolveRef(titleUr);
+          
+          if (detailsUr && detailsUr.trim().length > 0) {
+            combinedUrdu += `**${titleUr || 'Tafseer'}**
+
+${detailsUr}
+
+`;
+          }
+          
+          // ENGLISH
+          let detailsEn = topic.details_en;
+          detailsEn = resolveRef(detailsEn);
+          let titleEn = topic.title_en;
+          titleEn = resolveRef(titleEn);
+          
+          if (detailsEn && detailsEn.trim().length > 0) {
+            combinedEnglish += `**${titleEn || 'Tafseer'}**
+
+${detailsEn}
+
+`;
+          }
         }
+        
+        const cleanUrdu = combinedUrdu.trim();
+        const cleanEnglish = combinedEnglish.trim();
+        
+        if (cleanUrdu || cleanEnglish) {
+          const aKey = `tafseer_${surahNumber}_${currentAyah}_v6`;
+          const content: TafseerContent = { ur: cleanUrdu, en: cleanEnglish };
+          
+          memoryCache[aKey] = content;
+          localStorage.setItem(aKey, JSON.stringify(content));
+          
+          if (currentAyah === ayahNumber) {
+            foundTafseer = content;
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing topics for ayah", currentAyah, e);
       }
-    } catch (e) {
-      console.error("Error parsing topics for ayah", currentAyah, e);
     }
   }
 
