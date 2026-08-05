@@ -1,18 +1,14 @@
 name: Build Android APK
-
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          lfs: true
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,8 +28,7 @@ jobs:
           else
             npx cap sync android
           fi
-
-        
+          
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
