@@ -33,10 +33,6 @@ jobs:
             npx cap sync android
           fi
 
-      - name: Generate Assets
-        run: |
-          npm install -D @capacitor/assets
-          npx capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222'
         
       - name: Set up JDK 21
         uses: actions/setup-java@v4
