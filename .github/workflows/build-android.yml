@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -20,11 +22,6 @@ jobs:
         
       - name: Build Web App
         run: npm run build
-        
-      - name: Decode Icon
-        run: |
-          mkdir -p assets
-          node -e "require('fs').writeFileSync('assets/icon.png', Buffer.from(require('fs').readFileSync('icon.b64', 'utf8'), 'base64'));"
         
       - name: Sync Capacitor
         run: |
