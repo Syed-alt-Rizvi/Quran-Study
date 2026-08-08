@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchSurahDetail, SurahDetail, Ayah, TafseerItem } from '../api';
+import { fetchSurahDetail, SurahDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import Markdown from 'react-markdown';
@@ -264,7 +264,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-safe">
       <header className="sticky top-0 z-30 bg-stone-50/90 dark:bg-stone-950/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-4 py-4">
-        <div className="max-w-3xl mx-auto flex items-center gap-4">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center gap-4">
           <button 
             onClick={onBack}
             className="p-2 -ml-2 text-stone-600 hover:text-emerald-600 dark:text-stone-400 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors"
@@ -278,7 +278,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-8">
         {surah.number !== 1 && surah.number !== 9 && (
           <div className="text-center mb-12">
             <h2 

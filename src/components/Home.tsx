@@ -81,7 +81,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
   return (
     <div className="min-h-screen pb-safe">
       <header className="sticky top-0 z-30 bg-stone-50/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-4 py-4 sm:px-6">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 text-emerald-700 dark:text-emerald-500">
             <BookOpen size={28} />
             <h1 className="text-xl font-bold tracking-tight">Quran Study</h1>
@@ -103,7 +103,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
           </div>
         </div>
       </header>
-      <main className="max-w-3xl mx-auto px-4 py-6">
+      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6">
 
         <DynamicBanner />
         {lastRead && (

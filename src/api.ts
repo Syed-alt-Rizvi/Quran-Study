@@ -123,20 +123,3 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
   juzDetailCache.set(id, result);
   return result;
 };
-
-export interface TafseerBlock {
-  header: string;
-  paragraphs: string[];
-}
-
-export interface TafseerItem {
-  verses: string[];
-  tafseer: TafseerBlock[];
-}
-
-export const fetchTafseer = async (id: number): Promise<TafseerItem[]> => {
-  const res = await fetch(`/api/tafseer/surah/${id}`);
-  if (!res.ok) throw new Error('Failed to fetch tafseer');
-  const json = await res.json();
-  return json.data;
-};

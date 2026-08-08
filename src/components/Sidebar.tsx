@@ -316,7 +316,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
               <div className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed space-y-4">
                 <p>
-                  This is an amateur project by Syed Murtaza Rizvi from Kargil, Ladakh, India. I want to make it as easy as possible for our youth (Shiayaan e Ali) around the world and especially around the Barr-e-Sageer to learn and read the Holy Quran and it's meaning, as clearly and easily possible.
+                  Developed by Syed Murtaza Rizvi from Kargil, Ladakh, India. This project is dedicated to empowering the global youth (Shiayaan-e-Ali), particularly across the subcontinent (Barr-e-Sageer), by providing an intuitive and accessible platform to read, learn, and deeply understand the Holy Quran.
                 </p>
                 <p className="font-medium text-emerald-600 dark:text-emerald-500 font-arabic text-lg">Iltemas e dua.</p>
                 <div>
@@ -332,7 +332,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="p-6 bg-violet-50 dark:bg-violet-900/10 border-t border-violet-100 dark:border-violet-900/30">
               <div className="bg-violet-100 dark:bg-violet-900/30 p-4 rounded-2xl mb-4 border border-violet-200 dark:border-violet-800/50 text-center shadow-sm">
                 <p className="text-sm text-violet-800 dark:text-violet-300 font-medium leading-relaxed">
-                  Help the developer building more such amazing apps for the community. Positive change needs effort. jazakallah
+                  Support the developer in building more impactful applications for the community. Positive change requires collective effort. Jazakallah.
                 </p>
               </div>
               <a 
