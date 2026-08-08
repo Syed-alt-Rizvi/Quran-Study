@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,6 +23,21 @@ jobs:
       - name: Build Web App
         run: npm run build
         
+      - name: Verify Images
+        run: |
+          cat << 'SCRIPT' > verify-images.sh
+          #!/usr/bin/env bash
+          set -euo pipefail
+          for f in assets/icon.png assets/splash.png; do
+            if ! head -c 8 "\$f" | xxd -p | grep -qi '^89504e470d0a1a0a'; then
+              echo "ERROR: \$f does not have valid PNG signature" >&2
+              exit 2
+            fi
+            identify -format "%m %z-bit %r %w x %h\n" "\$f" || { echo "identify failed for \$f"; exit 3; }
+          done
+          SCRIPT
+          bash verify-images.sh
+
       - name: Sync Capacitor
         run: |
           if [ ! -d "android" ]; then
