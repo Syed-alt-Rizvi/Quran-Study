@@ -1,4 +1,4 @@
-package com.tafseerenamoona.app;
+package com.shiaquran.app;
 
 import com.getcapacitor.BridgeActivity;
 
