@@ -78,7 +78,7 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "2baa1f03a7a5be3ef3cb07e721b9916c"
+    "revision": "546fcba4da904cb2623f1beb8a04ab3a"
   }, {
     "url": "assets/workbox-window.prod.es5-BBnX5xw4.js",
     "revision": null
@@ -102,16 +102,16 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "apple-touch-icon.png",
-    "revision": "a18781bd5fbebddcb542ae21b044eb17"
+    "revision": "5596dbdce89e82247debbadf2a38f957"
   }, {
     "url": "favicon.png",
-    "revision": "35d75a3c25224cfa82a72d25d7cedac0"
+    "revision": "6fb15f8527cf017fd6e709f6136b297f"
   }, {
     "url": "pwa-192x192.png",
-    "revision": "3c8c476ab20ac58abc98efc002ffb789"
+    "revision": "db9585d6810112d779494eb141b7bed7"
   }, {
     "url": "pwa-512x512.png",
-    "revision": "8f2564b232887bd1dcbb6a27f016a70f"
+    "revision": "41e0053caf38af5d50f7b3ec5662279b"
   }, {
     "url": "manifest.webmanifest",
     "revision": "750c7f34f6ac4e8e81c1567a6f4e703d"
