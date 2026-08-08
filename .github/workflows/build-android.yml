@@ -22,6 +22,19 @@ jobs:
         
       - name: Build Web App
         run: npm run build
+
+      - name: Workaround AI Studio Binary Sync Bug
+        run: |
+          set -ex
+          npm install sharp
+          cat << 'SCRIPT' > convert.cjs
+          const sharp = require('sharp');
+          Promise.all([
+            sharp('assets/icon.svg').resize(1024, 1024).png().toFile('assets/icon.png'),
+            sharp('assets/splash.svg').resize(2732, 2732).png().toFile('assets/splash.png')
+          ]).then(() => console.log('Images generated successfully.')).catch(console.error);
+          SCRIPT
+          node convert.cjs
         
       - name: Verify Images
         run: |
