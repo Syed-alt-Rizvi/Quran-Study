@@ -156,14 +156,14 @@ jobs:
           npm install -D @capacitor/assets --loglevel verbose
           npx capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'
         
-      - name: Install CocoaPods dependencies
+      - name: Resolve SPM Dependencies
         working-directory: ./ios/App
-        run: pod install
+        run: xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
 
       - name: Build iOS App
         working-directory: ./ios/App
         run: |
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY=""
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY=""
           
           # Create IPA
           mkdir -p Payload
