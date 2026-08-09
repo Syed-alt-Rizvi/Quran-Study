@@ -1,0 +1,175 @@
+name: Build Mobile Apps
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --loglevel verbose
+        
+      - name: Build Web App
+        run: npm run build
+
+      - name: Workaround AI Studio Binary Sync Bug
+        run: |
+          set -ex
+          npm install sharp
+          cat << 'SCRIPT' > convert.cjs
+          const sharp = require('sharp');
+          Promise.all([
+            sharp('assets/icon.svg').resize(1024, 1024).png().toFile('assets/icon.png'),
+            sharp('assets/splash.svg').resize(2732, 2732).png().toFile('assets/splash.png')
+          ]).then(() => console.log('Images generated successfully.')).catch(console.error);
+          SCRIPT
+          node convert.cjs
+        
+      - name: Verify Images
+        run: |
+          set -ex
+          for f in assets/icon.png assets/splash.png; do
+            signature=$(od -A n -N 8 -t x1 "$f" | tr -d ' \n')
+            if [ "$signature" != "89504e470d0a1a0a" ]; then
+              echo "::error file=$f,line=1,col=1::ERROR: $f does not have valid PNG signature (found: $signature)"
+              exit 2
+            fi
+            file "$f" | grep -qi "PNG" || { 
+              echo "::error file=$f,line=1,col=1::file failed to recognize PNG for $f"; 
+              file "$f"; 
+              exit 3; 
+            }
+          done
+
+      - name: Sync Capacitor
+        run: |
+          set -ex
+          if [ ! -d "android" ]; then
+            npx cap add android
+          else
+            npx cap sync android
+          fi
+
+      - name: Generate Assets
+        run: |
+          set -ex
+          npm install -D @capacitor/assets --loglevel verbose
+          npx capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'
+        
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.14.3'
+          cache-disabled: true
+        
+      - name: Build APK
+        working-directory: ./android
+        run: gradle assembleDebug --stacktrace --info
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Quran-Study-App-APK
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --loglevel verbose
+        
+      - name: Build Web App
+        run: npm run build
+
+      - name: Workaround AI Studio Binary Sync Bug
+        run: |
+          set -ex
+          npm install sharp
+          cat << 'SCRIPT' > convert.cjs
+          const sharp = require('sharp');
+          Promise.all([
+            sharp('assets/icon.svg').resize(1024, 1024).png().toFile('assets/icon.png'),
+            sharp('assets/splash.svg').resize(2732, 2732).png().toFile('assets/splash.png')
+          ]).then(() => console.log('Images generated successfully.')).catch(console.error);
+          SCRIPT
+          node convert.cjs
+        
+      - name: Verify Images
+        run: |
+          set -ex
+          for f in assets/icon.png assets/splash.png; do
+            signature=$(od -A n -N 8 -t x1 "$f" | tr -d ' \n')
+            if [ "$signature" != "89504e470d0a1a0a" ]; then
+              echo "::error file=$f,line=1,col=1::ERROR: $f does not have valid PNG signature (found: $signature)"
+              exit 2
+            fi
+            file "$f" | grep -qi "PNG" || { 
+              echo "::error file=$f,line=1,col=1::file failed to recognize PNG for $f"; 
+              file "$f"; 
+              exit 3; 
+            }
+          done
+
+      - name: Sync Capacitor
+        run: |
+          set -ex
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          else
+            npx cap sync ios
+          fi
+
+      - name: Generate Assets
+        run: |
+          set -ex
+          npm install -D @capacitor/assets --loglevel verbose
+          npx capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'
+        
+      - name: Install CocoaPods dependencies
+        working-directory: ./ios/App
+        run: pod install
+
+      - name: Build iOS App
+        working-directory: ./ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY=""
+          
+          # Create IPA
+          mkdir -p Payload
+          cp -r build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -r Quran-Study-App.ipa Payload
+        
+      - name: Upload iOS Build
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Quran-Study-App-iOS-IPA
+          path: |
+            ios/App/Quran-Study-App.ipa
