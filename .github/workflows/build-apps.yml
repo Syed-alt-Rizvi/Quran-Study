@@ -18,7 +18,9 @@ jobs:
           node-version: '22'
           
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --loglevel verbose
+        run: |
+          rm -f package-lock.json
+          npm install --legacy-peer-deps --loglevel verbose
         
       - name: Build Web App
         run: npm run build
@@ -103,7 +105,9 @@ jobs:
           node-version: '22'
           
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --loglevel verbose
+        run: |
+          rm -f package-lock.json
+          npm install --legacy-peer-deps --loglevel verbose
         
       - name: Build Web App
         run: npm run build
