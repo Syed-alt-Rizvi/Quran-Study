@@ -6,6 +6,7 @@ import SurahView from './components/SurahView';
 import JuzView from './components/JuzView';
 import Sidebar from './components/Sidebar';
 import DuaScreen from './components/DuaScreen';
+import AudioPlayer from './components/AudioPlayer';
 import { AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -65,7 +66,7 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 selection:bg-emerald-500/30"
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 pb-24"
       style={{ fontFamily: englishFont }}
     >
       <AnimatePresence mode="wait">
@@ -77,7 +78,10 @@ export default function App() {
           <SurahView 
             key="surah-view" 
             surahId={selectedSurah} 
-            onBack={() => setSelectedSurah(null)} 
+            onBack={() => {
+              history.replaceState(null, '', ' ');
+              setSelectedSurah(null);
+            }} 
           />
         ) : selectedJuz ? (
           <JuzView 
@@ -100,6 +104,8 @@ export default function App() {
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
       />
+      
+      {!showWelcome && !isExiting && <AudioPlayer />}
     </div>
   );
 }

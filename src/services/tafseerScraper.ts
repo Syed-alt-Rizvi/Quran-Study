@@ -214,7 +214,28 @@ ${detailsEn}
           const content: TafseerContent = { ur: cleanUrdu, en: cleanEnglish };
           
           memoryCache[aKey] = content;
-          localStorage.setItem(aKey, JSON.stringify(content));
+          
+          try {
+            localStorage.setItem(aKey, JSON.stringify(content));
+          } catch (storageError: any) {
+            if (storageError.name === 'QuotaExceededError' || storageError.message?.includes('quota')) {
+              // Clear older localStorage cache to free up space
+              const keys = Object.keys(localStorage);
+              for (const key of keys) {
+                if (key.startsWith('tafseer_')) {
+                  localStorage.removeItem(key);
+                }
+              }
+              // Try saving again
+              try {
+                localStorage.setItem(aKey, JSON.stringify(content));
+              } catch (e) {
+                console.warn('LocalStorage is full, utilizing memory cache only.');
+              }
+            } else {
+              console.warn('Failed to save to localStorage', storageError);
+            }
+          }
           
           if (currentAyah === ayahNumber) {
             foundTafseer = content;

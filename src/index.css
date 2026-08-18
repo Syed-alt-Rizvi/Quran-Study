@@ -1,18 +1,59 @@
 @import "tailwindcss";
-
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Playfair Display", serif;
+  --font-serif: "Playfair Display", serif;
   --font-arabic: "Amiri", serif;
+  
+  /* Luxury Alabaster to Obsidian scale (replaces slate) */
+  --color-slate-50: #FDFBF7;
+  --color-slate-100: #FAF6EE;
+  --color-slate-200: #EFE9DB;
+  --color-slate-300: #E0D4BE;
+  --color-slate-400: #A89B88;
+  --color-slate-500: #7A6F62;
+  --color-slate-600: #5C5248;
+  --color-slate-700: #423B33;
+  --color-slate-800: #2C2A29;
+  --color-slate-900: #1A1A1A;
+  --color-slate-950: #121212;
+
+  /* Muted Gold scale (replaces teal) */
+  --color-teal-50: #FAF5E8;
+  --color-teal-100: #F2E5C6;
+  --color-teal-200: #E6D09F;
+  --color-teal-300: #D9B771;
+  --color-teal-400: #CE9F4C;
+  --color-teal-500: #C5A059;
+  --color-teal-600: #AB8843;
+  --color-teal-700: #886A32;
+  --color-teal-800: #6B532A;
+  --color-teal-900: #554324;
+  --color-teal-950: #302410;
+
+  /* Hint of Green (Emerald Luxury) */
+  --color-emerald-50: #F2F8F5;
+  --color-emerald-100: #DDF0E6;
+  --color-emerald-200: #BCE1D1;
+  --color-emerald-300: #93CDB9;
+  --color-emerald-400: #69B29B;
+  --color-emerald-500: #48957F;
+  --color-emerald-600: #357764;
+  --color-emerald-700: #2A5F51;
+  --color-emerald-800: #234D43;
+  --color-emerald-900: #1D3F37;
+  --color-emerald-950: #0F231F;
 }
 
 @layer base {
   body {
-    @apply font-sans antialiased bg-stone-50 text-stone-900 transition-colors duration-300;
+    @apply font-sans antialiased bg-slate-50 text-slate-800 transition-colors duration-500;
+    background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.06), transparent 50%), radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.03), transparent 50%);
   }
   
   .dark body {
-    @apply bg-stone-950 text-stone-100;
+    @apply bg-slate-950 text-slate-200;
+    background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.08), transparent 50%), radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.04), transparent 50%);
   }
 }

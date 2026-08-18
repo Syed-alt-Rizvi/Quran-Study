@@ -9,7 +9,7 @@ export default function DuaScreen({ onContinueExit }: { key?: string; onContinue
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex flex-col bg-stone-50 dark:bg-stone-950 overflow-y-auto"
+      className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-slate-950 overflow-y-auto"
     >
       <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full py-12">
         <h2 className="text-xl md:text-2xl font-bold text-emerald-700 dark:text-emerald-500 mb-12 text-center uppercase tracking-widest">
@@ -21,7 +21,7 @@ export default function DuaScreen({ onContinueExit }: { key?: string; onContinue
             بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
           </p>
           
-          <p className="font-arabic text-2xl md:text-3xl leading-[2.5] md:leading-[2.5] text-stone-800 dark:text-stone-100 px-4 text-justify" dir="rtl">
+          <p className="font-arabic text-2xl md:text-3xl leading-[2.5] md:leading-[2.5] text-slate-800 dark:text-slate-100 px-4 text-justify" dir="rtl">
             اَللّٰهُمَّ اِنِّي قَدْ قَرَاْتُ مَا قَضَيْتَ مِنْ كِتَابِكَ الَّذِيْ اَنْزَلْتَهُ عَلٰى نَبِيِّكَ الصَّادِقِ صَلَّى اللهُ عَلَيْهِ وَاٰلِهِ فَلَكَ الْحَمْدُ رَبَّنَا اَللّٰهُمَّ اجْعَلْنِيْ مِمَّنْ يُحِلُّ حَلَالَهُ، وَيُحَرِّمُ حَرَامَهُ، وَيُؤْمِنُ بِمُحْكَمِهِ وَمُتَشَابِهِهِ، وَاجْعَلْهُ لِيْ اُنْسًا فِيْ قَبْرِيْ، وَاُنْسًا فِيْ حَشْرِيْ وَاجْعَلْنِيْ مِمَّنْ تُرَقِّيْهِ بِكُلِّ اٰيَةٍ قَرَاَهَا دَرَجَةً فِيْ اَعْلٰى عِلِّيِّيْنَ،
           </p>
 
@@ -30,10 +30,10 @@ export default function DuaScreen({ onContinueExit }: { key?: string; onContinue
           </p>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800 w-full flex justify-center">
+        <div className="mt-16 pt-8 border-t-[0.5px] border-slate-200 dark:border-slate-800 w-full flex justify-center">
           <button
             onClick={onContinueExit}
-            className="px-8 py-3 bg-stone-200 hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 rounded-full font-medium transition-colors"
+            className="px-8 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-full font-medium transition-colors"
           >
             Close App
           </button>

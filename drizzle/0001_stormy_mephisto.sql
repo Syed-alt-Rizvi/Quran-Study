@@ -1,0 +1,1 @@
+ALTER TABLE `discussions` ADD `email` text;
