@@ -25,6 +25,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
   const { readProgress, lastRead } = useSettingsStore();
 
   useEffect(() => {
+    const abortController = new AbortController();
     fetchSurahs()
       .then(data => {
         setSurahs(data);
@@ -42,6 +43,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
         }
       })
       .catch(console.error);
+    return () => abortController.abort();
   }, []);
 
   const filteredSurahs = surahs.filter(s => 

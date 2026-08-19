@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, BookOpen, ChevronDown, ChevronUp, Loader2, Link as LinkIcon, Microscope, Maximize2, Minimize2 } from 'lucide-react';
 import { fetchSurahDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
@@ -14,6 +14,11 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
   const [expandedAyah, setExpandedAyah] = useState<string | null>(null);
   const [ayahData, setAyahData] = useState<Record<string, { ayah: Ayah, tafseer: any, loading: boolean }>>({});
   const [isArticleExpanded, setIsArticleExpanded] = useState(false);
+
+  const [isMounted, setIsMounted] = useState(true);
+  useEffect(() => {
+    return () => setIsMounted(false);
+  }, []);
 
   const toggleAyah = async (surahNumber: number, ayahNumber: number) => {
     const key = `${surahNumber}:${ayahNumber}`;
@@ -34,6 +39,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
         
         const ayah = surahDetail.ayahs.find(a => a.numberInSurah === ayahNumber);
         
+        if (!isMounted) return;
         setAyahData(prev => ({
           ...prev,
           [key]: {
