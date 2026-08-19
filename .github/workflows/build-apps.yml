@@ -83,7 +83,7 @@ jobs:
       - name: Build APK
         working-directory: ./android
         run: |
-          gradle wrapper
+          gradle wrapper --gradle-version 8.14.3
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace --info
         
