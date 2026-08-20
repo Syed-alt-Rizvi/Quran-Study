@@ -7,7 +7,19 @@ import { discussions, ayahReferences, tafseerReferences, scienceArticles, ayahSc
 import { eq, desc, and } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
+import { seed } from "./src/db/seed";
 async function startServer() {
+  // Check and seed DB if empty
+  try {
+    const existingArticles = await db.select().from(scienceArticles).limit(1).execute();
+    if (existingArticles.length === 0) {
+      console.log("Database empty. Seeding...");
+      await seed();
+    }
+  } catch (e) {
+    console.error("Failed to seed database:", e);
+  }
+
   const app = express();
   const PORT = 3000;
 

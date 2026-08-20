@@ -2,7 +2,7 @@ import { db } from './index';
 import { scienceArticles, scienceTopics, articleTopics, ayahScienceRelationships } from './schema';
 import { v4 as uuidv4 } from 'uuid';
 
-async function seed() {
+export async function seed() {
   const articleId1 = uuidv4();
   const articleId2 = uuidv4();
   const topicId1 = uuidv4();
@@ -55,4 +55,4 @@ async function seed() {
   
   console.log("Seeding complete.");
 }
-seed().catch(console.error);
+
