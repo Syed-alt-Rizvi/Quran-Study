@@ -18,6 +18,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
   const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
+  const [isScienceExpanded, setIsScienceExpanded] = useState(false);
   const [lazyTafseer, setLazyTafseer] = useState<any>(null);
   const [lazyLoading, setLazyLoading] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -296,19 +297,40 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
 
         {scienceRels.length > 0 && (
           <div className="mt-4 pt-4 border-t-[0.5px] border-blue-200/50 dark:border-blue-800/50">
-            <h4 className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <h4 
+              className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mb-3 flex items-center gap-2 cursor-pointer"
+              onClick={() => setIsScienceExpanded(!isScienceExpanded)}
+            >
               <Microscope size={12} />
               Science & Reflection
+              {isScienceExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             </h4>
-            <div className="space-y-3">
-              {scienceRels.map((rel, idx) => (
-                <div key={idx} className="bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-lg border-[0.5px] border-slate-200 dark:border-slate-800">
-                  <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1">{rel.article.title}</h5>
-                  <p className="text-[10px] uppercase tracking-widest font-medium text-blue-600 dark:text-blue-400 mb-2">{rel.article.author}</p>
-                  <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-blue-200 dark:border-blue-800 pl-3">"{rel.relation.explanation}"</p>
-                </div>
-              ))}
-            </div>
+            <AnimatePresence>
+              {isScienceExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="space-y-3 overflow-hidden"
+                >
+                  {scienceRels.map((rel, idx) => (
+                    <div 
+                      key={idx} 
+                      className="bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-lg border-[0.5px] border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors"
+                      onClick={() => {
+                        if (rel.article.originalUrl) {
+                          window.open(rel.article.originalUrl, '_blank');
+                        }
+                      }}
+                    >
+                      <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1">{rel.article.title}</h5>
+                      <p className="text-[10px] uppercase tracking-widest font-medium text-blue-600 dark:text-blue-400 mb-2">{rel.article.author}</p>
+                      <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-blue-200 dark:border-blue-800 pl-3">"{rel.relation.explanation}"</p>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>
