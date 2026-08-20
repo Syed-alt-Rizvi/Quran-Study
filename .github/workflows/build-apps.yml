@@ -179,5 +179,4 @@ jobs:
         if: always()
         with:
           name: Quran-Study-iOS-IPA
-          path: |
-            ios/App/"Quran Study.ipa"
+          path: ios/App/*.ipa
