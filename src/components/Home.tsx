@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/apiBase';
 import { useState, useEffect } from 'react';
 import { fetchSurahs, SurahMeta } from '../api';
 import { Search, BookOpen, Settings, LogOut, Microscope, ArrowRight, MessageCircle } from "lucide-react";
@@ -33,7 +34,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       })
       .catch(console.error);
 
-    fetch('/api/science')
+    fetch(getApiUrl('/api/science'))
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

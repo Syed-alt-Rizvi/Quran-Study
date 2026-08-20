@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/apiBase';
 import { useState, useEffect, useRef } from 'react';
 import { fetchSurahDetail, SurahDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
@@ -390,7 +391,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       });
 
     // Fetch science independently
-    fetch(`/api/science?surah=${surahId}`)
+    fetch(getApiUrl(`/api/science?surah=${surahId}`))
       .then(r => r.json())
       .then(scienceData => {
         setScienceRels(Array.isArray(scienceData) ? scienceData : []);

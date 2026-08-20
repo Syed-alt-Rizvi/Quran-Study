@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/apiBase';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorHttp } from '@capacitor/core';
 
@@ -37,7 +38,7 @@ export async function fetchTafseer(surahNumber: number, ayahNumber: number): Pro
       const response = await CapacitorHttp.get({ url });
       html = response.data;
     } else {
-      const response = await fetch(`/api/tafseer/proxy/${surahNumber}`);
+      const response = await fetch(getApiUrl(`/api/tafseer/proxy/${surahNumber}`));
       if (!response.ok) throw new Error("Failed to fetch proxy");
       html = await response.text();
     }

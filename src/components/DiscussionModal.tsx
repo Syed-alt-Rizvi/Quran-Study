@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/apiBase';
 import { useState, useEffect } from 'react';
 import { X, Send, Loader2, User } from 'lucide-react';
 import { Ayah, SurahDetail } from '../api';
@@ -19,7 +20,7 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
-    fetch(`/api/discussions?surah=${surah.number}&ayah=${ayah.numberInSurah}`)
+    fetch(getApiUrl(`/api/discussions?surah=${surah.number}&ayah=${ayah.numberInSurah}`))
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -42,7 +43,7 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
     
     setSubmitting(true);
     try {
-      const res = await fetch('/api/discussions', {
+      const res = await fetch(getApiUrl('/api/discussions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,7 +58,7 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
       if (res.ok) {
         setContent('');
         // Refresh
-        const newData = await fetch(`/api/discussions?surah=${surah.number}&ayah=${ayah.numberInSurah}`).then(r => r.json());
+        const newData = await fetch(getApiUrl(`/api/discussions?surah=${surah.number}&ayah=${ayah.numberInSurah}`)).then(r => r.json());
         setDiscussions(newData);
       }
     } catch (e) {

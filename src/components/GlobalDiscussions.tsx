@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/apiBase';
 import { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageCircle, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -43,7 +44,7 @@ export default function GlobalDiscussions() {
   const loadDiscussions = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/discussions');
+      const res = await fetch(getApiUrl('/api/discussions'));
       const data = await res.json();
       if (Array.isArray(data)) {
         setDiscussions(data);
@@ -63,7 +64,7 @@ export default function GlobalDiscussions() {
     if (!content.trim()) return;
 
     try {
-      await fetch('/api/discussions', {
+      await fetch(getApiUrl('/api/discussions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
