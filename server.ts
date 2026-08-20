@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { db } from "./src/db";
@@ -10,7 +11,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(cors());
   app.use(express.json());
+
 
   // API route for proxying HTML to bypass CORS on the web
   app.get("/api/tafseer/proxy/:id", async (req, res) => {
