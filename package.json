@@ -11,7 +11,9 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "generate-assets": "capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'"
+    "generate-assets": "capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'",
+    "encrypt-secrets": "node scripts/encrypt-secrets.js",
+    "decrypt-secrets": "node scripts/decrypt-secrets.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",
