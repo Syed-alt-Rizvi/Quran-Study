@@ -1,0 +1,15 @@
+{
+	"appId": "com.shiaquran.app",
+	"appName": "Quran Study",
+	"webDir": "dist",
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	},
+	"packageClassList": [
+		"AppPlugin",
+		"LocalNotificationsPlugin",
+		"PreferencesPlugin"
+	]
+}

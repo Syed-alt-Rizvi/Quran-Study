@@ -1,0 +1,23 @@
+{
+  "collections": {
+    "discussions": {
+      "description": "User discussions on specific Ayahs or global discussions",
+      "fields": {
+        "content": "string - The actual discussion text",
+        "author": "string - Name of the user (e.g., 'Anonymous')",
+        "email": "string | null - Email of the user",
+        "surahNumber": "number | null - Surah number if specific to an Ayah",
+        "ayahNumber": "number | null - Ayah number if specific to an Ayah",
+        "surahName": "string | null - Name of the Surah",
+        "replyToId": "string | null - ID of the discussion being replied to",
+        "createdAt": "timestamp - When the discussion was posted"
+      },
+      "rules": {
+        "read": "true",
+        "create": "true",
+        "update": "false",
+        "delete": "false"
+      }
+    }
+  }
+}

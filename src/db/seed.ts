@@ -1,58 +1,62 @@
 import { db } from './index';
 import { scienceArticles, scienceTopics, articleTopics, ayahScienceRelationships } from './schema';
-import { v4 as uuidv4 } from 'uuid';
+import data from './data.json';
 
 export async function seed() {
-  const articleId1 = uuidv4();
-  const articleId2 = uuidv4();
-  const topicId1 = uuidv4();
-  
-  await db.insert(scienceTopics).values({
-    id: topicId1,
-    name: 'Embryology'
-  }).execute();
-  
-  await db.insert(scienceArticles).values([
-    {
-      id: articleId1,
-      title: 'Embryology in the Quran',
-      author: 'Dr. Keith Moore',
-      content: 'The Quran describes the stages of human development in the womb with remarkable accuracy for its time. It mentions the "Alaqah" (leech-like structure) stage, which corresponds perfectly to the early embryo.',
-      source: 'The Developing Human',
-      originalUrl: 'https://example.com/embryology'
-    },
-    {
-      id: articleId2,
-      title: 'The Expanding Universe',
-      author: 'Various Cosmologists',
-      content: 'In Surah Adh-Dhariyat, it is mentioned that the universe is constantly expanding. Modern cosmology confirmed this in the 20th century.',
-      source: 'Modern Cosmology and the Quran',
-    }
-  ]).execute();
-  
-  await db.insert(articleTopics).values({
-    id: uuidv4(),
-    articleId: articleId1,
-    topicId: topicId1
-  }).execute();
-  
-  await db.insert(ayahScienceRelationships).values([
-    {
-      id: uuidv4(),
-      surahNumber: 23,
-      ayahNumber: 14,
-      articleId: articleId1,
-      explanation: 'Matches the description of Alaqah and Mudghah.'
-    },
-    {
-      id: uuidv4(),
-      surahNumber: 51,
-      ayahNumber: 47,
-      articleId: articleId2,
-      explanation: 'Mentions the expansion of the universe.'
-    }
-  ]).execute();
-  
-  console.log("Seeding complete.");
-}
+  console.log("Starting to seed database from data.json...");
 
+  if (data.topics && data.topics.length > 0) {
+    await db.insert(scienceTopics).values(data.topics).execute();
+  }
+
+  if (data.articles && data.articles.length > 0) {
+    const formatted = data.articles.map(a => ({
+      id: a.id,
+      title: a.title,
+      author: a.author,
+      content: a.content,
+      source: a.source,
+      originalUrl: a.original_url,
+      license: a.license,
+      publicationDate: a.publication_date,
+      createdAt: a.created_at
+    }));
+    
+    const chunkSize = 50;
+    for (let i = 0; i < formatted.length; i += chunkSize) {
+      const chunk = formatted.slice(i, i + chunkSize);
+      await db.insert(scienceArticles).values(chunk).execute();
+    }
+  }
+
+  if (data.articleTopics && data.articleTopics.length > 0) {
+    const formatted = data.articleTopics.map(a => ({
+      id: a.id,
+      articleId: a.article_id,
+      topicId: a.topic_id
+    }));
+    const chunkSize = 50;
+    for (let i = 0; i < formatted.length; i += chunkSize) {
+      const chunk = formatted.slice(i, i + chunkSize);
+      await db.insert(articleTopics).values(chunk).execute();
+    }
+  }
+
+  if (data.relationships && data.relationships.length > 0) {
+    const formatted = data.relationships.map(r => ({
+      id: r.id,
+      surahNumber: r.surah_number,
+      ayahNumber: r.ayah_number,
+      articleId: r.article_id,
+      explanation: r.explanation,
+      createdAt: r.created_at
+    }));
+    const chunkSize = 50;
+    for (let i = 0; i < formatted.length; i += chunkSize) {
+      const chunk = formatted.slice(i, i + chunkSize);
+      await db.insert(ayahScienceRelationships).values(chunk).execute();
+    }
+  }
+
+  console.log("Seeding complete. Seeded " + data.articles.length + " articles.");
+}

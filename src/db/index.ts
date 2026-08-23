@@ -5,7 +5,8 @@ import path from 'path';
 import os from 'os';
 
 // Use /tmp in production to avoid read-only filesystem errors in Cloud Run
-const dbDir = process.env.NODE_ENV === 'production' ? os.tmpdir() : process.cwd();
+const isCloudRun = process.env.K_SERVICE !== undefined || process.env.NODE_ENV === 'production';
+const dbDir = isCloudRun ? os.tmpdir() : process.cwd();
 const dbPath = path.join(dbDir, 'quran.db');
 
 const sqlite = new Database(dbPath);

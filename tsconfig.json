@@ -21,6 +21,13 @@
       ]
     },
     "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
+    "noEmit": true,
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "dist",
+    "android",
+    "ios",
+    "node_modules"
+  ]
 }

@@ -371,19 +371,31 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         setSurah(surahData);
         setLoading(false);
         
-        // Check for hash and scroll
-        if (window.location.hash && window.location.hash.startsWith('#ayah-')) {
-          setTimeout(() => {
-            const el = document.getElementById(window.location.hash.substring(1));
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/10', 'transition-colors', 'duration-700');
+        // Restore scroll position robustly using capacitor preferences
+        import('../utils/storage').then(({ getStorage }) => {
+          getStorage(`shia-quran-scroll-ayah-${surahId}`).then((savedAyahNum) => {
+            if (savedAyahNum) {
               setTimeout(() => {
-                el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/10');
-              }, 3000);
+                const el = document.getElementById(`ayah-${savedAyahNum}`);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'auto', block: 'center' });
+                }
+              }, 100);
+            } else if (window.location.hash && window.location.hash.startsWith('#ayah-')) {
+              // Fallback to hash
+              setTimeout(() => {
+                const el = document.getElementById(window.location.hash.substring(1));
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/10', 'transition-colors', 'duration-700');
+                  setTimeout(() => {
+                    el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/10');
+                  }, 3000);
+                }
+              }, 500); // Wait for render
             }
-          }, 500); // Wait for render
-        }
+          });
+        });
       })
       .catch((e) => {
         console.error(e);
@@ -398,6 +410,31 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       })
       .catch(() => setScienceRels([]));
   }, [surahId]);
+
+  // Track scroll position
+  useEffect(() => {
+    if (!surah) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const ayahNum = entry.target.id.replace('ayah-', '');
+            import('../utils/storage').then(({ setStorage }) => {
+              setStorage(`shia-quran-scroll-ayah-${surahId}`, ayahNum);
+            });
+          }
+        });
+      },
+      { rootMargin: '-10% 0px -80% 0px' } // Trigger when element is near top
+    );
+    
+    surah.ayahs.forEach(ayah => {
+      const el = document.getElementById(`ayah-${ayah.numberInSurah}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [surah, surahId]);
 
   const isThisSurahPlaying = audioSurahId === surah?.number && isPlaying;
 
@@ -459,7 +496,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       </header>
 
       <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white dark:bg-slate-900 sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
+        <div className="bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
           {surah.number !== 1 && surah.number !== 9 && (
             <div className="text-center mb-10 pb-8 border-b-[0.5px] border-slate-200 dark:border-slate-800">
               <h2 
@@ -499,7 +536,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               href={`https://www.tafseerenamoona.net/surahs/${surah.number}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>
@@ -515,7 +552,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               href="https://quran.com/en"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>

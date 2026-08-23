@@ -1,28 +1,10 @@
-import { getApiUrl } from '../utils/apiBase';
 import { useState, useEffect, useRef } from 'react';
-import { Send, User, MessageCircle, BookOpen } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-
-interface Discussion {
-  id: string;
-  content: string;
-  author: string;
-  email: string | null;
-  createdAt: string;
-  replyToId: string | null;
-}
-
-interface DBRow {
-  discussion: Discussion;
-  ayahRef: {
-    surahNumber: number;
-    ayahNumber: number;
-    surahName: string | null;
-  } | null;
-}
+import { Send, User, MessageCircle, BookOpen, Loader2 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function GlobalDiscussions() {
-  const [discussions, setDiscussions] = useState<DBRow[]>([]);
+  const [discussions, setDiscussions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Form state
@@ -31,220 +13,262 @@ export default function GlobalDiscussions() {
   const [email, setEmail] = useState("");
   const [citationSurah, setCitationSurah] = useState("");
   const [citationAyah, setCitationAyah] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   
   // Reply state
   const [replyTo, setReplyTo] = useState<string | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Load draft
   useEffect(() => {
-    loadDiscussions();
+    import('../utils/storage').then(({ getStorage }) => {
+      getStorage('shia-quran-draft-global').then((draftStr) => {
+        if (draftStr) {
+          try {
+            const draft = JSON.parse(draftStr);
+            if (draft.content) setContent(draft.content);
+            if (draft.author) setAuthor(draft.author);
+            if (draft.email) setEmail(draft.email);
+            if (draft.citationSurah) setCitationSurah(draft.citationSurah);
+            if (draft.citationAyah) setCitationAyah(draft.citationAyah);
+            if (draft.replyTo !== undefined) setReplyTo(draft.replyTo);
+          } catch (e) {}
+        }
+      });
+    });
   }, []);
 
-  const loadDiscussions = async () => {
+  // Save draft
+  useEffect(() => {
+    const draft = { content, author, email, citationSurah, citationAyah, replyTo };
+    import('../utils/storage').then(({ setStorage }) => {
+      setStorage('shia-quran-draft-global', JSON.stringify(draft));
+    });
+  }, [content, author, email, citationSurah, citationAyah, replyTo]);
+
+  useEffect(() => {
     setLoading(true);
-    try {
-      const res = await fetch(getApiUrl('/api/discussions'));
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setDiscussions(data);
-      } else {
-        console.error("Failed to fetch global discussions:", data);
-        setDiscussions([]);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
+    
+    const q = query(
+      collection(db, 'discussions'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setDiscussions(docs);
       setLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error("Firebase fetch error:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
+    
+    setSubmitting(true);
     try {
-      await fetch(getApiUrl('/api/discussions'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          author: author || 'Anonymous',
-          email: email || undefined,
-          surahNumber: citationSurah ? parseInt(citationSurah) : undefined,
-          ayahNumber: citationAyah ? parseInt(citationAyah) : undefined,
-          replyToId: replyTo
-        })
+      await addDoc(collection(db, 'discussions'), {
+        content: content.trim(),
+        author: author || 'Anonymous',
+        email: email || null,
+        surahNumber: citationSurah ? parseInt(citationSurah) : null,
+        ayahNumber: citationAyah ? parseInt(citationAyah) : null,
+        replyToId: replyTo || null,
+        createdAt: serverTimestamp(),
       });
       setContent("");
       setReplyTo(null);
       setCitationSurah("");
       setCitationAyah("");
-      loadDiscussions();
     } catch (e) {
-      console.error(e);
+      console.error("Firebase submit error:", e);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const topLevelDiscussions = discussions.filter(d => !d.discussion.replyToId);
-  const replies = discussions.filter(d => d.discussion.replyToId);
+  const topLevelDiscussions = discussions.filter(d => !d.replyToId);
+  const replies = discussions.filter(d => d.replyToId);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border-[0.5px] border-slate-200/60 dark:border-slate-800 shadow-sm">
-        <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-800 dark:text-slate-200">
-          <MessageCircle size={20} className="text-emerald-600" />
-          Start a Discussion
+    <div className="space-y-8">
+      {/* Glassmorphism Start Discussion Box */}
+      <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-white/40 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 relative overflow-hidden">
+        {/* Subtle decorative gradient */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        
+        <h3 className="font-bold text-2xl mb-6 flex items-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500">
+          <MessageCircle size={24} className="text-emerald-500" />
+          Discussions
         </h3>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-5 relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Name</label>
+              <label className="block text-xs font-semibold text-slate-500/80 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Name</label>
               <input 
                 type="text" 
                 placeholder="Your name" 
                 value={author}
                 onChange={e => setAuthor(e.target.value)}
-                className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full p-3.5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-sm placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Email (Optional)</label>
+              <label className="block text-xs font-semibold text-slate-500/80 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Email (Optional)</label>
               <input 
                 type="email" 
                 placeholder="your@email.com" 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full p-3.5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-sm placeholder:text-slate-400"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Surah Number (Optional Citation)</label>
+              <label className="block text-xs font-semibold text-slate-500/80 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Surah (Optional)</label>
               <input 
                 type="number" 
                 placeholder="e.g. 2" 
                 value={citationSurah}
                 onChange={e => setCitationSurah(e.target.value)}
-                className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full p-3.5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-sm placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Ayah Number (Optional Citation)</label>
+              <label className="block text-xs font-semibold text-slate-500/80 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Ayah (Optional)</label>
               <input 
                 type="number" 
                 placeholder="e.g. 255" 
                 value={citationAyah}
                 onChange={e => setCitationAyah(e.target.value)}
-                className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full p-3.5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-sm placeholder:text-slate-400"
               />
             </div>
           </div>
 
           {replyTo && (
-            <div className="flex items-center justify-between text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-xl border-[0.5px] border-emerald-100 dark:border-emerald-900/50">
-              <span>Replying to a discussion</span>
-              <button type="button" onClick={() => setReplyTo(null)} className="hover:underline">Cancel reply</button>
+            <div className="flex items-center justify-between text-xs font-semibold tracking-wide text-emerald-700 dark:text-emerald-300 bg-gradient-to-r from-emerald-100/50 to-teal-50/50 dark:from-emerald-900/30 dark:to-teal-900/30 p-3.5 rounded-2xl border border-emerald-200/50 dark:border-emerald-800/50 backdrop-blur-md">
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Replying to a discussion</span>
+              <button type="button" onClick={() => setReplyTo(null)} className="hover:text-emerald-800 dark:hover:text-emerald-100 hover:underline">Cancel reply</button>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Discussion / Question</label>
-            <div className="flex gap-2">
+            <label className="block text-xs font-semibold text-slate-500/80 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Discussion / Question</label>
+            <div className="flex gap-3">
               <textarea
                 ref={textareaRef}
                 value={content}
                 onChange={e => setContent(e.target.value)}
                 placeholder="Share your thoughts, reflections, or questions..."
-                className="flex-1 p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-emerald-500 resize-y min-h-[100px] text-sm custom-scrollbar"
+                className="flex-1 p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 resize-y min-h-[120px] text-sm custom-scrollbar transition-all shadow-sm placeholder:text-slate-400"
               />
               <button 
                 type="submit"
-                disabled={!content.trim()}
-                className="px-6 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl flex items-center justify-center transition-colors"
+                disabled={submitting || !content.trim()}
+                className="px-6 bg-gradient-to-br from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 disabled:opacity-50 disabled:from-slate-400 disabled:to-slate-400 text-white rounded-2xl flex items-center justify-center transition-all shadow-md shadow-emerald-500/20"
               >
-                <Send size={20} />
+                {submitting ? <Loader2 size={24} className="animate-spin" /> : <Send size={24} />}
               </button>
             </div>
           </div>
         </form>
       </div>
 
-      <div className="space-y-6 mt-8">
-        <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-800 dark:text-slate-200">
-          Community Discussions
+      {/* Glassmorphism Discussions List */}
+      <div className="space-y-6 mt-10">
+        <h3 className="font-bold text-2xl flex items-center gap-2 text-slate-800 dark:text-slate-200">
+          Community 
         </h3>
         
         {loading ? (
-          <p className="text-slate-500 text-center py-8">Loading discussions...</p>
+          <div className="flex justify-center py-12">
+            <Loader2 size={32} className="animate-spin text-emerald-500" />
+          </div>
         ) : topLevelDiscussions.length === 0 ? (
-          <p className="text-slate-500 text-center py-8">No discussions yet. Be the first to start one!</p>
+          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-3xl p-12 text-center border border-white/40 dark:border-slate-700/50 shadow-sm">
+            <MessageCircle size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+            <p className="text-slate-500 font-medium">No discussions yet.</p>
+            <p className="text-sm text-slate-400 mt-1">Be the first to start a conversation.</p>
+          </div>
         ) : (
-          topLevelDiscussions.map((row) => {
-            const threadReplies = replies.filter(r => r.discussion.replyToId === row.discussion.id).reverse();
-            return (
-              <div key={row.discussion.id} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border-[0.5px] border-slate-200/60 dark:border-slate-800 shadow-sm">
-                
-                {row.ayahRef && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-medium mb-4">
-                    <BookOpen size={14} />
-                    <span>Qur'an {row.ayahRef.surahNumber}:{row.ayahRef.ayahNumber}</span>
+          <div className="space-y-5">
+            {topLevelDiscussions.map((row) => {
+              const threadReplies = replies.filter(r => r.replyToId === row.id).reverse();
+              return (
+                <div key={row.id} className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-white/40 dark:border-slate-700/50 shadow-[0_4px_20px_rgb(0,0,0,0.03)] ring-1 ring-black/5 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+                  
+                  {row.surahNumber && row.ayahNumber && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border border-emerald-100/50 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 text-xs font-semibold tracking-wide mb-5 shadow-sm">
+                      <BookOpen size={14} />
+                      <span>Qur'an {row.surahNumber}:{row.ayahNumber}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/50 dark:to-teal-900/50 border border-white/50 dark:border-slate-700/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
+                      <User size={18} />
+                    </div>
+                    <div>
+                      <span className="font-bold block text-slate-900 dark:text-slate-100">{row.author || 'Anonymous'}</span>
+                      <span className="text-[11px] font-medium text-slate-400 block mt-0.5 uppercase tracking-wide">
+                        {row.createdAt?.toDate ? row.createdAt.toDate().toLocaleString() : 'Just now'}
+                      </span>
+                    </div>
                   </div>
-                )}
-                
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                    <User size={18} />
-                  </div>
-                  <div>
-                    <span className="font-semibold block text-slate-900 dark:text-slate-100">{row.discussion.author}</span>
-                    <span className="text-xs text-slate-500">{new Date(row.discussion.createdAt).toLocaleString()}</span>
-                  </div>
-                </div>
-                
-                <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed mb-4">
-                  {row.discussion.content}
-                </p>
-                
-                <button 
-                  onClick={() => {
-                    setReplyTo(row.discussion.id);
-                    setContent(`@${row.discussion.author} `);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setTimeout(() => textareaRef.current?.focus(), 100);
-                  }}
-                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-                >
-                  Reply
-                </button>
+                  
+                  <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed mb-5 text-sm md:text-base">
+                    {row.content}
+                  </p>
+                  
+                  <button 
+                    onClick={() => {
+                      setReplyTo(row.id);
+                      setContent(`@${row.author || 'Anonymous'} `);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      setTimeout(() => textareaRef.current?.focus(), 100);
+                    }}
+                    className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors flex items-center gap-1"
+                  >
+                    Reply
+                  </button>
 
-                {/* Nested Replies */}
-                {threadReplies.length > 0 && (
-                  <div className="mt-6 pl-4 md:pl-6 border-l-2 border-slate-100 dark:border-slate-800 space-y-4">
-                    {threadReplies.map(replyRow => (
-                      <div key={replyRow.discussion.id} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400">
-                            <User size={14} />
+                  {/* Nested Replies */}
+                  {threadReplies.length > 0 && (
+                    <div className="mt-6 pl-5 md:pl-8 border-l-2 border-emerald-100 dark:border-slate-700 space-y-4">
+                      {threadReplies.map(replyRow => (
+                        <div key={replyRow.id} className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl p-5 border border-white/40 dark:border-slate-700/50 shadow-sm">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 border border-white/50 dark:border-slate-600/50 flex items-center justify-center text-slate-500 dark:text-slate-400 shadow-sm">
+                              <User size={14} />
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{replyRow.author || 'Anonymous'}</span>
+                              <span className="text-[10px] font-medium text-slate-400 ml-2 uppercase tracking-wide">
+                                {replyRow.createdAt?.toDate ? replyRow.createdAt.toDate().toLocaleString() : 'Just now'}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{replyRow.discussion.author}</span>
-                            <span className="text-xs text-slate-500 ml-2">{new Date(replyRow.discussion.createdAt).toLocaleString()}</span>
-                          </div>
+                          <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
+                            {replyRow.content}
+                          </p>
                         </div>
-                        <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
-                          {replyRow.discussion.content}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
