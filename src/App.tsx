@@ -106,7 +106,7 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-teal-100 dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950/20 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 pb-24 bg-fixed"
+      className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 pb-24 bg-fixed"
       style={{ fontFamily: englishFont }}
     >
       <AnimatePresence mode="wait">

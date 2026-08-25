@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageCircle, BookOpen, Loader2 } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function GlobalDiscussions() {
   const [discussions, setDiscussions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<any>(null);
   
   // Form state
   const [content, setContent] = useState("");
@@ -21,76 +23,99 @@ export default function GlobalDiscussions() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Load draft
-  useEffect(() => {
-    import('../utils/storage').then(({ getStorage }) => {
-      getStorage('shia-quran-draft-global').then((draftStr) => {
-        if (draftStr) {
-          try {
-            const draft = JSON.parse(draftStr);
-            if (draft.content) setContent(draft.content);
-            if (draft.author) setAuthor(draft.author);
-            if (draft.email) setEmail(draft.email);
-            if (draft.citationSurah) setCitationSurah(draft.citationSurah);
-            if (draft.citationAyah) setCitationAyah(draft.citationAyah);
-            if (draft.replyTo !== undefined) setReplyTo(draft.replyTo);
-          } catch (e) {}
-        }
-      });
-    });
-  }, []);
-
-  // Save draft
-  useEffect(() => {
-    const draft = { content, author, email, citationSurah, citationAyah, replyTo };
-    import('../utils/storage').then(({ setStorage }) => {
-      setStorage('shia-quran-draft-global', JSON.stringify(draft));
-    });
-  }, [content, author, email, citationSurah, citationAyah, replyTo]);
-
-  useEffect(() => {
-    setLoading(true);
-    
-    const q = query(
-      collection(db, 'discussions'),
-      orderBy('createdAt', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+  const fetchDiscussions = async () => {
+    try {
+      const res = await fetch('/api/discussions');
+      const data = await res.json();
+      const docs = data.map((row: any) => ({
+        id: row.discussion.id,
+        ...row.discussion,
+        surahNumber: row.ayahRef?.surahNumber,
+        ayahNumber: row.ayahRef?.ayahNumber,
+        surahName: row.ayahRef?.surahName
+      }));
       setDiscussions(docs);
       setLoading(false);
-    }, (error) => {
-      console.error("Firebase fetch error:", error);
+    } catch (e) {
+      console.error(e);
       setLoading(false);
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchDiscussions();
+    const interval = setInterval(fetchDiscussions, 5000); // Polling for updates
+    return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    
+
     setSubmitting(true);
-    try {
-      await addDoc(collection(db, 'discussions'), {
-        content: content.trim(),
-        author: author || 'Anonymous',
-        email: email || null,
-        surahNumber: citationSurah ? parseInt(citationSurah) : null,
-        ayahNumber: citationAyah ? parseInt(citationAyah) : null,
-        replyToId: replyTo || null,
-        createdAt: serverTimestamp(),
-      });
+    setRetryError(null);
+    const idempotencyKey = uuidv4();
+    const tempId = uuidv4();
+    
+    // Optimistic UI
+    const newComment = {
+      id: tempId,
+      content: content.trim(),
+      author: author.trim() || 'Anonymous',
+      email: email.trim(),
+      createdAt: new Date().toISOString(),
+      replyToId: replyTo,
+      surahNumber: citationSurah ? parseInt(citationSurah) : null,
+      ayahNumber: citationAyah ? parseInt(citationAyah) : null
+    };
+    
+    setDiscussions(prev => [newComment, ...prev]);
+    setPendingDraft(newComment);
+
+    const payload = {
+      id: tempId,
+      idempotencyKey,
+      content: content.trim(),
+      author: author.trim() || 'Anonymous',
+      email: email.trim(),
+      replyToId: replyTo,
+      surahNumber: citationSurah ? parseInt(citationSurah) : undefined,
+      ayahNumber: citationAyah ? parseInt(citationAyah) : undefined
+    };
+
+    const attemptRequest = async (retries = 3, delay = 1000): Promise<boolean> => {
+      try {
+        const res = await fetch('/api/discussions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) return true;
+        throw new Error(`Status ${res.status}`);
+      } catch (error) {
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return attemptRequest(retries - 1, delay * 2);
+        }
+        return false;
+      }
+    };
+
+    const success = await attemptRequest();
+    
+    if (success) {
       setContent("");
       setReplyTo(null);
       setCitationSurah("");
       setCitationAyah("");
-    } catch (e) {
-      console.error("Firebase submit error:", e);
-    } finally {
-      setSubmitting(false);
+      setPendingDraft(null);
+    } else {
+      setRetryError("Failed to send message. Please try again.");
+      setDiscussions(prev => prev.filter(d => d.id !== tempId));
     }
+    setSubmitting(false);
   };
 
   const topLevelDiscussions = discussions.filter(d => !d.replyToId);
@@ -180,8 +205,14 @@ export default function GlobalDiscussions() {
                 {submitting ? <Loader2 size={24} className="animate-spin" /> : <Send size={24} />}
               </button>
             </div>
-          </div>
-        </form>
+                    {retryError && (
+            <div className="mt-4 p-3 bg-red-100/50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-center justify-between">
+              <span>{retryError}</span>
+              <button type="button" onClick={handleSubmit} className="font-bold underline hover:text-red-700 dark:hover:text-red-300">Retry</button>
+            </div>
+          )}
+        </div>
+      </form>
       </div>
 
       {/* Glassmorphism Discussions List */}
@@ -221,7 +252,7 @@ export default function GlobalDiscussions() {
                     <div>
                       <span className="font-bold block text-slate-900 dark:text-slate-100">{row.author || 'Anonymous'}</span>
                       <span className="text-[11px] font-medium text-slate-400 block mt-0.5 uppercase tracking-wide">
-                        {row.createdAt?.toDate ? row.createdAt.toDate().toLocaleString() : 'Just now'}
+                        {row.createdAt ? new Date(row.createdAt).toLocaleString() : 'Just now'}
                       </span>
                     </div>
                   </div>
@@ -254,7 +285,7 @@ export default function GlobalDiscussions() {
                             <div>
                               <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{replyRow.author || 'Anonymous'}</span>
                               <span className="text-[10px] font-medium text-slate-400 ml-2 uppercase tracking-wide">
-                                {replyRow.createdAt?.toDate ? replyRow.createdAt.toDate().toLocaleString() : 'Just now'}
+                                {replyRow.createdAt ? new Date(replyRow.createdAt).toLocaleString() : 'Just now'}
                               </span>
                             </div>
                           </div>

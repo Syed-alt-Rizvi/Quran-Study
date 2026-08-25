@@ -152,7 +152,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             placeholder="Search Surah..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-sm"
+            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
           />
         </div>
 
@@ -161,7 +161,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             onClick={() => setActiveTab('surah')}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'surah'
-                ? 'bg-white/60 dark:bg-slate-800/60 shadow-sm text-emerald-700 dark:text-emerald-400 border border-white/40 dark:border-slate-700/50'
+                ? 'bg-white/70 dark:bg-slate-800/70 shadow-[0_4px_12px_rgba(0,0,0,0.05)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] text-emerald-700 dark:text-emerald-400 border border-white/60 dark:border-slate-600/50'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -171,7 +171,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             onClick={() => setActiveTab('juz')}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'juz'
-                ? 'bg-white/60 dark:bg-slate-800/60 shadow-sm text-emerald-700 dark:text-emerald-400 border border-white/40 dark:border-slate-700/50'
+                ? 'bg-white/70 dark:bg-slate-800/70 shadow-[0_4px_12px_rgba(0,0,0,0.05)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] text-emerald-700 dark:text-emerald-400 border border-white/60 dark:border-slate-600/50'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -181,7 +181,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             onClick={() => setActiveTab('science')}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'science'
-                ? 'bg-white/60 dark:bg-slate-800/60 shadow-sm text-emerald-700 dark:text-emerald-400 border border-white/40 dark:border-slate-700/50'
+                ? 'bg-white/70 dark:bg-slate-800/70 shadow-[0_4px_12px_rgba(0,0,0,0.05)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] text-emerald-700 dark:text-emerald-400 border border-white/60 dark:border-slate-600/50'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -191,7 +191,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             onClick={() => setActiveTab('discuss')}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'discuss'
-                ? 'bg-white/60 dark:bg-slate-800/60 shadow-sm text-emerald-700 dark:text-emerald-400 border border-white/40 dark:border-slate-700/50'
+                ? 'bg-white/70 dark:bg-slate-800/70 shadow-[0_4px_12px_rgba(0,0,0,0.05)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] text-emerald-700 dark:text-emerald-400 border border-white/60 dark:border-slate-600/50'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -215,7 +215,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
                 <button
                   key={surah.number}
                   onClick={() => onSelectSurah(surah.number)}
-                  className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                  className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                   <div className="flex items-start justify-between w-full mb-3">
                     <div className="flex items-center gap-3">
@@ -287,7 +287,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               <button
                 key={juz.number}
                 onClick={() => onSelectJuz(juz.number)}
-                className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all"
               >
                 <div className="flex items-start justify-between w-full mb-3">
                   <div className="flex items-center gap-3">

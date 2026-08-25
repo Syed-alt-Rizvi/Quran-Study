@@ -36,7 +36,7 @@
     "react-dom": "^19.0.1",
     "react-markdown": "^10.1.0",
     "rss-parser": "^3.13.0",
-    "uuid": "^14.0.1",
+    "uuid": "^14.0.2",
     "vite": "^6.2.3",
     "zustand": "^5.0.14"
   },

@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { X, Send, Loader2, User } from 'lucide-react';
 import { Ayah, SurahDetail } from '../api';
 import { motion, AnimatePresence } from 'motion/react';
-import { db } from '../lib/firebase';
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
+
 
 interface DiscussionModalProps {
   isOpen: boolean;
@@ -15,75 +15,107 @@ interface DiscussionModalProps {
 export default function DiscussionModal({ isOpen, onClose, ayah, surah }: DiscussionModalProps) {
   const [discussions, setDiscussions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<any>(null);
   const [content, setContent] = useState('');
+  const [author, setAuthor] = useState('');
+  const [email, setEmail] = useState('');
+  const [replyTo, setReplyTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Load draft
-  useEffect(() => {
-    if (isOpen) {
-      import('../utils/storage').then(({ getStorage }) => {
-        getStorage(`draft-discussion-${surah.number}-${ayah.numberInSurah}`).then((draft) => {
-          if (draft) setContent(draft);
-        });
-      });
-    }
-  }, [isOpen, surah.number, ayah.numberInSurah]);
-
-  // Save draft
-  useEffect(() => {
-    if (isOpen) {
-      import('../utils/storage').then(({ setStorage }) => {
-        setStorage(`draft-discussion-${surah.number}-${ayah.numberInSurah}`, content);
-      });
-    }
-  }, [content, isOpen, surah.number, ayah.numberInSurah]);
-
-  useEffect(() => {
+  
+  const fetchDiscussions = async () => {
     if (!isOpen) return;
-    setLoading(true);
-    
-    const q = query(
-      collection(db, 'discussions'),
-      where('surahNumber', '==', surah.number),
-      where('ayahNumber', '==', ayah.numberInSurah),
-      orderBy('createdAt', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    try {
+      const res = await fetch(`/api/discussions?surah=${surah.number}&ayah=${ayah.numberInSurah}`);
+      const data = await res.json();
+      const docs = data.map((row: any) => ({
+        id: row.discussion.id,
+        ...row.discussion
+      }));
       setDiscussions(docs);
       setLoading(false);
-    }, (error) => {
-      console.error("Firebase fetch error:", error);
+    } catch (e) {
+      console.error(e);
       setLoading(false);
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    setLoading(true);
+    fetchDiscussions();
+    const interval = setInterval(fetchDiscussions, 5000);
+    return () => clearInterval(interval);
   }, [isOpen, surah.number, ayah.numberInSurah]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    
+
     setSubmitting(true);
-    try {
-      await addDoc(collection(db, 'discussions'), {
-        content: content.trim(),
-        author: 'Anonymous',
-        surahNumber: surah.number,
-        ayahNumber: ayah.numberInSurah,
-        surahName: surah.name,
-        createdAt: serverTimestamp(),
-      });
-      setContent('');
-      import('../utils/storage').then(({ removeStorage }) => {
-        removeStorage(`draft-discussion-${surah.number}-${ayah.numberInSurah}`);
-      });
-    } catch (e) {
-      console.error("Firebase submit error:", e);
-    } finally {
-      setSubmitting(false);
+    setRetryError(null);
+    const idempotencyKey = uuidv4();
+    const tempId = uuidv4();
+    
+    // Optimistic UI
+    const newComment = {
+      id: tempId,
+      content: content.trim(),
+      author: author.trim() || 'Anonymous',
+      email: email.trim(),
+      createdAt: new Date().toISOString(),
+      replyToId: replyTo,
+      surahNumber: surah.number,
+      ayahNumber: ayah.numberInSurah
+    };
+    
+    setDiscussions(prev => [newComment, ...prev]);
+    setPendingDraft(newComment);
+
+    const payload = {
+      id: tempId,
+      idempotencyKey,
+      content: content.trim(),
+      author: author.trim() || 'Anonymous',
+      email: email.trim(),
+      replyToId: replyTo,
+      surahNumber: surah.number,
+      ayahNumber: ayah.numberInSurah, surahName: surah.englishName
+    };
+
+    const attemptRequest = async (retries = 3, delay = 1000): Promise<boolean> => {
+      try {
+        const res = await fetch('/api/discussions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) return true;
+        throw new Error(`Status ${res.status}`);
+      } catch (error) {
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return attemptRequest(retries - 1, delay * 2);
+        }
+        return false;
+      }
+    };
+
+    const success = await attemptRequest();
+    
+    if (success) {
+      setContent("");
+      setReplyTo(null);
+      
+      
+      setPendingDraft(null);
+    } else {
+      setRetryError("Failed to send message. Please try again.");
+      setDiscussions(prev => prev.filter(d => d.id !== tempId));
     }
+    setSubmitting(false);
   };
 
   if (!isOpen) return null;
