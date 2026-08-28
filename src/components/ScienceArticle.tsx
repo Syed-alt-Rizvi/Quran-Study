@@ -56,7 +56,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
   };
 
   return (
-    <div className={`bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] rounded-2xl p-6 border-[0.5px] border-slate-200 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 overflow-hidden group`}>
+    <div className={`bg-white dark:bg-slate-900 rounded-2xl p-6 border-[0.5px] border-slate-200 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 overflow-hidden group`}>
       <div 
         className={`flex items-start justify-between gap-4 cursor-pointer`}
         onClick={() => setIsArticleExpanded(!isArticleExpanded)}
@@ -125,7 +125,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                         </button>
                       );
                     }
-                    return <a href={href} className="text-teal-600 hover:underline" {...props}>{children}</a>;
+                    return <a href={href} className="text-blue-600 hover:underline" {...props}>{children}</a>;
                   }
                 }}
               >
@@ -169,7 +169,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                     )}
                     <button 
                       onClick={() => toggleAyah(rel.surahNumber, rel.ayahNumber)}
-                      className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 border-slate-200 dark:border-slate-700 rounded-lg transition-colors flex items-center gap-1.5"
+                      className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 bg-white dark:bg-slate-800 border-[0.5px] border-slate-200 dark:border-slate-700 rounded-lg transition-colors flex items-center gap-1.5"
                     >
                       {isExpanded ? 'Hide Insights' : 'Read Insights'}
                       {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -185,7 +185,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden border-t-[0.5px] border-slate-200/60 dark:border-slate-700/50"
                     >
-                      <div className="p-4 sm:p-6 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] space-y-6">
+                      <div className="p-4 sm:p-6 bg-white dark:bg-slate-900 space-y-6">
                         {data?.loading ? (
                           <div className="flex items-center justify-center py-8 text-slate-400">
                             <Loader2 size={24} className="animate-spin" />

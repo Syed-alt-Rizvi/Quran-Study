@@ -9,7 +9,7 @@ const isCloudRun = process.env.K_SERVICE !== undefined || process.env.NODE_ENV =
 const dbDir = isCloudRun ? os.tmpdir() : process.cwd();
 const dbPath = path.join(dbDir, 'quran.db');
 
-export const sqlite = new Database(dbPath);
+const sqlite = new Database(dbPath);
 
 sqlite.exec(`
 CREATE TABLE IF NOT EXISTS discussions (

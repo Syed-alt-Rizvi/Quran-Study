@@ -33,6 +33,8 @@ interface SettingsState {
   tafseerLanguages: ('en' | 'ur')[];
   readProgress: Record<number, number>; // Maps surahId to highest read ayahNumber
   reminderTime: string | null; // HH:MM format
+  reciter: string;
+  userName: string;
   
   toggleDarkMode: () => void;
   setFontSize: (size: number) => void;
@@ -50,6 +52,8 @@ interface SettingsState {
   incrementTafseerRead: (date: string) => void;
   saveTafseerNote: (key: string, note: string) => void;
   setReminderTime: (time: string | null) => void;
+  setReciter: (reciter: string) => void;
+  setUserName: (name: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -69,6 +73,8 @@ export const useSettingsStore = create<SettingsState>()(
       tafseerLanguages: ['ur'],
       readProgress: {},
       reminderTime: null,
+      reciter: 'ar.alafasy',
+      userName: '',
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setFontSize: (size) => set({ fontSize: size }),
       setArabicFont: (font) => set({ arabicFont: font }),
@@ -126,6 +132,8 @@ export const useSettingsStore = create<SettingsState>()(
         }
       })),
       setReminderTime: (time) => set({ reminderTime: time }),
+      setReciter: (reciter) => set({ reciter }),
+      setUserName: (name) => set({ userName: name }),
     }),
     {
       name: 'quran-app-settings',

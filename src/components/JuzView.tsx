@@ -94,17 +94,24 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
     }
   };
 
+  const baseHue = Math.floor(((surahId * 137.5) + (ayah.numberInSurah * 35)) % 360);
+  const secHue = (baseHue + 40) % 360;
+
+  const styleProps = {
+    '--ayah-base-hue': `${baseHue}`,
+    '--ayah-sec-hue': `${secHue}`,
+  } as React.CSSProperties;
+
   return (
     <div className="flex flex-col">
       <div 
         id={`ayah-${surahId}-${ayah.numberInSurah}`}
         ref={ayahRef}
-        className={`group relative py-2 px-2 sm:px-6 transition-all duration-500 rounded-xl ${
-          isActivePlaying 
-            ? 'bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800' 
-            : isLastRead 
-              ? 'bg-emerald-50/30 dark:bg-emerald-900/10 border border-transparent' 
-              : 'border border-transparent'
+        style={styleProps}
+        className={`group relative py-4 px-4 sm:px-8 transition-all duration-500 rounded-[2rem] border ${
+          isActivePlaying || isLastRead
+            ? 'border-[hsl(var(--ayah-base-hue),60%,80%)] dark:border-[hsl(var(--ayah-base-hue),40%,30%)] shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,70%,0.4)] dark:shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,20%,0.6)] bg-gradient-to-br from-[hsl(var(--ayah-base-hue),80%,90%)] to-[hsl(var(--ayah-sec-hue),70%,85%)] dark:from-[hsl(var(--ayah-base-hue),60%,20%)] dark:to-[hsl(var(--ayah-sec-hue),50%,15%)]' 
+            : 'border-transparent bg-gradient-to-br from-[hsl(var(--ayah-base-hue),40%,98%)] to-[hsl(var(--ayah-sec-hue),30%,95%)] dark:from-[hsl(var(--ayah-base-hue),20%,12%)] dark:to-[hsl(var(--ayah-sec-hue),15%,8%)]'
         }`}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
@@ -308,49 +315,9 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
       .then(data => {
         setJuz(data);
         setLoading(false);
-
-        // Restore scroll position robustly using capacitor preferences
-        import('../utils/storage').then(({ getStorage }) => {
-          getStorage(`shia-quran-scroll-ayah-juz-${juzId}`).then((savedAyahId) => {
-            if (savedAyahId) {
-              setTimeout(() => {
-                const el = document.getElementById(savedAyahId);
-                if (el) {
-                  el.scrollIntoView({ behavior: 'auto', block: 'center' });
-                }
-              }, 100);
-            }
-          });
-        });
       })
       .catch(console.error);
   }, [juzId]);
-
-  // Track scroll position
-  useEffect(() => {
-    if (!juz) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const ayahId = entry.target.id; // e.g. "ayah-surahId-ayahNum"
-            import('../utils/storage').then(({ setStorage }) => {
-              setStorage(`shia-quran-scroll-ayah-juz-${juzId}`, ayahId);
-            });
-          }
-        });
-      },
-      { rootMargin: '-10% 0px -80% 0px' }
-    );
-    
-    juz.ayahs.forEach(ayah => {
-      // In juz, ayah has surahId attached manually in JuzView mapping
-      const el = document.getElementById(`ayah-${ayah.surahNumber}-${ayah.numberInSurah}`);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [juz, juzId]);
 
   // Using -1 * juzId to differentiate between surahId and juzId in the store if needed, 
   // or we can just pass juzId. Wait, audioSurahId is just an ID. 
@@ -414,7 +381,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
       </header>
 
       <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
+        <div className="bg-white dark:bg-slate-900 sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
           <div className="flex flex-col space-y-0">
             {juz.ayahs.map((ayah, index) => {
               const isNewSurah = index === 0 || ayah.surahNumber !== juz.ayahs[index - 1].surahNumber;
@@ -457,7 +424,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
               href={`https://www.tafseerenamoona.net/juzs/${juz.number}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>
@@ -473,7 +440,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
               href="https://quran.com/en"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>

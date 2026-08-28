@@ -1,23 +1,63 @@
 {
-  "collections": {
-    "discussions": {
-      "description": "User discussions on specific Ayahs or global discussions",
-      "fields": {
-        "content": "string - The actual discussion text",
-        "author": "string - Name of the user (e.g., 'Anonymous')",
-        "email": "string | null - Email of the user",
-        "surahNumber": "number | null - Surah number if specific to an Ayah",
-        "ayahNumber": "number | null - Ayah number if specific to an Ayah",
-        "surahName": "string | null - Name of the Surah",
-        "replyToId": "string | null - ID of the discussion being replied to",
-        "createdAt": "timestamp - When the discussion was posted"
+  "entities": {
+    "Discussion": {
+      "title": "Discussion",
+      "description": "A user-submitted discussion or comment on an Ayah.",
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5000
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "userId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "timestamp"
+        },
+        "replyToId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "ayahRef": {
+          "type": "object",
+          "properties": {
+            "surahNumber": {
+              "type": "number"
+            },
+            "ayahNumber": {
+              "type": "number"
+            },
+            "surahName": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        },
+        "isModerated": {
+          "type": "boolean"
+        }
       },
-      "rules": {
-        "read": "true",
-        "create": "true",
-        "update": "false",
-        "delete": "false"
-      }
+      "required": ["content", "author", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "discussions/{discussionId}": {
+      "schema": {
+        "$ref": "#/entities/Discussion"
+      },
+      "description": "Global and Ayah-specific discussions."
     }
   }
 }

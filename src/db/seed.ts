@@ -1,6 +1,8 @@
 import { db } from './index';
 import { scienceArticles, scienceTopics, articleTopics, ayahScienceRelationships } from './schema';
-import data from './data.json';
+import dataRaw from './data.json';
+
+const data = dataRaw as any;
 
 export async function seed() {
   console.log("Starting to seed database from data.json...");

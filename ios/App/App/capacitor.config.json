@@ -9,7 +9,6 @@
 	},
 	"packageClassList": [
 		"AppPlugin",
-		"LocalNotificationsPlugin",
-		"PreferencesPlugin"
+		"LocalNotificationsPlugin"
 	]
 }

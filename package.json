@@ -11,9 +11,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "generate-assets": "capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'",
-    "encrypt-secrets": "node scripts/encrypt-secrets.js",
-    "decrypt-secrets": "node scripts/decrypt-secrets.js"
+    "generate-assets": "capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",
@@ -21,7 +19,6 @@
     "@capacitor/core": "^8.4.2",
     "@capacitor/ios": "^8.5.0",
     "@capacitor/local-notifications": "^8.2.1",
-    "@capacitor/preferences": "^8.0.1",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "better-sqlite3": "^13.0.3",
@@ -36,13 +33,14 @@
     "react-dom": "^19.0.1",
     "react-markdown": "^10.1.0",
     "rss-parser": "^3.13.0",
-    "uuid": "^14.0.2",
+    "uuid": "^14.0.1",
     "vite": "^6.2.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.2",
+    "@firebase/eslint-plugin-security-rules": "^0.0.2",
     "@types/better-sqlite3": "^9.6.0",
     "@types/cheerio": "^0.22.35",
     "@types/cors": "^2.8.19",

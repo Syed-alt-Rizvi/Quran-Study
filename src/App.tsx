@@ -8,7 +8,6 @@ import Sidebar from './components/Sidebar';
 import DuaScreen from './components/DuaScreen';
 import AudioPlayer from './components/AudioPlayer';
 import { AnimatePresence } from 'motion/react';
-import { getStorage, setStorage, removeStorage } from './utils/storage';
 
 export default function App() {
   const { isDarkMode, englishFont } = useSettingsStore();
@@ -17,7 +16,6 @@ export default function App() {
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(true);
 
   // Apply dark mode class to html element
   useEffect(() => {
@@ -28,43 +26,32 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Load saved navigation state robustly on mount
+  // Load saved navigation state on mount
   useEffect(() => {
-    const restoreState = async () => {
-      try {
-        const savedSurah = await getStorage('shia-quran-active-surah');
-        const savedJuz = await getStorage('shia-quran-active-juz');
-        if (savedSurah) {
-          setSelectedSurah(parseInt(savedSurah));
-          setShowWelcome(false); // Skip welcome screen if resuming reading
-        } else if (savedJuz) {
-          setSelectedJuz(parseInt(savedJuz));
-          setShowWelcome(false);
-        }
-      } catch (e) {
-        console.warn('Failed to restore state', e);
-      } finally {
-        setIsRestoring(false);
-      }
-    };
-    restoreState();
+    const savedSurah = localStorage.getItem('shia-quran-active-surah');
+    const savedJuz = localStorage.getItem('shia-quran-active-juz');
+    if (savedSurah) {
+      setSelectedSurah(parseInt(savedSurah));
+      setShowWelcome(false); // Skip welcome screen if resuming reading
+    } else if (savedJuz) {
+      setSelectedJuz(parseInt(savedJuz));
+      setShowWelcome(false);
+    }
   }, []);
 
-  // Save navigation state robustly on change
+  // Save navigation state on change
   useEffect(() => {
-    if (isRestoring) return; // Don't save while restoring
-    
     if (selectedSurah) {
-      setStorage('shia-quran-active-surah', selectedSurah.toString());
-      removeStorage('shia-quran-active-juz');
+      localStorage.setItem('shia-quran-active-surah', selectedSurah.toString());
+      localStorage.removeItem('shia-quran-active-juz');
     } else if (selectedJuz) {
-      setStorage('shia-quran-active-juz', selectedJuz.toString());
-      removeStorage('shia-quran-active-surah');
+      localStorage.setItem('shia-quran-active-juz', selectedJuz.toString());
+      localStorage.removeItem('shia-quran-active-surah');
     } else {
-      removeStorage('shia-quran-active-surah');
-      removeStorage('shia-quran-active-juz');
+      localStorage.removeItem('shia-quran-active-surah');
+      localStorage.removeItem('shia-quran-active-juz');
     }
-  }, [selectedSurah, selectedJuz, isRestoring]);
+  }, [selectedSurah, selectedJuz]);
 
   useEffect(() => {
     let appListener: any;
@@ -106,7 +93,7 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 pb-24 bg-fixed"
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 pb-24"
       style={{ fontFamily: englishFont }}
     >
       <AnimatePresence mode="wait">

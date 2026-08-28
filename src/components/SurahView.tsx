@@ -96,17 +96,24 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
     }
   };
 
+  const baseHue = Math.floor(((surah.number * 137.5) + (ayah.numberInSurah * 35)) % 360);
+  const secHue = (baseHue + 40) % 360;
+
+  const styleProps = {
+    '--ayah-base-hue': `${baseHue}`,
+    '--ayah-sec-hue': `${secHue}`,
+  } as React.CSSProperties;
+
   return (
     <div className="flex flex-col">
       <div 
         id={`ayah-${ayah.numberInSurah}`}
         ref={ayahRef}
-        className={`group relative py-2 px-2 sm:px-6 transition-all duration-500 rounded-xl ${
-          isActivePlaying 
-            ? 'bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800' 
-            : isLastRead 
-              ? 'bg-emerald-50/30 dark:bg-emerald-900/10 border border-transparent' 
-              : 'border border-transparent'
+        style={styleProps}
+        className={`group relative py-4 px-4 sm:px-8 transition-all duration-500 rounded-[2rem] border ${
+          isActivePlaying || isLastRead
+            ? 'border-[hsl(var(--ayah-base-hue),60%,80%)] dark:border-[hsl(var(--ayah-base-hue),40%,30%)] shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,70%,0.4)] dark:shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,20%,0.6)] bg-gradient-to-br from-[hsl(var(--ayah-base-hue),80%,90%)] to-[hsl(var(--ayah-sec-hue),70%,85%)] dark:from-[hsl(var(--ayah-base-hue),60%,20%)] dark:to-[hsl(var(--ayah-sec-hue),50%,15%)]' 
+            : 'border-transparent bg-gradient-to-br from-[hsl(var(--ayah-base-hue),40%,98%)] to-[hsl(var(--ayah-sec-hue),30%,95%)] dark:from-[hsl(var(--ayah-base-hue),20%,12%)] dark:to-[hsl(var(--ayah-sec-hue),15%,8%)]'
         }`}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
@@ -297,9 +304,9 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
         </AnimatePresence>
 
         {scienceRels.length > 0 && (
-          <div className="mt-4 pt-4 border-t-[0.5px] border-teal-200/50 dark:border-teal-800/50">
+          <div className="mt-4 pt-4 border-t-[0.5px] border-blue-200/50 dark:border-blue-800/50">
             <h4 
-              className="text-[10px] font-bold text-teal-600/70 dark:text-teal-400/70 uppercase tracking-widest mb-3 flex items-center gap-2 cursor-pointer"
+              className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mb-3 flex items-center gap-2 cursor-pointer"
               onClick={() => setIsScienceExpanded(!isScienceExpanded)}
             >
               <Microscope size={12} />
@@ -325,8 +332,8 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
                       }}
                     >
                       <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1">{rel.article.title}</h5>
-                      <p className="text-[10px] uppercase tracking-widest font-medium text-teal-600 dark:text-teal-400 mb-2">{rel.article.author}</p>
-                      <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-teal-200 dark:border-teal-800 pl-3">"{rel.relation.explanation}"</p>
+                      <p className="text-[10px] uppercase tracking-widest font-medium text-blue-600 dark:text-blue-400 mb-2">{rel.article.author}</p>
+                      <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-blue-200 dark:border-blue-800 pl-3">"{rel.relation.explanation}"</p>
                     </div>
                   ))}
                 </motion.div>
@@ -371,31 +378,19 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         setSurah(surahData);
         setLoading(false);
         
-        // Restore scroll position robustly using capacitor preferences
-        import('../utils/storage').then(({ getStorage }) => {
-          getStorage(`shia-quran-scroll-ayah-${surahId}`).then((savedAyahNum) => {
-            if (savedAyahNum) {
+        // Check for hash and scroll
+        if (window.location.hash && window.location.hash.startsWith('#ayah-')) {
+          setTimeout(() => {
+            const el = document.getElementById(window.location.hash.substring(1));
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/10', 'transition-colors', 'duration-700');
               setTimeout(() => {
-                const el = document.getElementById(`ayah-${savedAyahNum}`);
-                if (el) {
-                  el.scrollIntoView({ behavior: 'auto', block: 'center' });
-                }
-              }, 100);
-            } else if (window.location.hash && window.location.hash.startsWith('#ayah-')) {
-              // Fallback to hash
-              setTimeout(() => {
-                const el = document.getElementById(window.location.hash.substring(1));
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/10', 'transition-colors', 'duration-700');
-                  setTimeout(() => {
-                    el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/10');
-                  }, 3000);
-                }
-              }, 500); // Wait for render
+                el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/10');
+              }, 3000);
             }
-          });
-        });
+          }, 500); // Wait for render
+        }
       })
       .catch((e) => {
         console.error(e);
@@ -410,31 +405,6 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       })
       .catch(() => setScienceRels([]));
   }, [surahId]);
-
-  // Track scroll position
-  useEffect(() => {
-    if (!surah) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const ayahNum = entry.target.id.replace('ayah-', '');
-            import('../utils/storage').then(({ setStorage }) => {
-              setStorage(`shia-quran-scroll-ayah-${surahId}`, ayahNum);
-            });
-          }
-        });
-      },
-      { rootMargin: '-10% 0px -80% 0px' } // Trigger when element is near top
-    );
-    
-    surah.ayahs.forEach(ayah => {
-      const el = document.getElementById(`ayah-${ayah.numberInSurah}`);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [surah, surahId]);
 
   const isThisSurahPlaying = audioSurahId === surah?.number && isPlaying;
 
@@ -496,7 +466,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       </header>
 
       <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
+        <div className="bg-white dark:bg-slate-900 sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
           {surah.number !== 1 && surah.number !== 9 && (
             <div className="text-center mb-10 pb-8 border-b-[0.5px] border-slate-200 dark:border-slate-800">
               <h2 
@@ -536,7 +506,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               href={`https://www.tafseerenamoona.net/surahs/${surah.number}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>
@@ -552,7 +522,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               href="https://quran.com/en"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
+              className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-md transition-shadow group border-[0.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-800"
             >
               <FileText className="text-emerald-500 mt-0.5 shrink-0" size={18} />
               <div>

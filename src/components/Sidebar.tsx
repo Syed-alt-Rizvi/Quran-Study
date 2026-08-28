@@ -17,8 +17,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     translationLanguages, toggleTranslationLanguage,
     tafseerLanguages, toggleTafseerLanguage,
     reminderTime, setReminderTime,
+    reciter, setReciter,
     bookmarks, removeBookmark 
   } = useSettingsStore();
+
+  const reciters = [
+    { name: 'Mishary Rashid Alafasy', value: 'ar.alafasy' },
+    { name: 'Abdul Basit (Murattal)', value: 'ar.abdulbasitmurattal' },
+    { name: 'Abdur-Rahman as-Sudais', value: 'ar.abdurrahmaansudais' },
+    { name: 'Mohamed Siddiq al-Minshawi', value: 'ar.minshawi' }
+  ];
 
   const arabicFonts = [
     { name: 'Amiri', value: 'Amiri' },
@@ -49,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-white/30 dark:bg-slate-900/30 backdrop-blur-2xl border-l border-white/40 dark:border-slate-700/50 shadow-2xl overflow-y-auto flex flex-col"
+            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-slate-50 dark:bg-slate-900 shadow-2xl overflow-y-auto flex flex-col"
           >
             <div className="flex items-center justify-between p-6 border-b-[0.5px] border-slate-200 dark:border-slate-800">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Settings</h2>
@@ -70,7 +78,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
                 <button
                   onClick={toggleDarkMode}
-                  className="w-full flex items-center justify-between p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 hover:border-emerald-500 transition-colors"
+                  className="w-full flex items-center justify-between p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition-colors"
                 >
                   <span>{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
                   <div className="w-10 h-6 bg-emerald-500 rounded-full relative">
@@ -100,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       const selected = englishFonts.find(f => f.name === e.target.value)?.value;
                       if (selected) setEnglishFont(selected);
                     }}
-                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
+                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
                   >
                     {englishFonts.map(f => (
                       <option key={f.name} value={f.name}>{f.name}</option>
@@ -116,7 +124,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       const selected = arabicFonts.find(f => f.name === e.target.value)?.value;
                       if (selected) setArabicFont(selected);
                     }}
-                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
+                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
                   >
                     {arabicFonts.map(f => (
                       <option key={f.name} value={f.name}>{f.name}</option>
@@ -133,7 +141,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
                 <button
                   onClick={toggleShowTranslation}
-                  className="w-full flex items-center justify-between p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 hover:border-emerald-500 transition-colors"
+                  className="w-full flex items-center justify-between p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition-colors"
                 >
                   <span>Show Translations</span>
                   <div className={`w-10 h-6 rounded-full relative transition-colors ${showTranslation ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
@@ -187,6 +195,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               </div>
 
+              {/* Audio // Reciter */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-slate-800 dark:text-slate-200 font-medium">
+                  <Pilcrow size={20} />
+                  <span>Audio // Reciter</span>
+                </div>
+                <div className="relative">
+                  <select
+                    value={reciter}
+                    onChange={(e) => setReciter(e.target.value)}
+                    className="w-full p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none"
+                  >
+                    {reciters.map((r) => (
+                      <option key={r.value} value={r.value}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               {/* Daily Reminder */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-slate-800 dark:text-slate-200 font-medium">
@@ -232,7 +259,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         console.error('Local notifications not supported:', err);
                       }
                     }}
-                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
+                    className="w-full p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:border-emerald-500 dark:text-slate-200"
                   />
                   {reminderTime && (
                     <button
@@ -259,7 +286,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <Type size={20} />
                   <span>Arabic Font Size</span>
                 </div>
-                <div className="p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50">
+                <div className="p-4 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                   <div className="flex items-center gap-4">
                     <span className="text-sm">A</span>
                     <input
@@ -291,7 +318,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                   {bookmarks.map((b) => (
-                    <div key={`${b.surahId}-${b.ayahNumber}`} className="flex items-center justify-between p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md border border-white/40 dark:border-slate-700/50">
+                    <div key={`${b.surahId}-${b.ayahNumber}`} className="flex items-center justify-between p-3 rounded-xl border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Surah {b.surahId}, Ayah {b.ayahNumber}</span>
                       </div>
