@@ -122,25 +122,19 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
         </div>
       </header>
       {userName && (
-        <div className="max-w-4xl lg:max-w-5xl mx-auto px-4 pt-6">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto px-4 pt-10 pb-4">
           <motion.div 
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-emerald-50 dark:bg-emerald-900/20 border-[0.5px] border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex items-center justify-between shadow-sm"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col space-y-2"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <span className="text-lg font-bold">{userName.charAt(0).toUpperCase()}</span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-                  Assalamualaikum, {userName} ✨
-                </p>
-                <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80">
-                  Ready to continue your recitation?
-                </p>
-              </div>
-            </div>
+            <h2 className="text-2xl sm:text-3xl font-light text-slate-800 dark:text-slate-200 tracking-tight">
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Assalamualaikum,</span> {userName}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] font-medium">
+              May peace and blessings be upon you
+            </p>
           </motion.div>
         </div>
       )}

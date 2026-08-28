@@ -10,8 +10,8 @@ import AudioPlayer from './components/AudioPlayer';
 import { AnimatePresence } from 'motion/react';
 
 export default function App() {
-  const { isDarkMode, englishFont } = useSettingsStore();
-  const [showWelcome, setShowWelcome] = useState(true);
+  const { isDarkMode, englishFont, hasSeenWelcome, setHasSeenWelcome } = useSettingsStore();
+  const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -75,6 +75,7 @@ export default function App() {
 
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
+    setHasSeenWelcome(true);
   };
 
   const handleExitComplete = async () => {

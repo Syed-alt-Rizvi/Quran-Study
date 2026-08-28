@@ -78,9 +78,17 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   const handleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
       await signInWithPopup(auth, provider);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Sign in error:", e);
+      if (e.code === 'auth/popup-closed-by-user') {
+        alert("The sign-in popup was closed. If your browser blocked it, please allow popups for this site, or open the app in a new tab using the button in the top right corner.");
+      } else {
+        alert("Sign in error: " + (e.message || String(e)));
+      }
     }
   };
 
