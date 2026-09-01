@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSettingsStore } from './store';
 import WelcomeScreen from './components/WelcomeScreen';
 import Home from './components/Home';
@@ -16,6 +16,18 @@ export default function App() {
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+
+  const isSidebarOpenRef = useRef(isSidebarOpen);
+  isSidebarOpenRef.current = isSidebarOpen;
+  const selectedSurahRef = useRef(selectedSurah);
+  selectedSurahRef.current = selectedSurah;
+  const selectedJuzRef = useRef(selectedJuz);
+  selectedJuzRef.current = selectedJuz;
+  const isExitingRef = useRef(isExiting);
+  isExitingRef.current = isExiting;
+  const showWelcomeRef = useRef(showWelcome);
+  showWelcomeRef.current = showWelcome;
+
 
   // Apply dark mode class to html element
   useEffect(() => {
@@ -55,20 +67,37 @@ export default function App() {
 
   useEffect(() => {
     let appListener: any;
-    import('@capacitor/app').then(({ App }) => {
-      appListener = App.addListener('appStateChange', ({ isActive }) => {
+    let backButtonListener: any;
+    import('@capacitor/app').then(({ App: CapacitorApp }) => {
+      appListener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
         if (isActive) {
           setIsExiting(false);
-          // Intentionally NOT calling setShowWelcome(true) to preserve reading context
         }
       });
-    }).catch(() => {
-      // Ignore if capacitor is not available
-    });
+
+      backButtonListener = CapacitorApp.addListener('backButton', () => {
+        if (isSidebarOpenRef.current) {
+          setIsSidebarOpen(false);
+        } else if (selectedSurahRef.current !== null) {
+          setSelectedSurah(null);
+        } else if (selectedJuzRef.current !== null) {
+          setSelectedJuz(null);
+        } else if (isExitingRef.current) {
+          setIsExiting(false);
+        } else if (!showWelcomeRef.current) {
+          setIsExiting(true);
+        } else {
+          CapacitorApp.exitApp();
+        }
+      });
+    }).catch(() => {});
 
     return () => {
       if (appListener) {
         appListener.then((listener: any) => listener.remove());
+      }
+      if (backButtonListener) {
+        backButtonListener.then((listener: any) => listener.remove());
       }
     };
   }, []);

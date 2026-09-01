@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { X, Send, Loader2, User, LogIn } from 'lucide-react';
 import { Ayah, SurahDetail } from '../api';
 import { motion, AnimatePresence } from 'motion/react';
-import { db, auth } from '../utils/firebase';
+import { db } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, where } from 'firebase/firestore';
 import { Capacitor } from '@capacitor/core';
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, User as FirebaseUser, browserPopupRedirectResolver } from "firebase/auth";
+import { getGuestProfile, saveGuestProfile, clearGuestProfile, GuestProfile } from '../utils/guestAuth';
 
 interface DiscussionModalProps {
   isOpen: boolean;
@@ -19,14 +19,14 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [currentUser, setCurrentUser] = useState<GuestProfile | null>(getGuestProfile());
+  const [author, setAuthor] = useState(currentUser?.displayName || '');
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribeAuth();
-  }, []);
+    if (currentUser && !author) {
+      setAuthor(currentUser.displayName || "Anonymous");
+    }
+    }, []);
 
   // Load draft
   useEffect(() => {
@@ -77,16 +77,11 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   }, [isOpen, surah.number, ayah.numberInSurah]);
 
   const handleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
-    } catch (e: any) {
-      console.error("Sign in error:", e);
-      if (e.code === 'auth/popup-closed-by-user') {
-        alert("The sign-in popup was closed. If your browser blocked it, please allow popups for this site, or open the app in a new tab using the button in the top right corner.");
-      } else {
-        alert("Sign in error: " + (e.message || String(e)));
-      }
+    const name = prompt("Please enter a Display Name to post:");
+    if (name && name.trim()) {
+      const profile = saveGuestProfile(name.trim());
+      setCurrentUser(profile);
+      setAuthor(profile.displayName);
     }
   };
 
@@ -99,8 +94,8 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
       await addDoc(collection(db, 'discussions'), {
         content,
         author: currentUser.displayName || 'Anonymous',
-        userId: currentUser.uid,
-        email: currentUser.email || null,
+        userId: currentUser.userId,
+        
         createdAt: serverTimestamp(),
         isModerated: false,
         ayahRef: {

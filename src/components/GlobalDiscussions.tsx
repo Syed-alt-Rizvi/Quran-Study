@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageCircle, BookOpen, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { db, auth } from '../utils/firebase';
+import { db } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Capacitor } from '@capacitor/core';
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut, User as FirebaseUser, browserPopupRedirectResolver } from "firebase/auth";
+import { getGuestProfile, saveGuestProfile, clearGuestProfile, GuestProfile } from '../utils/guestAuth';
 
 interface Discussion {
   id: string;
@@ -29,7 +29,7 @@ interface DBRow {
 export default function GlobalDiscussions() {
   const [discussions, setDiscussions] = useState<DBRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [currentUser, setCurrentUser] = useState<GuestProfile | null>(getGuestProfile());
 
   // Form state
   const [content, setContent] = useState("");
@@ -43,13 +43,9 @@ export default function GlobalDiscussions() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      if (user && !author) {
-        setAuthor(user.displayName || "Anonymous");
-        setEmail(user.email || "");
-      }
-    });
+    if (currentUser && !author) {
+      setAuthor(currentUser.displayName || "Anonymous");
+    }
 
     const q = query(collection(db, 'discussions'), orderBy('createdAt', 'desc'));
     const unsubscribeDb = onSnapshot(q, (snapshot) => {
@@ -78,22 +74,16 @@ export default function GlobalDiscussions() {
     });
 
     return () => {
-      unsubscribeAuth();
       unsubscribeDb();
     };
   }, []);
 
   const handleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
-    } catch (e: any) {
-      console.error("Sign in error:", e);
-      if (e.code === 'auth/popup-closed-by-user') {
-        alert("The sign-in popup was closed. If your browser blocked it, please allow popups for this site, or open the app in a new tab using the button in the top right corner.");
-      } else {
-        alert("Sign in error: " + (e.message || String(e)));
-      }
+    const name = prompt("Please enter a Display Name to post:");
+    if (name && name.trim()) {
+      const profile = saveGuestProfile(name.trim());
+      setCurrentUser(profile);
+      setAuthor(profile.displayName);
     }
   };
 
@@ -105,7 +95,7 @@ export default function GlobalDiscussions() {
       const payload: any = {
         content,
         author: author || currentUser.displayName || 'Anonymous',
-        userId: currentUser.uid,
+        userId: currentUser.userId,
         createdAt: serverTimestamp(),
         isModerated: false,
       };
@@ -145,7 +135,7 @@ export default function GlobalDiscussions() {
             Start a Discussion
           </h3>
           {currentUser ? (
-            <button onClick={() => signOut(auth)} className="text-xs text-slate-500 hover:text-red-500">
+            <button onClick={() => { clearGuestProfile(); setCurrentUser(null); }} className="text-xs text-slate-500 hover:text-red-500">
               Sign Out
             </button>
           ) : null}

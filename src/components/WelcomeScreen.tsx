@@ -37,10 +37,10 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
                 setTimeout(() => setStep(1), 2500);
               }}
             >
-              <h1 className="font-arabic text-5xl md:text-7xl leading-relaxed text-amber-400">
+              <h1 className="font-arabic text-[2rem] leading-tight leading-relaxed text-amber-400">
                 بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
               </h1>
-              <p className="mt-4 text-emerald-200/80 tracking-widest uppercase text-sm md:text-base font-medium">
+              <p className="mt-4 text-emerald-200/80 tracking-widest uppercase text-[0.8rem] leading-snug px-4 font-medium">
                 In the name of Allah, the Most Gracious, the Most Merciful
               </p>
             </motion.div>
@@ -53,7 +53,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
               transition={{ duration: 0.8, ease: 'easeOut' }}
               className="w-full flex flex-col items-center"
             >
-              <h2 className="font-arabic text-4xl md:text-6xl text-amber-100/90 mb-8">
+              <h2 className="font-arabic text-4xl text-amber-100/90 mb-8">
                 يا علي مدد
               </h2>
               

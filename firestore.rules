@@ -5,8 +5,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    function isSignedIn() {
-      return request.auth != null && request.auth.token.email_verified == true;
+    function isGuest() {
+      return true; // We use local device IDs now
     }
 
     function isValidId(id) {
@@ -26,7 +26,7 @@ service cloud.firestore {
              data.size() >= 5 && data.size() <= 8 &&
              data.content is string && data.content.size() > 0 && data.content.size() <= 5000 &&
              data.author is string && data.author.size() > 0 && data.author.size() <= 100 &&
-             data.userId is string && data.userId == request.auth.uid &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
              data.isModerated is bool &&
              (
                !('email' in data) || (data.email is string && data.email.size() <= 255)
@@ -49,17 +49,17 @@ service cloud.firestore {
       allow read: if true; // Public read
       allow list: if true; // Client filters, but public data is public
       
-      allow create: if isSignedIn() &&
+      allow create: if isGuest() &&
                     isValidId(discussionId) &&
                     isValidDiscussion(incoming()) &&
                     incoming().createdAt == request.time &&
                     incoming().isModerated == false;
-
-      // Allow deletion by author
-      allow delete: if isSignedIn() &&
-                    isValidId(discussionId) &&
-                    existing().userId == request.auth.uid;
                     
+      // Allow deletion by author (checking if userId matches what they claim, which is loose but works for guest auth)
+      // They can only delete if the document's userId matches what they send in a mock update, but we can't verify sender identity securely without auth.
+      // So let's just allow delete if they know the ID and it's from the app, or actually, restrict delete since guests shouldn't have secure delete.
+      allow delete: if false; 
+
       // Updates generally disabled for now except if we want likes later.
       allow update: if false;
     }
