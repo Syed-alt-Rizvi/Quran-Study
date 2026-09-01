@@ -1,4 +1,6 @@
 import { getApiUrl } from '../utils/apiBase';
+import { hapticImpact, hapticSelection } from '../utils/haptics';
+import { ImpactStyle } from '@capacitor/haptics';
 import { useState, useEffect, useRef } from 'react';
 import { fetchSurahDetail, SurahDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
@@ -398,10 +400,33 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       });
 
     // Fetch science independently
-    fetch(getApiUrl(`/api/science?surah=${surahId}`))
+    fetch('/data.json')
       .then(r => r.json())
-      .then(scienceData => {
-        setScienceRels(Array.isArray(scienceData) ? scienceData : []);
+      .then(data => {
+        if (data && data.articles && data.relationships) {
+          const surahRels = data.relationships.filter((r: any) => r.surah_number === surahId);
+          const results = surahRels.map((rel: any) => {
+            const article = data.articles.find((a: any) => a.id === rel.article_id);
+            if (!article) return null;
+            return {
+              relation: {
+                surahNumber: rel.surah_number,
+                ayahNumber: rel.ayah_number,
+                explanation: rel.explanation
+              },
+              article: {
+                id: article.id,
+                title: article.title,
+                author: article.author,
+                content: article.content,
+                originalUrl: article.original_url
+              }
+            };
+          }).filter(Boolean);
+          setScienceRels(results);
+        } else {
+          setScienceRels([]);
+        }
       })
       .catch(() => setScienceRels([]));
   }, [surahId]);
@@ -430,7 +455,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-4">
             <button 
-              onClick={onBack}
+              onClick={() => { hapticImpact(ImpactStyle.Light); onBack(); }}
               className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
               <ArrowLeft size={24} />
@@ -442,7 +467,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
           </div>
           <div className="flex-1 flex justify-end">
             <button 
-              onClick={handlePlaySurah}
+              onClick={() => { hapticImpact(ImpactStyle.Heavy); handlePlaySurah(); }}
               className={`p-2 rounded-full transition-colors flex items-center gap-2 text-sm font-medium pr-4 ${
                 isThisSurahPlaying 
                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' 

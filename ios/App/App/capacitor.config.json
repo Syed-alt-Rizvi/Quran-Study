@@ -9,6 +9,7 @@
 	},
 	"packageClassList": [
 		"AppPlugin",
+		"HapticsPlugin",
 		"LocalNotificationsPlugin"
 	]
 }

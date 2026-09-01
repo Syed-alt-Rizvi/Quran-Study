@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Moon, Sun, Type, Info, Bookmark, Pilcrow, BookOpen, Heart, MessageSquare } from 'lucide-react';
 import { useSettingsStore } from '../store';
+import { hapticImpact, hapticSelection } from '../utils/haptics';
+import { ImpactStyle } from '@capacitor/haptics';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -49,7 +51,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={() => { hapticImpact(ImpactStyle.Light); onClose(); }}
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
           />
           <motion.div
@@ -62,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="flex items-center justify-between p-6 border-b-[0.5px] border-slate-200 dark:border-slate-800">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Settings</h2>
               <button
-                onClick={onClose}
+                onClick={() => { hapticImpact(ImpactStyle.Light); onClose(); }}
                 className="p-2 -mr-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
               >
                 <X size={20} />
@@ -242,6 +244,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 title: "Quran Study Time",
                                 body: "It's time for your daily Quran reading.",
                                 id: 1,
+                                sound: "bismillah.ogg",
                                 schedule: {
                                   on: {
                                     hour: hours,

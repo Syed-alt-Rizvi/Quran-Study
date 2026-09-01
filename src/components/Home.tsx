@@ -1,4 +1,6 @@
 import { getApiUrl } from '../utils/apiBase';
+import { hapticImpact } from '../utils/haptics';
+import { ImpactStyle } from '@capacitor/haptics';
 import { useState, useEffect } from 'react';
 import { fetchSurahs, SurahMeta } from '../api';
 import { Search, BookOpen, Settings, LogOut, Microscope, ArrowRight, MessageCircle } from "lucide-react";
@@ -34,13 +36,24 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       })
       .catch(console.error);
 
-    fetch(getApiUrl('/api/science'))
+    fetch('/data.json')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setScienceArticles(data);
+        if (data && data.articles) {
+          const processedArticles = data.articles.map((article: any) => ({
+            id: article.id,
+            title: article.title,
+            author: article.author,
+            content: article.content,
+            originalUrl: article.original_url,
+            relations: (data.relationships || []).filter((r: any) => r.article_id === article.id).map((r: any) => ({
+              surahNumber: r.surah_number,
+              ayahNumber: r.ayah_number
+            }))
+          }));
+          setScienceArticles(processedArticles);
         } else {
-          console.error("Failed to fetch science articles:", data);
+          console.error("Failed to parse static articles");
         }
       })
       .catch(console.error);
@@ -106,7 +119,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
           </div>
           <div className="flex items-center gap-2">
             <button 
-              onClick={onOpenSettings}
+              onClick={() => { hapticImpact(ImpactStyle.Light); onOpenSettings(); }}
               className="p-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 bg-slate-100 hover:bg-emerald-50 dark:bg-slate-900 dark:hover:bg-slate-800 rounded-full transition-colors"
             >
               <Settings size={22} />
@@ -152,7 +165,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
                 window.location.hash = `ayah-${lastRead.ayahNumber}`;
                 onSelectSurah(lastRead.surahId);
               }}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl transition-colors"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl transition-colors active:scale-95"
             >
               Resume
             </button>
@@ -231,7 +244,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               return (
                 <button
                   key={surah.number}
-                  onClick={() => onSelectSurah(surah.number)}
+                  onClick={() => { hapticImpact(ImpactStyle.Medium); onSelectSurah(surah.number); }}
                   className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border-[0.5px] border-slate-200/60 dark:border-slate-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
                   <div className="flex items-start justify-between w-full mb-3">

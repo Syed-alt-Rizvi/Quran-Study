@@ -5,6 +5,8 @@ import { db } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Capacitor } from '@capacitor/core';
 import { getGuestProfile, saveGuestProfile, clearGuestProfile, GuestProfile } from '../utils/guestAuth';
+import { hapticImpact, hapticNotification } from '../utils/haptics';
+import { ImpactStyle } from '@capacitor/haptics';
 
 interface Discussion {
   id: string;
@@ -79,6 +81,7 @@ export default function GlobalDiscussions() {
   }, []);
 
   const handleSignIn = async () => {
+    hapticImpact(ImpactStyle.Light);
     const name = prompt("Please enter a Display Name to post:");
     if (name && name.trim()) {
       const profile = saveGuestProfile(name.trim());
@@ -113,7 +116,7 @@ export default function GlobalDiscussions() {
       }
 
       await addDoc(collection(db, 'discussions'), payload);
-
+      hapticNotification('SUCCESS');
       setContent("");
       setReplyTo(null);
       setCitationSurah("");
@@ -215,7 +218,7 @@ export default function GlobalDiscussions() {
                 <button 
                   type="submit"
                   disabled={!content.trim()}
-                  className="px-6 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl flex items-center justify-center transition-colors"
+                  className="px-6 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl flex items-center justify-center transition-colors active:scale-95"
                 >
                   <Send size={20} />
                 </button>
