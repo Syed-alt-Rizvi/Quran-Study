@@ -4,7 +4,8 @@ import { Ayah, SurahDetail } from '../api';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, where } from 'firebase/firestore';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, User as FirebaseUser, browserPopupRedirectResolver } from "firebase/auth";
 
 interface DiscussionModalProps {
   isOpen: boolean;
@@ -78,10 +79,7 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   const handleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
     } catch (e: any) {
       console.error("Sign in error:", e);
       if (e.code === 'auth/popup-closed-by-user') {

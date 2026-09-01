@@ -3,7 +3,8 @@ import { Send, User, MessageCircle, BookOpen, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut, User as FirebaseUser, browserPopupRedirectResolver } from "firebase/auth";
 
 interface Discussion {
   id: string;
@@ -85,10 +86,7 @@ export default function GlobalDiscussions() {
   const handleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
     } catch (e: any) {
       console.error("Sign in error:", e);
       if (e.code === 'auth/popup-closed-by-user') {
