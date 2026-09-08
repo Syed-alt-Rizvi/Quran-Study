@@ -5,12 +5,131 @@ import { CapacitorHttp } from '@capacitor/core';
 export interface TafseerContent {
   ur: string;
   en: string;
+  tafseer_text?: string;
+  tafseer_title?: string;
+  isAiRefined?: boolean;
 }
 
 // In-memory cache
 const memoryCache: Record<string, TafseerContent> = {};
 
-export async function fetchTafseer(surahNumber: number, ayahNumber: number): Promise<TafseerContent> {
+export async function refineKautharWithGemini(
+  surahNumber: number, 
+  ayahNumber: number, 
+  rawText?: string
+): Promise<TafseerContent> {
+  const kKey = "kauthar_" + surahNumber + "_" + ayahNumber;
+  const endpoint = getApiUrl('/api/tafseer/kauthar/refine');
+  const payload = {
+    surah: surahNumber,
+    ayah: ayahNumber,
+    rawText: rawText ? rawText.slice(0, 15000) : undefined,
+    force: true
+  };
+
+  try {
+    if (Capacitor.isNativePlatform()) {
+      const nativeRes = await CapacitorHttp.post({
+        url: endpoint,
+        headers: { 'Content-Type': 'application/json' },
+        data: payload
+      });
+      if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data?.ur) {
+        const result: TafseerContent = {
+          ur: nativeRes.data.ur,
+          en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
+          isAiRefined: true
+        };
+        memoryCache[kKey] = result;
+        return result;
+      }
+    } else {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ur) {
+            const result: TafseerContent = {
+              ur: data.ur,
+              en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
+              isAiRefined: true
+            };
+            memoryCache[kKey] = result;
+            return result;
+          }
+        } else {
+          console.warn(`Refinement server responded with status: ${res.status}`);
+        }
+      } catch (fetchErr: any) {
+        clearTimeout(timeoutId);
+        if (fetchErr?.name === 'AbortError') {
+          console.warn("Gemini refinement timed out after 45 seconds.");
+        } else {
+          console.warn("Gemini live refinement network note:", fetchErr?.message || fetchErr);
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn("Gemini live refinement note:", err?.message || err);
+  }
+  return memoryCache[kKey] || { ur: rawText || "", en: "", isAiRefined: false };
+}
+
+export async function fetchTafseer(surahNumber: number, ayahNumber: number, provider: 'namoona' | 'kauthar' = 'namoona'): Promise<TafseerContent> {
+
+  
+  if (provider === 'kauthar') {
+    const kKey = "kauthar_" + surahNumber + "_" + ayahNumber;
+    if (memoryCache[kKey]) return memoryCache[kKey];
+    
+    // 1. Try server API endpoint first (returns fast static or cached refined data)
+    try {
+      const apiRes = await fetch(getApiUrl(`/api/tafseer/kauthar/${surahNumber}/${ayahNumber}`));
+      if (apiRes.ok) {
+        const item = await apiRes.json();
+        if (item && item.ur) {
+          memoryCache[kKey] = item;
+          return item;
+        }
+      }
+    } catch(e) {
+      // ignore and fallback
+    }
+
+    // 2. Try per-surah static JSON chunk
+    try {
+      const surahChunkRes = await fetch(`/tafseer_kauthar/surah_${surahNumber}.json`);
+      if (surahChunkRes.ok) {
+        const surahList = await surahChunkRes.json();
+        const match = surahList.find((d: any) => d.ayah === ayahNumber);
+        if (match) {
+          memoryCache[kKey] = match;
+          return match;
+        }
+      }
+    } catch(e) {
+      // ignore and fallback
+    }
+
+    const placeholder = {
+      ur: "**تفسیر الکوثر**\n\nعلامہ شیخ محسن علی نجفی کی تفسیر الکوثر سے اس آیت کی تشریح لوڈ کی جا رہی ہے۔",
+      en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi."
+    };
+    return placeholder;
+  }
+
+
   const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v6`;
   
   // 1. Check in-memory cache
@@ -264,5 +383,12 @@ export function clearTafseerCache() {
   }
   for (const key of Object.keys(memoryCache)) {
     delete memoryCache[key];
+  }
+}
+
+
+declare global {
+  interface Window {
+    __kautharCache?: any[];
   }
 }

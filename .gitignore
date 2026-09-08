@@ -6,3 +6,11 @@ coverage/
 *.log
 .env*
 !.env.example
+public/kauthar.json
+dist/kauthar.json
+scripts/tafseer_raw/
+scripts/*.cjs
+scripts/*.ts
+recovered.sql
+DRAFT_firestore.rules
+convert.cjs

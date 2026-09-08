@@ -13,9 +13,22 @@ export default function App() {
   const { isDarkMode, englishFont, hasSeenWelcome, setHasSeenWelcome } = useSettingsStore();
   const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
+  const [targetAyah, setTargetAyah] = useState<number | null>(null);
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+
+  const handleSelectSurah = (id: number, ayahNumber?: number) => {
+    setSelectedSurah(id);
+    setTargetAyah(ayahNumber || null);
+    setSelectedJuz(null);
+  };
+
+  const handleSelectJuz = (id: number) => {
+    setSelectedJuz(id);
+    setSelectedSurah(null);
+    setTargetAyah(null);
+  };
 
   const isSidebarOpenRef = useRef(isSidebarOpen);
   isSidebarOpenRef.current = isSidebarOpen;
@@ -133,24 +146,35 @@ export default function App() {
           <DuaScreen key="dua" onContinueExit={handleExitComplete} />
         ) : selectedSurah ? (
           <SurahView 
-            key="surah-view" 
-            surahId={selectedSurah} 
+            key={`surah-view-${selectedSurah}`} 
+            surahId={selectedSurah}
+            targetAyah={targetAyah || undefined} 
             onBack={() => {
-              history.replaceState(null, '', ' ');
+              if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+              }
               setSelectedSurah(null);
+              setTargetAyah(null);
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             }} 
           />
         ) : selectedJuz ? (
           <JuzView 
-            key="juz-view" 
+            key={`juz-view-${selectedJuz}`} 
             juzId={selectedJuz} 
-            onBack={() => setSelectedJuz(null)} 
+            onBack={() => {
+              if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+              }
+              setSelectedJuz(null);
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }} 
           />
         ) : (
           <Home 
             key="home" 
-            onSelectSurah={setSelectedSurah} 
-            onSelectJuz={setSelectedJuz}
+            onSelectSurah={handleSelectSurah} 
+            onSelectJuz={handleSelectJuz}
             onOpenSettings={() => setIsSidebarOpen(true)} 
             onExit={() => setIsExiting(true)}
           />
@@ -159,7 +183,11 @@ export default function App() {
 
       <Sidebar 
         isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+        onClose={() => setIsSidebarOpen(false)}
+        onSelectSurah={(surahId, ayahNumber) => {
+          setIsSidebarOpen(false);
+          handleSelectSurah(surahId, ayahNumber);
+        }} 
       />
       
       {!showWelcome && !isExiting && <AudioPlayer />}

@@ -65,7 +65,7 @@ export default function DynamicBanner() {
         
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentIndex}
+            key={`banner-slide-${currentIndex}`}
             initial={{ opacity: 0, scale: 0.98, filter: 'blur(2px)' }}
             animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 1.02, filter: 'blur(2px)' }}
@@ -97,9 +97,9 @@ export default function DynamicBanner() {
         </AnimatePresence>
         
         <div className="absolute bottom-4 flex gap-3">
-          {BANNERS.map((_, i) => (
+          {BANNERS.map((banner, i) => (
             <button
-              key={i}
+              key={`banner-indicator-${banner.title.replace(/\s+/g, '-')}-${i}`}
               onClick={() => setCurrentIndex(i)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                 i === currentIndex ? 'bg-[#d4af37] w-6 opacity-100' : 'bg-[#d4af37]/40 hover:bg-[#d4af37]/70 opacity-60'

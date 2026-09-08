@@ -31,8 +31,11 @@ interface SettingsState {
   showTranslation: boolean;
   translationLanguages: ('en' | 'ur')[];
   tafseerLanguages: ('en' | 'ur')[];
+  tafseerProvider: 'namoona' | 'kauthar';
   readProgress: Record<number, number>; // Maps surahId to highest read ayahNumber
-  reminderTime: string | null; // HH:MM format
+  reminderTime: string | null;
+  reminderSound: string; // HH:MM format
+  autoScrollAudio: boolean;
   reciter: string;
   userName: string;
   
@@ -43,6 +46,9 @@ interface SettingsState {
   toggleShowTranslation: () => void;
   toggleTranslationLanguage: (lang: 'en' | 'ur') => void;
   toggleTafseerLanguage: (lang: 'en' | 'ur') => void;
+  setTafseerProvider: (provider: 'namoona' | 'kauthar') => void;
+  toggleAutoScrollAudio: () => void;
+  setAutoScrollAudio: (val: boolean) => void;
   setHasSeenWelcome: (seen: boolean) => void;
   addBookmark: (bookmark: Bookmark) => void;
   removeBookmark: (surahId: number, ayahNumber: number) => void;
@@ -52,6 +58,7 @@ interface SettingsState {
   incrementTafseerRead: (date: string) => void;
   saveTafseerNote: (key: string, note: string) => void;
   setReminderTime: (time: string | null) => void;
+  setReminderSound: (sound: string) => void;
   setReciter: (reciter: string) => void;
   setUserName: (name: string) => void;
 }
@@ -71,8 +78,11 @@ export const useSettingsStore = create<SettingsState>()(
       showTranslation: true,
       translationLanguages: ['en'],
       tafseerLanguages: ['ur'],
+      tafseerProvider: 'namoona',
       readProgress: {},
       reminderTime: null,
+      reminderSound: 'bismillah.ogg',
+      autoScrollAudio: false,
       reciter: 'ar.alafasy',
       userName: '',
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
@@ -90,6 +100,9 @@ export const useSettingsStore = create<SettingsState>()(
           ? state.tafseerLanguages.filter(l => l !== lang)
           : [...state.tafseerLanguages, lang]
       })),
+      setTafseerProvider: (provider) => set({ tafseerProvider: provider }),
+      toggleAutoScrollAudio: () => set((state) => ({ autoScrollAudio: !state.autoScrollAudio })),
+      setAutoScrollAudio: (val) => set({ autoScrollAudio: val }),
       setHasSeenWelcome: (seen) => set({ hasSeenWelcome: seen }),
       addBookmark: (bookmark) => set((state) => ({ 
         bookmarks: [...state.bookmarks.filter(b => !(b.surahId === bookmark.surahId && b.ayahNumber === bookmark.ayahNumber)), bookmark] 
@@ -132,6 +145,7 @@ export const useSettingsStore = create<SettingsState>()(
         }
       })),
       setReminderTime: (time) => set({ reminderTime: time }),
+      setReminderSound: (sound) => set({ reminderSound: sound }),
       setReciter: (reciter) => set({ reciter }),
       setUserName: (name) => set({ userName: name }),
     }),

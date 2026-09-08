@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, X } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, X, LocateFixed } from 'lucide-react';
 import { useAudioStore } from '../audioStore';
 import { useSettingsStore } from '../store';
+import { hapticSelection } from '../utils/haptics';
 
 export default function AudioPlayer() {
   const { 
@@ -15,7 +16,7 @@ export default function AudioPlayer() {
     stop 
   } = useAudioStore();
   
-  const { reciter } = useSettingsStore();
+  const { reciter, autoScrollAudio, toggleAutoScrollAudio } = useSettingsStore();
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -94,12 +95,29 @@ export default function AudioPlayer() {
         </button>
       </div>
 
-      <button 
-        onClick={stop}
-        className="ml-4 text-slate-400 hover:text-red-500 transition-colors"
-      >
-        <X size={20} />
-      </button>
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={() => {
+            hapticSelection();
+            toggleAutoScrollAudio();
+          }}
+          title={autoScrollAudio ? "Auto-scroll to playing verse: ON" : "Auto-scroll to playing verse: OFF"}
+          className={`p-1.5 rounded-full transition-all ${
+            autoScrollAudio 
+              ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 ring-1 ring-emerald-500/50' 
+              : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+          }`}
+        >
+          <LocateFixed size={18} />
+        </button>
+
+        <button 
+          onClick={stop}
+          className="text-slate-400 hover:text-red-500 transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
 
       {currentAyah.audio && (
         <audio 

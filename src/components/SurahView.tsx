@@ -1,4 +1,5 @@
 import { getApiUrl } from '../utils/apiBase';
+import TafseerAlKautharViewer from './TafseerAlKautharViewer';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import { useState, useEffect, useRef } from 'react';
@@ -7,18 +8,19 @@ import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, Microscope, PauseCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, Microscope, PauseCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 
 interface SurahViewProps {
   key?: string;
   surahId: number;
+  targetAyah?: number;
   onBack: () => void;
 }
 
 function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; scienceRels?: any[]; isLast?: boolean }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages } = useSettingsStore();
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
   const [isScienceExpanded, setIsScienceExpanded] = useState(false);
@@ -31,15 +33,15 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
   const isActivePlaying = audioSurahId === surah.number && activeAyahNumber === ayah.numberInSurah && activeSurahNumber === surah.number;
 
   useEffect(() => {
-    if (isActivePlaying && isPlaying && ayahRef.current) {
+    if (autoScrollAudio && isActivePlaying && isPlaying && ayahRef.current) {
       ayahRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [isActivePlaying, isPlaying]);
+  }, [isActivePlaying, isPlaying, autoScrollAudio]);
 
   useEffect(() => {
     if (activeTab === 'tafseer' && !lazyTafseer) {
       setLazyLoading(true);
-      fetchTafseer(surah.number, ayah.numberInSurah)
+      fetchTafseer(surah.number, ayah.numberInSurah, tafseerProvider)
         .then(res => setLazyTafseer(res))
         .catch(err => {
           console.error(err);
@@ -47,7 +49,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
         })
         .finally(() => setLazyLoading(false));
     }
-  }, [activeTab, surah.number, ayah.numberInSurah, lazyTafseer]);
+  }, [activeTab, surah.number, ayah.numberInSurah, lazyTafseer, tafseerProvider]);
 
   const bookmarked = isBookmarked(surah.number, ayah.numberInSurah);
   const isLastRead = lastRead?.surahId === surah.number && lastRead?.ayahNumber === ayah.numberInSurah;
@@ -191,6 +193,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
         <AnimatePresence>
           {showTooltip && (
             <motion.div 
+              key={`tooltip-${surah.number}-${ayah.numberInSurah}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -233,7 +236,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
         <AnimatePresence mode="wait">
           {activeTab === 'translation' && (
             <motion.div
-              key="translation"
+              key={`ayah-tab-trans-${ayah.numberInSurah}`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -262,44 +265,57 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
 
           {activeTab === 'tafseer' && (
             <motion.div
-              key="tafseer"
+              key={`ayah-tab-tafseer-${ayah.numberInSurah}`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
               <div className="py-4">
-                <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <FileText size={12} />
-                  Tafseer-e-Namoona Discussion
-                </h4>
-                <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] text-slate-700 dark:text-slate-300">
-                  {lazyLoading ? (
-                    <div className="py-8 flex flex-col items-center justify-center text-center">
-                      <Loader2 className="w-5 h-5 text-emerald-600 animate-spin mb-3" />
-                      <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Reference...</p>
-                    </div>
-                  ) : typeof lazyTafseer === 'string' ? (
-                    <div className="text-red-500 text-sm">
-                      {lazyTafseer}
-                    </div>
-                  ) : (
-                    <div>
-                      {tafseerLanguages.includes('en') && lazyTafseer?.en && (
-                         <div className="mb-2">
-                           <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">English</h5>
-                           <Markdown>{lazyTafseer.en}</Markdown>
-                         </div>
-                      )}
-                      {tafseerLanguages.includes('ur') && lazyTafseer?.ur && (
-                        <div dir="rtl" className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200">
-                          <h5 dir="ltr" className="font-semibold text-slate-800 dark:text-slate-200 mb-2 text-left">Urdu</h5>
-                          <Markdown>{lazyTafseer.ur}</Markdown>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest flex items-center gap-2">
+                      <FileText size={12} />
+                      {tafseerProvider === 'kauthar' ? 'Tafseer Al-Kauthar' : 'Tafseer-e-Namoona'} Discussion
+                    </h4>
+                  </div>
+                  <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] text-slate-700 dark:text-slate-300">
+                    {lazyLoading ? (
+                      <div className="py-8 flex flex-col items-center justify-center text-center">
+                        <Loader2 className="w-5 h-5 text-emerald-600 animate-spin mb-3" />
+                        <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Reference...</p>
+                      </div>
+                    ) : typeof lazyTafseer === 'string' ? (
+                      <div className="text-red-500 text-sm">
+                        {lazyTafseer}
+                      </div>
+                    ) : (
+                      <div>
+                        {tafseerLanguages.includes('en') && lazyTafseer?.en && (
+                          <div className="mb-4">
+                            <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">English</h5>
+                            <Markdown>{lazyTafseer.en}</Markdown>
+                          </div>
+                        )}
+                        {tafseerLanguages.includes('ur') && lazyTafseer?.tafseer_text ? (
+                          <div 
+                            className="tafseer-html-content text-slate-800 dark:text-slate-200 font-urdu leading-loose" 
+                            dangerouslySetInnerHTML={{ __html: lazyTafseer.tafseer_text }} 
+                          />
+                        ) : tafseerLanguages.includes('ur') && lazyTafseer?.ur ? (
+                          <div dir="rtl" className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200">
+                            <h5 dir="ltr" className="font-semibold text-slate-800 dark:text-slate-200 mb-2 text-left">Urdu</h5>
+                            <Markdown>{lazyTafseer.ur}</Markdown>
+                          </div>
+                        ) : null}
+                        {!lazyTafseer?.en && !lazyTafseer?.ur && !lazyTafseer?.tafseer_text && (
+                          <p className="text-slate-500 italic text-sm">No tafseer content available for this provider.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
               </div>
             </motion.div>
           )}
@@ -318,6 +334,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
             <AnimatePresence>
               {isScienceExpanded && (
                 <motion.div
+                  key={`science-panel-${surah.number}-${ayah.numberInSurah}`}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -325,7 +342,7 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
                 >
                   {scienceRels.map((rel, idx) => (
                     <div 
-                      key={idx} 
+                      key={`science-rel-${surah.number}-${ayah.numberInSurah}-${rel.relation.articleId || idx}-${idx}`} 
                       className="bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-lg border-[0.5px] border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors"
                       onClick={() => {
                         if (rel.article.originalUrl) {
@@ -357,13 +374,26 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
   );
 }
 
-export default function SurahView({ surahId, onBack }: SurahViewProps) {
+export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProps) {
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const { fontSize } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
   const [scienceRels, setScienceRels] = useState<any[]>([]);
+  const hasScrolledTargetRef = useRef(false);
+
+  useEffect(() => {
+    // Clear any dirty hash from URL so native browser layout doesn't jump
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    
+    // If opening without a specific target ayah, guarantee starting at the top
+    if (!targetAyah) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [surahId, targetAyah]);
 
   useEffect(() => {
     const handleOpenDiscussion = (e: CustomEvent) => {
@@ -375,24 +405,11 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
 
   useEffect(() => {
     setLoading(true);
+    hasScrolledTargetRef.current = false;
     fetchSurahDetail(surahId)
       .then((surahData) => {
         setSurah(surahData);
         setLoading(false);
-        
-        // Check for hash and scroll
-        if (window.location.hash && window.location.hash.startsWith('#ayah-')) {
-          setTimeout(() => {
-            const el = document.getElementById(window.location.hash.substring(1));
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/10', 'transition-colors', 'duration-700');
-              setTimeout(() => {
-                el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/10');
-              }, 3000);
-            }
-          }, 500); // Wait for render
-        }
       })
       .catch((e) => {
         console.error(e);
@@ -400,7 +417,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
       });
 
     // Fetch science independently
-    fetch('/data.json')
+    fetch('/data.json').then(r => { if(!r.ok) throw new Error(); const ct = r.headers.get('content-type'); if(!ct || !ct.includes('json')) throw new Error(); return r; })
       .then(r => r.json())
       .then(data => {
         if (data && data.articles && data.relationships) {
@@ -428,8 +445,30 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
           setScienceRels([]);
         }
       })
-      .catch(() => setScienceRels([]));
+      .catch(() => {
+        setScienceRels([]);
+      });
   }, [surahId]);
+
+  // One-time smooth scroll to target ayah if specifically requested
+  useEffect(() => {
+    if (loading || !surah || hasScrolledTargetRef.current) return;
+    
+    if (targetAyah) {
+      hasScrolledTargetRef.current = true;
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`ayah-${targetAyah}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
+          setTimeout(() => {
+            el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50');
+          }, 3000);
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, surah, targetAyah]);
 
   const isThisSurahPlaying = audioSurahId === surah?.number && isPlaying;
 
@@ -509,7 +548,7 @@ export default function SurahView({ surahId, onBack }: SurahViewProps) {
               const isLast = index === surah.ayahs.length - 1;
               return (
                 <AyahCard 
-                  key={ayah.numberInSurah} 
+                  key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
                   ayah={ayah} 
                   surah={surah} 
                   scienceRels={ayahScienceRels}

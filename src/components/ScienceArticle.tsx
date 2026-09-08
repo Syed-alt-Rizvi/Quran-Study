@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 interface ScienceArticleProps {
   article: any;
-  onSelectSurah?: (surah: number) => void;
+  onSelectSurah?: (surah: number, ayah?: number) => void;
 }
 
 export default function ScienceArticle({ article, onSelectSurah }: ScienceArticleProps) {
@@ -86,6 +86,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
       <AnimatePresence initial={false}>
         {isArticleExpanded && (
           <motion.div
+            key={`article-body-${article.id || 'main'}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -112,12 +113,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
-                            if (ayah) {
-                              window.location.hash = `#ayah-${ayah}`;
-                            } else {
-                              window.location.hash = ''; // clear hash
-                            }
-                            onSelectSurah?.(surah);
+                            onSelectSurah?.(surah, ayah || undefined);
                           }}
                           className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 px-2 py-1 -mx-2 rounded transition-colors cursor-pointer text-left inline-block w-full"
                         >
@@ -140,33 +136,32 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                   Related Ayahs & Tafseer Insights
                 </h4>
                 
-                {article.relations.map((rel: any) => {
-                  const key = `${rel.surahNumber}:${rel.ayahNumber}`;
-                  const isExpanded = expandedAyah === key;
-                  const data = ayahData[key];
+                {article.relations.map((rel: any, idx: number) => {
+                  const ayahKey = `${rel.surahNumber}:${rel.ayahNumber}:${idx}`;
+                  const isExpanded = expandedAyah === ayahKey;
+                  const data = ayahData[ayahKey];
                   
                   return (
-                    <div key={key} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl overflow-hidden border-[0.5px] border-slate-200/60 dark:border-slate-700/50">
+                    <div key={`article-${article.id || 'item'}-relation-${ayahKey}`} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl overflow-hidden border-[0.5px] border-slate-200/60 dark:border-slate-700/50">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-medium text-xs">
-
-                      {rel.surahNumber}:{rel.ayahNumber}
-                    </div>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Surah {rel.surahNumber}, Ayah {rel.ayahNumber}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    {onSelectSurah && (
-                      <button 
-                        onClick={() => onSelectSurah(rel.surahNumber)}
-                        className="px-3 py-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg transition-colors flex items-center gap-1.5"
-                      >
-                        <LinkIcon size={14} /> Open Surah
-                      </button>
-                    )}
+                            {rel.surahNumber}:{rel.ayahNumber}
+                          </div>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Surah {rel.surahNumber}, Ayah {rel.ayahNumber}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          {onSelectSurah && (
+                            <button 
+                              onClick={() => onSelectSurah(rel.surahNumber, rel.ayahNumber)}
+                              className="px-3 py-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg transition-colors flex items-center gap-1.5"
+                            >
+                              <LinkIcon size={14} /> Open Surah
+                            </button>
+                          )}
                     <button 
                       onClick={() => toggleAyah(rel.surahNumber, rel.ayahNumber)}
                       className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 bg-white dark:bg-slate-800 border-[0.5px] border-slate-200 dark:border-slate-700 rounded-lg transition-colors flex items-center gap-1.5"
@@ -180,6 +175,7 @@ export default function ScienceArticle({ article, onSelectSurah }: ScienceArticl
                 <AnimatePresence>
                   {isExpanded && (
                     <motion.div
+                      key={`ayah-insights-${ayahKey}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}

@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 interface HomeProps {
   key?: string;
-  onSelectSurah: (id: number) => void;
+  onSelectSurah: (id: number, targetAyah?: number) => void;
   onSelectJuz: (id: number) => void;
   onOpenSettings: () => void;
   onExit: () => void;
@@ -28,6 +28,13 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
   const { readProgress, lastRead, userName } = useSettingsStore();
 
   useEffect(() => {
+    // Clear any hash remaining in the URL
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
+
+  useEffect(() => {
     const abortController = new AbortController();
     fetchSurahs()
       .then(data => {
@@ -36,8 +43,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       })
       .catch(console.error);
 
-    fetch('/data.json')
-      .then(res => res.json())
+    fetch('/data.json').then(r => { if(!r.ok) throw new Error(); const ct = r.headers.get('content-type'); if(!ct || !ct.includes('json')) throw new Error(); return r; }).then(res => res.json())
       .then(data => {
         if (data && data.articles) {
           const processedArticles = data.articles.map((article: any) => ({
@@ -162,8 +168,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             </div>
             <button 
               onClick={() => {
-                window.location.hash = `ayah-${lastRead.ayahNumber}`;
-                onSelectSurah(lastRead.surahId);
+                onSelectSurah(lastRead.surahId, lastRead.ayahNumber);
               }}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl transition-colors active:scale-95"
             >
@@ -232,18 +237,18 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
         {loading ? (
           <div className="space-y-3">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
+              <div key={`skeleton-${i}`} className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : activeTab === 'surah' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSurahs.map((surah) => {
+            {filteredSurahs.map((surah, surahIdx) => {
               const highestRead = readProgress?.[surah.number] || 0;
               const progressPercent = Math.min(100, Math.round((highestRead / surah.numberOfAyahs) * 100));
               
               return (
                 <button
-                  key={surah.number}
+                  key={`surah-card-${surah.number || surahIdx}`}
                   onClick={() => { hapticImpact(ImpactStyle.Medium); onSelectSurah(surah.number); }}
                   className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border-[0.5px] border-slate-200/60 dark:border-slate-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
@@ -299,9 +304,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               <p className="text-slate-500 text-center py-8">No articles loaded yet.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {scienceArticles.map((article: any) => (
+                {scienceArticles.map((article: any, artIdx: number) => (
                   <ScienceArticle 
-                    key={article.id} 
+                    key={`science-art-${article.id || artIdx}-${artIdx}`} 
                     article={article} 
                     onSelectSurah={onSelectSurah} 
                   />
@@ -313,9 +318,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
           <GlobalDiscussions />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredJuzs.map((juz) => (
+            {filteredJuzs.map((juz, juzIdx) => (
               <button
-                key={juz.number}
+                key={`juz-card-${juz.number || juzIdx}`}
                 onClick={() => onSelectJuz(juz.number)}
                 className="w-full text-left group flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border-[0.5px] border-slate-200/60 dark:border-slate-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
               >
@@ -343,6 +348,39 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             ))}
           </div>
         )}
+
+        {/* Footer with App & Developer Info & Iltemas-e-Surah Fatiha */}
+        <footer className="mt-12 pt-8 pb-12 border-t border-slate-200/80 dark:border-slate-800/80 text-center space-y-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+            <button
+              onClick={onOpenSettings}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>Voluntary Support & Settings</span>
+            </button>
+
+            <button
+              onClick={onOpenSettings}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5"
+            >
+              <span>Developer: Syed Murtaza Razavee</span>
+            </button>
+          </div>
+
+          <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-center space-y-1">
+            <p className="text-xs font-bold text-amber-900 dark:text-amber-300 font-serif">
+              التماسِ سورۂ فاتحہ (Iltemas-e-Surah Fatiha)
+            </p>
+            <p className="text-[11px] text-slate-700 dark:text-slate-300">
+              برائے مغفرت و ایصالِ ثواب: <span className="font-semibold">Sakina Banoo D/O Akhoon Mohd Kazim</span> & <span className="font-semibold">Syed Abbas Rizvi S/O Syed Hassan Rizvi</span>
+            </p>
+          </div>
+
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            Shia Quran & Tafseer • Exegesis: Tafseer-e-Namoona & Tafseer Al-Kauthar
+          </p>
+        </footer>
       </main>
     </div>
   );

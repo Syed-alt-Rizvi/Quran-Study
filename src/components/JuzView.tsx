@@ -5,7 +5,7 @@ import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface JuzViewProps {
@@ -15,7 +15,7 @@ interface JuzViewProps {
 }
 
 function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; juz: JuzDetail; isLast?: boolean }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages } = useSettingsStore();
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -28,15 +28,15 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
   const isActivePlaying = audioSurahId === -juz.number && activeAyahNumber === ayah.numberInSurah && activeSurahNumber === surahId;
 
   useEffect(() => {
-    if (isActivePlaying && isPlaying && ayahRef.current) {
+    if (autoScrollAudio && isActivePlaying && isPlaying && ayahRef.current) {
       ayahRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [isActivePlaying, isPlaying]);
+  }, [isActivePlaying, isPlaying, autoScrollAudio]);
 
   useEffect(() => {
     if (activeTab === 'tafseer' && !lazyTafseer) {
       setLazyLoading(true);
-      fetchTafseer(surahId, ayah.numberInSurah)
+      fetchTafseer(surahId, ayah.numberInSurah, tafseerProvider)
         .then(res => setLazyTafseer(res))
         .catch(err => {
           console.error(err);
@@ -44,7 +44,7 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
         })
         .finally(() => setLazyLoading(false));
     }
-  }, [activeTab, surahId, ayah.numberInSurah, lazyTafseer]);
+  }, [activeTab, surahId, ayah.numberInSurah, lazyTafseer, tafseerProvider]);
   const bookmarked = isBookmarked(surahId, ayah.numberInSurah);
   const isLastRead = lastRead?.surahId === surahId && lastRead?.ayahNumber === ayah.numberInSurah;
 
@@ -173,6 +173,7 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
         <AnimatePresence>
           {showTooltip && (
             <motion.div 
+              key={`juz-tooltip-${ayah.surahNumber}-${ayah.numberInSurah}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -215,7 +216,7 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
         <AnimatePresence mode="wait">
           {activeTab === 'translation' && (
             <motion.div
-              key="translation"
+              key={`juz-ayah-tab-trans-${ayah.surahNumber}-${ayah.numberInSurah}`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -244,17 +245,19 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
 
           {activeTab === 'tafseer' && (
             <motion.div
-              key="tafseer"
+              key={`juz-ayah-tab-tafseer-${ayah.surahNumber}-${ayah.numberInSurah}`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
               <div className="py-4">
-                <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <FileText size={12} />
-                  Tafseer-e-Namoona Discussion
-                </h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest flex items-center gap-2">
+                    <FileText size={12} />
+                    {tafseerProvider === 'kauthar' ? 'Tafseer Al-Kauthar' : 'Tafseer-e-Namoona'} Discussion
+                  </h4>
+                </div>
                 <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] text-slate-700 dark:text-slate-300">
                   {lazyLoading ? (
                     <div className="py-8 flex flex-col items-center justify-center text-center">
@@ -308,6 +311,14 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
   const [loading, setLoading] = useState(true);
   const { fontSize } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
+
+  useEffect(() => {
+    // Clear any dirty URL hash and start at top
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [juzId]);
 
   useEffect(() => {
     setLoading(true);
@@ -389,7 +400,7 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
               const isLast = index === juz.ayahs.length - 1;
 
               return (
-                <div key={`${ayah.surahNumber}-${ayah.numberInSurah}-${index}`}>
+                <div key={`juz-ayah-${ayah.surahNumber}-${ayah.numberInSurah}-${index}`}>
                   {isNewSurah && (
                     <div className="text-center my-12 pt-8">
                       {index > 0 && <hr className="mb-12 border-slate-200 dark:border-slate-800" />}

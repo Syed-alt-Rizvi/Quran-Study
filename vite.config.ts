@@ -11,30 +11,44 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png', 'favicon.ico'],
+        includeAssets: ['pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png', 'favicon.ico', 'manifest.webmanifest'],
         manifest: {
-          name: 'Shia Quran',
-          short_name: 'Quran',
-          description: 'A beautiful Shia Quran application',
+          id: '/',
+          name: 'Quran Study - Shia Quran & Tafseer',
+          short_name: 'Quran Study',
+          description: 'Comprehensive Quran study application featuring Shia Tafseer (Al-Kauthar & Namona), verse-by-verse recitations, translations, and scientific reflections.',
           theme_color: '#059669',
           background_color: '#ffffff',
           display: 'standalone',
+          orientation: 'portrait',
+          start_url: '/',
+          scope: '/',
+          categories: ['books', 'education', 'reference'],
           icons: [
             {
-              src: 'pwa-192x192.png',
+              src: '/pwa-192x192.png',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any'
             },
             {
-              src: 'pwa-512x512.png',
+              src: '/pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}']
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+          globIgnores: ['**/kauthar.json', '**/tafseer_kauthar/**', '**/tafseer_kauthar_refined/**'],
+          maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
         }
       })
     ],

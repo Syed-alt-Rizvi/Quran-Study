@@ -81,13 +81,20 @@ jobs:
           gradle-version: '8.14.3'
           cache-disabled: true
         
+      - name: Make Gradlew Executable
+        working-directory: ./android
+        run: chmod +x ./gradlew
+
       - name: Build APK
         working-directory: ./android
         run: |
-          gradle assembleDebug --stacktrace --info
+          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
         
       - name: Rename APK
-        run: mv android/app/build/outputs/apk/debug/app-debug.apk "android/app/build/outputs/apk/debug/Quran Study.apk"
+        run: |
+          if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            mv "android/app/build/outputs/apk/debug/app-debug.apk" "android/app/build/outputs/apk/debug/Quran Study.apk"
+          fi
         
       - name: Upload APK
         uses: actions/upload-artifact@v4

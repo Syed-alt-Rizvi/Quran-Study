@@ -1,3 +1,9 @@
+
+async function safeJson(res) {
+  const text = await res.text();
+  try { return JSON.parse(text); } 
+  catch(e) { console.error("Invalid JSON from " + res.url, text.substring(0, 100)); throw new Error("Invalid JSON"); }
+}
 export interface SurahMeta {
   number: number;
   name: string;
@@ -35,7 +41,7 @@ export const fetchSurahs = async (): Promise<SurahMeta[]> => {
   if (surahMetaCache.length > 0) return surahMetaCache;
   const response = await fetch('https://api.alquran.cloud/v1/surah');
   if (!response.ok) throw new Error('Failed to fetch surahs');
-  const data = await response.json();
+  const data = await safeJson(response);
   if (surahMetaCache.length === 0) { surahMetaCache.push(...data.data); }
   return data.data;
 };
@@ -48,7 +54,7 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
   
   if (!response.ok) throw new Error('Failed to fetch surah details');
   
-  const json = await response.json();
+  const json = await safeJson(response);
   const data = json.data;
   
   const arabicData = data[0];
@@ -109,10 +115,10 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
   }
   
   const [arabicJson, englishJson, urduJson, audioJson] = await Promise.all([
-    arabicResponse.json(),
-    englishResponse.json(),
-    urduResponse.json(),
-    audioResponse.json()
+    safeJson(arabicResponse),
+    safeJson(englishResponse),
+    safeJson(urduResponse),
+    safeJson(audioResponse)
   ]);
   
   const arabicData = arabicJson.data;
@@ -147,7 +153,7 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
   } else if (id === 21) {
     try {
       const singleAyahRes = await fetch(`https://api.alquran.cloud/v1/ayah/29:45/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`);
-      const singleAyahJson = await singleAyahRes.json();
+      const singleAyahJson = await safeJson(singleAyahRes);
       if (singleAyahJson.data) {
         const d = singleAyahJson.data;
         const missingAyah: Ayah = {

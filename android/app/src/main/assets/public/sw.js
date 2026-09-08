@@ -90,10 +90,10 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
     "revision": "5c1b99d198fcd1ba58b2023d4fa7612d"
   }, {
     "url": "manifest.webmanifest",
-    "revision": "11ae52b962c2e725096f653732e3d7f9"
+    "revision": "b96652049d119c284e83a58d69e65de1"
   }, {
     "url": "index.html",
-    "revision": "6fc649a9cec7afe16fb370fb9118aec1"
+    "revision": "ef5392df6916b5b95b4a28d8ad481444"
   }, {
     "url": "favicon.ico",
     "revision": "3f158cc720c1d428f16c6db50181f237"
@@ -104,25 +104,19 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
     "url": "assets/workbox-window.prod.es5-BBnX5xw4.js",
     "revision": null
   }, {
-    "url": "assets/web-Dn2wICfL.js",
+    "url": "assets/web-D7mH4R_7.js",
     "revision": null
   }, {
-    "url": "assets/web-Cv6-PjmY.js",
+    "url": "assets/web-Ce8EIBQH.js",
     "revision": null
   }, {
-    "url": "assets/web-B8fLbM_s.js",
+    "url": "assets/index-CznS5FdC.js",
     "revision": null
   }, {
-    "url": "assets/index-DBMiFRm9.js",
+    "url": "assets/index-BAOncOxL.css",
     "revision": null
   }, {
-    "url": "assets/index-C8gdujba.js",
-    "revision": null
-  }, {
-    "url": "assets/index-C7jXWE4M.css",
-    "revision": null
-  }, {
-    "url": "assets/index-BEvQ24NB.js",
+    "url": "assets/index-3eOgeQah.js",
     "revision": null
   }, {
     "url": "apple-touch-icon.png",
@@ -131,6 +125,9 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
     "url": "favicon.ico",
     "revision": "3f158cc720c1d428f16c6db50181f237"
   }, {
+    "url": "manifest.webmanifest",
+    "revision": "be23b353808f7d3e7815c34123d5e17d"
+  }, {
     "url": "pwa-192x192.png",
     "revision": "5c1b99d198fcd1ba58b2023d4fa7612d"
   }, {
@@ -138,7 +135,7 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
     "revision": "3bbd5dc384386fc3ac64c9f89876ca48"
   }, {
     "url": "manifest.webmanifest",
-    "revision": "11ae52b962c2e725096f653732e3d7f9"
+    "revision": "b96652049d119c284e83a58d69e65de1"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html")));
