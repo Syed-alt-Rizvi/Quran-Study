@@ -84,8 +84,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Android SDK Licenses
-        run: yes | sdkmanager --licenses || true
+      - name: Accept Android SDK Licenses & Setup Platforms
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "platforms;android-35" "build-tools;35.0.0" || true
           
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -93,26 +95,35 @@ jobs:
           gradle-version: '8.14.3'
           build-root-directory: ./android
           cache-disabled: true
-        
-      - name: Make Gradlew Executable
-        working-directory: ./android
-        run: chmod +x ./gradlew
 
+      - name: Restore Gradle Wrapper
+        run: |
+          set -ex
+          # Download pristine gradle-wrapper.jar to prevent AI Studio binary sync corruption
+          curl -sSL -o android/gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.14.3/gradle/wrapper/gradle-wrapper.jar
+          chmod +x android/gradlew
+        
       - name: Build Android App Bundle (Google Play AAB) & APKs
         working-directory: ./android
         run: |
           set -x
           # 1. Build APKs for direct device installation & testing
-          ./gradlew assembleDebug --no-daemon --stacktrace || true
+          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
 
           # 2. Build Android App Bundle (.aab) required for Google Play Console upload
-          ./gradlew bundleRelease --no-daemon --stacktrace || ./gradlew bundleDebug --no-daemon --stacktrace || true
+          ./gradlew bundleRelease --no-daemon --stacktrace || gradle bundleRelease --no-daemon --stacktrace || ./gradlew bundleDebug --no-daemon --stacktrace || gradle bundleDebug --no-daemon --stacktrace || true
           
           # 3. Release APK (if applicable)
-          ./gradlew assembleRelease --no-daemon --stacktrace || true
+          ./gradlew assembleRelease --no-daemon --stacktrace || gradle assembleRelease --no-daemon --stacktrace || true
 
           echo "Listing all generated APKs and AABs:"
           find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) || true
+
+          # Assert that at least one artifact was created
+          if [ -z "$(find app/build/outputs -type f \( -name '*.apk' -o -name '*.aab' \))" ]; then
+            echo "::error::Build completed but no APK or AAB was generated!"
+            exit 1
+          fi
         
       - name: Prepare Android Artifacts
         if: always()
