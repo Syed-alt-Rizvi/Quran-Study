@@ -32,6 +32,7 @@ interface SettingsState {
   translationLanguages: ('en' | 'ur')[];
   tafseerLanguages: ('en' | 'ur')[];
   tafseerProvider: 'namoona' | 'kauthar';
+  tafseerZoom: number; // Percentage zoom for Tafseer readability (default 100)
   readProgress: Record<number, number>; // Maps surahId to highest read ayahNumber
   reminderTime: string | null;
   reminderSound: string; // HH:MM format
@@ -47,6 +48,7 @@ interface SettingsState {
   toggleTranslationLanguage: (lang: 'en' | 'ur') => void;
   toggleTafseerLanguage: (lang: 'en' | 'ur') => void;
   setTafseerProvider: (provider: 'namoona' | 'kauthar') => void;
+  setTafseerZoom: (zoom: number) => void;
   toggleAutoScrollAudio: () => void;
   setAutoScrollAudio: (val: boolean) => void;
   setHasSeenWelcome: (seen: boolean) => void;
@@ -79,6 +81,7 @@ export const useSettingsStore = create<SettingsState>()(
       translationLanguages: ['en'],
       tafseerLanguages: ['ur'],
       tafseerProvider: 'namoona',
+      tafseerZoom: 100,
       readProgress: {},
       reminderTime: null,
       reminderSound: 'bismillah.ogg',
@@ -101,6 +104,7 @@ export const useSettingsStore = create<SettingsState>()(
           : [...state.tafseerLanguages, lang]
       })),
       setTafseerProvider: (provider) => set({ tafseerProvider: provider }),
+      setTafseerZoom: (zoom) => set({ tafseerZoom: Math.max(70, Math.min(250, zoom)) }),
       toggleAutoScrollAudio: () => set((state) => ({ autoScrollAudio: !state.autoScrollAudio })),
       setAutoScrollAudio: (val) => set({ autoScrollAudio: val }),
       setHasSeenWelcome: (seen) => set({ hasSeenWelcome: seen }),

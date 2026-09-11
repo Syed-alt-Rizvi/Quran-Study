@@ -6,7 +6,7 @@ import { fetchSurahs, SurahMeta } from '../api';
 import { Search, BookOpen, Settings, LogOut, Microscope, ArrowRight, MessageCircle } from "lucide-react";
 import DynamicBanner from "./DynamicBanner";
 import GlobalDiscussions from "./GlobalDiscussions";
-import ScienceArticle from "./ScienceArticle";
+import ImamScienceFeed from "./ImamScienceFeed";
 import { useSettingsStore } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -23,7 +23,6 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'surah' | 'juz' | 'science' | 'discuss'>('surah');
-  const [scienceArticles, setScienceArticles] = useState<any[]>([]);
   
   const { readProgress, lastRead, userName } = useSettingsStore();
 
@@ -43,33 +42,20 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       })
       .catch(console.error);
 
-    fetch('/data.json').then(r => { if(!r.ok) throw new Error(); const ct = r.headers.get('content-type'); if(!ct || !ct.includes('json')) throw new Error(); return r; }).then(res => res.json())
-      .then(data => {
-        if (data && data.articles) {
-          const processedArticles = data.articles.map((article: any) => ({
-            id: article.id,
-            title: article.title,
-            author: article.author,
-            content: article.content,
-            originalUrl: article.original_url,
-            relations: (data.relationships || []).filter((r: any) => r.article_id === article.id).map((r: any) => ({
-              surahNumber: r.surah_number,
-              ayahNumber: r.ayah_number
-            }))
-          }));
-          setScienceArticles(processedArticles);
-        } else {
-          console.error("Failed to parse static articles");
-        }
-      })
-      .catch(console.error);
     return () => abortController.abort();
   }, []);
 
-  const filteredSurahs = surahs.filter(s => 
-    s.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.name.includes(searchQuery)
-  );
+  const q = searchQuery.trim().toLowerCase();
+  const filteredSurahs = surahs.filter(s => {
+    if (!q) return true;
+    return (
+      s.number.toString() === q ||
+      s.englishName.toLowerCase().includes(q) ||
+      (s.englishNameTranslation && s.englishNameTranslation.toLowerCase().includes(q)) ||
+      s.name.includes(searchQuery.trim()) ||
+      s.englishName.toLowerCase().replace(/[^a-z0-9]/g, '').includes(q.replace(/[^a-z0-9]/g, ''))
+    );
+  });
   
   const juzNames = [
     'Alif Laam Meem',
@@ -294,26 +280,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
             })}
           </div>
         ) : activeTab === 'science' ? (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between border-b-[0.5px] border-slate-900 dark:border-slate-100 pb-2 mb-6 mt-4">
-               <h2 className="text-3xl font-serif font-black uppercase tracking-widest text-slate-900 dark:text-slate-50">Qur'an & Science</h2>
-               <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">Research Archive</span>
-            </div>
-
-            {scienceArticles.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">No articles loaded yet.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {scienceArticles.map((article: any, artIdx: number) => (
-                  <ScienceArticle 
-                    key={`science-art-${article.id || artIdx}-${artIdx}`} 
-                    article={article} 
-                    onSelectSurah={onSelectSurah} 
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <ImamScienceFeed onSelectSurah={onSelectSurah} />
         ) : activeTab === 'discuss' ? (
           <GlobalDiscussions />
         ) : (

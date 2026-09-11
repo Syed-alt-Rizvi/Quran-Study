@@ -5,7 +5,7 @@ import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface JuzViewProps {
@@ -15,7 +15,7 @@ interface JuzViewProps {
 }
 
 function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; juz: JuzDetail; isLast?: boolean }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, autoScrollAudio } = useSettingsStore();
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, tafseerZoom, setTafseerZoom, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -252,17 +252,56 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
               className="overflow-hidden"
             >
               <div className="py-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest flex items-center gap-2">
-                    <FileText size={12} />
-                    {tafseerProvider === 'kauthar' ? 'Tafseer Al-Kauthar' : 'Tafseer-e-Namoona'} Discussion
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <h4 className="text-[11px] font-bold text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-widest flex items-center gap-2">
+                    <FileText size={13} />
+                    {tafseerProvider === 'kauthar' ? 'تفسیر الکوثر — علامہ شیخ محسن علی نجفی' : 'تفسیرِ نمونہ — آیت اللہ ناصر مکارم شیرازی'}
                   </h4>
+
+                  {/* Accessible Zoom / Readability Controls */}
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
+                    <button
+                      id={`juz-zoom-out-btn-${ayah.surahNumber}-${ayah.numberInSurah}`}
+                      type="button"
+                      title="Zoom Out / کم زوم"
+                      onClick={() => setTafseerZoom(tafseerZoom - 15)}
+                      disabled={tafseerZoom <= 70}
+                      className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ZoomOut size={13} />
+                    </button>
+                    <button
+                      id={`juz-zoom-reset-btn-${ayah.surahNumber}-${ayah.numberInSurah}`}
+                      type="button"
+                      title="Reset Zoom / اصل سائز"
+                      onClick={() => setTafseerZoom(100)}
+                      className="px-1.5 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 transition-colors"
+                    >
+                      {tafseerZoom}%
+                    </button>
+                    <button
+                      id={`juz-zoom-in-btn-${ayah.surahNumber}-${ayah.numberInSurah}`}
+                      type="button"
+                      title="Zoom In / زیادہ زوم (بزرگوں اور کمزور نظر کے لیے)"
+                      onClick={() => setTafseerZoom(tafseerZoom + 15)}
+                      disabled={tafseerZoom >= 250}
+                      className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ZoomIn size={13} />
+                    </button>
+                  </div>
                 </div>
-                <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] text-slate-700 dark:text-slate-300">
+                <div 
+                  className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 transition-[font-size] duration-150"
+                  style={{
+                    fontSize: `${Math.round(15 * (tafseerZoom / 100))}px`,
+                    lineHeight: 1.85
+                  }}
+                >
                   {lazyLoading ? (
                     <div className="py-8 flex flex-col items-center justify-center text-center">
                       <Loader2 className="w-5 h-5 text-emerald-600 animate-spin mb-3" />
-                      <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Reference...</p>
+                      <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Tafseer Content...</p>
                     </div>
                   ) : typeof lazyTafseer === 'string' ? (
                     <div className="text-red-500 text-sm">
@@ -276,16 +315,42 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
                            <Markdown>{lazyTafseer.en}</Markdown>
                          </div>
                       )}
-                      {tafseerLanguages.includes('ur') && lazyTafseer?.ur && (
-                        <div dir="rtl" className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200">
+                      {tafseerLanguages.includes('ur') && lazyTafseer?.tafseer_text ? (
+                        <div 
+                          className="tafseer-html-content text-slate-800 dark:text-slate-200 font-urdu leading-loose" 
+                          style={{
+                            fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
+                            lineHeight: 2.1
+                          }}
+                          dangerouslySetInnerHTML={{ __html: lazyTafseer.tafseer_text }} 
+                        />
+                      ) : tafseerLanguages.includes('ur') && lazyTafseer?.ur ? (
+                        <div 
+                          dir="rtl" 
+                          className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200"
+                          style={{
+                            fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
+                            lineHeight: 2.1
+                          }}
+                        >
                           <h5 dir="ltr" className="font-semibold text-slate-800 dark:text-slate-200 mb-2 text-left">Urdu</h5>
                           <Markdown>{lazyTafseer.ur}</Markdown>
                         </div>
+                      ) : null}
+                      {tafseerLanguages.length === 0 && (
+                        <p className="text-amber-600 dark:text-amber-400 italic text-sm">Please enable Urdu or English in Tafseer Settings (sidebar) to view commentary.</p>
+                      )}
+                      {tafseerLanguages.length > 0 && !lazyTafseer?.en && !lazyTafseer?.ur && !lazyTafseer?.tafseer_text && (
+                        <p className="text-slate-500 italic text-sm">No tafseer content available for this ayah in the selected provider.</p>
                       )}
                     </div>
                   )}
                   <div className="mt-6 pt-4 border-t-[0.5px] border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400">
-                    <p>Source: Tafseer-e-Namoona (تفسیر نمونه)</p>
+                    <p>
+                      {tafseerProvider === 'kauthar' 
+                        ? 'ماخذ: تفسیر الکوثر — علامہ شیخ محسن علی نجفی (balaghulquran.com)'
+                        : 'ماخذ: تفسیرِ نمونہ — آیت اللہ العظمی ناصر مکارم شیرازی (tafseerenamoona.net)'}
+                    </p>
                   </div>
                 </div>
               </div>

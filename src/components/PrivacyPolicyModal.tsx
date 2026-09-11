@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ShieldCheck, FileText, Trash2, ExternalLink, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { deleteGuestAccountAndAllData } from '../utils/guestAuth';
 import { useSettingsStore } from '../store';
 import { hapticNotification } from '../utils/haptics';
+import { registerModal } from '../utils/modalBackHandler';
 
 interface PrivacyPolicyModalProps {
   isOpen: boolean;
@@ -19,6 +20,18 @@ export default function PrivacyPolicyModal({
   const [activeTab, setActiveTab] = useState<'privacy' | 'terms' | 'deletion'>(initialTab);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [dataDeleted, setDataDeleted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      return registerModal(onClose);
+    }
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   const handleDeleteAllData = () => {
     deleteGuestAccountAndAllData();

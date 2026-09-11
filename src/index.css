@@ -57,3 +57,64 @@
     background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.08), transparent 50%), radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.04), transparent 50%);
   }
 }
+
+/* Tafseer HTML Rendering & Readability Styles */
+.tafseer-html-content {
+  direction: rtl;
+  text-align: right;
+  word-spacing: 0.05em;
+}
+
+.tafseer-html-content .txtArabic,
+.tafseer-html-content .txtArabicQuran,
+.tafseer-html-content font.txtArabic {
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  color: #047857;
+  font-weight: 600;
+  display: inline-block;
+  line-height: 1.9;
+}
+
+.dark .tafseer-html-content .txtArabic,
+.dark .tafseer-html-content .txtArabicQuran,
+.dark .tafseer-html-content font.txtArabic {
+  color: #34d399;
+}
+
+.tafseer-html-content h1,
+.tafseer-html-content h2,
+.tafseer-html-content h3,
+.tafseer-html-content h4 {
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #065f46;
+}
+
+.dark .tafseer-html-content h1,
+.dark .tafseer-html-content h2,
+.dark .tafseer-html-content h3,
+.dark .tafseer-html-content h4 {
+  color: #6ee7b7;
+}
+
+.tafseer-html-content p {
+  margin-bottom: 1rem;
+}
+
+/* Mobile Safe Area Insets for Android gesture bar and iOS notches */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+

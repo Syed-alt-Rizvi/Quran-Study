@@ -38,36 +38,30 @@ CREATE TABLE IF NOT EXISTS tafseer_references (
   source TEXT NOT NULL,
   FOREIGN KEY (discussion_id) REFERENCES discussions(id)
 );
-CREATE TABLE IF NOT EXISTS science_articles (
+CREATE TABLE IF NOT EXISTS imam_science_articles (
   id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
-  author TEXT,
+  excerpt TEXT,
   content TEXT NOT NULL,
-  source TEXT NOT NULL,
-  original_url TEXT,
-  license TEXT,
-  publication_date TEXT,
+  primary_category TEXT NOT NULL DEFAULT 'Ahlebait Teachings',
+  categories_json TEXT NOT NULL DEFAULT '[]',
+  image_url TEXT NOT NULL,
+  image_alt TEXT,
+  highlights_json TEXT DEFAULT '[]',
+  headings_json TEXT DEFAULT '[]',
+  reading_time TEXT DEFAULT '3 min read',
+  word_count INTEGER DEFAULT 0,
+  source_url TEXT NOT NULL,
+  author TEXT DEFAULT 'Imam & Science Research',
+  published_date TEXT DEFAULT '2025-2026',
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE TABLE IF NOT EXISTS science_topics (
+CREATE TABLE IF NOT EXISTS imam_science_categories (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE
-);
-CREATE TABLE IF NOT EXISTS article_topics (
-  id TEXT PRIMARY KEY,
-  article_id TEXT NOT NULL,
-  topic_id TEXT NOT NULL,
-  FOREIGN KEY (article_id) REFERENCES science_articles(id),
-  FOREIGN KEY (topic_id) REFERENCES science_topics(id)
-);
-CREATE TABLE IF NOT EXISTS ayah_science_relationships (
-  id TEXT PRIMARY KEY,
-  surah_number INTEGER NOT NULL,
-  ayah_number INTEGER NOT NULL,
-  article_id TEXT NOT NULL,
-  explanation TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (article_id) REFERENCES science_articles(id)
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  count INTEGER NOT NULL DEFAULT 0
 );
 `);
 

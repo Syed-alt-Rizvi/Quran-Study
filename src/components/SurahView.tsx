@@ -1,5 +1,4 @@
 import { getApiUrl } from '../utils/apiBase';
-import TafseerAlKautharViewer from './TafseerAlKautharViewer';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import { useState, useEffect, useRef } from 'react';
@@ -8,7 +7,7 @@ import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, Microscope, PauseCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 
@@ -19,11 +18,10 @@ interface SurahViewProps {
   onBack: () => void;
 }
 
-function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; scienceRels?: any[]; isLast?: boolean }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, autoScrollAudio } = useSettingsStore();
+function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; isLast?: boolean }) {
+  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, tafseerZoom, setTafseerZoom, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
-  const [isScienceExpanded, setIsScienceExpanded] = useState(false);
   const [lazyTafseer, setLazyTafseer] = useState<any>(null);
   const [lazyLoading, setLazyLoading] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -274,17 +272,65 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
               <div className="py-4">
                 
                 <>
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest flex items-center gap-2">
-                      <FileText size={12} />
-                      {tafseerProvider === 'kauthar' ? 'Tafseer Al-Kauthar' : 'Tafseer-e-Namoona'} Discussion
+                  <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <h4 className="text-[11px] font-bold text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-widest flex items-center gap-2">
+                      <FileText size={13} />
+                      {tafseerProvider === 'kauthar' ? 'تفسیر الکوثر — علامہ شیخ محسن علی نجفی' : 'تفسیرِ نمونہ — آیت اللہ ناصر مکارم شیرازی'}
                     </h4>
+
+                    {/* Accessible Zoom / Readability Controls */}
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
+                      <button
+                        id={`surah-zoom-out-btn-${ayah.numberInSurah}`}
+                        type="button"
+                        title="Zoom Out / کم زوم"
+                        onClick={() => {
+                          hapticSelection();
+                          setTafseerZoom(tafseerZoom - 15);
+                        }}
+                        disabled={tafseerZoom <= 70}
+                        className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ZoomOut size={13} />
+                      </button>
+                      <button
+                        id={`surah-zoom-reset-btn-${ayah.numberInSurah}`}
+                        type="button"
+                        title="Reset Zoom / اصل سائز"
+                        onClick={() => {
+                          hapticSelection();
+                          setTafseerZoom(100);
+                        }}
+                        className="px-1.5 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 transition-colors"
+                      >
+                        {tafseerZoom}%
+                      </button>
+                      <button
+                        id={`surah-zoom-in-btn-${ayah.numberInSurah}`}
+                        type="button"
+                        title="Zoom In / زیادہ زوم (بزرگوں اور کمزور نظر کے لیے)"
+                        onClick={() => {
+                          hapticSelection();
+                          setTafseerZoom(tafseerZoom + 15);
+                        }}
+                        disabled={tafseerZoom >= 250}
+                        className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ZoomIn size={13} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] text-slate-700 dark:text-slate-300">
+                  <div 
+                    className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 transition-[font-size] duration-150"
+                    style={{
+                      fontSize: `${Math.round(15 * (tafseerZoom / 100))}px`,
+                      lineHeight: 1.85
+                    }}
+                  >
                     {lazyLoading ? (
                       <div className="py-8 flex flex-col items-center justify-center text-center">
                         <Loader2 className="w-5 h-5 text-emerald-600 animate-spin mb-3" />
-                        <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Reference...</p>
+                        <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Tafseer Content...</p>
                       </div>
                     ) : typeof lazyTafseer === 'string' ? (
                       <div className="text-red-500 text-sm">
@@ -301,16 +347,30 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
                         {tafseerLanguages.includes('ur') && lazyTafseer?.tafseer_text ? (
                           <div 
                             className="tafseer-html-content text-slate-800 dark:text-slate-200 font-urdu leading-loose" 
+                            style={{
+                              fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
+                              lineHeight: 2.1
+                            }}
                             dangerouslySetInnerHTML={{ __html: lazyTafseer.tafseer_text }} 
                           />
                         ) : tafseerLanguages.includes('ur') && lazyTafseer?.ur ? (
-                          <div dir="rtl" className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200">
+                          <div 
+                            dir="rtl" 
+                            className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200"
+                            style={{
+                              fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
+                              lineHeight: 2.1
+                            }}
+                          >
                             <h5 dir="ltr" className="font-semibold text-slate-800 dark:text-slate-200 mb-2 text-left">Urdu</h5>
                             <Markdown>{lazyTafseer.ur}</Markdown>
                           </div>
                         ) : null}
-                        {!lazyTafseer?.en && !lazyTafseer?.ur && !lazyTafseer?.tafseer_text && (
-                          <p className="text-slate-500 italic text-sm">No tafseer content available for this provider.</p>
+                        {tafseerLanguages.length === 0 && (
+                          <p className="text-amber-600 dark:text-amber-400 italic text-sm">Please enable Urdu or English in Tafseer Settings (sidebar) to view commentary.</p>
+                        )}
+                        {tafseerLanguages.length > 0 && !lazyTafseer?.en && !lazyTafseer?.ur && !lazyTafseer?.tafseer_text && (
+                          <p className="text-slate-500 italic text-sm">No tafseer content available for this ayah in the selected provider.</p>
                         )}
                       </div>
                     )}
@@ -320,46 +380,6 @@ function AyahCard({ ayah, surah, scienceRels = [], isLast }: { key?: string | nu
             </motion.div>
           )}
         </AnimatePresence>
-
-        {scienceRels.length > 0 && (
-          <div className="mt-4 pt-4 border-t-[0.5px] border-blue-200/50 dark:border-blue-800/50">
-            <h4 
-              className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mb-3 flex items-center gap-2 cursor-pointer"
-              onClick={() => setIsScienceExpanded(!isScienceExpanded)}
-            >
-              <Microscope size={12} />
-              Science & Reflection
-              {isScienceExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            </h4>
-            <AnimatePresence>
-              {isScienceExpanded && (
-                <motion.div
-                  key={`science-panel-${surah.number}-${ayah.numberInSurah}`}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="space-y-3 overflow-hidden"
-                >
-                  {scienceRels.map((rel, idx) => (
-                    <div 
-                      key={`science-rel-${surah.number}-${ayah.numberInSurah}-${rel.relation.articleId || idx}-${idx}`} 
-                      className="bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-lg border-[0.5px] border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors"
-                      onClick={() => {
-                        if (rel.article.originalUrl) {
-                          window.open(rel.article.originalUrl, '_blank');
-                        }
-                      }}
-                    >
-                      <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1">{rel.article.title}</h5>
-                      <p className="text-[10px] uppercase tracking-widest font-medium text-blue-600 dark:text-blue-400 mb-2">{rel.article.author}</p>
-                      <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-blue-200 dark:border-blue-800 pl-3">"{rel.relation.explanation}"</p>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
       </div>
       {!isLast && (
         <div className="w-full flex items-center justify-center py-2">
@@ -380,10 +400,12 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
   const { fontSize } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
-  const [scienceRels, setScienceRels] = useState<any[]>([]);
   const hasScrolledTargetRef = useRef(false);
 
   useEffect(() => {
+    // Reset scroll lock when target ayah or surah changes
+    hasScrolledTargetRef.current = false;
+
     // Clear any dirty hash from URL so native browser layout doesn't jump
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -414,39 +436,6 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
       .catch((e) => {
         console.error(e);
         setLoading(false);
-      });
-
-    // Fetch science independently
-    fetch('/data.json').then(r => { if(!r.ok) throw new Error(); const ct = r.headers.get('content-type'); if(!ct || !ct.includes('json')) throw new Error(); return r; })
-      .then(r => r.json())
-      .then(data => {
-        if (data && data.articles && data.relationships) {
-          const surahRels = data.relationships.filter((r: any) => r.surah_number === surahId);
-          const results = surahRels.map((rel: any) => {
-            const article = data.articles.find((a: any) => a.id === rel.article_id);
-            if (!article) return null;
-            return {
-              relation: {
-                surahNumber: rel.surah_number,
-                ayahNumber: rel.ayah_number,
-                explanation: rel.explanation
-              },
-              article: {
-                id: article.id,
-                title: article.title,
-                author: article.author,
-                content: article.content,
-                originalUrl: article.original_url
-              }
-            };
-          }).filter(Boolean);
-          setScienceRels(results);
-        } else {
-          setScienceRels([]);
-        }
-      })
-      .catch(() => {
-        setScienceRels([]);
       });
   }, [surahId]);
 
@@ -544,14 +533,12 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
 
           <div className="flex flex-col">
             {surah.ayahs.map((ayah, index) => {
-              const ayahScienceRels = scienceRels.filter((r: any) => r.relation.ayahNumber === ayah.numberInSurah);
               const isLast = index === surah.ayahs.length - 1;
               return (
                 <AyahCard 
                   key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
                   ayah={ayah} 
                   surah={surah} 
-                  scienceRels={ayahScienceRels}
                   isLast={isLast}
                 />
               );

@@ -1,64 +1,71 @@
 import { db } from './index';
-import { scienceArticles, scienceTopics, articleTopics, ayahScienceRelationships } from './schema';
-import dataRaw from './data.json';
+import { imamScienceArticles, imamScienceCategories } from './schema';
+import dataRaw from './imam_science_data.json';
 
 const data = dataRaw as any;
 
 export async function seed() {
-  console.log("Starting to seed database from data.json...");
+  console.log("Starting to seed database from imam_science_data.json...");
 
-  if (data.topics && data.topics.length > 0) {
-    await db.insert(scienceTopics).values(data.topics).execute();
+  if (data.categories && data.categories.length > 0) {
+    const formattedCategories = data.categories.map((c: any) => ({
+      id: c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      name: c.name,
+      slug: c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      count: c.count || 0
+    }));
+    try {
+      await db.delete(imamScienceCategories).execute();
+      await db.insert(imamScienceCategories).values(formattedCategories).execute();
+    } catch (e: any) {
+      console.warn("Categories already seeded or duplicate:", e.message);
+    }
   }
 
   if (data.articles && data.articles.length > 0) {
-    const formatted = data.articles.map(a => ({
-      id: a.id,
+    const formattedArticles = data.articles.map((a: any) => ({
+      id: a.id || a.slug,
+      slug: a.slug,
       title: a.title,
-      author: a.author,
-      content: a.content,
-      source: a.source,
-      originalUrl: a.original_url,
-      license: a.license,
-      publicationDate: a.publication_date,
-      createdAt: a.created_at
+      excerpt: a.excerpt || null,
+      content: a.content || "",
+      primaryCategory: a.primaryCategory || (a.categories && a.categories[0]) || "Ahlebait Teachings",
+      categoriesJson: JSON.stringify(a.categories || []),
+      imageUrl: a.imageUrl || "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=800&q=80",
+      imageAlt: a.imageAlt || a.title,
+      highlightsJson: JSON.stringify(a.highlights || []),
+      headingsJson: JSON.stringify(a.headings || []),
+      readingTime: a.readingTime || "3 min read",
+      wordCount: a.wordCount || 0,
+      sourceUrl: a.sourceUrl || "https://imamandscience.com/all-topics/",
+      author: a.author || "Imam & Science Research",
+      publishedDate: a.publishedDate || "2025-2026"
     }));
     
-    const chunkSize = 50;
-    for (let i = 0; i < formatted.length; i += chunkSize) {
-      const chunk = formatted.slice(i, i + chunkSize);
-      await db.insert(scienceArticles).values(chunk).execute();
+    try {
+      await db.delete(imamScienceArticles).execute();
+    } catch (e: any) {
+      console.warn("Could not delete existing articles:", e.message);
+    }
+
+    const chunkSize = 25;
+    for (let i = 0; i < formattedArticles.length; i += chunkSize) {
+      const chunk = formattedArticles.slice(i, i + chunkSize);
+      try {
+        await db.insert(imamScienceArticles).values(chunk).execute();
+      } catch (e: any) {
+        console.warn("Articles chunk error (possible duplicates):", e.message);
+      }
     }
   }
 
-  if (data.articleTopics && data.articleTopics.length > 0) {
-    const formatted = data.articleTopics.map(a => ({
-      id: a.id,
-      articleId: a.article_id,
-      topicId: a.topic_id
-    }));
-    const chunkSize = 50;
-    for (let i = 0; i < formatted.length; i += chunkSize) {
-      const chunk = formatted.slice(i, i + chunkSize);
-      await db.insert(articleTopics).values(chunk).execute();
-    }
-  }
+  console.log("Seeding complete. Seeded Imam & Science articles.");
+}
 
-  if (data.relationships && data.relationships.length > 0) {
-    const formatted = data.relationships.map(r => ({
-      id: r.id,
-      surahNumber: r.surah_number,
-      ayahNumber: r.ayah_number,
-      articleId: r.article_id,
-      explanation: r.explanation,
-      createdAt: r.created_at
-    }));
-    const chunkSize = 50;
-    for (let i = 0; i < formatted.length; i += chunkSize) {
-      const chunk = formatted.slice(i, i + chunkSize);
-      await db.insert(ayahScienceRelationships).values(chunk).execute();
-    }
-  }
-
-  console.log("Seeding complete. Seeded " + data.articles.length + " articles.");
+// Auto-run if executed directly via CLI
+if (process.argv[1] && (process.argv[1].includes('seed.ts') || process.argv[1].includes('seed.js'))) {
+  seed().catch(err => {
+    console.error("Seeding failed:", err);
+    process.exit(1);
+  });
 }

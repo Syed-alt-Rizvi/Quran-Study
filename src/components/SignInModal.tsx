@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, X, Check, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { saveGuestProfile, acceptGuidelines, GuestProfile } from '../utils/guestAuth';
 import { hapticNotification } from '../utils/haptics';
+import { registerModal } from '../utils/modalBackHandler';
 
 interface SignInModalProps {
   isOpen: boolean;
@@ -14,6 +15,12 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
   const [name, setName] = useState('');
   const [agreed, setAgreed] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      return registerModal(onClose);
+    }
+  }, [isOpen, onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

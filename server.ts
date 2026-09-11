@@ -4,11 +4,10 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { db } from "./src/db";
-import { discussions, ayahReferences, tafseerReferences, scienceArticles, ayahScienceRelationships } from "./src/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema";
+import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { getOrRefineTafseer } from "./server/geminiTafseer";
-import { cleanTafseerUrduText } from "./src/services/cleanTafseerText";
+import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper";
 
 import { seed } from "./src/db/seed";
 
@@ -207,9 +206,9 @@ async function startServer() {
   // Non-blocking background seed check
   (async () => {
     try {
-      const existingArticles = await db.select().from(scienceArticles).limit(1).execute();
+      const existingArticles = await db.select().from(imamScienceArticles).limit(1).execute();
       if (existingArticles.length === 0) {
-        console.log("Database empty. Seeding in background...");
+        console.log("Database empty. Seeding Imam & Science articles in background...");
         await seed();
         console.log("Database seeding completed.");
       }
@@ -235,97 +234,61 @@ async function startServer() {
     }
   });
 
-  // Tafseer Al-Kauthar Direct API with Gemini AI Approximation
+  // Tafseer Al-Kauthar Official Digital Exegesis (from balaghulquran.com)
   app.get("/api/tafseer/kauthar/:surah/:ayah", async (req, res) => {
     try {
       const s = parseInt(req.params.surah, 10);
       const a = parseInt(req.params.ayah, 10);
-      const autoRefine = req.query.autoRefine === "true" || req.query.refine === "true";
+      const force = req.query.force === "true";
 
-      // 1. Check refined cache directory first
-      const refinedFilePath = path.join(process.cwd(), "public", "tafseer_kauthar_refined", `s${s}_a${a}.json`);
-      if (fs.existsSync(refinedFilePath)) {
-        try {
-          const cached = JSON.parse(fs.readFileSync(refinedFilePath, "utf8"));
-          if (cached && cached.text) {
-            return res.json({
-              surah: s,
-              ayah: a,
-              ur: cached.text,
-              en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
-              tafseer_title: "تفسیر الکوثر — علامہ شیخ محسن علی نجفی"
-            });
-          }
-        } catch (e) {}
+      if (isNaN(s) || isNaN(a) || s < 1 || s > 114 || a < 1) {
+        return res.status(400).json({ error: "Invalid surah or ayah number" });
       }
 
-      const surahFilePath = path.join(process.cwd(), "public", "tafseer_kauthar", `surah_${s}.json`);
-      let rawMatch: any = null;
-      
-      if (fs.existsSync(surahFilePath)) {
-        const fileContent = fs.readFileSync(surahFilePath, "utf8");
-        const list = JSON.parse(fileContent);
-        rawMatch = list.find((item: any) => item.ayah === a);
-      }
-
-      if (rawMatch) {
-        const cleanedUrdu = cleanTafseerUrduText(rawMatch.ur || "");
-        return res.json({
-          ...rawMatch,
-          ur: cleanedUrdu,
-          en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
-          tafseer_title: "تفسیر الکوثر — علامہ شیخ محسن علی نجفی"
-        });
-      }
-
-      res.status(404).json({ error: `Tafseer Al-Kauthar not found for Surah ${s}, Ayah ${a}` });
+      const item = await fetchTafseerAlKauthar(s, a, force);
+      res.json(item);
     } catch (e: any) {
+      console.error(`[BalaghScraper] Error fetching s${req.params.surah}_a${req.params.ayah}:`, e.message);
       res.status(500).json({ error: e.message });
     }
   });
 
-  // Explicit endpoint to trigger Gemini AI approximation and grammatical correction
-  app.post("/api/tafseer/kauthar/refine", async (req, res) => {
-    try {
-      const { surah, ayah, rawText, force } = req.body;
-      const s = parseInt(surah, 10);
-      const a = parseInt(ayah, 10);
-
-      let textToRefine = rawText;
-      if (!textToRefine) {
-        const surahFilePath = path.join(process.cwd(), "public", "tafseer_kauthar", `surah_${s}.json`);
-        if (fs.existsSync(surahFilePath)) {
-          const list = JSON.parse(fs.readFileSync(surahFilePath, "utf8"));
-          const match = list.find((item: any) => item.ayah === a);
-          if (match) textToRefine = match.ur;
-        }
-      }
-
-      if (!textToRefine) {
-        return res.status(404).json({ error: "Text to refine not found." });
-      }
-
-      const result = await getOrRefineTafseer(s, a, textToRefine, force === true);
-      return res.json({
-        surah: s,
-        ayah: a,
-        ur: result.text,
-        isAiRefined: result.isAiRefined
-      });
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
-
+  // Fetch cached or bundle of whole Surah for Tafseer Al-Kauthar
   app.get("/api/tafseer/kauthar/:surah", async (req, res) => {
     try {
       const s = parseInt(req.params.surah, 10);
-      const surahFilePath = path.join(process.cwd(), "public", "tafseer_kauthar", `surah_${s}.json`);
-      if (fs.existsSync(surahFilePath)) {
-        const fileContent = fs.readFileSync(surahFilePath, "utf8");
+      if (isNaN(s) || s < 1 || s > 114) {
+        return res.status(400).json({ error: "Invalid surah number" });
+      }
+
+      const surahBundlePath = path.join(process.cwd(), "public", "tafseer_kauthar", `surah_${s}.json`);
+      if (fs.existsSync(surahBundlePath)) {
+        const fileContent = fs.readFileSync(surahBundlePath, "utf8");
         return res.json(JSON.parse(fileContent));
       }
-      res.status(404).json({ error: `Tafseer Al-Kauthar not found for Surah ${s}` });
+
+      res.status(404).json({ error: `Surah ${s} bundle not yet created. Ayahs can be fetched dynamically.` });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Background crawler trigger for a surah
+  app.post("/api/tafseer/kauthar/crawl/:surah", async (req, res) => {
+    try {
+      const s = parseInt(req.params.surah, 10);
+      const totalAyahs = parseInt(req.body.totalAyahs || "7", 10);
+
+      crawlSurahKauthar(s, totalAyahs).catch(err => {
+        console.error(`[CrawlError] Failed crawling Surah ${s}:`, err);
+      });
+
+      res.json({
+        status: "crawling_started",
+        surah: s,
+        totalAyahs,
+        message: `Crawling Tafseer Al-Kauthar for Surah ${s} in background.`
+      });
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
@@ -408,39 +371,122 @@ async function startServer() {
     }
   });
 
-  // Science API
+  // Imam & Science API Endpoints
+  app.get("/api/imam-science/articles", async (req, res) => {
+    try {
+      const { category, search, sort = "shortest", limit = "60", offset = "0", includeContent = "false" } = req.query;
+      const parsedLimit = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 60));
+      const parsedOffset = Math.max(0, parseInt(offset as string, 10) || 0);
+
+      let articlesQuery = db.select().from(imamScienceArticles);
+      let articles;
+
+      if (sort === "longest") {
+        articles = await articlesQuery.orderBy(desc(imamScienceArticles.wordCount)).execute();
+      } else if (sort === "recent") {
+        articles = await articlesQuery.orderBy(desc(imamScienceArticles.createdAt)).execute();
+      } else if (sort === "title") {
+        articles = await articlesQuery.orderBy(asc(imamScienceArticles.title)).execute();
+      } else {
+        // Default: Shortest on top, lengthy ones and books on the bottom
+        articles = await articlesQuery.orderBy(asc(imamScienceArticles.wordCount)).execute();
+      }
+
+      // Filter by category
+      if (category && category !== "all") {
+        const catStr = (category as string).toLowerCase();
+        articles = articles.filter(a => {
+          if (a.primaryCategory.toLowerCase() === catStr) return true;
+          try {
+            const cats: string[] = JSON.parse(a.categoriesJson || "[]");
+            return cats.some(c => c.toLowerCase().includes(catStr) || c.toLowerCase().replace(/[^a-z0-9]+/g, "-") === catStr);
+          } catch {
+            return false;
+          }
+        });
+      }
+
+      // Filter by search query
+      if (search && typeof search === "string" && search.trim().length > 0) {
+        const q = search.toLowerCase().trim();
+        articles = articles.filter(a => 
+          a.title.toLowerCase().includes(q) || 
+          (a.excerpt && a.excerpt.toLowerCase().includes(q)) ||
+          a.content.toLowerCase().includes(q)
+        );
+      }
+
+      const total = articles.length;
+      const shouldIncludeFullContent = includeContent === "true";
+
+      const paginated = articles.slice(parsedOffset, parsedOffset + parsedLimit).map(a => ({
+        id: a.id,
+        slug: a.slug,
+        title: a.title,
+        excerpt: a.excerpt,
+        primaryCategory: a.primaryCategory,
+        categories: JSON.parse(a.categoriesJson || "[]"),
+        imageUrl: a.imageUrl,
+        imageAlt: a.imageAlt,
+        readingTime: a.readingTime,
+        wordCount: a.wordCount,
+        sourceUrl: a.sourceUrl,
+        author: a.author,
+        publishedDate: a.publishedDate,
+        highlights: JSON.parse(a.highlightsJson || "[]"),
+        headings: JSON.parse(a.headingsJson || "[]"),
+        content: shouldIncludeFullContent ? a.content : (a.content.length > 500 ? a.content.slice(0, 500) + "..." : a.content)
+      }));
+
+      res.json({ total, articles: paginated });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.get("/api/imam-science/articles/:slug", async (req, res) => {
+    try {
+      const slug = req.params.slug;
+      const found = await db.select().from(imamScienceArticles).where(or(
+        eq(imamScienceArticles.slug, slug),
+        eq(imamScienceArticles.id, slug)
+      )).limit(1).execute();
+
+      if (found.length === 0) {
+        return res.status(404).json({ error: "Article not found" });
+      }
+
+      const article = found[0];
+      res.json({
+        ...article,
+        categories: JSON.parse(article.categoriesJson || "[]"),
+        highlights: JSON.parse(article.highlightsJson || "[]"),
+        headings: JSON.parse(article.headingsJson || "[]")
+      });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.get("/api/imam-science/categories", async (req, res) => {
+    try {
+      const categories = await db.select().from(imamScienceCategories).orderBy(desc(imamScienceCategories.count)).execute();
+      res.json(categories);
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Alias for backward compatibility
   app.get("/api/science", async (req, res) => {
     try {
-      const { surah, ayah } = req.query;
-      
-      if (surah) {
-        const s = parseInt(surah as string);
-        const conditions = [eq(ayahScienceRelationships.surahNumber, s)];
-        
-        if (ayah) {
-          conditions.push(eq(ayahScienceRelationships.ayahNumber, parseInt(ayah as string)));
-        }
-        
-        const results = await db.select({
-          article: scienceArticles,
-          relation: ayahScienceRelationships
-        }).from(ayahScienceRelationships)
-          .innerJoin(scienceArticles, eq(ayahScienceRelationships.articleId, scienceArticles.id))
-          .where(and(...conditions))
-          .execute();
-          
-        return res.json(results);
-      }
-      
-      const articles = await db.select().from(scienceArticles).orderBy(desc(scienceArticles.createdAt)).execute();
-      const relationships = await db.select().from(ayahScienceRelationships).execute();
-      
-      const response = articles.map(article => ({
-         ...article,
-         relations: relationships.filter(r => r.articleId === article.id)
-      }));
-      
-      res.json(response);
+      const articles = await db.select().from(imamScienceArticles).orderBy(asc(imamScienceArticles.wordCount)).limit(50).execute();
+      res.json(articles.map(a => ({
+        ...a,
+        categories: JSON.parse(a.categoriesJson || "[]"),
+        highlights: JSON.parse(a.highlightsJson || "[]"),
+        content: a.content.length > 500 ? a.content.slice(0, 500) + "..." : a.content
+      })));
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }

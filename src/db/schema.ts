@@ -28,34 +28,29 @@ export const tafseerReferences = sqliteTable('tafseer_references', {
   source: text('source').notNull(),
 });
 
-export const scienceArticles = sqliteTable('science_articles', {
+export const imamScienceArticles = sqliteTable('imam_science_articles', {
   id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
-  author: text('author'),
+  excerpt: text('excerpt'),
   content: text('content').notNull(),
-  source: text('source').notNull(),
-  originalUrl: text('original_url'),
-  license: text('license'),
-  publicationDate: text('publication_date'),
+  primaryCategory: text('primary_category').notNull().default('Ahlebait Teachings'),
+  categoriesJson: text('categories_json').notNull().default('[]'),
+  imageUrl: text('image_url').notNull(),
+  imageAlt: text('image_alt'),
+  highlightsJson: text('highlights_json').default('[]'),
+  headingsJson: text('headings_json').default('[]'),
+  readingTime: text('reading_time').default('3 min read'),
+  wordCount: integer('word_count').default(0),
+  sourceUrl: text('source_url').notNull(),
+  author: text('author').default('Imam & Science Research'),
+  publishedDate: text('published_date').default('2025-2026'),
   createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const scienceTopics = sqliteTable('science_topics', {
+export const imamScienceCategories = sqliteTable('imam_science_categories', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),
-});
-
-export const articleTopics = sqliteTable('article_topics', {
-  id: text('id').primaryKey(),
-  articleId: text('article_id').notNull().references(() => scienceArticles.id),
-  topicId: text('topic_id').notNull().references(() => scienceTopics.id),
-});
-
-export const ayahScienceRelationships = sqliteTable('ayah_science_relationships', {
-  id: text('id').primaryKey(),
-  surahNumber: integer('surah_number').notNull(),
-  ayahNumber: integer('ayah_number').notNull(),
-  articleId: text('article_id').notNull().references(() => scienceArticles.id),
-  explanation: text('explanation'),
-  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  slug: text('slug').notNull().unique(),
+  count: integer('count').notNull().default(0),
 });

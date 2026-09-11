@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flag, X, ShieldAlert, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { reportDiscussion } from '../utils/guestAuth';
 import { hapticNotification } from '../utils/haptics';
+import { registerModal } from '../utils/modalBackHandler';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -30,6 +31,12 @@ export default function ReportModal({
   const [selectedReason, setSelectedReason] = useState<string>('inappropriate');
   const [customText, setCustomText] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      return registerModal(onClose);
+    }
+  }, [isOpen, onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

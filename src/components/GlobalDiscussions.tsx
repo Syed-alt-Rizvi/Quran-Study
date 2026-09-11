@@ -15,6 +15,7 @@ import {
 } from '../utils/guestAuth';
 import { hapticImpact, hapticNotification, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
+import { registerModal } from '../utils/modalBackHandler';
 import SignInModal from './SignInModal';
 import ReportModal from './ReportModal';
 
@@ -46,6 +47,7 @@ export default function GlobalDiscussions() {
 
   // Modals state
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [blockConfirm, setBlockConfirm] = useState<{ userId: string; authorName: string } | null>(null);
   const [reportModal, setReportModal] = useState<{
     isOpen: boolean;
     discussionId: string;
@@ -55,6 +57,12 @@ export default function GlobalDiscussions() {
     discussionId: '',
     authorName: '',
   });
+
+  useEffect(() => {
+    if (blockConfirm) {
+      return registerModal(() => setBlockConfirm(null));
+    }
+  }, [blockConfirm]);
 
   // Form state
   const [content, setContent] = useState("");
@@ -110,12 +118,15 @@ export default function GlobalDiscussions() {
 
   const handleBlockAuthor = (userId: string, authorName: string) => {
     if (!userId) return;
-    const confirmed = window.confirm(`Are you sure you want to block ${authorName}? You will no longer see any reflections from this user.`);
-    if (confirmed) {
-      blockUserId(userId);
-      hapticNotification('SUCCESS');
-      setBlockedVersion(v => v + 1);
-    }
+    setBlockConfirm({ userId, authorName });
+  };
+
+  const confirmBlock = () => {
+    if (!blockConfirm) return;
+    blockUserId(blockConfirm.userId);
+    hapticNotification('SUCCESS');
+    setBlockedVersion(v => v + 1);
+    setBlockConfirm(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -441,6 +452,39 @@ export default function GlobalDiscussions() {
         authorName={reportModal.authorName}
         onReportSuccess={() => setBlockedVersion(v => v + 1)}
       />
+
+      {/* In-app Block Confirmation Dialog */}
+      {blockConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+            <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 mx-auto flex items-center justify-center mb-3">
+              <UserX size={22} />
+            </div>
+            <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
+              Block {blockConfirm.authorName}?
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
+              You will no longer see reflections or comments posted by this user.
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setBlockConfirm(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBlock}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-600/20 transition-colors"
+              >
+                Block User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

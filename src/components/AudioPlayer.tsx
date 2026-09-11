@@ -59,7 +59,7 @@ export default function AudioPlayer() {
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-emerald-200 dark:border-emerald-900/50 shadow-2xl rounded-full px-6 py-3 z-50 flex items-center justify-between">
+    <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-emerald-200/80 dark:border-emerald-900/50 shadow-2xl rounded-full px-5 py-3 z-50 flex items-center justify-between">
       
       <div className="flex flex-col text-left mr-4 overflow-hidden">
         <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
@@ -124,6 +124,10 @@ export default function AudioPlayer() {
           ref={audioRef} 
           src={currentAyah.audio.replace(/\/\d+\/ar\.[^/]+/, `/${['ar.abdulbasitmurattal', 'ar.abdurrahmaansudais'].includes(reciter) ? '192' : '128'}/${reciter}`)} 
           onEnded={next} 
+          onError={(e) => {
+            console.warn("Audio failed to load from source:", e);
+            pause();
+          }}
         />
       )}
     </div>
