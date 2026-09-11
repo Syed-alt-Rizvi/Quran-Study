@@ -224,13 +224,17 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
 
       - name: Install Apple certificate and provisioning profile
-        if: ${{ secrets.IOS_CERTIFICATE_BASE64 != '' }}
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          if [ -z "$BUILD_CERTIFICATE_BASE64" ]; then
+            echo "No iOS signing certificate secret found. Skipping certificate installation."
+            exit 0
+          fi
+
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
@@ -256,8 +260,10 @@ jobs:
 
       - name: Build iOS App
         working-directory: ./ios/App
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
         run: |
-          if [ -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+          if [ -n "$IOS_CERTIFICATE_BASE64" ]; then
             # Build the app with code signing enabled automatically using the imported profile
             xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGNING_STYLE=Manual
           else
