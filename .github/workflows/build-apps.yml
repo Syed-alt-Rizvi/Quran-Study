@@ -80,11 +80,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
           
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.14.3'
+          build-root-directory: ./android
           cache-disabled: true
         
       - name: Make Gradlew Executable
@@ -94,22 +101,28 @@ jobs:
       - name: Build Android App Bundle (Google Play AAB) & APKs
         working-directory: ./android
         run: |
-          set -ex
-          # 1. Build Android App Bundle (.aab) required for Google Play Console upload
-          ./gradlew bundleRelease --no-daemon --stacktrace || ./gradlew bundleDebug --no-daemon --stacktrace
+          set -x
+          # 1. Build APKs for direct device installation & testing
+          ./gradlew assembleDebug --no-daemon --stacktrace || true
+
+          # 2. Build Android App Bundle (.aab) required for Google Play Console upload
+          ./gradlew bundleRelease --no-daemon --stacktrace || ./gradlew bundleDebug --no-daemon --stacktrace || true
           
-          # 2. Build APKs for direct device installation & testing
-          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
+          # 3. Release APK (if applicable)
           ./gradlew assembleRelease --no-daemon --stacktrace || true
+
+          echo "Listing all generated APKs and AABs:"
+          find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) || true
         
       - name: Prepare Android Artifacts
+        if: always()
         run: |
-          set -ex
+          set -x
           mkdir -p build-artifacts/play-store-bundle
           mkdir -p build-artifacts/apk
 
           # Collect and label AAB files for Google Play Store
-          find android/app/build/outputs/bundle -type f -name "*.aab" -exec cp {} build-artifacts/play-store-bundle/ \; 2>/dev/null || true
+          find android -type f -name "*.aab" -exec cp {} build-artifacts/play-store-bundle/ \; 2>/dev/null || true
           if [ -f "build-artifacts/play-store-bundle/app-release.aab" ]; then
             cp "build-artifacts/play-store-bundle/app-release.aab" "build-artifacts/play-store-bundle/Quran-Study-PlayStore-Release.aab"
           fi
@@ -118,7 +131,7 @@ jobs:
           fi
 
           # Collect and label APK files
-          find android/app/build/outputs/apk -type f -name "*.apk" -exec cp {} build-artifacts/apk/ \; 2>/dev/null || true
+          find android -type f -name "*.apk" -exec cp {} build-artifacts/apk/ \; 2>/dev/null || true
           if [ -f "build-artifacts/apk/app-debug.apk" ]; then
             cp "build-artifacts/apk/app-debug.apk" "build-artifacts/apk/Quran Study.apk"
           fi
@@ -131,13 +144,20 @@ jobs:
           if [ -f "build-artifacts/apk/Quran Study.apk" ]; then
             cp "build-artifacts/apk/Quran Study.apk" "android/app/build/outputs/apk/debug/Quran Study.apk"
           fi
+
+          echo "Contents of build-artifacts/play-store-bundle:"
+          ls -la build-artifacts/play-store-bundle || true
+          echo "Contents of build-artifacts/apk:"
+          ls -la build-artifacts/apk || true
         
       - name: Upload Google Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Quran-Study-PlayStore-AAB
-          path: build-artifacts/play-store-bundle/*.aab
+          path: |
+            build-artifacts/play-store-bundle/*.aab
+            android/**/*.aab
           if-no-files-found: warn
 
       - name: Upload APK
@@ -148,6 +168,7 @@ jobs:
           path: |
             build-artifacts/apk/*.apk
             android/app/build/outputs/apk/debug/Quran Study.apk
+            android/**/*.apk
           if-no-files-found: warn
 
   build-ios:
