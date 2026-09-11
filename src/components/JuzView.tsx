@@ -34,17 +34,21 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
   }, [isActivePlaying, isPlaying, autoScrollAudio]);
 
   useEffect(() => {
-    if (activeTab === 'tafseer' && !lazyTafseer) {
+    setLazyTafseer(null);
+  }, [tafseerProvider]);
+
+  useEffect(() => {
+    if (activeTab === 'tafseer' && !lazyTafseer && !lazyLoading) {
       setLazyLoading(true);
       fetchTafseer(surahId, ayah.numberInSurah, tafseerProvider)
         .then(res => setLazyTafseer(res))
         .catch(err => {
           console.error(err);
-          setLazyTafseer("Tafseer for this Ayah could not be found or failed to load.");
+          setLazyTafseer(err?.message || "Tafseer for this Ayah could not be found or failed to load.");
         })
         .finally(() => setLazyLoading(false));
     }
-  }, [activeTab, surahId, ayah.numberInSurah, lazyTafseer, tafseerProvider]);
+  }, [activeTab, surahId, ayah.numberInSurah, lazyTafseer, lazyLoading, tafseerProvider]);
   const bookmarked = isBookmarked(surahId, ayah.numberInSurah);
   const isLastRead = lastRead?.surahId === surahId && lastRead?.ayahNumber === ayah.numberInSurah;
 
@@ -304,8 +308,18 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
                       <p className="text-slate-400 text-xs uppercase tracking-widest">Loading Tafseer Content...</p>
                     </div>
                   ) : typeof lazyTafseer === 'string' ? (
-                    <div className="text-red-500 text-sm">
-                      {lazyTafseer}
+                    <div className="py-4 text-center">
+                      <p className="text-red-500 text-sm mb-3 font-urdu leading-relaxed">{lazyTafseer}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLazyTafseer(null);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        دوبارہ کوشش کریں (Retry)
+                      </button>
                     </div>
                   ) : (
                     <div>

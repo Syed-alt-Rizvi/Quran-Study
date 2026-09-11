@@ -7,10 +7,79 @@ export interface TafseerContent {
   en: string;
   tafseer_text?: string;
   tafseer_title?: string;
+  surah?: number;
+  ayah?: number;
 }
 
 // In-memory cache
 const memoryCache: Record<string, TafseerContent> = {};
+
+/**
+ * Clean and parse raw HTML from Balagh ul Quran (Tafseer Al-Kauthar)
+ * Works in both browser DOM and native WebView environments
+ */
+export function parseKautharHtml(html: string, surah: number, ayah: number): TafseerContent | null {
+  if (!html || typeof html !== 'string' || html.length < 100) return null;
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Remove unwanted scripts, styles, buttons, forms, nav, and message headers
+    doc.querySelectorAll('script, style, iframe, form, button, a.btn, #msg2, #suraname, header, footer, nav, .breadcrumb').forEach(el => el.remove());
+
+    // Remove navigation rows with آگے / پیچھے / اگلی آیت
+    doc.querySelectorAll('section.section .container > .row, section.section .container .row').forEach(el => {
+      const text = el.textContent || '';
+      if ((text.includes('پیچھے') && text.includes('آگے')) || el.querySelector('#msg2, #suraname')) {
+        el.remove();
+      }
+    });
+
+    const container = doc.querySelector('section.section .container') || doc.body;
+
+    // Clean empty containers
+    container.querySelectorAll('p, div, span').forEach(el => {
+      if (!el.textContent?.trim() && !el.querySelector('img')) {
+        el.remove();
+      }
+    });
+
+    // Extract Urdu text from rows
+    let urduText = '';
+    const rows = container.querySelectorAll('.row');
+    if (rows.length > 0) {
+      rows.forEach(r => {
+        const t = (r.textContent || '').trim().replace(/[ \t]+/g, ' ');
+        if (t) {
+          urduText += t + '\n\n';
+        }
+      });
+    }
+
+    if (!urduText.trim()) {
+      urduText = (container.textContent || '').trim().replace(/[ \t]+/g, ' ');
+    }
+
+    const cleanHtml = container.innerHTML || '';
+
+    if (!urduText.trim() && !cleanHtml.trim()) {
+      return null;
+    }
+
+    return {
+      surah,
+      ayah,
+      ur: urduText.trim(),
+      tafseer_text: cleanHtml.trim(),
+      en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
+      tafseer_title: "تفسیر الکوثر — علامہ شیخ محسن علی نجفی",
+    };
+  } catch (err) {
+    console.warn('[parseKautharHtml] Error parsing Tafseer HTML:', err);
+    return null;
+  }
+}
 
 export async function fetchTafseer(
   surahNumber: number, 
@@ -22,7 +91,7 @@ export async function fetchTafseer(
     const kKey = `tafseer_kauthar_${surahNumber}_${ayahNumber}`;
     if (memoryCache[kKey]) return memoryCache[kKey];
 
-    // 1. Check localStorage
+    // 1. Check localStorage first
     const localData = localStorage.getItem(kKey);
     if (localData) {
       try {
@@ -32,19 +101,66 @@ export async function fetchTafseer(
           return parsed;
         }
       } catch (e) {
-        // ignore
+        // ignore JSON parse error
       }
     }
 
-    // 2. Fetch from backend API / balaghulquran scraper endpoint
+    const sno = String(surahNumber);
+    const ano = String(surahNumber).padStart(3, '0') + String(ayahNumber).padStart(3, '0');
+    const balaghDirectUrl = `https://balaghulquran.com/tafseer.php?sno=${sno}&ano=${ano}`;
+
+    // 2. On Native Mobile (Capacitor), fetch directly from balaghulquran.com without CORS constraints
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const nativeRes = await CapacitorHttp.get({
+          url: balaghDirectUrl,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
+          },
+          connectTimeout: 15000,
+          readTimeout: 20000
+        });
+
+        if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
+          const rawData = typeof nativeRes.data === 'string' ? nativeRes.data : JSON.stringify(nativeRes.data);
+          const parsed = parseKautharHtml(rawData, surahNumber, ayahNumber);
+          if (parsed && (parsed.ur || parsed.tafseer_text)) {
+            memoryCache[kKey] = parsed;
+            try {
+              localStorage.setItem(kKey, JSON.stringify(parsed));
+            } catch (e) {}
+            return parsed;
+          }
+        }
+      } catch (nativeErr) {
+        console.warn(`[TafseerScraper] Native direct fetch from balaghulquran failed:`, nativeErr);
+      }
+    }
+
+    // 3. Fallback: try static pre-bundled or pre-scraped json
+    try {
+      const staticRes = await fetch(`/tafseer_kauthar/s${surahNumber}_a${ayahNumber}.json`);
+      if (staticRes.ok) {
+        const data = await staticRes.json();
+        if (data && (data.ur || data.tafseer_text)) {
+          memoryCache[kKey] = data;
+          try {
+            localStorage.setItem(kKey, JSON.stringify(data));
+          } catch (e) {}
+          return data;
+        }
+      }
+    } catch (e) {}
+
+    // 4. Try backend API proxy route
     try {
       const endpoint = getApiUrl(`/api/tafseer/kauthar/${surahNumber}/${ayahNumber}`);
       let item: TafseerContent | null = null;
 
       if (Capacitor.isNativePlatform()) {
-        const nativeRes = await CapacitorHttp.get({ url: endpoint });
+        const nativeRes = await CapacitorHttp.get({ url: endpoint, connectTimeout: 6000, readTimeout: 6000 });
         if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
-          item = nativeRes.data;
+          item = typeof nativeRes.data === 'string' ? JSON.parse(nativeRes.data) : nativeRes.data;
         }
       } else {
         const apiRes = await fetch(endpoint);
@@ -57,28 +173,41 @@ export async function fetchTafseer(
         memoryCache[kKey] = item;
         try {
           localStorage.setItem(kKey, JSON.stringify(item));
-        } catch (e) {
-          // storage quota exceeded or disabled
-        }
+        } catch (e) {}
         return item;
       }
     } catch (e) {
-      console.warn(`[TafseerScraper] Failed to fetch Al-Kauthar via API:`, e);
+      console.warn(`[TafseerScraper] Backend API route failed for Al-Kauthar:`, e);
     }
 
-    // 3. Fallback: try static pre-scraped json if available
-    try {
-      const staticRes = await fetch(`/tafseer_kauthar/s${surahNumber}_a${ayahNumber}.json`);
-      if (staticRes.ok) {
-        const data = await staticRes.json();
-        if (data && (data.ur || data.tafseer_text)) {
-          memoryCache[kKey] = data;
-          return data;
+    // 5. Fallback for Web Browser: fetch via web CORS proxies
+    if (!Capacitor.isNativePlatform()) {
+      const corsProxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(balaghDirectUrl)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(balaghDirectUrl)}`
+      ];
+
+      for (const proxyUrl of corsProxies) {
+        try {
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            const html = await res.text();
+            const parsed = parseKautharHtml(html, surahNumber, ayahNumber);
+            if (parsed && (parsed.ur || parsed.tafseer_text)) {
+              memoryCache[kKey] = parsed;
+              try {
+                localStorage.setItem(kKey, JSON.stringify(parsed));
+              } catch (e) {}
+              return parsed;
+            }
+          }
+        } catch (proxyErr) {
+          // continue to next proxy
         }
       }
-    } catch (e) {}
+    }
 
-    throw new Error(`تفسیر الکوثر: سورہ ${surahNumber} آیت ${ayahNumber} کا مواد لوڈ نہیں ہو سکا۔`);
+    throw new Error(`تفسیر الکوثر: سورہ ${surahNumber} آیت ${ayahNumber} کا مواد لوڈ نہیں ہو سکا۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔`);
   }
 
 

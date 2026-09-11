@@ -129,31 +129,27 @@ jobs:
         if: always()
         run: |
           set -x
+          rm -rf build-artifacts
           mkdir -p build-artifacts/play-store-bundle
           mkdir -p build-artifacts/apk
 
-          # Collect and label AAB files for Google Play Store
-          find android -type f -name "*.aab" -exec cp {} build-artifacts/play-store-bundle/ \; 2>/dev/null || true
-          if [ -f "build-artifacts/play-store-bundle/app-release.aab" ]; then
-            cp "build-artifacts/play-store-bundle/app-release.aab" "build-artifacts/play-store-bundle/Quran-Study-PlayStore-Release.aab"
-          fi
-          if [ -f "build-artifacts/play-store-bundle/app-debug.aab" ]; then
-            cp "build-artifacts/play-store-bundle/app-debug.aab" "build-artifacts/play-store-bundle/Quran-Study-PlayStore-Debug.aab"
+          # 1. Collect Google Play Store Bundle (.aab)
+          if [ -f "android/app/build/outputs/bundle/release/app-release.aab" ]; then
+            cp "android/app/build/outputs/bundle/release/app-release.aab" "build-artifacts/play-store-bundle/Quran-Study-PlayStore-Release.aab"
+          elif [ -f "android/app/build/outputs/bundle/debug/app-debug.aab" ]; then
+            cp "android/app/build/outputs/bundle/debug/app-debug.aab" "build-artifacts/play-store-bundle/Quran-Study-PlayStore-Debug.aab"
           fi
 
-          # Collect and label APK files
-          find android -type f -name "*.apk" -exec cp {} build-artifacts/apk/ \; 2>/dev/null || true
-          if [ -f "build-artifacts/apk/app-debug.apk" ]; then
-            cp "build-artifacts/apk/app-debug.apk" "build-artifacts/apk/Quran Study.apk"
-          fi
-          if [ -f "build-artifacts/apk/app-release.apk" ]; then
-            cp "build-artifacts/apk/app-release.apk" "build-artifacts/apk/Quran-Study-Release.apk"
+          # 2. Collect directly installable APK (debug keystore signed - installs immediately on Android phones)
+          if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp "android/app/build/outputs/apk/debug/app-debug.apk" "build-artifacts/apk/Quran-Study-Install-Directly.apk"
           fi
 
-          # Maintain legacy output path for backward compatibility
-          mkdir -p android/app/build/outputs/apk/debug
-          if [ -f "build-artifacts/apk/Quran Study.apk" ]; then
-            cp "build-artifacts/apk/Quran Study.apk" "android/app/build/outputs/apk/debug/Quran Study.apk"
+          # 3. Collect Release APK (optimized build)
+          if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            cp "android/app/build/outputs/apk/release/app-release-unsigned.apk" "build-artifacts/apk/Quran-Study-Release-Optimized.apk"
+          elif [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+            cp "android/app/build/outputs/apk/release/app-release.apk" "build-artifacts/apk/Quran-Study-Release-Optimized.apk"
           fi
 
           echo "Contents of build-artifacts/play-store-bundle:"
@@ -166,20 +162,15 @@ jobs:
         if: always()
         with:
           name: Quran-Study-PlayStore-AAB
-          path: |
-            build-artifacts/play-store-bundle/*.aab
-            android/**/*.aab
+          path: build-artifacts/play-store-bundle/*.aab
           if-no-files-found: warn
 
-      - name: Upload APK
+      - name: Upload APK (For Direct Phone Installation)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Quran-Study-APK
-          path: |
-            build-artifacts/apk/*.apk
-            android/app/build/outputs/apk/debug/Quran Study.apk
-            android/**/*.apk
+          path: build-artifacts/apk/*.apk
           if-no-files-found: warn
 
   build-ios:
