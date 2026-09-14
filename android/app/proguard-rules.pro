@@ -1,21 +1,26 @@
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Capacitor ProGuard & R8 rules
+-keep class com.getcapacitor.** { *; }
+-keep class * extends com.getcapacitor.Plugin { *; }
+-keep public class * extends com.getcapacitor.Plugin
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# WebKit & JavaScript Interfaces
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# AndroidX Core, Webkit & Splashscreen
+-keep class androidx.core.splashscreen.** { *; }
+-keep class androidx.webkit.** { *; }
+
+# Preserve line numbers and source file names for crash analytics
+-keepattributes SourceFile,LineNumberTable,*Annotation*
+-keepattributes EnclosingMethod,InnerClasses,Signature
+
+# Suppress harmless warnings during release compilation
+-dontwarn com.getcapacitor.**
+-dontwarn androidx.webkit.**
+

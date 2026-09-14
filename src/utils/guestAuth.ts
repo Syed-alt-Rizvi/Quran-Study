@@ -106,6 +106,9 @@ export const deleteGuestAccountAndAllData = () => {
   localStorage.removeItem('shia_quran_reported_discussions');
   localStorage.removeItem('shia_quran_report_details');
   localStorage.removeItem('shia-quran-settings');
+  localStorage.removeItem('quran-app-settings');
+  localStorage.removeItem('shia-quran-has-seen-welcome');
   localStorage.removeItem('shia-quran-active-surah');
   localStorage.removeItem('shia-quran-active-juz');
+  localStorage.removeItem('shia-quran-surahs-cache');
 };

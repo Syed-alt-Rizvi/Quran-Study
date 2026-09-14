@@ -9,7 +9,7 @@ import { registerModal } from '../utils/modalBackHandler';
 interface PrivacyPolicyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'privacy' | 'terms' | 'deletion';
+  initialTab?: 'privacy' | 'terms' | 'deletion' | 'licenses';
 }
 
 export default function PrivacyPolicyModal({
@@ -17,7 +17,7 @@ export default function PrivacyPolicyModal({
   onClose,
   initialTab = 'privacy',
 }: PrivacyPolicyModalProps) {
-  const [activeTab, setActiveTab] = useState<'privacy' | 'terms' | 'deletion'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'privacy' | 'terms' | 'deletion' | 'licenses'>(initialTab);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [dataDeleted, setDataDeleted] = useState(false);
 
@@ -110,6 +110,16 @@ export default function PrivacyPolicyModal({
                 }`}
               >
                 Data Deletion
+              </button>
+              <button
+                onClick={() => setActiveTab('licenses')}
+                className={`py-3 px-3 border-b-2 transition-colors ${
+                  activeTab === 'licenses'
+                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Open Source
               </button>
             </div>
 
@@ -278,6 +288,79 @@ export default function PrivacyPolicyModal({
                       <span>Web Account Deletion Portal</span>
                       <ExternalLink size={14} />
                     </a>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'licenses' && (
+                <div className="space-y-4">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300">
+                    <strong>Open Source Software & Font Attributions</strong>
+                    <p className="mt-1 text-[11px] opacity-90">
+                      Shia Quran proudly incorporates open-source software libraries and freely licensed Arabic typography in compliance with their respective licenses.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">React & Vite</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">MIT License</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Copyright &copy; Meta Platforms, Inc. and Vite contributors.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">Capacitor (@capacitor/*)</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">MIT License</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Copyright &copy; Drifty Co. / Ionic. Provides native mobile bridges for Android and iOS.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">Lucide Icons</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">ISC License</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Copyright &copy; Lucide Contributors. Feather Icons community fork.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">Amiri & Amiri Quran Fonts</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">SIL OFL 1.1</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Copyright &copy; 2010-2022 Khaled Hosny. Classical Naskh Quranic typeface.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">Scheherazade New & Lateef Fonts</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">SIL OFL 1.1</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Copyright &copy; SIL International. Designed for Arabic script legibility.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">AlQuran Cloud & EveryAyah</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Open Data</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Quran text, translations, and verse-by-verse recitation audio services.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

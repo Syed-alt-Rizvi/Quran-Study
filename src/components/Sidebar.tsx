@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
 
   const [privacyModal, setPrivacyModal] = useState<{
     isOpen: boolean;
-    tab: 'privacy' | 'terms' | 'deletion';
+    tab: 'privacy' | 'terms' | 'deletion' | 'licenses';
   }>({
     isOpen: false,
     tab: 'privacy',
@@ -1104,7 +1104,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                     </h4>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
                       id="open-privacy-policy-btn"
                       type="button"
@@ -1112,7 +1112,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'privacy' });
                       }}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors"
+                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <Shield size={12} className="text-emerald-600" />
                       <span>Privacy</span>
@@ -1125,10 +1125,23 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'terms' });
                       }}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors"
+                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <FileText size={12} className="text-emerald-600" />
                       <span>Terms</span>
+                    </button>
+
+                    <button
+                      id="open-licenses-modal-btn"
+                      type="button"
+                      onClick={() => {
+                        hapticSelection();
+                        setPrivacyModal({ isOpen: true, tab: 'licenses' });
+                      }}
+                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
+                    >
+                      <Code size={12} className="text-emerald-600" />
+                      <span>Licenses</span>
                     </button>
 
                     <button
@@ -1138,7 +1151,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'deletion' });
                       }}
-                      className="p-2 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors"
+                      className="p-2 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <Trash2 size={12} className="text-rose-600" />
                       <span>Delete</span>

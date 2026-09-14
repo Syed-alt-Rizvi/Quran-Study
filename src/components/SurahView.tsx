@@ -1,13 +1,13 @@
 import { getApiUrl } from '../utils/apiBase';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { fetchSurahDetail, SurahDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 
@@ -18,7 +18,7 @@ interface SurahViewProps {
   onBack: () => void;
 }
 
-function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; isLast?: boolean }) {
+const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; isLast?: boolean }) {
   const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, tafseerZoom, setTafseerZoom, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
@@ -173,7 +173,9 @@ function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; 
             <button
               onClick={() => {
                 const text = `Qur'an ${surah.number}:${ayah.numberInSurah}`;
-                navigator.clipboard.writeText(text);
+                try {
+                  navigator.clipboard?.writeText?.(text)?.catch?.(() => {});
+                } catch (e) {}
                 const event = new CustomEvent('open-discussion', { detail: { ayah, surah } });
                 window.dispatchEvent(event);
               }}
@@ -406,11 +408,12 @@ function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; 
       )}
     </div>
   );
-}
+});
 
 export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProps) {
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { fontSize } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
@@ -435,12 +438,39 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
     const handleOpenDiscussion = (e: CustomEvent) => {
       setDiscussionAyah(e.detail);
     };
-    window.addEventListener('open-discussion', handleOpenDiscussion as EventListener);
-    return () => window.removeEventListener('open-discussion', handleOpenDiscussion as EventListener);
-  }, []);
+    const handleScrollToAyah = (e: CustomEvent<{ ayahNumber?: number; surahNumber?: number }>) => {
+      const sNum = e.detail?.surahNumber;
+      const aNum = e.detail?.ayahNumber;
+      if (aNum && (!sNum || sNum === surahId)) {
+        let attempts = 0;
+        const tryScroll = () => {
+          const el = document.getElementById(`ayah-${aNum}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
+            setTimeout(() => {
+              el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50');
+            }, 3000);
+          } else if (attempts < 10) {
+            attempts++;
+            setTimeout(tryScroll, 100);
+          }
+        };
+        tryScroll();
+      }
+    };
 
-  useEffect(() => {
+    window.addEventListener('open-discussion', handleOpenDiscussion as EventListener);
+    window.addEventListener('scroll-to-ayah', handleScrollToAyah as EventListener);
+    return () => {
+      window.removeEventListener('open-discussion', handleOpenDiscussion as EventListener);
+      window.removeEventListener('scroll-to-ayah', handleScrollToAyah as EventListener);
+    };
+  }, [surahId]);
+
+  const loadSurah = () => {
     setLoading(true);
+    setError(null);
     hasScrolledTargetRef.current = false;
     fetchSurahDetail(surahId)
       .then((surahData) => {
@@ -448,9 +478,14 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
         setLoading(false);
       })
       .catch((e) => {
-        console.error(e);
+        console.error("Failed to load Surah:", e);
+        setError("Unable to load Surah verses. Please check your internet connection.");
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadSurah();
   }, [surahId]);
 
   // One-time smooth scroll to target ayah if specifically requested
@@ -458,18 +493,24 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
     if (loading || !surah || hasScrolledTargetRef.current) return;
     
     if (targetAyah) {
-      hasScrolledTargetRef.current = true;
-      const timer = setTimeout(() => {
+      let attempts = 0;
+      let timeoutId: any;
+      const tryScroll = () => {
         const el = document.getElementById(`ayah-${targetAyah}`);
         if (el) {
+          hasScrolledTargetRef.current = true;
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
           setTimeout(() => {
             el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50');
           }, 3000);
+        } else if (attempts < 10) {
+          attempts++;
+          timeoutId = setTimeout(tryScroll, 100);
         }
-      }, 150);
-      return () => clearTimeout(timer);
+      };
+      timeoutId = setTimeout(tryScroll, 80);
+      return () => clearTimeout(timeoutId);
     }
   }, [loading, surah, targetAyah]);
 
@@ -483,10 +524,52 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
     }
   };
 
-  if (loading || !surah) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !surah) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+        <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 px-4 py-4">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <button 
+              onClick={() => { hapticImpact(ImpactStyle.Light); onBack(); }}
+              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            >
+              <ArrowLeft size={24} />
+            </button>
+            <span className="font-bold text-slate-800 dark:text-slate-200">Surah {surahId}</span>
+            <div className="w-8" />
+          </div>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
+          <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4">
+            <AlertTriangle size={32} />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">Could Not Load Surah</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+            {error || "An unexpected error occurred while fetching the Quran verses."}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => onBack()}
+              className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={loadSurah}
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

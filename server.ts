@@ -9,8 +9,6 @@ import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper";
 
-import { seed } from "./src/db/seed";
-
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -209,6 +207,7 @@ async function startServer() {
       const existingArticles = await db.select().from(imamScienceArticles).limit(1).execute();
       if (existingArticles.length === 0) {
         console.log("Database empty. Seeding Imam & Science articles in background...");
+        const { seed } = await import("./src/db/seed");
         await seed();
         console.log("Database seeding completed.");
       }

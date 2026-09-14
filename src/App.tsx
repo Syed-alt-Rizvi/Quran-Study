@@ -19,7 +19,7 @@ export default function App() {
       if (localStorage.getItem('shia-quran-has-seen-welcome') === 'true') {
         return false;
       }
-      const raw = localStorage.getItem('shia-quran-settings');
+      const raw = localStorage.getItem('quran-app-settings') || localStorage.getItem('shia-quran-settings');
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed?.state?.hasSeenWelcome) return false;
@@ -30,6 +30,7 @@ export default function App() {
 
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [targetAyah, setTargetAyah] = useState<number | null>(null);
+  const [targetSurah, setTargetSurah] = useState<number | null>(null);
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -42,15 +43,19 @@ export default function App() {
   }, [hasSeenWelcome, showWelcome]);
 
   const handleSelectSurah = (id: number, ayahNumber?: number) => {
-    setSelectedSurah(id);
-    setTargetAyah(ayahNumber || null);
+    setIsSidebarOpen(false);
+    setSelectedSurah(Number(id));
+    setTargetAyah(ayahNumber ? Number(ayahNumber) : null);
+    setTargetSurah(null);
     setSelectedJuz(null);
   };
 
-  const handleSelectJuz = (id: number) => {
-    setSelectedJuz(id);
+  const handleSelectJuz = (id: number, ayahNumber?: number, surahNumber?: number) => {
+    setIsSidebarOpen(false);
+    setSelectedJuz(Number(id));
     setSelectedSurah(null);
-    setTargetAyah(null);
+    setTargetAyah(ayahNumber ? Number(ayahNumber) : null);
+    setTargetSurah(surahNumber ? Number(surahNumber) : null);
   };
 
   const isSidebarOpenRef = useRef(isSidebarOpen);
@@ -222,11 +227,15 @@ export default function App() {
           <JuzView 
             key={`juz-view-${selectedJuz}`} 
             juzId={selectedJuz} 
+            targetAyah={targetAyah || undefined}
+            targetSurah={targetSurah || undefined}
             onBack={() => {
               if (window.location.hash) {
                 history.replaceState(null, '', window.location.pathname + window.location.search);
               }
               setSelectedJuz(null);
+              setTargetAyah(null);
+              setTargetSurah(null);
               window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             }} 
           />
@@ -250,7 +259,12 @@ export default function App() {
         }} 
       />
       
-      {!showWelcome && !isExiting && <AudioPlayer />}
+      {!showWelcome && !isExiting && (
+        <AudioPlayer 
+          onSelectSurah={handleSelectSurah}
+          onSelectJuz={handleSelectJuz}
+        />
+      )}
     </div>
   );
 }

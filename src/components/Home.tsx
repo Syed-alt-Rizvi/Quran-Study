@@ -3,7 +3,8 @@ import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import { useState, useEffect } from 'react';
 import { fetchSurahs, SurahMeta } from '../api';
-import { Search, BookOpen, Settings, LogOut, Microscope, ArrowRight, MessageCircle } from "lucide-react";
+import staticSurahs from '../surahList.json';
+import { Search, BookOpen, Settings, LogOut, Microscope, ArrowRight, MessageCircle, AlertTriangle } from "lucide-react";
 import DynamicBanner from "./DynamicBanner";
 import GlobalDiscussions from "./GlobalDiscussions";
 import ImamScienceFeed from "./ImamScienceFeed";
@@ -19,8 +20,11 @@ interface HomeProps {
 }
 
 export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExit }: HomeProps) {
-  const [surahs, setSurahs] = useState<SurahMeta[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [surahs, setSurahs] = useState<SurahMeta[]>(() => {
+    return Array.isArray(staticSurahs) && staticSurahs.length === 114 ? (staticSurahs as SurahMeta[]) : [];
+  });
+  const [loading, setLoading] = useState(() => surahs.length === 0);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'surah' | 'juz' | 'science' | 'discuss'>('surah');
   
@@ -33,16 +37,27 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
     }
   }, []);
 
-  useEffect(() => {
-    const abortController = new AbortController();
+  const loadSurahs = () => {
+    if (surahs.length === 0) {
+      setLoading(true);
+    }
+    setError(null);
     fetchSurahs()
       .then(data => {
         setSurahs(data);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error("Failed to fetch surahs:", err);
+        if (surahs.length === 0) {
+          setError("Unable to load Quran chapters. Please check your internet connection.");
+        }
+        setLoading(false);
+      });
+  };
 
-    return () => abortController.abort();
+  useEffect(() => {
+    loadSurahs();
   }, []);
 
   const q = searchQuery.trim().toLowerCase();
@@ -145,7 +160,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
       )}
       <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6">
 
-        <DynamicBanner />
+        <DynamicBanner onSelectSurah={onSelectSurah} />
         {lastRead && (
           <div className="mb-8 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border-[0.5px] border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
             <div>
@@ -226,7 +241,34 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               <div key={`skeleton-${i}`} className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
             ))}
           </div>
+        ) : error && surahs.length === 0 ? (
+          <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm max-w-md mx-auto my-6">
+            <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle size={24} />
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">Failed to Load Content</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{error}</p>
+            <button
+              onClick={loadSurahs}
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-md transition-colors"
+            >
+              Retry
+            </button>
+          </div>
         ) : activeTab === 'surah' ? (
+          filteredSurahs.length === 0 ? (
+            <div className="text-center py-12 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                No Surahs found matching &ldquo;{searchQuery}&rdquo;
+              </p>
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSurahs.map((surah, surahIdx) => {
               const highestRead = readProgress?.[surah.number] || 0;
@@ -279,11 +321,25 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               );
             })}
           </div>
+          )
         ) : activeTab === 'science' ? (
           <ImamScienceFeed onSelectSurah={onSelectSurah} />
         ) : activeTab === 'discuss' ? (
           <GlobalDiscussions />
         ) : (
+          filteredJuzs.length === 0 ? (
+            <div className="text-center py-12 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                No Juz found matching &ldquo;{searchQuery}&rdquo;
+              </p>
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredJuzs.map((juz, juzIdx) => (
               <button
@@ -314,6 +370,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onOpenSettings, onExi
               </button>
             ))}
           </div>
+          )
         )}
 
         {/* Footer with App & Developer Info & Iltemas-e-Surah Fatiha */}

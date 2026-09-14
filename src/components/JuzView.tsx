@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { fetchJuzDetail, JuzDetail, Ayah } from '../api';
 import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, FileText, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface JuzViewProps {
   key?: string;
   juzId: number;
+  targetAyah?: number;
+  targetSurah?: number;
   onBack: () => void;
 }
 
-function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; juz: JuzDetail; isLast?: boolean }) {
+const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; juz: JuzDetail; isLast?: boolean }) {
   const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, tafseerZoom, setTafseerZoom, autoScrollAudio } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
@@ -25,7 +27,7 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
   const ayahRef = useRef<HTMLDivElement>(null);
   
   const surahId = ayah.surahNumber || 1;
-  const isActivePlaying = audioSurahId === -juz.number && activeAyahNumber === ayah.numberInSurah && activeSurahNumber === surahId;
+  const isActivePlaying = (audioSurahId === -juz.number || audioSurahId === surahId) && activeAyahNumber === ayah.numberInSurah && activeSurahNumber === surahId;
 
   useEffect(() => {
     if (autoScrollAudio && isActivePlaying && isPlaying && ayahRef.current) {
@@ -94,7 +96,7 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
       pause();
     } else {
       const index = juz.ayahs.findIndex(a => a.numberInSurah === ayah.numberInSurah && a.surahNumber === surahId);
-      setPlaylist(surahId, juz.ayahs, index !== -1 ? index : 0);
+      setPlaylist(-juz.number, juz.ayahs, index !== -1 ? index : 0);
     }
   };
 
@@ -383,30 +385,103 @@ function AyahCard({ ayah, juz, isLast }: { key?: string | number; ayah: Ayah; ju
       )}
     </div>
   );
-}
+});
 
-export default function JuzView({ juzId, onBack }: JuzViewProps) {
+export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzViewProps) {
   const [juz, setJuz] = useState<JuzDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { fontSize } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
+  const hasScrolledTargetRef = useRef(false);
 
   useEffect(() => {
-    // Clear any dirty URL hash and start at top
+    hasScrolledTargetRef.current = false;
+  }, [juzId, targetAyah]);
+
+  useEffect(() => {
+    // Clear any dirty URL hash and start at top if not navigating to target ayah
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [juzId]);
+    if (!targetAyah) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [juzId, targetAyah]);
 
   useEffect(() => {
+    const handleScrollToAyah = (e: CustomEvent<{ ayahNumber?: number; surahNumber?: number }>) => {
+      const sNum = e.detail?.surahNumber;
+      const aNum = e.detail?.ayahNumber;
+      if (aNum) {
+        let attempts = 0;
+        const tryScroll = () => {
+          const el = (sNum ? document.getElementById(`ayah-${sNum}-${aNum}`) : null) || 
+                     document.getElementById(`ayah-${aNum}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
+            setTimeout(() => {
+              el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50');
+            }, 3000);
+          } else if (attempts < 10) {
+            attempts++;
+            setTimeout(tryScroll, 100);
+          }
+        };
+        tryScroll();
+      }
+    };
+
+    window.addEventListener('scroll-to-ayah', handleScrollToAyah as EventListener);
+    return () => {
+      window.removeEventListener('scroll-to-ayah', handleScrollToAyah as EventListener);
+    };
+  }, [juzId]);
+
+  // One-time smooth scroll to target ayah if specifically requested
+  useEffect(() => {
+    if (loading || !juz || hasScrolledTargetRef.current) return;
+    if (targetAyah) {
+      let attempts = 0;
+      let timeoutId: any;
+      const tryScroll = () => {
+        const el = (targetSurah ? document.getElementById(`ayah-${targetSurah}-${targetAyah}`) : null) ||
+                   document.getElementById(`ayah-${targetAyah}`);
+        if (el) {
+          hasScrolledTargetRef.current = true;
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
+          setTimeout(() => {
+            el.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50');
+          }, 3000);
+        } else if (attempts < 10) {
+          attempts++;
+          timeoutId = setTimeout(tryScroll, 100);
+        }
+      };
+      timeoutId = setTimeout(tryScroll, 80);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [loading, juz, targetAyah, targetSurah]);
+
+  const loadJuz = () => {
     setLoading(true);
+    setError(null);
     fetchJuzDetail(juzId)
       .then(data => {
         setJuz(data);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error("Failed to load Juz:", err);
+        setError("Unable to load Juz verses. Please check your internet connection.");
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    loadJuz();
   }, [juzId]);
 
   // Using -1 * juzId to differentiate between surahId and juzId in the store if needed, 
@@ -421,10 +496,52 @@ export default function JuzView({ juzId, onBack }: JuzViewProps) {
     }
   };
 
-  if (loading || !juz) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !juz) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+        <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 px-4 py-4">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <button 
+              onClick={onBack}
+              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            >
+              <ArrowLeft size={24} />
+            </button>
+            <span className="font-bold text-slate-800 dark:text-slate-200">Juz {juzId}</span>
+            <div className="w-8" />
+          </div>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
+          <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4">
+            <AlertTriangle size={32} />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">Could Not Load Juz</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+            {error || "An unexpected error occurred while fetching the Juz verses."}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={onBack}
+              className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={loadJuz}
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

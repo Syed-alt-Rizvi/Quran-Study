@@ -1,5 +1,5 @@
 
-async function safeJson(res) {
+async function safeJson(res: Response) {
   const text = await res.text();
   try { return JSON.parse(text); } 
   catch(e) { console.error("Invalid JSON from " + res.url, text.substring(0, 100)); throw new Error("Invalid JSON"); }
@@ -33,22 +33,64 @@ export interface SurahDetail {
   ayahs: Ayah[];
 }
 
-const surahMetaCache: SurahMeta[] = [];
+import staticSurahs from './surahList.json';
+
+const surahMetaCache: SurahMeta[] = Array.isArray(staticSurahs) && staticSurahs.length === 114 ? [...(staticSurahs as SurahMeta[])] : [];
 const surahDetailCache = new Map<number, SurahDetail>();
 const juzDetailCache = new Map<number, JuzDetail>();
 
 export const fetchSurahs = async (): Promise<SurahMeta[]> => {
   if (surahMetaCache.length > 0) return surahMetaCache;
-  const response = await fetch('https://api.alquran.cloud/v1/surah');
-  if (!response.ok) throw new Error('Failed to fetch surahs');
-  const data = await safeJson(response);
-  if (surahMetaCache.length === 0) { surahMetaCache.push(...data.data); }
-  return data.data;
+
+  // Check offline localStorage cache first
+  try {
+    const cached = localStorage.getItem('shia-quran-surahs-cache');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length === 114) {
+        surahMetaCache.push(...parsed);
+        return surahMetaCache;
+      }
+    }
+  } catch (e) {}
+
+  try {
+    const response = await fetch('https://api.alquran.cloud/v1/surah');
+    if (response.ok) {
+      const data = await safeJson(response);
+      if (data?.data && Array.isArray(data.data)) {
+        surahMetaCache.length = 0;
+        surahMetaCache.push(...data.data);
+        localStorage.setItem('shia-quran-surahs-cache', JSON.stringify(data.data));
+      }
+    }
+  } catch (e) {
+    console.warn("Could not fetch remote surahs list, using static:", e);
+  }
+
+  return surahMetaCache;
 };
 
 export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
   if (surahDetailCache.has(id)) return surahDetailCache.get(id)!;
   
+  const cacheKey = `quran-surah-detail-${id}`;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.ayahs && parsed.ayahs.length > 0) {
+        // Guarantee surahNumber and surahName are populated on all ayahs
+        parsed.ayahs.forEach((a: any) => {
+          if (!a.surahNumber && parsed.number) a.surahNumber = parsed.number;
+          if (!a.surahName && parsed.englishName) a.surahName = parsed.englishName;
+        });
+        surahDetailCache.set(id, parsed);
+        return parsed;
+      }
+    }
+  } catch (e) {}
+
   // Fetch Arabic (quran-uthmani), English (en.asad), Urdu (ur.jalandhry), and Audio (ar.alafasy)
   const response = await fetch(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`);
   
@@ -75,13 +117,13 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
       surahNumber: arabicData.number,
       surahName: arabicData.englishName,
       text: text,
-      translationEn: englishData.ayahs[index].text,
-      translationUr: urduData.ayahs[index].text,
-      audio: audioData.ayahs[index].audio,
+      translationEn: englishData.ayahs[index]?.text || '',
+      translationUr: urduData.ayahs[index]?.text || '',
+      audio: audioData.ayahs[index]?.audio,
     };
   });
 
-  const result = {
+  const result: SurahDetail = {
     number: arabicData.number,
     name: arabicData.name,
     englishName: arabicData.englishName,
@@ -92,6 +134,10 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
   };
   
   surahDetailCache.set(id, result);
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+  } catch (e) {}
+
   return result;
 };
 
@@ -103,6 +149,22 @@ export interface JuzDetail {
 export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
   if (juzDetailCache.has(id)) return juzDetailCache.get(id)!;
   
+  const cacheKey = `quran-juz-detail-${id}`;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.ayahs && parsed.ayahs.length > 0) {
+        parsed.ayahs.forEach((a: any) => {
+          if (!a.surahNumber && a.surah?.number) a.surahNumber = a.surah.number;
+          if (!a.surahName && a.surah?.englishName) a.surahName = a.surah.englishName;
+        });
+        juzDetailCache.set(id, parsed);
+        return parsed;
+      }
+    }
+  } catch (e) {}
+
   const [arabicResponse, englishResponse, urduResponse, audioResponse] = await Promise.all([
     fetch(`https://api.alquran.cloud/v1/juz/${id}/quran-uthmani`),
     fetch(`https://api.alquran.cloud/v1/juz/${id}/en.asad`),
@@ -141,9 +203,9 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
       surahNumber: sNum,
       surahName: ayah.surah?.englishName || 'Unknown',
       text: text,
-      translationEn: englishData.ayahs[index].text,
-      translationUr: urduData.ayahs[index].text,
-      audio: audioData.ayahs[index].audio,
+      translationEn: englishData.ayahs[index]?.text || '',
+      translationUr: urduData.ayahs[index]?.text || '',
+      audio: audioData.ayahs[index]?.audio,
     };
   });
 
@@ -172,11 +234,15 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
     }
   }
 
-  const result = {
+  const result: JuzDetail = {
     number: arabicData.number,
     ayahs,
   };
   
   juzDetailCache.set(id, result);
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+  } catch (e) {}
+
   return result;
 };
