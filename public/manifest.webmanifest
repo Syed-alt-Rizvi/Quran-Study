@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Quran Study - Shia Quran & Tafseer",
-  "short_name": "Quran Study",
-  "description": "Comprehensive Quran study application featuring Shia Tafseer (Al-Kauthar & Namona), verse-by-verse recitations, translations, and scientific reflections.",
+  "name": "Shia Markaz",
+  "short_name": "Shia Markaz",
+  "description": "Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications & ziyaraat with audio recitations, scientific insights from the Ahlulbayt (a.s), and community discussions.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

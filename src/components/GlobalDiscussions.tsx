@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, User, MessageCircle, BookOpen, LogIn, Flag, UserX, ShieldCheck, Check } from 'lucide-react';
+import { Send, User, MessageCircle, BookOpen, LogIn, Flag, UserX, ShieldCheck, Check, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../utils/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import {
   getGuestProfile,
   saveGuestProfile,
@@ -28,6 +28,7 @@ interface Discussion {
   createdAt: string;
   replyToId: string | null;
   isModerated: boolean;
+  isOfficialAnswer?: boolean;
 }
 
 interface DBRow {
@@ -85,6 +86,21 @@ export default function GlobalDiscussions() {
       const docs: DBRow[] = [];
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
+        let formattedCreatedAt = new Date().toISOString();
+        if (data.createdAt) {
+          try {
+            if (typeof data.createdAt.toMillis === 'function') {
+              formattedCreatedAt = new Date(data.createdAt.toMillis()).toISOString();
+            } else if (typeof data.createdAt.toDate === 'function') {
+              formattedCreatedAt = data.createdAt.toDate().toISOString();
+            } else if (typeof data.createdAt === 'number') {
+              formattedCreatedAt = new Date(data.createdAt).toISOString();
+            } else if (typeof data.createdAt === 'string') {
+              const d = new Date(data.createdAt);
+              formattedCreatedAt = !isNaN(d.getTime()) ? d.toISOString() : data.createdAt;
+            }
+          } catch (e) {}
+        }
         docs.push({
           discussion: {
             id: docSnap.id,
@@ -92,9 +108,10 @@ export default function GlobalDiscussions() {
             author: data.author,
             email: data.email || null,
             userId: data.userId,
-            createdAt: data.createdAt ? new Date(data.createdAt.toMillis()).toISOString() : new Date().toISOString(),
+            createdAt: formattedCreatedAt,
             replyToId: data.replyToId || null,
-            isModerated: data.isModerated || false
+            isModerated: data.isModerated || false,
+            isOfficialAnswer: data.isOfficialAnswer || false
           },
           ayahRef: data.ayahRef || null
         });
@@ -335,12 +352,19 @@ export default function GlobalDiscussions() {
                       <User size={18} />
                     </div>
                     <div>
-                      <span className="font-semibold block text-slate-900 dark:text-slate-100">{row.discussion.author}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold block text-slate-900 dark:text-slate-100">{row.discussion.author}</span>
+                        {row.discussion.isOfficialAnswer && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 size={11} /> Official Answer
+                          </span>
+                        )}
+                      </div>
                       <span className="text-xs text-slate-500">{new Date(row.discussion.createdAt).toLocaleString()}</span>
                     </div>
                   </div>
 
-                  {/* Safety Actions: Report & Block */}
+                  {/* Safety & Flag Actions */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setReportModal({

@@ -6,9 +6,11 @@ import {
   Flame, Compass, Volume2, Heart, ShieldCheck,
   Languages, FileEdit, CheckCircle2, User,
   Code, Mail, Copy, Info, Shield, FileText,
-  ZoomIn, ZoomOut, Palette, Sliders
+  ZoomIn, ZoomOut, Palette, Sliders, Key,
+  Sparkles, Smartphone, Vibrate, ExternalLink,
+  Microscope, MessageCircle
 } from 'lucide-react';
-import { useSettingsStore } from '../store';
+import { useSettingsStore, AppTab } from '../store';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
@@ -17,11 +19,12 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectSurah?: (surahId: number, ayahNumber?: number) => void;
+  onSelectMafatihItem?: (itemId: string) => void;
 }
 
-type TabCategory = 'display' | 'tafseer' | 'audio' | 'library' | 'about';
+type TabCategory = 'display' | 'quran' | 'mafatih' | 'audio' | 'library' | 'about';
 
-export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafatihItem }: SidebarProps) {
   const { 
     isDarkMode, toggleDarkMode, 
     fontSize, setFontSize, 
@@ -38,7 +41,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
     bookmarks, removeBookmark,
     lastRead, habitStats,
     tafseerNotes,
-    userName, setUserName
+    userName, setUserName,
+    defaultAppTab, setDefaultAppTab,
+    hapticsEnabled, toggleHaptics,
+    mafatihAutoScroll, toggleMafatihAutoScroll,
+    mafatihFontSize, setMafatihFontSize,
+    mafatihShowTranslation, toggleMafatihShowTranslation,
+    mafatihDefaultSpeed, setMafatihDefaultSpeed
   } = useSettingsStore();
 
   const [activeTab, setActiveTab] = useState<TabCategory>('display');
@@ -148,15 +157,17 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
   const notesList = Object.entries(tafseerNotes || {}).filter(([_, note]) => note && note.trim().length > 0);
 
   const tabs: { id: TabCategory; label: string; icon: any; badge?: number }[] = [
-    { id: 'display', label: 'Display', icon: Palette },
-    { id: 'tafseer', label: 'Tafseer', icon: BookOpen },
+    { id: 'display', label: 'App', icon: Sliders },
+    { id: 'quran', label: 'Quran', icon: BookOpen },
+    { id: 'mafatih', label: 'Mafatih', icon: Sparkles },
     { id: 'audio', label: 'Audio', icon: Headphones },
     { id: 'library', label: 'Library', icon: Bookmark, badge: bookmarks.length },
     { id: 'about', label: 'About', icon: Heart },
   ];
 
   return (
-    <AnimatePresence>
+    <>
+      <AnimatePresence>
       {isOpen && (
         <motion.div
           key="sidebar-backdrop"
@@ -181,14 +192,14 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
           <div className="px-5 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200/70 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
-                  <Compass size={17} />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center font-arabic font-bold text-sm shadow-xs border border-emerald-400/30">
+                  ش
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-                    Settings & Library
+                    Shia Markaz Settings
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Shia Quran & Scholarly Tafseer</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Quran • Mafatih Al Jinan • Global Controls</p>
                 </div>
               </div>
 
@@ -264,7 +275,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
             </div>
 
             {/* Modern Segmented Navigation Bar */}
-            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/90 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
+            <div className="grid grid-cols-6 gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/90 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -273,21 +284,21 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                     key={`sidebar-tab-${tab.id}`}
                     id={`sidebar-tab-btn-${tab.id}`}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`relative py-2 px-1 rounded-lg text-xs font-medium flex flex-col items-center justify-center gap-1 transition-all ${
+                    className={`relative py-2 px-0.5 rounded-lg text-xs font-medium flex flex-col items-center justify-center gap-1 transition-all ${
                       isActive
                         ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                     }`}
                   >
                     <div className="relative">
-                      <Icon size={16} />
+                      <Icon size={15} />
                       {tab.badge !== undefined && tab.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] rounded-full bg-emerald-600 text-white text-[9px] font-bold flex items-center justify-center px-0.5">
+                        <span className="absolute -top-1.5 -right-2 min-w-[13px] h-[13px] rounded-full bg-emerald-600 text-white text-[8px] font-bold flex items-center justify-center px-0.5">
                           {tab.badge}
                         </span>
                       )}
                     </div>
-                    <span className="text-[11px] font-semibold leading-none">{tab.label}</span>
+                    <span className="text-[10px] font-semibold leading-none truncate max-w-full">{tab.label}</span>
                   </button>
                 );
               })}
@@ -297,9 +308,54 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
           {/* Dedicated Scrollable Content Container */}
           <div ref={contentRef} className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
 
-            {/* TAB 1: DISPLAY & FONTS */}
+            {/* TAB 1: GENERAL APP CONTROLS */}
             {activeTab === 'display' && (
               <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Default App Startup Tab */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Compass size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Default Startup Screen</span>
+                    </div>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      On App Launch
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'quran' as AppTab, label: 'Holy Quran', desc: 'Surahs & Juz', icon: BookOpen },
+                      { id: 'mafatih' as AppTab, label: 'Mafatih Al Jinan', desc: 'Duas & Ziyaraat', icon: Sparkles },
+                      { id: 'science' as AppTab, label: 'Imams & Science', desc: 'Hadith Discoveries', icon: Microscope },
+                      { id: 'discuss' as AppTab, label: 'Community', desc: 'Discussions', icon: MessageCircle },
+                    ].map((tabOption) => {
+                      const isSelected = defaultAppTab === tabOption.id;
+                      const Icon = tabOption.icon;
+                      return (
+                        <button
+                          key={`startup-tab-${tabOption.id}`}
+                          onClick={() => {
+                            hapticSelection();
+                            setDefaultAppTab(tabOption.id);
+                          }}
+                          className={`p-2.5 rounded-xl border text-left transition-all ${
+                            isSelected
+                              ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <Icon size={14} className={isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'} />
+                            {isSelected && <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />}
+                          </div>
+                          <span className="text-xs font-bold block">{tabOption.label}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">{tabOption.desc}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Theme Mode Segmented Picker */}
                 <div className="space-y-2">
                   <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -342,6 +398,30 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                       <Moon size={17} className="text-emerald-400" />
                       <span className="font-semibold">Dark Mode</span>
                       {isDarkMode && <CheckCircle2 size={14} className="text-emerald-400 ml-auto" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Haptic Vibration Feedback Toggle */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Vibrate size={17} className="text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Haptic Vibration Feedback</span>
+                        <span className="text-[11px] text-slate-400">Native physical feedback on interactions</span>
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-haptics-btn"
+                      onClick={() => {
+                        toggleHaptics();
+                        hapticSelection();
+                      }}
+                      className={`w-11 h-6 rounded-full transition-colors relative ${hapticsEnabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      aria-label="Toggle haptic vibration"
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${hapticsEnabled ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                     </button>
                   </div>
                 </div>
@@ -395,12 +475,45 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                   </div>
                 </div>
 
+                {/* Interface & Translation Typography */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                  <div className="flex items-center gap-2">
+                    <Languages size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Interface & Translation Font</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {uiFonts.map((f) => (
+                      <button
+                        key={`ui-font-${f.id}`}
+                        id={`ui-font-btn-${f.id}`}
+                        onClick={() => {
+                          hapticSelection();
+                          setEnglishFont(f.id);
+                        }}
+                        className={`p-2.5 rounded-xl border text-center transition-all ${
+                          englishFont === f.id
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        }`}
+                        style={{ fontFamily: f.id }}
+                      >
+                        <span className="text-xs block">{f.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: QURAN & SCHOLARLY TAFSEER */}
+            {activeTab === 'quran' && (
+              <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Arabic Font Size Slider with Live Preview */}
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Type size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Arabic Text Size</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Quran Verse Text Size</span>
                     </div>
                     <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
                       {fontSize}px
@@ -429,34 +542,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                     >
                       بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                     </p>
-                  </div>
-                </div>
-
-                {/* Interface & Translation Typography */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <Languages size={16} className="text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Interface & Translation Font</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {uiFonts.map((f) => (
-                      <button
-                        key={`ui-font-${f.id}`}
-                        id={`ui-font-btn-${f.id}`}
-                        onClick={() => {
-                          hapticSelection();
-                          setEnglishFont(f.id);
-                        }}
-                        className={`p-2.5 rounded-xl border text-center transition-all ${
-                          englishFont === f.id
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold'
-                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                        }`}
-                        style={{ fontFamily: f.id }}
-                      >
-                        <span className="text-xs block">{f.name}</span>
-                      </button>
-                    ))}
                   </div>
                 </div>
 
@@ -507,12 +592,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                     </div>
                   )}
                 </div>
-              </div>
-            )}
 
-            {/* TAB 2: TAFSEER & SCHOLARLY COMMENTARY */}
-            {activeTab === 'tafseer' && (
-              <div className="space-y-5 animate-in fade-in duration-200">
+
                 <div className="space-y-2">
                   <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     Select Shia Exegesis Provider
@@ -664,7 +745,162 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
               </div>
             )}
 
-            {/* TAB 3: AUDIO & RECITATION */}
+            {/* TAB 3: MAFATIH AL JINAN SETTINGS */}
+            {activeTab === 'mafatih' && (
+              <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Supplications Arabic Font Size */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Type size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Dua & Ziyarat Text Size</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                      {mafatihFontSize}px
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-400">20px</span>
+                    <input
+                      id="mafatih-font-size-slider"
+                      type="range"
+                      min="20"
+                      max="44"
+                      step="2"
+                      value={mafatihFontSize}
+                      onChange={(e) => setMafatihFontSize(Number(e.target.value))}
+                      className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    />
+                    <span className="text-xs font-bold text-slate-400">44px</span>
+                  </div>
+
+                  <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
+                    <p 
+                      className="text-emerald-800 dark:text-emerald-200 leading-relaxed py-1 font-arabic"
+                      style={{ fontSize: `${mafatihFontSize}px`, fontFamily: arabicFont }}
+                    >
+                      اَللَّهُمَّ إِنِّي أَسْأَلُكَ بِرَحْمَتِكَ الَّتِي وَسِعَتْ كُلَّ شَيْءٍ
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                      Dua Kumayl sample verse preview
+                    </p>
+                  </div>
+                </div>
+
+                {/* Show English Translation in Mafatih */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <BookOpen size={17} className="text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Show English Translation</span>
+                        <span className="text-[11px] text-slate-400">Display English below supplication verses</span>
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-mafatih-translation-btn"
+                      onClick={() => { hapticSelection(); toggleMafatihShowTranslation(); }}
+                      className={`w-11 h-6 rounded-full transition-colors relative ${mafatihShowTranslation ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      aria-label="Toggle supplication translation"
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${mafatihShowTranslation ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Supplication Recitation Auto-Scroll */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Sliders size={17} className="text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Recitation Auto-Scroll</span>
+                        <span className="text-[11px] text-slate-400">Smoothly scroll to active verse during playback</span>
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-mafatih-autoscroll-btn"
+                      onClick={() => { hapticSelection(); toggleMafatihAutoScroll(); }}
+                      className={`w-11 h-6 rounded-full transition-colors relative ${mafatihAutoScroll ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      aria-label="Toggle supplication autoscroll"
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${mafatihAutoScroll ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Default Audio Playback Speed */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                  <div className="flex items-center gap-2">
+                    <Headphones size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Default Audio Speed</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[0.75, 1.0, 1.25, 1.5].map((speed) => (
+                      <button
+                        key={`mafatih-speed-${speed}`}
+                        onClick={() => {
+                          hapticSelection();
+                          setMafatihDefaultSpeed(speed);
+                        }}
+                        className={`py-2 rounded-xl border text-center text-xs font-bold transition-all ${
+                          mafatihDefaultSpeed === speed
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                            : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        {speed}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Access to Main Duas & Ziyaraat */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      Quick Open Supplication
+                    </span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Direct Launch</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'maf_dua40', title: 'Dua Kumail', arabic: 'دعاء كميل' },
+                      { id: 'maf_dua51', title: 'Dua Tawassul', arabic: 'دعاء التوسل' },
+                      { id: 'maf_ziy86', title: 'Ziyarat Ashura', arabic: 'زيارة عاشوراء' },
+                      { id: 'maf_ziy126a', title: 'Dua Nudba', arabic: 'دعاء الندبة' },
+                      { id: 'maf_dua46b', title: 'Dua Al-Faraj', arabic: 'دعاء الفرج' },
+                      { id: 'h_kisa', title: 'Hadith al-Kisa', arabic: 'حديث الكساء' },
+                    ].map((item) => (
+                      <button
+                        key={`quick-mafatih-${item.id}`}
+                        onClick={() => {
+                          hapticSelection();
+                          if (onSelectMafatihItem) {
+                            onSelectMafatihItem(item.id);
+                          }
+                          onClose();
+                        }}
+                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500/60 transition-all text-left group shadow-xs cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            {item.title}
+                          </span>
+                          <ExternalLink size={12} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-arabic block mt-0.5">
+                          {item.arabic}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: AUDIO & RECITATION */}
             {activeTab === 'audio' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Reciter List */}
@@ -780,9 +1016,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
 
                   {bookmarks.length > 0 ? (
                     <div className="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                      {bookmarks.map((b) => (
+                      {bookmarks.map((b, bIdx) => (
                         <div
-                          key={`bookmark-${b.surahId}-${b.ayahNumber}`}
+                          key={`bookmark-${b.surahId}-${b.ayahNumber}-${bIdx}`}
                           className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500/50 transition-all group shadow-xs"
                         >
                           <button
@@ -836,13 +1072,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                       Personal Reflections & Notes ({notesList.length})
                     </span>
                     <div className="space-y-2 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
-                      {notesList.map(([key, note]) => {
+                      {notesList.map(([key, note], nIdx) => {
                         const parts = key.split('_');
                         const sId = parseInt(parts[0], 10);
                         const aId = parseInt(parts[1], 10);
                         return (
                           <div
-                            key={`note-item-${key}`}
+                            key={`note-item-${key}-${nIdx}`}
                             onClick={() => {
                               if (!isNaN(sId) && !isNaN(aId)) {
                                 hapticSelection();
@@ -1068,7 +1304,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                   <div className="grid grid-cols-2 gap-2">
                     <a
                       id="contact-developer-mail-link"
-                      href="mailto:Syedmurtazarazavee@gmail.com?subject=Shia%20Quran%20%26%20Tafseer%20Feedback"
+                      href="mailto:Syedmurtazarazavee@gmail.com?subject=Shia%20Markaz%20Feedback"
                       className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                     >
                       <Mail size={14} />
@@ -1165,9 +1401,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Tafseer-e-Namoona & Tafseer Al-Kauthar
                   </p>
-                  <p className="text-[10px] text-slate-400">
-                    Version 1.2.0 • Offline Ready
-                  </p>
+                  <div>
+                    <p className="text-[10px] text-slate-400">
+                      Version 1.2.0 • Offline Ready
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -1175,13 +1413,14 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah }: SidebarProps
           </div>
         </motion.div>
       )}
-
-      {/* In-app Privacy, Terms & Data Deletion Modal */}
-      <PrivacyPolicyModal
-        isOpen={privacyModal.isOpen}
-        onClose={() => setPrivacyModal(p => ({ ...p, isOpen: false }))}
-        initialTab={privacyModal.tab}
-      />
     </AnimatePresence>
+
+    {/* In-app Privacy, Terms & Data Deletion Modal */}
+    <PrivacyPolicyModal
+      isOpen={privacyModal.isOpen}
+      onClose={() => setPrivacyModal(p => ({ ...p, isOpen: false }))}
+      initialTab={privacyModal.tab}
+    />
+  </>
   );
 }

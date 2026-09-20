@@ -67,7 +67,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
                   }}
                   className="w-full py-3.5 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-emerald-950 font-bold text-sm shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Start Reading Quran</span>
+                  <span>Enter Shia Markaz</span>
                   <ArrowRight size={18} />
                 </button>
                 <button
@@ -98,7 +98,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
               <div className="w-full bg-emerald-900/60 backdrop-blur-xl border border-emerald-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl">
                 <div className="flex items-center justify-center gap-2 text-amber-400 mb-2">
                   <Sparkles size={18} />
-                  <h3 className="text-lg font-bold text-amber-100">Welcome to Shia Quran</h3>
+                  <h3 className="text-lg font-bold text-amber-100">Welcome to Shia Markaz</h3>
                 </div>
                 <p className="text-emerald-200/80 text-xs sm:text-sm mb-6">
                   What is your name? (Optional)
@@ -135,7 +135,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
                     className="w-full mt-2 py-3 rounded-xl bg-emerald-700/60 hover:bg-emerald-700 active:scale-95 border border-emerald-600/50 text-emerald-100 font-semibold text-sm transition-all flex items-center justify-center gap-2"
                   >
                     <BookOpen size={16} />
-                    <span>Enter Quran</span>
+                    <span>Enter Shia Markaz</span>
                   </button>
                 </form>
                 

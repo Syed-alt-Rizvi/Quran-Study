@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import { DatabaseSync } from 'node:sqlite';
 import * as schema from './schema';
 import path from 'path';
 import os from 'os';
@@ -9,7 +9,7 @@ const isCloudRun = process.env.K_SERVICE !== undefined || process.env.NODE_ENV =
 const dbDir = isCloudRun ? os.tmpdir() : process.cwd();
 const dbPath = path.join(dbDir, 'quran.db');
 
-const sqlite = new Database(dbPath);
+const sqlite = new DatabaseSync(dbPath);
 
 sqlite.exec(`
 CREATE TABLE IF NOT EXISTS discussions (
@@ -65,4 +65,21 @@ CREATE TABLE IF NOT EXISTS imam_science_categories (
 );
 `);
 
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(async (sql, params, method) => {
+  try {
+    const stmt = sqlite.prepare(sql);
+    if (method === 'run') {
+      stmt.run(...params);
+      return { rows: [] };
+    } else if (method === 'get') {
+      const row = stmt.get(...params);
+      return { rows: row ? Object.values(row) : [] };
+    } else {
+      const rows = stmt.all(...params);
+      return { rows: rows.map((r: any) => Object.values(r)) };
+    }
+  } catch (err: any) {
+    console.error('SQLite execution error:', err);
+    throw err;
+  }
+}, { schema });

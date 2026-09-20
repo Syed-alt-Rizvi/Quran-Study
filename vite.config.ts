@@ -18,9 +18,9 @@ export default defineConfig(async ({ command }) => {
           includeAssets: ['pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png', 'favicon.ico', 'manifest.webmanifest'],
           manifest: {
             id: '/',
-            name: 'Quran Study - Shia Quran & Tafseer',
-            short_name: 'Quran Study',
-            description: 'Comprehensive Quran study application featuring Shia Tafseer (Al-Kauthar & Namona), verse-by-verse recitations, translations, and scientific reflections.',
+            name: 'Shia Markaz',
+            short_name: 'Shia Markaz',
+            description: 'Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications & ziyaraat with audio recitations, scientific insights from the Ahlulbayt (a.s), and community discussions.',
             theme_color: '#059669',
             background_color: '#ffffff',
             display: 'standalone',
@@ -50,6 +50,8 @@ export default defineConfig(async ({ command }) => {
             ]
           },
           workbox: {
+            clientsClaim: true,
+            skipWaiting: true,
             globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
             globIgnores: ['**/kauthar.json', '**/tafseer_kauthar/**', '**/tafseer_kauthar_refined/**'],
             maximumFileSizeToCacheInBytes: 4 * 1024 * 1024

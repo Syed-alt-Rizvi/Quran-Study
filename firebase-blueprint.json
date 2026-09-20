@@ -47,9 +47,55 @@
         },
         "isModerated": {
           "type": "boolean"
+        },
+        "isOfficialAnswer": {
+          "type": "boolean"
         }
       },
       "required": ["content", "author", "userId", "createdAt"]
+    },
+    "AppUser": {
+      "title": "AppUser",
+      "description": "User profile, session tracking, device location info for developer analytics.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "city": { "type": "string", "maxLength": 100 },
+        "region": { "type": "string", "maxLength": 100 },
+        "country": { "type": "string", "maxLength": 100 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "devicePlatform": { "type": "string", "maxLength": 50 },
+        "lastActive": { "type": "timestamp" },
+        "firstSeen": { "type": "timestamp" },
+        "sessionCount": { "type": "number" },
+        "preferredLanguage": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "lastActive"]
+    },
+    "AppStat": {
+      "title": "AppStat",
+      "description": "Aggregate download, install, and activity counters.",
+      "type": "object",
+      "properties": {
+        "metric": { "type": "string", "maxLength": 100 },
+        "count": { "type": "number" },
+        "lastUpdated": { "type": "timestamp" }
+      },
+      "required": ["metric", "count", "lastUpdated"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Reported spam or policy violating messages.",
+      "type": "object",
+      "properties": {
+        "discussionId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "maxLength": 500 },
+        "reportedBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["discussionId", "reason", "createdAt"]
     }
   },
   "firestore": {
@@ -58,6 +104,24 @@
         "$ref": "#/entities/Discussion"
       },
       "description": "Global and Ayah-specific discussions."
+    },
+    "app_users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/AppUser"
+      },
+      "description": "Registered and guest app user telemetry and location info."
+    },
+    "app_stats/{statId}": {
+      "schema": {
+        "$ref": "#/entities/AppStat"
+      },
+      "description": "Aggregated application and install metrics."
+    },
+    "reports/{reportId}": {
+      "schema": {
+        "$ref": "#/entities/Report"
+      },
+      "description": "Flagged spam or violation reports."
     }
   }
 }

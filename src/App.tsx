@@ -7,8 +7,10 @@ import JuzView from './components/JuzView';
 import Sidebar from './components/Sidebar';
 import DuaScreen from './components/DuaScreen';
 import AudioPlayer from './components/AudioPlayer';
+import MafatihItemView from './components/MafatihItemView';
 import { AnimatePresence } from 'motion/react';
 import { popModal } from './utils/modalBackHandler';
+import { trackAppLaunchAndTelemetry } from './utils/telemetry';
 
 export default function App() {
   const { isDarkMode, englishFont, hasSeenWelcome, setHasSeenWelcome } = useSettingsStore();
@@ -16,10 +18,15 @@ export default function App() {
   // Safe initial check checking both localStorage and store so the user is never stuck
   const [showWelcome, setShowWelcome] = useState(() => {
     try {
-      if (localStorage.getItem('shia-quran-has-seen-welcome') === 'true') {
+      if (
+        localStorage.getItem('shia-quran-has-seen-welcome') === 'true' ||
+        localStorage.getItem('quran_welcome_seen') === 'true'
+      ) {
         return false;
       }
-      const raw = localStorage.getItem('quran-app-settings') || localStorage.getItem('shia-quran-settings');
+      const raw = localStorage.getItem('quran-app-settings') || 
+                  localStorage.getItem('shia-quran-settings') ||
+                  localStorage.getItem('shia_quran_settings');
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed?.state?.hasSeenWelcome) return false;
@@ -32,6 +39,7 @@ export default function App() {
   const [targetAyah, setTargetAyah] = useState<number | null>(null);
   const [targetSurah, setTargetSurah] = useState<number | null>(null);
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
+  const [selectedMafatihItem, setSelectedMafatihItem] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -45,6 +53,7 @@ export default function App() {
   const handleSelectSurah = (id: number, ayahNumber?: number) => {
     setIsSidebarOpen(false);
     setSelectedSurah(Number(id));
+    setSelectedMafatihItem(null);
     setTargetAyah(ayahNumber ? Number(ayahNumber) : null);
     setTargetSurah(null);
     setSelectedJuz(null);
@@ -54,8 +63,18 @@ export default function App() {
     setIsSidebarOpen(false);
     setSelectedJuz(Number(id));
     setSelectedSurah(null);
+    setSelectedMafatihItem(null);
     setTargetAyah(ayahNumber ? Number(ayahNumber) : null);
     setTargetSurah(surahNumber ? Number(surahNumber) : null);
+  };
+
+  const handleSelectMafatihItem = (id: string) => {
+    setIsSidebarOpen(false);
+    setSelectedMafatihItem(id);
+    setSelectedSurah(null);
+    setSelectedJuz(null);
+    setTargetAyah(null);
+    setTargetSurah(null);
   };
 
   const isSidebarOpenRef = useRef(isSidebarOpen);
@@ -78,11 +97,18 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // Track app launch and user location telemetry for developer master console
+  useEffect(() => {
+    trackAppLaunchAndTelemetry().catch(() => {});
+  }, []);
+
   // Load saved navigation state on mount
   useEffect(() => {
     try {
-      const savedSurah = localStorage.getItem('shia-quran-active-surah');
-      const savedJuz = localStorage.getItem('shia-quran-active-juz');
+      const savedSurah = localStorage.getItem('shia-quran-active-surah') || 
+                         localStorage.getItem('quran_active_surah');
+      const savedJuz = localStorage.getItem('shia-quran-active-juz') || 
+                       localStorage.getItem('quran_active_juz');
       if (savedSurah) {
         const num = parseInt(savedSurah, 10);
         if (!isNaN(num) && num >= 1 && num <= 114) {
@@ -106,13 +132,19 @@ export default function App() {
     try {
       if (selectedSurah) {
         localStorage.setItem('shia-quran-active-surah', selectedSurah.toString());
+        localStorage.setItem('quran_active_surah', selectedSurah.toString());
         localStorage.removeItem('shia-quran-active-juz');
+        localStorage.removeItem('quran_active_juz');
       } else if (selectedJuz) {
         localStorage.setItem('shia-quran-active-juz', selectedJuz.toString());
+        localStorage.setItem('quran_active_juz', selectedJuz.toString());
         localStorage.removeItem('shia-quran-active-surah');
+        localStorage.removeItem('quran_active_surah');
       } else {
         localStorage.removeItem('shia-quran-active-surah');
+        localStorage.removeItem('quran_active_surah');
         localStorage.removeItem('shia-quran-active-juz');
+        localStorage.removeItem('quran_active_juz');
       }
     } catch (e) {}
   }, [selectedSurah, selectedJuz]);
@@ -239,11 +271,24 @@ export default function App() {
               window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             }} 
           />
+        ) : selectedMafatihItem ? (
+          <MafatihItemView 
+            key={`mafatih-view-${selectedMafatihItem}`} 
+            itemId={selectedMafatihItem} 
+            onBack={() => {
+              if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+              }
+              setSelectedMafatihItem(null);
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }} 
+          />
         ) : (
           <Home 
             key="home" 
             onSelectSurah={handleSelectSurah} 
             onSelectJuz={handleSelectJuz}
+            onSelectMafatihItem={handleSelectMafatihItem}
             onOpenSettings={() => setIsSidebarOpen(true)} 
             onExit={() => setIsExiting(true)}
           />
@@ -257,6 +302,10 @@ export default function App() {
           setIsSidebarOpen(false);
           handleSelectSurah(surahId, ayahNumber);
         }} 
+        onSelectMafatihItem={(itemId) => {
+          setIsSidebarOpen(false);
+          handleSelectMafatihItem(itemId);
+        }}
       />
       
       {!showWelcome && !isExiting && (

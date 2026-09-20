@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Send, Loader2, User, LogIn, Flag, UserX, ShieldCheck } from 'lucide-react';
+import { X, Send, Loader2, User, LogIn, Flag, UserX, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Ayah, SurahDetail } from '../api';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../utils/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, serverTimestamp, where, deleteDoc, doc } from 'firebase/firestore';
 import {
   getGuestProfile,
   saveGuestProfile,
@@ -22,6 +22,26 @@ interface DiscussionModalProps {
   onClose: () => void;
   ayah: Ayah;
   surah: SurahDetail;
+}
+
+function formatDiscussionDate(createdAt: any): string {
+  if (!createdAt) return 'Just now';
+  try {
+    if (typeof createdAt.toDate === 'function') {
+      return createdAt.toDate().toLocaleString();
+    }
+    if (typeof createdAt.toMillis === 'function') {
+      return new Date(createdAt.toMillis()).toLocaleString();
+    }
+    if (typeof createdAt === 'number') {
+      return new Date(createdAt).toLocaleString();
+    }
+    if (typeof createdAt === 'string') {
+      const parsed = new Date(createdAt);
+      return !isNaN(parsed.getTime()) ? parsed.toLocaleString() : createdAt;
+    }
+  } catch (e) {}
+  return 'Just now';
 }
 
 export default function DiscussionModal({ isOpen, onClose, ayah, surah }: DiscussionModalProps) {
@@ -171,14 +191,13 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          key={`modal-overlay-${surah.number}-${ayah.numberInSurah}`}
+          key={`modal-overlay-${surah.number || 's'}-${ayah.numberInSurah || 'a'}`}
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs"
         >
           <motion.div 
-            key={`modal-dialog-${surah.number}-${ayah.numberInSurah}`}
             initial={{ scale: 0.95, opacity: 0 }} 
             animate={{ scale: 1, opacity: 1 }} 
             exit={{ scale: 0.95, opacity: 0 }}
@@ -209,16 +228,23 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
                 <p className="text-center text-slate-500 py-10 text-xs">No reflections yet for this Ayah. Be the first to reflect!</p>
               ) : (
                 visibleDiscussions.map((d: any, dIdx: number) => (
-                  <div key={`modal-disc-${d.discussion?.id || dIdx}-${dIdx}`} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+                  <div key={`modal-disc-${d.id || d.discussion?.id || dIdx}-${dIdx}`} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400">
                           <User size={14} />
                         </div>
                         <div>
-                          <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{d.discussion.author}</span>
-                          <span className="text-xs text-slate-500 ml-2">
-                            {d.discussion.createdAt ? new Date(d.discussion.createdAt.toMillis ? d.discussion.createdAt.toMillis() : d.discussion.createdAt).toLocaleString() : 'Just now'}
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{d.discussion.author}</span>
+                            {d.discussion.isOfficialAnswer && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
+                                <CheckCircle2 size={10} /> Official
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs text-slate-500">
+                            {formatDiscussionDate(d.discussion.createdAt)}
                           </span>
                         </div>
                       </div>
@@ -266,21 +292,21 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
                  </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex gap-2">
-                  <input 
-                    type="text"
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    placeholder="Share your reflection on this Ayah..."
-                    className="flex-1 p-3 rounded-full border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-hidden focus:border-emerald-500"
-                  />
-                  <button 
-                    type="submit"
-                    disabled={!content.trim() || submitting}
-                    className="w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white flex items-center justify-center transition-colors flex-shrink-0 shadow-xs"
-                  >
-                    {submitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
-                  </button>
-                </form>
+                    <input 
+                      type="text"
+                      value={content}
+                      onChange={e => setContent(e.target.value)}
+                      placeholder="Share your reflection on this Ayah..."
+                      className="flex-1 p-3 rounded-full border-[0.5px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-hidden focus:border-emerald-500"
+                    />
+                    <button 
+                      type="submit"
+                      disabled={!content.trim() || submitting}
+                      className="w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white flex items-center justify-center transition-colors flex-shrink-0 shadow-xs"
+                    >
+                      {submitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
+                    </button>
+                  </form>
               )}
             </div>
           </motion.div>

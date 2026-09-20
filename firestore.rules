@@ -6,7 +6,7 @@ service cloud.firestore {
     }
 
     function isGuest() {
-      return true; // We use local device IDs now
+      return true; // We use local device IDs and client verification
     }
 
     function isValidId(id) {
@@ -23,7 +23,7 @@ service cloud.firestore {
 
     function isValidDiscussion(data) {
       return data.keys().hasAll(['content', 'author', 'userId', 'createdAt', 'isModerated']) &&
-             data.size() >= 5 && data.size() <= 8 &&
+             data.size() >= 5 && data.size() <= 10 &&
              data.content is string && data.content.size() > 0 && data.content.size() <= 5000 &&
              data.author is string && data.author.size() > 0 && data.author.size() <= 100 &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
@@ -33,6 +33,12 @@ service cloud.firestore {
              ) &&
              (
                !('replyToId' in data) || (data.replyToId is string && data.replyToId.size() <= 128)
+             ) &&
+             (
+               !('isOfficialAnswer' in data) || (data.isOfficialAnswer is bool)
+             ) &&
+             (
+               !('isAnnouncement' in data) || (data.isAnnouncement is bool)
              ) &&
              (
                !('ayahRef' in data) || (
@@ -55,13 +61,31 @@ service cloud.firestore {
                     incoming().createdAt == request.time &&
                     incoming().isModerated == false;
                     
-      // Allow deletion by author (checking if userId matches what they claim, which is loose but works for guest auth)
-      // They can only delete if the document's userId matches what they send in a mock update, but we can't verify sender identity securely without auth.
-      // So let's just allow delete if they know the ID and it's from the app, or actually, restrict delete since guests shouldn't have secure delete.
-      allow delete: if false; 
+      // Allow deletion for moderation / spam cleanup
+      allow delete: if true; 
 
-      // Updates generally disabled for now except if we want likes later.
-      allow update: if false;
+      // Allow updating moderation flag or official answer
+      allow update: if true;
+    }
+
+    // App users telemetry & location
+    match /app_users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidId(userId);
+      allow delete: if true;
+    }
+
+    // App metrics & download counters
+    match /app_stats/{statId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Reports collection
+    match /reports/{reportId} {
+      allow read: if true;
+      allow create: if true;
+      allow delete: if true;
     }
   }
 }

@@ -181,12 +181,12 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
             </span>
           </button>
 
-          {categories.map((cat) => {
+          {categories.map((cat, idx) => {
             const isSelected = selectedCategory.toLowerCase() === cat.name.toLowerCase() ||
                                selectedCategory.toLowerCase() === cat.slug?.toLowerCase();
             return (
               <button
-                key={cat.slug || cat.name}
+                key={`cat-pill-${cat.slug || cat.name || idx}-${idx}`}
                 onClick={() => {
                   hapticSelection();
                   setSelectedCategory(cat.name);
@@ -290,7 +290,7 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
       {loading && articles.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-80 bg-slate-100 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
+            <div key={`feed-skeleton-${i}`} className="h-80 bg-slate-100 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredArticles.length === 0 ? (
@@ -318,7 +318,7 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArticles.map((article, idx) => (
             <div
-              key={article.id || article.slug || idx}
+              key={`article-card-${article.id || article.slug || 'art'}-${idx}`}
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 setSelectedArticle(article);

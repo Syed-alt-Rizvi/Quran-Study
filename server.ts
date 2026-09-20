@@ -446,6 +446,7 @@ async function startServer() {
   app.get("/api/imam-science/articles/:slug", async (req, res) => {
     try {
       const slug = req.params.slug;
+
       const found = await db.select().from(imamScienceArticles).where(or(
         eq(imamScienceArticles.slug, slug),
         eq(imamScienceArticles.id, slug)
@@ -491,25 +492,289 @@ async function startServer() {
     }
   });
 
+  // --- Mafatih Al Jinan Endpoints ---
+  let mafatihIndexCache: any[] | null = null;
+  let mafatihFullCache: Map<string, any> | null = null;
+
+  function loadMafatihData(): any[] {
+    if (!mafatihIndexCache || mafatihIndexCache.length === 0) {
+      try {
+        const candidatePaths = [
+          path.join(process.cwd(), 'public', 'mafatih_index.json'),
+          path.join(process.cwd(), 'src', 'db', 'mafatih_index.json'),
+          path.join(process.cwd(), 'dist', 'mafatih_index.json')
+        ];
+        for (const p of candidatePaths) {
+          if (fs.existsSync(p)) {
+            mafatihIndexCache = JSON.parse(fs.readFileSync(p, 'utf8'));
+            break;
+          }
+        }
+        if (!mafatihIndexCache) mafatihIndexCache = [];
+      } catch (e) {
+        console.error("Error loading mafatih index:", e);
+        mafatihIndexCache = [];
+      }
+    }
+    return mafatihIndexCache || [];
+  }
+
+  function getMafatihItem(id: string): any | null {
+    if (!mafatihFullCache) {
+      mafatihFullCache = new Map();
+      try {
+        const candidatePaths = [
+          path.join(process.cwd(), 'src', 'db', 'mafatih_full_data.json'),
+          path.join(process.cwd(), 'dist', 'mafatih_full_data.json'),
+          path.join(process.cwd(), 'public', 'mafatih_full_data.json')
+        ];
+        for (const fullPath of candidatePaths) {
+          if (fs.existsSync(fullPath)) {
+            const items: any[] = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+            for (const item of items) {
+              mafatihFullCache.set(item.id, item);
+              if (item.code && !mafatihFullCache.has(item.code)) {
+                mafatihFullCache.set(item.code, item);
+              }
+            }
+            break;
+          }
+        }
+          // Also set convenience aliases
+          const aliases: Record<string, string> = {
+            'kumayl': 'maf_dua40',
+            'kumail': 'maf_dua40',
+            'tawassul': 'maf_dua51',
+            'ashura': 'maf_ziy86',
+            'nudba': 'maf_ziy126a',
+            'nudbah': 'maf_ziy126a',
+            'faraj': 'maf_dua46b',
+            'kisa': 'h_kisa',
+            'ahad': 'maf_ziy128',
+            'waritha': 'maf_ziy73a',
+            'mashlool': 'maf_dua43',
+            'sabah': 'maf_dua39',
+            'jawshan': 'maf_dua47',
+          };
+          for (const [alias, realId] of Object.entries(aliases)) {
+            const resolved = mafatihFullCache.get(realId);
+            if (resolved) {
+              mafatihFullCache.set(alias, resolved);
+            }
+          }
+      } catch (e) {
+        console.error("Failed to load mafatih full data:", e);
+      }
+    }
+    return mafatihFullCache.get(id) || null;
+  }
+
+  // Get categories with counts
+  app.get("/api/mafatih/categories", (req, res) => {
+    try {
+      const index = loadMafatihData();
+      const catMap = new Map<string, { name: string; code: string; count: number; audioCount: number }>();
+      for (const item of index) {
+        const catName = item.mainCategory || "General";
+        const catCode = item.mainCategoryCode || "general";
+        const cur = catMap.get(catName) || { name: catName, code: catCode, count: 0, audioCount: 0 };
+        cur.count++;
+        if (item.hasAudio) cur.audioCount++;
+        catMap.set(catName, cur);
+      }
+      res.json(Array.from(catMap.values()));
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Get list of items with filtering, search, and pagination
+  app.get("/api/mafatih/items", (req, res) => {
+    try {
+      const index = loadMafatihData();
+      const { category, search, hasAudio, limit = "50", offset = "0" } = req.query;
+
+      let filtered = index;
+      if (category && category !== "all") {
+        const catLower = String(category).toLowerCase();
+        filtered = filtered.filter(i => 
+          i.mainCategory?.toLowerCase() === catLower || 
+          i.mainCategoryCode?.toLowerCase() === catLower ||
+          i.categoryChain?.some((c: string) => c.toLowerCase() === catLower)
+        );
+      }
+
+      if (search && typeof search === "string" && search.trim().length > 0) {
+        const q = search.toLowerCase().trim();
+        filtered = filtered.filter(i => 
+          i.title?.toLowerCase().includes(q) ||
+          i.snippet?.toLowerCase().includes(q) ||
+          i.categoryChain?.some((c: string) => c.toLowerCase().includes(q))
+        );
+      }
+
+      if (hasAudio === "true") {
+        filtered = filtered.filter(i => i.hasAudio);
+      }
+
+      const parsedLimit = Math.min(Math.max(parseInt(limit as string) || 50, 1), 500);
+      const parsedOffset = Math.max(parseInt(offset as string) || 0, 0);
+
+      const items = filtered.slice(parsedOffset, parsedOffset + parsedLimit);
+      res.json({
+        total: filtered.length,
+        offset: parsedOffset,
+        limit: parsedLimit,
+        items
+      });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Get single full item with verses, arabic, translation, audio
+  app.get("/api/mafatih/items/:id", (req, res) => {
+    try {
+      const id = req.params.id;
+      const item = getMafatihItem(id);
+      if (!item) {
+        return res.status(404).json({ error: "Mafatih item not found" });
+      }
+      res.json(item);
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Audio proxy to bypass strict CORS if needed
+  app.get("/api/mafatih/audio-proxy", async (req, res) => {
+    try {
+      const audioUrl = req.query.url as string;
+      if (!audioUrl || !audioUrl.startsWith("http")) {
+        return res.status(400).send("Invalid audio URL");
+      }
+      const upstream = await fetch(audioUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShiaQuranApp/1.0',
+          'Referer': 'https://www.ya-mahdi.net/'
+        }
+      });
+      if (!upstream.ok) {
+        return res.status(upstream.status).send("Failed to fetch audio stream");
+      }
+      const contentType = upstream.headers.get("content-type") || "audio/mp4";
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      if (upstream.body) {
+        const arrayBuf = await upstream.arrayBuffer();
+        res.send(Buffer.from(arrayBuf));
+      } else {
+        res.status(404).send("Empty audio stream");
+      }
+    } catch (e: any) {
+      res.status(500).send(e.message);
+    }
+  });
+
+  // Always serve PWA service worker, manifest, and static data files with correct MIME types
+  app.get(['/sw.js', '/registerSW.js', '/manifest.webmanifest', '/mafatih_index.json'], (req, res, next) => {
+    const filename = req.path.replace(/^\//, '');
+    const candidatePaths = [
+      path.join(process.cwd(), 'dist', filename),
+      path.join(process.cwd(), 'public', filename),
+      path.join(process.cwd(), 'src', 'db', filename)
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        if (filename.endsWith('.js')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        } else if (filename.endsWith('.webmanifest')) {
+          res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        } else if (filename.endsWith('.json')) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        }
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        return res.sendFile(p);
+      }
+    }
+    next();
+  });
+
+  app.get(/^\/workbox-[a-zA-Z0-9_-]+\.js$/, (req, res, next) => {
+    const filename = req.path.replace(/^\//, '');
+    const candidatePaths = [
+      path.join(process.cwd(), 'dist', filename),
+      path.join(process.cwd(), 'public', filename)
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        return res.sendFile(p);
+      }
+    }
+    next();
+  });
+
   // Vite middleware for development
   const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith("server.cjs");
   if (!isProd) {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: process.env.DISABLE_HMR === "true" ? false : undefined,
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    // Ensure HTML and service workers are not cached stale so older clients seamlessly update
+    app.use(express.static(distPath, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('index.html') || filePath.endsWith('sw.js') || filePath.endsWith('manifest.webmanifest')) {
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+        }
+      }
+    }));
     app.get('*', (req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+
+  server.on("error", (err: any) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Port ${PORT} is currently in use. Exiting cleanly.`);
+      process.exit(1);
+    } else {
+      console.error("Server error:", err);
+      process.exit(1);
+    }
+  });
+
+  const handleTermination = () => {
+    server.close(() => {
+      process.exit(0);
+    });
+  };
+  process.on("SIGTERM", handleTermination);
+  process.on("SIGINT", handleTermination);
 }
 
 startServer();

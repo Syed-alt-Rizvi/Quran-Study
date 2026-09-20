@@ -224,6 +224,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
   return (
     <AnimatePresence>
       <div 
+        key="imam-reader-modal-overlay"
         id="imam-reader-overlay"
         data-modal="imam-science-reader"
         className="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-md transition-opacity duration-300"
@@ -404,6 +405,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
           <AnimatePresence>
             {copied && (
               <motion.div 
+                key="toast-copied"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -419,6 +421,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
           <AnimatePresence>
             {showToc && displayHeadings && displayHeadings.length > 0 && (
               <motion.div
+                key="toc-drawer-popover"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -437,7 +440,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                 <div className="space-y-1.5">
                   {displayHeadings.map((h, idx) => (
                     <button
-                      key={idx}
+                      key={`toc-heading-${idx}-${h.text}`}
                       onClick={() => scrollToHeading(h.text)}
                       className={`w-full text-left text-xs sm:text-sm py-2 px-3 rounded-xl hover:bg-emerald-500/10 hover:text-emerald-600 transition-colors flex items-start gap-2 ${
                         h.level === 'h3' ? 'pl-6 opacity-85' : 'font-semibold'
@@ -542,7 +545,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                   </div>
                   <div className="space-y-3">
                     {article.highlights.map((h, idx) => (
-                      <p key={idx} className="text-lg sm:text-xl italic font-serif leading-relaxed text-slate-800 dark:text-slate-200">
+                      <p key={`highlight-${idx}`} className="text-lg sm:text-xl italic font-serif leading-relaxed text-slate-800 dark:text-slate-200">
                         "{h}"
                       </p>
                     ))}
@@ -560,7 +563,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                     {displayHeadings.slice(0, 8).map((h, i) => (
                       <button
-                        key={i}
+                        key={`quick-heading-${i}-${h.text}`}
                         onClick={() => scrollToHeading(h.text)}
                         className="text-left text-xs sm:text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400 py-1.5 px-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors truncate flex items-center gap-2"
                       >
@@ -701,7 +704,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                     </span>
                     {article.categories.map((cat, idx) => (
                       <button
-                        key={idx}
+                        key={`article-cat-${cat}-${idx}`}
                         onClick={() => {
                           onSelectCategory?.(cat);
                           onClose();
@@ -756,6 +759,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
           <AnimatePresence>
             {showBackToTop && (
               <motion.button
+                key="back-to-top-button"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}

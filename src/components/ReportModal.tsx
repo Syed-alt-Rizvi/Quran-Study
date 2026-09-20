@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Flag, X, ShieldAlert, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { reportDiscussion } from '../utils/guestAuth';
+import { reportDiscussion, getGuestProfile } from '../utils/guestAuth';
 import { hapticNotification } from '../utils/haptics';
 import { registerModal } from '../utils/modalBackHandler';
+import { db } from '../utils/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -45,6 +47,18 @@ export default function ReportModal({
       : REPORT_REASONS.find(r => r.id === selectedReason)?.label || selectedReason;
 
     reportDiscussion(discussionId, reasonText);
+    
+    // Save report to Firestore for developer moderation
+    try {
+      const guest = getGuestProfile();
+      addDoc(collection(db, 'reports'), {
+        discussionId,
+        reason: reasonText,
+        reportedBy: guest?.userId || 'guest_device',
+        createdAt: serverTimestamp()
+      }).catch(() => {});
+    } catch (e) {}
+
     hapticNotification('SUCCESS');
     setSubmitted(true);
 
@@ -58,12 +72,14 @@ export default function ReportModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <motion.div
-            key="report-modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+        <motion.div 
+          key="report-modal-portal" 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+        >
+          <div
             className="absolute inset-0"
             onClick={onClose}
           />
@@ -109,9 +125,9 @@ export default function ReportModal({
                   </p>
 
                   <div className="space-y-2">
-                    {REPORT_REASONS.map((r) => (
+                    {REPORT_REASONS.map((r, rIdx) => (
                       <label
-                        key={r.id}
+                        key={`report-reason-${r.id}-${rIdx}`}
                         className={`flex items-center gap-3 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                           selectedReason === r.id
                             ? 'bg-rose-50/60 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 font-medium'
@@ -161,7 +177,7 @@ export default function ReportModal({
               </div>
             )}
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

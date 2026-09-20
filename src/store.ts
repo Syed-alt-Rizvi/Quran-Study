@@ -18,6 +18,8 @@ interface HabitStats {
   dailyTafseerRead: Record<string, number>;
 }
 
+export type AppTab = 'quran' | 'mafatih' | 'science' | 'discuss';
+
 interface SettingsState {
   isDarkMode: boolean;
   fontSize: number; // For Arabic text
@@ -40,6 +42,17 @@ interface SettingsState {
   reciter: string;
   userName: string;
   
+  // Generalized App Utility Settings
+  defaultAppTab: AppTab;
+  hapticsEnabled: boolean;
+  mafatihAutoScroll: boolean;
+  mafatihFontSize: number;
+  mafatihShowTranslation: boolean;
+  mafatihDefaultSpeed: number;
+  scienceCategory: string;
+  mafatihBookmarks: string[];
+  mafatihRecentIds: string[];
+
   toggleDarkMode: () => void;
   setFontSize: (size: number) => void;
   setArabicFont: (font: string) => void;
@@ -63,6 +76,20 @@ interface SettingsState {
   setReminderSound: (sound: string) => void;
   setReciter: (reciter: string) => void;
   setUserName: (name: string) => void;
+  setDefaultAppTab: (tab: AppTab) => void;
+  toggleHaptics: () => void;
+  toggleMafatihAutoScroll: () => void;
+  setMafatihAutoScroll: (val: boolean) => void;
+  setMafatihFontSize: (val: number) => void;
+  toggleMafatihShowTranslation: () => void;
+  setMafatihShowTranslation: (val: boolean) => void;
+  setMafatihDefaultSpeed: (speed: number) => void;
+  setScienceCategory: (cat: string) => void;
+  addMafatihBookmark: (id: string) => void;
+  removeMafatihBookmark: (id: string) => void;
+  isMafatihBookmarked: (id: string) => boolean;
+  addMafatihRecent: (id: string) => void;
+  clearMafatihRecents: () => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -88,6 +115,15 @@ export const useSettingsStore = create<SettingsState>()(
       autoScrollAudio: false,
       reciter: 'ar.alafasy',
       userName: '',
+      defaultAppTab: 'quran',
+      hapticsEnabled: true,
+      mafatihAutoScroll: true,
+      mafatihFontSize: 28,
+      mafatihShowTranslation: true,
+      mafatihDefaultSpeed: 1,
+      scienceCategory: 'all',
+      mafatihBookmarks: [],
+      mafatihRecentIds: ['maf_dua46b', 'maf_dua40', 'maf_ziy86'],
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setFontSize: (size) => set({ fontSize: size }),
       setArabicFont: (font) => set({ arabicFont: font }),
@@ -152,9 +188,78 @@ export const useSettingsStore = create<SettingsState>()(
       setReminderSound: (sound) => set({ reminderSound: sound }),
       setReciter: (reciter) => set({ reciter }),
       setUserName: (name) => set({ userName: name }),
+      setDefaultAppTab: (tab) => set({ defaultAppTab: tab }),
+      toggleHaptics: () => set((state) => ({ hapticsEnabled: !state.hapticsEnabled })),
+      toggleMafatihAutoScroll: () => set((state) => ({ mafatihAutoScroll: !state.mafatihAutoScroll })),
+      setMafatihAutoScroll: (val) => set({ mafatihAutoScroll: val }),
+      setMafatihFontSize: (val) => set({ mafatihFontSize: val }),
+      toggleMafatihShowTranslation: () => set((state) => ({ mafatihShowTranslation: !state.mafatihShowTranslation })),
+      setMafatihShowTranslation: (val) => set({ mafatihShowTranslation: val }),
+      setMafatihDefaultSpeed: (speed) => set({ mafatihDefaultSpeed: speed }),
+      setScienceCategory: (cat) => set({ scienceCategory: cat }),
+      addMafatihBookmark: (id) => set((state) => ({
+        mafatihBookmarks: state.mafatihBookmarks.includes(id) 
+          ? state.mafatihBookmarks 
+          : [id, ...state.mafatihBookmarks]
+      })),
+      removeMafatihBookmark: (id) => set((state) => ({
+        mafatihBookmarks: state.mafatihBookmarks.filter(bId => bId !== id)
+      })),
+      isMafatihBookmarked: (id) => get().mafatihBookmarks.includes(id),
+      addMafatihRecent: (id) => set((state) => {
+        const filtered = state.mafatihRecentIds.filter(rId => rId !== id);
+        return {
+          mafatihRecentIds: [id, ...filtered].slice(0, 15)
+        };
+      }),
+      clearMafatihRecents: () => set({ mafatihRecentIds: [] }),
     }),
     {
       name: 'quran-app-settings',
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        // Automatically migrate legacy formats or cross-version updates
+        return persistedState || {};
+      },
+      storage: {
+        getItem: (name) => {
+          try {
+            // Check primary key first, then fallback to historical keys across updates
+            const primary = localStorage.getItem(name);
+            if (primary) return JSON.parse(primary);
+            const legacyKeys = ['shia-quran-settings', 'shia_quran_settings', 'quran_settings'];
+            for (const legacyKey of legacyKeys) {
+              const val = localStorage.getItem(legacyKey);
+              if (val) {
+                // Mirror to standard key
+                localStorage.setItem(name, val);
+                return JSON.parse(val);
+              }
+            }
+          } catch (e) {
+            console.warn("Storage hydration error", e);
+          }
+          return null;
+        },
+        setItem: (name, value) => {
+          try {
+            const serialized = JSON.stringify(value);
+            localStorage.setItem(name, serialized);
+            // Also dual-write to legacy keys to ensure backwards compatibility across versions
+            localStorage.setItem('shia-quran-settings', serialized);
+            // Reflect hasSeenWelcome flag directly for ultra-fast instantaneous splash bypass
+            if (value?.state?.hasSeenWelcome) {
+              localStorage.setItem('shia-quran-has-seen-welcome', 'true');
+            }
+          } catch (e) {}
+        },
+        removeItem: (name) => {
+          try {
+            localStorage.removeItem(name);
+            localStorage.removeItem('shia-quran-settings');
+          } catch (e) {}
+        }
+      }
     }
   )
 );
