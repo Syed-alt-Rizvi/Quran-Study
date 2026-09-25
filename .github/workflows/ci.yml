@@ -1,4 +1,4 @@
-name: Continuous Integration & Android Release
+name: Build & Release Pipeline
 
 on:
   push:
@@ -18,14 +18,14 @@ on:
           - playstore_bundle
 
 concurrency:
-  group: ci-android-${{ github.workflow }}-${{ github.ref }}
+  group: build-release-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  quality-gate:
-    name: Lint, Typecheck & Web Build
+  build-and-release:
+    name: Build Web & Android Artifacts
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Code
@@ -41,63 +41,27 @@ jobs:
         run: |
           npm ci --prefer-offline || npm install --legacy-peer-deps
 
-      - name: Typecheck & Lint
+      - name: Code Quality & Typecheck
         run: |
-          echo "Running TypeScript compiler check (tsc --noEmit)..."
           npm run lint
-
-      - name: Build Production Web Bundle
-        run: |
-          echo "Compiling Vite client and Node server bundle..."
-          npm run build
-
-      - name: Verify Build Artifacts Integrity
-        run: |
-          set -e
-          echo "Verifying generated distribution assets..."
-          test -f dist/index.html || { echo "::error::dist/index.html is missing!"; exit 1; }
-          test -f dist/server.cjs || { echo "::error::dist/server.cjs is missing!"; exit 1; }
-          test -s dist/index.html || { echo "::error::dist/index.html is empty!"; exit 1; }
-          test -s dist/server.cjs || { echo "::error::dist/server.cjs is empty!"; exit 1; }
-
-          # Syntax validate compiled server bundle
-          node -c dist/server.cjs
-          echo "✓ Client assets and server bundle verified successfully."
-
-  build-android:
-    name: Build Android APK & Play Store Bundle
-    needs: quality-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "npm"
-
-      - name: Install Node Dependencies
-        run: |
-          npm ci --prefer-offline || npm install --legacy-peer-deps
 
       - name: Compile Web Application
         run: |
           npm run build
 
-      - name: Generate Mobile Asset Graphics
+      - name: Verify Web Distribution Assets
         run: |
-          node prepare-assets.cjs
-          npx capacitor-assets generate --android --iconBackgroundColor '#059669' --iconBackgroundColorDark '#047857' --splashBackgroundColor '#059669' --splashBackgroundColorDark '#047857' || true
+          set -e
+          test -s dist/index.html || { echo "::error::dist/index.html is missing or empty!"; exit 1; }
+          test -s dist/server.cjs || { echo "::error::dist/server.cjs is missing or empty!"; exit 1; }
+          node -c dist/server.cjs
+          echo "✓ Web bundle verified successfully."
 
       - name: Sync Capacitor Android
         run: |
           npx cap sync android
-          # Exclude backend server bundle from Android client webview assets
           rm -f android/app/src/main/assets/public/server.cjs || true
+          echo "✓ Android web assets synchronized."
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -105,48 +69,51 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Configure Android SDK Environment
+      - name: Configure Android SDK
         run: |
-          set -e
-          ANDROID_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          echo "sdk.dir=$ANDROID_PATH" > android/local.properties
-          if command -v sdkmanager >/dev/null 2>&1; then
-            yes | sdkmanager --licenses 2>/dev/null || true
-          fi
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+          echo "✓ Android SDK configured."
 
-      - name: Set up Gradle 8.14.3
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.14.3"
           build-root-directory: ./android
 
       - name: Validate Gradle Wrapper Permissions
         run: |
           chmod +x android/gradlew
 
-      - name: Decode Custom Keystore if Configured
-        if: ${{ env.KEYSTORE_BASE64 != '' }}
+      - name: Configure Custom Keystore if Secret Configured
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS_NAME: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
-          echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
-          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Decoding custom signing keystore from repository secrets..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+            echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
+            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASS" >> $GITHUB_ENV
+            echo "KEY_ALIAS=$KEY_ALIAS_NAME" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+            echo "✓ Custom release keystore loaded."
+          else
+            echo "No custom release keystore secret configured. Gradle will sign with standard debug key for immediate installation."
+          fi
 
       - name: Build Direct Installation APK (assembleDebug)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'playstore_bundle' }}
         working-directory: ./android
         run: |
-          echo "Executing Gradle assembleDebug..."
+          echo "Building debug APK for direct phone installation..."
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Build Android App Bundle for Google Play (bundleRelease)
+      - name: Build Google Play Store Bundle (bundleRelease)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
-          echo "Executing Gradle bundleRelease..."
+          echo "Building release bundle for Google Play Store..."
           ./gradlew bundleRelease --no-daemon --stacktrace
 
       - name: Collect and Verify Distribution Artifacts
@@ -160,7 +127,9 @@ jobs:
             cp "$DEBUG_APK" dist-mobile/apk/Shia-Markaz-DirectInstall.apk
             cp "$DEBUG_APK" dist-mobile/apk/app-debug.apk
             echo "✓ Direct-install APK ready: $(ls -lh dist-mobile/apk/Shia-Markaz-DirectInstall.apk)"
-          elif [ "${{ github.event.inputs.build_target }}" != "playstore_bundle" ]; then
+          elif [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.build_target == 'playstore_bundle' }}"; then
+            echo "Skipping APK collection as requested by workflow input."
+          else
             echo "::error::Expected Debug APK at $DEBUG_APK but file was not found!"
             exit 1
           fi
@@ -170,7 +139,9 @@ jobs:
           if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
             cp "$AAB_FILE" dist-mobile/bundle/Shia-Markaz-PlayStore.aab
             echo "✓ Play Store Bundle ready: $(ls -lh dist-mobile/bundle/Shia-Markaz-PlayStore.aab)"
-          elif [ "${{ github.event.inputs.build_target }}" != "direct_install_apk" ]; then
+          elif [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.build_target == 'direct_install_apk' }}"; then
+            echo "Skipping AAB collection as requested by workflow input."
+          else
             echo "::error::Expected Play Store AAB file but none was found!"
             exit 1
           fi
