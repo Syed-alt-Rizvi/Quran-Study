@@ -14,6 +14,7 @@ import { useSettingsStore, AppTab } from '../store';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -1270,6 +1271,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     May Allah (SWT) grant them forgiveness, elevate their spiritual stations, and illuminate their graves in the company of the Holy Prophet Muhammad (s.a.w.w) and the 14 Infallible Ahlulbayt (a.s).
                   </p>
                 </div>
+
+                {/* Download Web App (Android / iOS) */}
+                <PWAInstallButton variant="full" />
 
                 {/* Developer Profile Card */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs">

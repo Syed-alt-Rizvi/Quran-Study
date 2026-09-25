@@ -45,7 +45,10 @@ async function prepare() {
   if (sharp) {
     if (iconNeedsUpdate && fs.existsSync(iconSvg)) {
       await sharp(iconSvg).resize(1024, 1024).png().toFile(iconPng);
-      console.log('✓ Generated icon.png from SVG');
+      await sharp(iconSvg).resize(192, 192).png().toFile(path.join(__dirname, 'public', 'pwa-192x192.png'));
+      await sharp(iconSvg).resize(512, 512).png().toFile(path.join(__dirname, 'public', 'pwa-512x512.png'));
+      await sharp(iconSvg).resize(180, 180).png().toFile(path.join(__dirname, 'public', 'apple-touch-icon.png'));
+      console.log('✓ Generated icon.png and PWA icons from SVG');
     }
     if (splashNeedsUpdate && fs.existsSync(splashSvg)) {
       await sharp(splashSvg).resize(2732, 2732).png().toFile(splashPng);

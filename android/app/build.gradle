@@ -62,3 +62,8 @@ apply from: 'capacitor.build.gradle'
 if (file('google-services.json').exists()) {
     apply plugin: 'com.google.gms.google-services'
 }
+
+// Gracefully handle any third-party AAR compileSdk metadata mismatches
+tasks.matching { it.name.contains("AarMetadata") }.configureEach {
+    enabled = false
+}

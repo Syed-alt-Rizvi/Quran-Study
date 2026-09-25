@@ -11,6 +11,7 @@ import GlobalDiscussions from "./GlobalDiscussions";
 import ImamScienceFeed from "./ImamScienceFeed";
 import MafatihView from "./MafatihView";
 import { useSettingsStore } from '../store';
+import { PWAInstallButton } from './PWAInstallButton';
 
 const JUZ_NAMES = [
   'Alif Laam Meem', 'Sayaqool', 'Tilkal Rusul', 'Lan Tana Loo', 'Wal Mohsanat',
@@ -199,7 +200,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="flex items-center gap-2 text-right">
+            <PWAInstallButton variant="compact" />
             <span className="text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400">
               {activeTab === 'quran' && 'Quran Reader'}
               {activeTab === 'mafatih' && 'Mafatih Al Jinan'}
