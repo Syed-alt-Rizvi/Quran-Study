@@ -17,8 +17,8 @@ export interface UserTelemetry {
   preferredLanguage?: string;
 }
 
-// Track app launch, install, and obtain location permission gracefully
-export async function trackAppLaunchAndTelemetry(requestLocationPrompt = false): Promise<void> {
+// Track app launch, install, and device session gracefully without requesting unnecessary permissions
+export async function trackAppLaunchAndTelemetry(): Promise<void> {
   try {
     let userId = localStorage.getItem('guest_device_id');
     if (!userId) {
@@ -64,48 +64,7 @@ export async function trackAppLaunchAndTelemetry(requestLocationPrompt = false):
       baseData.firstSeen = serverTimestamp();
     }
 
-    // If geolocation is available and permitted, gather city/coords
-    if ('geolocation' in navigator) {
-      try {
-        if (requestLocationPrompt || localStorage.getItem('shia_quran_location_granted') === 'true') {
-          navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-              localStorage.setItem('shia_quran_location_granted', 'true');
-              const lat = pos.coords.latitude;
-              const lng = pos.coords.longitude;
-              
-              // Reverse geocode via open reverse API or fallback
-              let city = 'Unknown';
-              let country = 'Unknown';
-              try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`);
-                if (res.ok) {
-                  const geoData = await res.json();
-                  city = geoData.address?.city || geoData.address?.town || geoData.address?.state_district || 'City';
-                  country = geoData.address?.country || 'Country';
-                }
-              } catch (e) {
-                // Non-blocking
-              }
-
-              await updateDoc(userRef, {
-                latitude: lat,
-                longitude: lng,
-                city,
-                country,
-                lastActive: serverTimestamp()
-              }).catch(() => {});
-            },
-            () => {
-              // Permission denied or dismissed
-            },
-            { timeout: 8000, maximumAge: 300000 }
-          );
-        }
-      } catch (err) {}
-    }
-
-    // Save initial user doc
+    // Save user doc
     await setDoc(userRef, baseData, { merge: true }).catch((err) => {
       console.warn("Telemetry ping:", err);
     });

@@ -8,13 +8,15 @@ import './index.css';
 if ('serviceWorker' in navigator && !import.meta.env.DEV) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((registration) => {
-      // Promptly check for updates
+      // Promptly check for updates on startup
       registration.update().catch(() => {});
 
-      // Periodically poll for updates every 2 minutes
-      setInterval(() => {
-        registration.update().catch(() => {});
-      }, 120 * 1000);
+      // Efficiently check for updates when user returns to app instead of constant polling
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update().catch(() => {});
+        }
+      });
 
       registration.addEventListener('updatefound', () => {
         const installingWorker = registration.installing;

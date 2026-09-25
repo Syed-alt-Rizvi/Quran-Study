@@ -2,6 +2,8 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Capacitor } from '@capacitor/core';
 import { useSettingsStore } from '../store';
 
+export { ImpactStyle };
+
 export const hapticImpact = async (style: ImpactStyle = ImpactStyle.Light) => {
   if (useSettingsStore.getState().hapticsEnabled === false) return;
   if (Capacitor.isNativePlatform()) {

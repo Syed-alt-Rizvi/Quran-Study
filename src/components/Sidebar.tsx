@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Moon, Sun, Type, Bookmark, BookOpen, Headphones, 
   Bell, Check, Trash2, ArrowRight, Clock,
-  Flame, Compass, Volume2, Heart, ShieldCheck,
+  Activity, Compass, Volume2, Heart, ShieldCheck,
   Languages, FileEdit, CheckCircle2, User,
   Code, Mail, Copy, Info, Shield, FileText,
-  ZoomIn, ZoomOut, Palette, Sliders, Key,
-  Sparkles, Smartphone, Vibrate, ExternalLink,
+  ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
+  Smartphone, Vibrate, ExternalLink,
   Microscope, MessageCircle
 } from 'lucide-react';
 import { useSettingsStore, AppTab } from '../store';
@@ -44,7 +44,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     userName, setUserName,
     defaultAppTab, setDefaultAppTab,
     hapticsEnabled, toggleHaptics,
-    mafatihAutoScroll, toggleMafatihAutoScroll,
     mafatihFontSize, setMafatihFontSize,
     mafatihShowTranslation, toggleMafatihShowTranslation,
     mafatihDefaultSpeed, setMafatihDefaultSpeed
@@ -159,10 +158,10 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
   const tabs: { id: TabCategory; label: string; icon: any; badge?: number }[] = [
     { id: 'display', label: 'App', icon: Sliders },
     { id: 'quran', label: 'Quran', icon: BookOpen },
-    { id: 'mafatih', label: 'Mafatih', icon: Sparkles },
+    { id: 'mafatih', label: 'Mafatih', icon: KeyRound },
     { id: 'audio', label: 'Audio', icon: Headphones },
     { id: 'library', label: 'Library', icon: Bookmark, badge: bookmarks.length },
-    { id: 'about', label: 'About', icon: Heart },
+    { id: 'about', label: 'About', icon: Info },
   ];
 
   return (
@@ -325,7 +324,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { id: 'quran' as AppTab, label: 'Holy Quran', desc: 'Surahs & Juz', icon: BookOpen },
-                      { id: 'mafatih' as AppTab, label: 'Mafatih Al Jinan', desc: 'Duas & Ziyaraat', icon: Sparkles },
+                      { id: 'mafatih' as AppTab, label: 'Mafatih Al Jinan', desc: 'Duas & Ziyaraat', icon: KeyRound },
                       { id: 'science' as AppTab, label: 'Imams & Science', desc: 'Hadith Discoveries', icon: Microscope },
                       { id: 'discuss' as AppTab, label: 'Community', desc: 'Discussions', icon: MessageCircle },
                     ].map((tabOption) => {
@@ -809,24 +808,14 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   </div>
                 </div>
 
-                {/* Supplication Recitation Auto-Scroll */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Sliders size={17} className="text-emerald-600 dark:text-emerald-400" />
-                      <div>
-                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Recitation Auto-Scroll</span>
-                        <span className="text-[11px] text-slate-400">Smoothly scroll to active verse during playback</span>
-                      </div>
+                {/* Supplication Audio & Reading Quality */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Headphones size={17} className="text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Serene Audio Recitation</span>
+                      <span className="text-[11px] text-slate-400">High-fidelity recordings with loop mode and speed tuning</span>
                     </div>
-                    <button
-                      id="toggle-mafatih-autoscroll-btn"
-                      onClick={() => { hapticSelection(); toggleMafatihAutoScroll(); }}
-                      className={`w-11 h-6 rounded-full transition-colors relative ${mafatihAutoScroll ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                      aria-label="Toggle supplication autoscroll"
-                    >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${mafatihAutoScroll ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
-                    </button>
                   </div>
                 </div>
 
@@ -967,7 +956,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                        <Flame size={16} />
+                        <Activity size={16} />
                       </div>
                       <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
                         Daily Study Activity

@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { useSettingsStore } from '../store';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 export default function WelcomeScreen({ onComplete }: { key?: string; onComplete: () => void }) {
   const { userName, setUserName } = useSettingsStore();
@@ -97,7 +97,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
               
               <div className="w-full bg-emerald-900/60 backdrop-blur-xl border border-emerald-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl">
                 <div className="flex items-center justify-center gap-2 text-amber-400 mb-2">
-                  <Sparkles size={18} />
+                  <BookOpen size={18} />
                   <h3 className="text-lg font-bold text-amber-100">Welcome to Shia Markaz</h3>
                 </div>
                 <p className="text-emerald-200/80 text-xs sm:text-sm mb-6">

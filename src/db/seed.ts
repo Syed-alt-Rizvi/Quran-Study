@@ -1,11 +1,16 @@
+import fs from 'fs';
+import path from 'path';
 import { db } from './index';
 import { imamScienceArticles, imamScienceCategories } from './schema';
-import dataRaw from './imam_science_data.json';
-
-const data = dataRaw as any;
 
 export async function seed() {
-  console.log("Starting to seed database from imam_science_data.json...");
+  const dataPath = path.join(process.cwd(), 'public', 'imam_science_data.json');
+  if (!fs.existsSync(dataPath)) {
+    console.log("No imam_science_data.json found in public directory to seed.");
+    return;
+  }
+  const data = JSON.parse(fs.readFileSync(dataPath, 'utf8')) as any;
+  console.log("Starting to seed database from public/imam_science_data.json...");
 
   if (data.categories && data.categories.length > 0) {
     const formattedCategories = data.categories.map((c: any) => ({

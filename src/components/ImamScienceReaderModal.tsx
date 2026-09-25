@@ -8,7 +8,7 @@ import {
   ArrowLeft, 
   Quote, 
   Check, 
-  Sparkles, 
+  Microscope, 
   Layers, 
   Type, 
   Bookmark, 
@@ -76,23 +76,22 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
 
     if (isTruncated) {
       setIsLoadingContent(true);
-      // Try local offline bundled file first (/imam_science_articles/${article.slug}.json)
-      fetch(`/imam_science_articles/${article.slug}.json`)
+      // Fetch full content via backend API first, falling back to static offline file if present
+      fetch(getApiUrl(`/api/imam-science/articles/${article.slug}`))
         .then(res => {
-          if (!res.ok) throw new Error('Offline file not found');
+          if (!res.ok) throw new Error('API request failed');
           return res.json();
         })
         .then(data => {
           if (data && data.content) {
             setActiveContent(data.content);
-            setIsLoadingContent(false);
           } else {
-            throw new Error('No content in offline json');
+            throw new Error('No content returned from API');
           }
         })
         .catch(() => {
-          // Fallback to backend API
-          return fetch(getApiUrl(`/api/imam-science/articles/${article.slug}`))
+          // Fallback to static offline file if bundled
+          return fetch(`/imam_science_articles/${article.slug}.json`)
             .then(res => res.json())
             .then(data => {
               if (data && data.content) {
@@ -265,7 +264,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
               </button>
 
               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100/80 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
-                <Sparkles size={11} className="mr-1 opacity-75" />
+                <BookOpen size={11} className="mr-1 opacity-75" />
                 {article.primaryCategory || 'Ahlebait Teachings'}
               </span>
 
@@ -469,7 +468,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                 {/* Mobile Meta Header for small screens */}
                 <div className="sm:hidden flex items-center justify-between pb-2">
                   <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
-                    <Sparkles size={12} />
+                    <Microscope size={12} />
                     <span>Qur'an & Science Archive</span>
                   </span>
                   {article.readingTime && (

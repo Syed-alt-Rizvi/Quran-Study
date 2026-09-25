@@ -47,7 +47,22 @@
 }
 
 @layer base {
+  html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
+    width: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    touch-action: manipulation;
     @apply font-sans antialiased bg-slate-50 text-slate-800 transition-colors duration-500;
     background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.06), transparent 50%), radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.03), transparent 50%);
   }
@@ -56,6 +71,38 @@
     @apply bg-slate-950 text-slate-200;
     background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.08), transparent 50%), radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.04), transparent 50%);
   }
+
+  #root {
+    width: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Fast Rendering & GPU Acceleration Utilities */
+.render-content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 180px;
+}
+
+.render-content-auto-dense {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 90px;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Smooth high-speed touch scrolling */
+.smooth-scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Tafseer HTML Rendering & Readability Styles */
@@ -111,10 +158,46 @@
 }
 
 .pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 .pt-safe {
-  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+}
+
+/* GPU acceleration for sticky headers and navigation bars */
+.gpu-layer {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* High-speed rendering for long list cards on budget/mobile devices */
+.surah-card-render {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 74px;
+}
+
+.juz-card-render {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 74px;
+}
+
+.ayah-card-render {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 160px;
+}
+
+/* Ayah Card & Text Contrast Safeguards for Android WebViews & High Contrast Displays */
+.ayah-card {
+  forced-color-adjust: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+.ayah-arabic-text {
+  forced-color-adjust: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 

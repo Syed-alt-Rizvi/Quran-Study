@@ -7,7 +7,7 @@ import { fetchTafseer } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, Sparkles, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, MessageSquare, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 
@@ -19,8 +19,31 @@ interface SurahViewProps {
 }
 
 const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; isLast?: boolean }) {
-  const { fontSize, arabicFont, isBookmarked, addBookmark, removeBookmark, lastRead, setLastRead, incrementAyahsRead, showTranslation, translationLanguages, tafseerLanguages, tafseerProvider, tafseerZoom, setTafseerZoom, autoScrollAudio } = useSettingsStore();
-  const { play, pause, isPlaying, surahId: audioSurahId, activeAyahNumber, activeSurahNumber, setPlaylist } = useAudioStore();
+  const isDarkMode = useSettingsStore(s => s.isDarkMode);
+  const fontSize = useSettingsStore(s => s.fontSize);
+  const arabicFont = useSettingsStore(s => s.arabicFont);
+  const showTranslation = useSettingsStore(s => s.showTranslation);
+  const translationLanguages = useSettingsStore(s => s.translationLanguages);
+  const tafseerLanguages = useSettingsStore(s => s.tafseerLanguages);
+  const tafseerProvider = useSettingsStore(s => s.tafseerProvider);
+  const tafseerZoom = useSettingsStore(s => s.tafseerZoom);
+  const setTafseerZoom = useSettingsStore(s => s.setTafseerZoom);
+  const autoScrollAudio = useSettingsStore(s => s.autoScrollAudio);
+  const bookmarked = useSettingsStore(s => s.bookmarks.some(b => b.surahId === surah.number && b.ayahNumber === ayah.numberInSurah));
+  const isLastRead = useSettingsStore(s => s.lastRead?.surahId === surah.number && s.lastRead?.ayahNumber === ayah.numberInSurah);
+  const addBookmark = useSettingsStore(s => s.addBookmark);
+  const removeBookmark = useSettingsStore(s => s.removeBookmark);
+  const setLastRead = useSettingsStore(s => s.setLastRead);
+  const incrementAyahsRead = useSettingsStore(s => s.incrementAyahsRead);
+
+  // High-performance granular audio selectors (prevents 280+ Ayah cards from re-rendering on audio ticks)
+  const isActivePlaying = useAudioStore(s => 
+    s.surahId === surah.number && s.activeAyahNumber === ayah.numberInSurah && s.activeSurahNumber === surah.number && s.isPlaying
+  );
+  const isAudioPlaying = useAudioStore(s => s.isPlaying);
+  const pause = useAudioStore(s => s.pause);
+  const setPlaylist = useAudioStore(s => s.setPlaylist);
+
   const [activeTab, setActiveTab] = useState<'none' | 'translation' | 'tafseer'>('none');
   const [lazyTafseer, setLazyTafseer] = useState<any>(null);
   const [lazyLoading, setLazyLoading] = useState(false);
@@ -28,13 +51,11 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
   const [showTooltip, setShowTooltip] = useState(false);
   const ayahRef = useRef<HTMLDivElement>(null);
 
-  const isActivePlaying = audioSurahId === surah.number && activeAyahNumber === ayah.numberInSurah && activeSurahNumber === surah.number;
-
   useEffect(() => {
-    if (autoScrollAudio && isActivePlaying && isPlaying && ayahRef.current) {
+    if (autoScrollAudio && isActivePlaying && isAudioPlaying && ayahRef.current) {
       ayahRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [isActivePlaying, isPlaying, autoScrollAudio]);
+  }, [isActivePlaying, isAudioPlaying, autoScrollAudio]);
 
   useEffect(() => {
     setLazyTafseer(null);
@@ -52,9 +73,6 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         .finally(() => setLazyLoading(false));
     }
   }, [activeTab, surah.number, ayah.numberInSurah, lazyTafseer, lazyLoading, tafseerProvider]);
-
-  const bookmarked = isBookmarked(surah.number, ayah.numberInSurah);
-  const isLastRead = lastRead?.surahId === surah.number && lastRead?.ayahNumber === ayah.numberInSurah;
 
   const handlePressStart = () => {
     pressTimer.current = setTimeout(() => {
@@ -94,7 +112,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
 
   const handlePlayAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isActivePlaying && isPlaying) {
+    if (isActivePlaying && isAudioPlaying) {
       pause();
     } else {
       const index = surah.ayahs.findIndex(a => a.numberInSurah === ayah.numberInSurah);
@@ -102,25 +120,25 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
     }
   };
 
-  const baseHue = Math.floor(((surah.number * 137.5) + (ayah.numberInSurah * 35)) % 360);
-  const secHue = (baseHue + 40) % 360;
-
-  const styleProps = {
-    '--ayah-base-hue': `${baseHue}`,
-    '--ayah-sec-hue': `${secHue}`,
-  } as React.CSSProperties;
-
   return (
     <div className="flex flex-col">
       <div 
         id={`ayah-${ayah.numberInSurah}`}
         ref={ayahRef}
-        style={styleProps}
-        className={`group relative py-4 px-4 sm:px-8 transition-all duration-500 rounded-[2rem] border ${
+        className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3 sm:px-8 transition-all duration-200 rounded-2xl sm:rounded-[1.75rem] border ${
           isActivePlaying || isLastRead
-            ? 'border-[hsl(var(--ayah-base-hue),60%,80%)] dark:border-[hsl(var(--ayah-base-hue),40%,30%)] shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,70%,0.4)] dark:shadow-[0_4px_15px_-3px_hsla(var(--ayah-base-hue),70%,20%,0.6)] bg-gradient-to-br from-[hsl(var(--ayah-base-hue),80%,90%)] to-[hsl(var(--ayah-sec-hue),70%,85%)] dark:from-[hsl(var(--ayah-base-hue),60%,20%)] dark:to-[hsl(var(--ayah-sec-hue),50%,15%)]' 
-            : 'border-transparent bg-gradient-to-br from-[hsl(var(--ayah-base-hue),40%,98%)] to-[hsl(var(--ayah-sec-hue),30%,95%)] dark:from-[hsl(var(--ayah-base-hue),20%,12%)] dark:to-[hsl(var(--ayah-sec-hue),15%,8%)]'
+            ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/70 dark:border-emerald-600/70 shadow-md ring-1 ring-emerald-400/30'
+            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90 shadow-xs hover:border-slate-300 dark:hover:border-slate-700'
         }`}
+        style={{
+          forcedColorAdjust: 'none',
+          backgroundColor: isActivePlaying || isLastRead
+            ? (isDarkMode ? '#0d281e' : '#f0fdf4')
+            : (isDarkMode ? '#0f172a' : '#ffffff'),
+          borderColor: isActivePlaying || isLastRead
+            ? (isDarkMode ? '#059669' : '#86efac')
+            : (isDarkMode ? '#1e293b' : '#e2e8f0'),
+        }}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
         onPointerLeave={handlePressEnd}
@@ -133,13 +151,15 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
       >
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-3">
-            <span className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
-              isActivePlaying 
-                ? 'bg-emerald-500 text-white shadow-md' 
-                : isLastRead 
-                  ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200' 
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-            }`}>
+            <span 
+              className="w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-colors border"
+              style={{
+                backgroundColor: isActivePlaying ? '#10b981' : (isLastRead ? (isDarkMode ? '#065f46' : '#d1fae5') : (isDarkMode ? '#1e293b' : '#f1f5f9')),
+                color: isActivePlaying ? '#ffffff' : (isLastRead ? (isDarkMode ? '#6ee7b7' : '#065f46') : (isDarkMode ? '#cbd5e1' : '#334155')),
+                borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+                forcedColorAdjust: 'none',
+              }}
+            >
               {ayah.numberInSurah}
             </span>
             
@@ -150,22 +170,28 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                   ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800' 
                   : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
-              title={isActivePlaying && isPlaying ? "Pause Audio" : "Play from this Ayah"}
+              title={isActivePlaying && isAudioPlaying ? "Pause Audio" : "Play from this Ayah"}
             >
-              {isActivePlaying && isPlaying ? <PauseCircle size={22} fill="currentColor" /> : <PlayCircle size={22} />}
+              {isActivePlaying && isAudioPlaying ? <PauseCircle size={22} fill="currentColor" /> : <PlayCircle size={22} />}
             </button>
             {bookmarked && (
               <BookmarkCheck size={20} className="text-emerald-500" />
             )}
             {isLastRead && (
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Last Read</span>
+              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Last Read</span>
             )}
           </div>
           <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             {!isLastRead && (
               <button
                 onClick={handleMarkAsRead}
-                className="px-3 py-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 rounded-full transition-colors"
+                className="px-3 py-1 text-xs font-medium rounded-full transition-colors border"
+                style={{
+                  backgroundColor: isDarkMode ? '#064e3b' : '#ecfdf5',
+                  color: isDarkMode ? '#6ee7b7' : '#047857',
+                  borderColor: isDarkMode ? '#047857' : '#a7f3d0',
+                  forcedColorAdjust: 'none',
+                }}
               >
                 Mark Read
               </button>
@@ -182,7 +208,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
               className="p-2 text-slate-400 hover:text-emerald-500 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
               title="Cite & Discuss"
             >
-              <BookOpen size={18} />
+              <MessageSquare size={18} />
             </button>
             <button 
               onClick={toggleBookmark}
@@ -209,32 +235,61 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         </AnimatePresence>
 
         <p 
-          className="font-arabic text-right leading-loose text-slate-900 dark:text-slate-50 select-none mb-2"
-          style={{ fontSize: `${fontSize}px`, fontFamily: arabicFont }}
+          className="ayah-arabic-text font-arabic text-right leading-loose select-none mb-3 font-normal"
+          style={{ 
+            fontSize: `${fontSize}px`, 
+            fontFamily: arabicFont,
+            color: isDarkMode ? '#F8FAFC' : '#0F172A',
+            forcedColorAdjust: 'none',
+          }}
         >
           {ayah.text}
         </p>
 
-        {/* Tiny Elegant Tabs with Beautiful Breaker Line */}
-        <div className="flex items-center justify-center gap-4 mt-4 mb-2">
-          <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-emerald-500/20"></div>
+        {/* Clean, high-contrast Ayah Tabs with subtle divider */}
+        <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+          <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
           <div className="flex gap-2">
             {showTranslation && (
               <button 
                 onClick={() => setActiveTab(activeTab === 'translation' ? 'none' : 'translation')}
-                className={`px-4 py-1.5 text-[10px] uppercase tracking-widest font-semibold rounded-full border-[0.5px] transition-all ${activeTab === 'translation' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700' : 'bg-transparent text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200'}`}
+                className="px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-semibold rounded-full border transition-all"
+                style={{
+                  backgroundColor: activeTab === 'translation' 
+                    ? '#059669' 
+                    : (isDarkMode ? '#1e293b' : '#f1f5f9'),
+                  color: activeTab === 'translation' 
+                    ? '#ffffff' 
+                    : (isDarkMode ? '#cbd5e1' : '#334155'),
+                  borderColor: activeTab === 'translation' 
+                    ? '#059669' 
+                    : (isDarkMode ? '#334155' : '#cbd5e1'),
+                  forcedColorAdjust: 'none',
+                }}
               >
                 Translation
               </button>
             )}
             <button 
               onClick={() => setActiveTab(activeTab === 'tafseer' ? 'none' : 'tafseer')}
-              className={`px-4 py-1.5 text-[10px] uppercase tracking-widest font-semibold rounded-full border-[0.5px] transition-all ${activeTab === 'tafseer' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700' : 'bg-transparent text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200'}`}
+              className="px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-semibold rounded-full border transition-all"
+              style={{
+                backgroundColor: activeTab === 'tafseer' 
+                  ? '#059669' 
+                  : (isDarkMode ? '#1e293b' : '#f1f5f9'),
+                color: activeTab === 'tafseer' 
+                  ? '#ffffff' 
+                  : (isDarkMode ? '#cbd5e1' : '#334155'),
+                borderColor: activeTab === 'tafseer' 
+                  ? '#059669' 
+                  : (isDarkMode ? '#334155' : '#cbd5e1'),
+                forcedColorAdjust: 'none',
+              }}
             >
               Tafseer
             </button>
           </div>
-          <div className="flex-1 h-[0.5px] bg-gradient-to-l from-transparent via-slate-200 dark:via-slate-800 to-emerald-500/20"></div>
+          <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -575,7 +630,7 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-safe">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-36 sm:pb-32 pb-safe">
       <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 px-4 py-4">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-4">
@@ -615,8 +670,8 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
         </div>
       </header>
 
-      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white dark:bg-slate-900 sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:sm:shadow-[0_8px_30px_rgb(0,0,0,0.4)] sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-12 md:p-16 relative">
+      <main className="max-w-4xl lg:max-w-5xl mx-auto px-2.5 sm:px-4 py-4 sm:py-8 md:py-12">
+        <div className="bg-white dark:bg-slate-900 sm:shadow-sm sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-8 md:p-12 relative">
           {surah.number !== 1 && surah.number !== 9 && (
             <div className="text-center mb-10 pb-8 border-b-[0.5px] border-slate-200 dark:border-slate-800">
               <h2 

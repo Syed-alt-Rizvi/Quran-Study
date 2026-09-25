@@ -6,12 +6,16 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --minify --outfile=dist/server.cjs",
-    "build:android": "npm run build && npx cap sync",
+    "sync:android": "npx cap sync android && rm -f android/app/src/main/assets/public/server.cjs",
+    "sync:ios": "npx cap sync ios && rm -f ios/App/App/public/server.cjs",
+    "build:android": "npm run build && npm run sync:android",
+    "build:ios": "npm run build && npm run sync:ios",
+    "clean:mobile": "rm -rf android/app/src/main/assets/public/* ios/App/App/public/*",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist server.js dist-mobile",
     "lint": "tsc --noEmit",
-    "generate-assets": "capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'"
+    "generate-assets": "node prepare-assets.cjs && capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#222222'"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

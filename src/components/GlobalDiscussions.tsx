@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageCircle, BookOpen, LogIn, Flag, UserX, ShieldCheck, Check, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../utils/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, deleteDoc, doc, updateDoc, limit } from 'firebase/firestore';
 import {
   getGuestProfile,
   saveGuestProfile,
@@ -81,7 +81,7 @@ export default function GlobalDiscussions() {
       setAuthor(currentUser.displayName || "Anonymous");
     }
 
-    const q = query(collection(db, 'discussions'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'discussions'), orderBy('createdAt', 'desc'), limit(60));
     const unsubscribeDb = onSnapshot(q, (snapshot) => {
       const docs: DBRow[] = [];
       snapshot.forEach(docSnap => {

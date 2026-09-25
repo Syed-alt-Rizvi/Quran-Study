@@ -1,0 +1,68 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - ".gitattributes"
+      - "firestore.rules"
+      - "firebase-blueprint.json"
+  pull_request:
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - ".gitattributes"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    name: Lint, Typecheck & Web Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci --prefer-offline || npm install --legacy-peer-deps
+
+      - name: Typecheck & Lint
+        run: |
+          echo "Running TypeScript compiler check (tsc --noEmit)..."
+          npm run lint
+
+      - name: Build Production Web Bundle
+        run: |
+          echo "Compiling Vite client and Node server bundle..."
+          npm run build
+
+      - name: Verify Build Artifacts Integrity
+        run: |
+          set -e
+          echo "Verifying generated distribution assets..."
+          test -f dist/index.html || { echo "::error::dist/index.html is missing!"; exit 1; }
+          test -f dist/server.cjs || { echo "::error::dist/server.cjs is missing!"; exit 1; }
+          test -s dist/index.html || { echo "::error::dist/index.html is empty!"; exit 1; }
+          test -s dist/server.cjs || { echo "::error::dist/server.cjs is empty!"; exit 1; }
+
+          # Syntax validate compiled server bundle
+          node -c dist/server.cjs
+          echo "✓ Client assets and server bundle verified successfully."

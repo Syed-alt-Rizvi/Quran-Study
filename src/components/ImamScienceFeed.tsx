@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Sparkles, Clock, BookOpen, Filter, ArrowRight, RefreshCw, Layers } from 'lucide-react';
+import { Search, Microscope, Clock, BookOpen, Filter, ArrowRight, RefreshCw, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ImamScienceReaderModal, { ImamArticle } from './ImamScienceReaderModal';
 import { getApiUrl } from '../utils/apiBase';
@@ -10,19 +10,29 @@ interface ImamScienceFeedProps {
   onSelectSurah?: (surah: number, ayah?: number) => void;
 }
 
+// Module-level in-memory cache to guarantee instantaneous tab transitions
+let cachedArticles: ImamArticle[] = [];
+let cachedCategories: { name: string; count: number; slug: string }[] = [];
+
 export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps) {
-  const [articles, setArticles] = useState<ImamArticle[]>([]);
-  const [categories, setCategories] = useState<{ name: string; count: number; slug: string }[]>([]);
+  const [articles, setArticles] = useState<ImamArticle[]>(() => cachedArticles);
+  const [categories, setCategories] = useState<{ name: string; count: number; slug: string }[]>(() => cachedCategories);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'shortest' | 'longest' | 'recent' | 'title'>('shortest');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(() => cachedArticles.length === 0);
   const [selectedArticle, setSelectedArticle] = useState<ImamArticle | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
 
-    // Load static backup first for instant zero-flicker render
+    // If already in memory, no need to show loading or refetch
+    if (cachedArticles.length > 0) {
+      setLoading(false);
+      return;
+    }
+
+    // Load static dataset first for instant render
     fetch('/imam_science_data.json')
       .then(res => {
         if (!res.ok) throw new Error('Static data missing');
@@ -31,8 +41,10 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
       .then(data => {
         if (isCancelled) return;
         if (data && data.articles) {
+          cachedArticles = data.articles;
           setArticles(data.articles);
           if (data.categories) {
+            cachedCategories = data.categories;
             setCategories(data.categories);
           }
           setLoading(false);
@@ -40,39 +52,39 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
       })
       .catch(() => {
         // Failover gracefully to live API
+        fetch(getApiUrl('/api/imam-science/articles?limit=100'))
+          .then(res => res.json())
+          .then(data => {
+            if (isCancelled) return;
+            if (data && data.articles) {
+              cachedArticles = data.articles;
+              setArticles(data.articles);
+              setLoading(false);
+            }
+          })
+          .catch(() => {
+            if (!isCancelled) setLoading(false);
+          });
       });
-
-    // Also fetch from live backend API to sync latest
-    fetch(getApiUrl(`/api/imam-science/articles?limit=100&sort=${sortBy}`))
-      .then(res => {
-        if (!res.ok) throw new Error('API failed');
-        return res.json();
-      })
-      .then(data => {
-        if (isCancelled) return;
-        if (data && data.articles && data.articles.length > 0) {
-          setArticles(data.articles);
-          setLoading(false);
-        }
-      })
-      .catch(err => {
-        console.warn('Backend API sync notice:', err);
-      });
-
-    fetch(getApiUrl('/api/imam-science/categories'))
-      .then(res => res.json())
-      .then(cats => {
-        if (isCancelled) return;
-        if (Array.isArray(cats) && cats.length > 0) {
-          setCategories(cats);
-        }
-      })
-      .catch(() => {});
 
     return () => {
       isCancelled = true;
     };
-  }, [sortBy]);
+  }, []);
+
+  const handleRefresh = () => {
+    setLoading(true);
+    fetch(getApiUrl('/api/imam-science/articles?limit=100'))
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.articles && data.articles.length > 0) {
+          cachedArticles = data.articles;
+          setArticles(data.articles);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
 
   // Filtered & sorted articles based on active category, search query, and sort order
   const filteredArticles = useMemo(() => {
@@ -103,8 +115,8 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
       return true;
     });
 
-    // Sort according to user preference (Shortest on top, lengthy/books at bottom by default)
-    return list.sort((a, b) => {
+    // Pure non-mutating sort according to user preference
+    return [...list].sort((a, b) => {
       if (sortBy === 'shortest') {
         return (a.wordCount || 0) - (b.wordCount || 0);
       } else if (sortBy === 'longest') {
@@ -124,7 +136,7 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
       <div className="border-b-[0.5px] border-slate-200 dark:border-slate-800 pb-5 mt-2">
         <div className="flex items-center gap-2 mb-2">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300">
-            <Sparkles size={11} className="mr-1" />
+            <Microscope size={11} className="mr-1" />
             Dynamic Research Archive
           </span>
         </div>
@@ -343,12 +355,14 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
                     {article.primaryCategory || 'Science'}
                   </span>
                   {((article.wordCount || 0) > 15000 || (article.title && article.title.toLowerCase().startsWith('book'))) ? (
-                    <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-amber-950/80 backdrop-blur-md text-amber-300 border border-amber-500/30">
-                      📚 Full Book
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-amber-950/80 backdrop-blur-md text-amber-300 border border-amber-500/30">
+                      <BookOpen size={11} />
+                      <span>Full Treatise</span>
                     </span>
                   ) : ((article.wordCount || 0) < 1000) ? (
-                    <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-950/80 backdrop-blur-md text-emerald-200 border border-emerald-500/30">
-                      ⚡ Quick Read
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-950/80 backdrop-blur-md text-emerald-200 border border-emerald-500/30">
+                      <Clock size={11} />
+                      <span>Quick Read</span>
                     </span>
                   ) : null}
                 </div>

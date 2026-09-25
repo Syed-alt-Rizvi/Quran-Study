@@ -45,10 +45,10 @@ interface SettingsState {
   // Generalized App Utility Settings
   defaultAppTab: AppTab;
   hapticsEnabled: boolean;
-  mafatihAutoScroll: boolean;
   mafatihFontSize: number;
   mafatihShowTranslation: boolean;
   mafatihDefaultSpeed: number;
+  globalAudioSpeed: number; // Reimagined unified global playback speed (0.5x, 0.75x, 1x, 1.25x, 1.5x, 1.75x, 2x)
   scienceCategory: string;
   mafatihBookmarks: string[];
   mafatihRecentIds: string[];
@@ -78,12 +78,11 @@ interface SettingsState {
   setUserName: (name: string) => void;
   setDefaultAppTab: (tab: AppTab) => void;
   toggleHaptics: () => void;
-  toggleMafatihAutoScroll: () => void;
-  setMafatihAutoScroll: (val: boolean) => void;
   setMafatihFontSize: (val: number) => void;
   toggleMafatihShowTranslation: () => void;
   setMafatihShowTranslation: (val: boolean) => void;
   setMafatihDefaultSpeed: (speed: number) => void;
+  setGlobalAudioSpeed: (speed: number) => void;
   setScienceCategory: (cat: string) => void;
   addMafatihBookmark: (id: string) => void;
   removeMafatihBookmark: (id: string) => void;
@@ -117,10 +116,10 @@ export const useSettingsStore = create<SettingsState>()(
       userName: '',
       defaultAppTab: 'quran',
       hapticsEnabled: true,
-      mafatihAutoScroll: true,
       mafatihFontSize: 28,
       mafatihShowTranslation: true,
       mafatihDefaultSpeed: 1,
+      globalAudioSpeed: 1,
       scienceCategory: 'all',
       mafatihBookmarks: [],
       mafatihRecentIds: ['maf_dua46b', 'maf_dua40', 'maf_ziy86'],
@@ -190,12 +189,11 @@ export const useSettingsStore = create<SettingsState>()(
       setUserName: (name) => set({ userName: name }),
       setDefaultAppTab: (tab) => set({ defaultAppTab: tab }),
       toggleHaptics: () => set((state) => ({ hapticsEnabled: !state.hapticsEnabled })),
-      toggleMafatihAutoScroll: () => set((state) => ({ mafatihAutoScroll: !state.mafatihAutoScroll })),
-      setMafatihAutoScroll: (val) => set({ mafatihAutoScroll: val }),
       setMafatihFontSize: (val) => set({ mafatihFontSize: val }),
       toggleMafatihShowTranslation: () => set((state) => ({ mafatihShowTranslation: !state.mafatihShowTranslation })),
       setMafatihShowTranslation: (val) => set({ mafatihShowTranslation: val }),
-      setMafatihDefaultSpeed: (speed) => set({ mafatihDefaultSpeed: speed }),
+      setMafatihDefaultSpeed: (speed) => set({ mafatihDefaultSpeed: speed, globalAudioSpeed: speed }),
+      setGlobalAudioSpeed: (speed) => set({ globalAudioSpeed: speed, mafatihDefaultSpeed: speed }),
       setScienceCategory: (cat) => set({ scienceCategory: cat }),
       addMafatihBookmark: (id) => set((state) => ({
         mafatihBookmarks: state.mafatihBookmarks.includes(id) 

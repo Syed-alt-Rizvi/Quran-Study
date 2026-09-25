@@ -8,6 +8,13 @@ import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, im
 import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper";
+import {
+  getMafatihCategories,
+  getMafatihItemsList,
+  getOrFetchMafatihItem,
+  getScrapeStatus,
+  startBackgroundScraper
+} from "./server/mafatihService";
 
 async function startServer() {
   const app = express();
@@ -213,6 +220,13 @@ async function startServer() {
       }
     } catch (e) {
       console.error("Failed to seed database:", e);
+    }
+
+    // Start background scraper for Mafatih Al Jinan supplications
+    try {
+      startBackgroundScraper();
+    } catch (e) {
+      console.error("Failed to start Mafatih background scraper:", e);
     }
   })();
 
@@ -493,96 +507,15 @@ async function startServer() {
   });
 
   // --- Mafatih Al Jinan Endpoints ---
-  let mafatihIndexCache: any[] | null = null;
-  let mafatihFullCache: Map<string, any> | null = null;
 
-  function loadMafatihData(): any[] {
-    if (!mafatihIndexCache || mafatihIndexCache.length === 0) {
-      try {
-        const candidatePaths = [
-          path.join(process.cwd(), 'public', 'mafatih_index.json'),
-          path.join(process.cwd(), 'src', 'db', 'mafatih_index.json'),
-          path.join(process.cwd(), 'dist', 'mafatih_index.json')
-        ];
-        for (const p of candidatePaths) {
-          if (fs.existsSync(p)) {
-            mafatihIndexCache = JSON.parse(fs.readFileSync(p, 'utf8'));
-            break;
-          }
-        }
-        if (!mafatihIndexCache) mafatihIndexCache = [];
-      } catch (e) {
-        console.error("Error loading mafatih index:", e);
-        mafatihIndexCache = [];
-      }
-    }
-    return mafatihIndexCache || [];
-  }
 
-  function getMafatihItem(id: string): any | null {
-    if (!mafatihFullCache) {
-      mafatihFullCache = new Map();
-      try {
-        const candidatePaths = [
-          path.join(process.cwd(), 'src', 'db', 'mafatih_full_data.json'),
-          path.join(process.cwd(), 'dist', 'mafatih_full_data.json'),
-          path.join(process.cwd(), 'public', 'mafatih_full_data.json')
-        ];
-        for (const fullPath of candidatePaths) {
-          if (fs.existsSync(fullPath)) {
-            const items: any[] = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-            for (const item of items) {
-              mafatihFullCache.set(item.id, item);
-              if (item.code && !mafatihFullCache.has(item.code)) {
-                mafatihFullCache.set(item.code, item);
-              }
-            }
-            break;
-          }
-        }
-          // Also set convenience aliases
-          const aliases: Record<string, string> = {
-            'kumayl': 'maf_dua40',
-            'kumail': 'maf_dua40',
-            'tawassul': 'maf_dua51',
-            'ashura': 'maf_ziy86',
-            'nudba': 'maf_ziy126a',
-            'nudbah': 'maf_ziy126a',
-            'faraj': 'maf_dua46b',
-            'kisa': 'h_kisa',
-            'ahad': 'maf_ziy128',
-            'waritha': 'maf_ziy73a',
-            'mashlool': 'maf_dua43',
-            'sabah': 'maf_dua39',
-            'jawshan': 'maf_dua47',
-          };
-          for (const [alias, realId] of Object.entries(aliases)) {
-            const resolved = mafatihFullCache.get(realId);
-            if (resolved) {
-              mafatihFullCache.set(alias, resolved);
-            }
-          }
-      } catch (e) {
-        console.error("Failed to load mafatih full data:", e);
-      }
-    }
-    return mafatihFullCache.get(id) || null;
-  }
+
 
   // Get categories with counts
   app.get("/api/mafatih/categories", (req, res) => {
     try {
-      const index = loadMafatihData();
-      const catMap = new Map<string, { name: string; code: string; count: number; audioCount: number }>();
-      for (const item of index) {
-        const catName = item.mainCategory || "General";
-        const catCode = item.mainCategoryCode || "general";
-        const cur = catMap.get(catName) || { name: catName, code: catCode, count: 0, audioCount: 0 };
-        cur.count++;
-        if (item.hasAudio) cur.audioCount++;
-        catMap.set(catName, cur);
-      }
-      res.json(Array.from(catMap.values()));
+      const categories = getMafatihCategories();
+      res.json(categories);
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
@@ -591,52 +524,25 @@ async function startServer() {
   // Get list of items with filtering, search, and pagination
   app.get("/api/mafatih/items", (req, res) => {
     try {
-      const index = loadMafatihData();
-      const { category, search, hasAudio, limit = "50", offset = "0" } = req.query;
-
-      let filtered = index;
-      if (category && category !== "all") {
-        const catLower = String(category).toLowerCase();
-        filtered = filtered.filter(i => 
-          i.mainCategory?.toLowerCase() === catLower || 
-          i.mainCategoryCode?.toLowerCase() === catLower ||
-          i.categoryChain?.some((c: string) => c.toLowerCase() === catLower)
-        );
-      }
-
-      if (search && typeof search === "string" && search.trim().length > 0) {
-        const q = search.toLowerCase().trim();
-        filtered = filtered.filter(i => 
-          i.title?.toLowerCase().includes(q) ||
-          i.snippet?.toLowerCase().includes(q) ||
-          i.categoryChain?.some((c: string) => c.toLowerCase().includes(q))
-        );
-      }
-
-      if (hasAudio === "true") {
-        filtered = filtered.filter(i => i.hasAudio);
-      }
-
-      const parsedLimit = Math.min(Math.max(parseInt(limit as string) || 50, 1), 500);
-      const parsedOffset = Math.max(parseInt(offset as string) || 0, 0);
-
-      const items = filtered.slice(parsedOffset, parsedOffset + parsedLimit);
-      res.json({
-        total: filtered.length,
-        offset: parsedOffset,
-        limit: parsedLimit,
-        items
+      const { category, search, hasAudio, limit, offset } = req.query;
+      const result = getMafatihItemsList({
+        category: category as string,
+        search: search as string,
+        hasAudio: hasAudio === "true",
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+        offset: offset ? parseInt(offset as string, 10) : undefined,
       });
+      res.json(result);
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
   });
 
-  // Get single full item with verses, arabic, translation, audio
-  app.get("/api/mafatih/items/:id", (req, res) => {
+  // Get single full item with verses, arabic, translation, audio (dynamically fetched & cached)
+  app.get("/api/mafatih/items/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const item = getMafatihItem(id);
+      const item = await getOrFetchMafatihItem(id);
       if (!item) {
         return res.status(404).json({ error: "Mafatih item not found" });
       }
@@ -644,6 +550,17 @@ async function startServer() {
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
+  });
+
+  // Scraper status
+  app.get("/api/mafatih/status", (req, res) => {
+    res.json(getScrapeStatus());
+  });
+
+  // Manual trigger for background scraper
+  app.post("/api/mafatih/start-scrape", (req, res) => {
+    startBackgroundScraper();
+    res.json({ message: "Background scraper initiated", status: getScrapeStatus() });
   });
 
   // Audio proxy to bypass strict CORS if needed

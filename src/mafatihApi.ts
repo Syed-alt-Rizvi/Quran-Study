@@ -114,6 +114,25 @@ export async function fetchMafatihCategories(): Promise<MafatihCategory[]> {
   return [];
 }
 
+function normalizeSearchText(str: string): string {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .replace(/[’'`\-_]/g, "")
+    .replace(/hadith|hadees|hadis|hadeeth/g, "hadis")
+    .replace(/kisaa?|kisa/g, "kisa")
+    .replace(/ziyara[th]|ziyarat/g, "ziyarat")
+    .replace(/kumayl|kumail/g, "kumail")
+    .replace(/ay/g, "ai")
+    .replace(/ee/g, "i")
+    .replace(/oo/g, "u")
+    .replace(/ou/g, "u")
+    .replace(/th/g, "s")
+    .replace(/dh/g, "z")
+    .replace(/ah\b/g, "at")
+    .replace(/aa/g, "a");
+}
+
 export async function fetchMafatihItems(params: {
   category?: string;
   search?: string;
@@ -151,21 +170,71 @@ export async function fetchMafatihItems(params: {
     if (index.length > 0) {
       let filtered = index;
       if (params.category && params.category !== 'all') {
-        const catLower = params.category.toLowerCase();
-        filtered = filtered.filter(i => 
-          i.mainCategory?.toLowerCase() === catLower || 
-          i.mainCategoryCode?.toLowerCase() === catLower ||
-          i.categoryChain?.some(c => c.toLowerCase() === catLower)
-        );
+        const catLower = params.category.toLowerCase().trim();
+        if (catLower === "ziyaraat" || catLower === "ziyarat") {
+          filtered = filtered.filter(
+            (i) =>
+              i.mainCategory?.toLowerCase().includes("ziyaraat") ||
+              i.mainCategory?.toLowerCase().includes("ziyarat") ||
+              i.categoryChain?.some((c) => c.toLowerCase().includes("ziyara"))
+          );
+        } else if (catLower === "duas" || catLower === "dua") {
+          filtered = filtered.filter(
+            (i) =>
+              i.mainCategory?.toLowerCase().includes("dua") ||
+              i.mainCategory?.toLowerCase().includes("supplication") ||
+              i.categoryChain?.some((c) => c.toLowerCase().includes("dua"))
+          );
+        } else if (catLower === "namaz" || catLower === "prayers") {
+          filtered = filtered.filter(
+            (i) =>
+              i.mainCategory?.toLowerCase().includes("namaz") ||
+              i.mainCategory?.toLowerCase().includes("prayer")
+          );
+        } else {
+          filtered = filtered.filter(i => 
+            i.mainCategory?.toLowerCase() === catLower || 
+            i.mainCategoryCode?.toLowerCase() === catLower ||
+            i.categoryChain?.some(c => c.toLowerCase() === catLower)
+          );
+        }
       }
 
       if (params.search && params.search.trim().length > 0) {
-        const q = params.search.toLowerCase().trim();
-        filtered = filtered.filter(i => 
-          i.title?.toLowerCase().includes(q) ||
-          i.snippet?.toLowerCase().includes(q) ||
-          i.categoryChain?.some(c => c.toLowerCase() === q)
-        );
+        const rawQ = params.search.toLowerCase().trim();
+        const normQ = normalizeSearchText(rawQ);
+        const tokens = normQ.split(/\s+/).filter(Boolean);
+
+        filtered = filtered.filter(i => {
+          const rawTitle = (i.title || "").toLowerCase();
+          const rawSnippet = (i.snippet || "").toLowerCase();
+          const rawChain = (i.categoryChain || []).join(" ").toLowerCase();
+          const normTitle = normalizeSearchText(i.title || "");
+          const normSnippet = normalizeSearchText(i.snippet || "");
+          const normChain = normalizeSearchText((i.categoryChain || []).join(" "));
+
+          if (
+            rawTitle.includes(rawQ) ||
+            rawSnippet.includes(rawQ) ||
+            rawChain.includes(rawQ) ||
+            normTitle.includes(normQ) ||
+            normSnippet.includes(normQ) ||
+            normChain.includes(normQ)
+          ) {
+            return true;
+          }
+
+          if (tokens.length > 1) {
+            return tokens.every(
+              t =>
+                normTitle.includes(t) ||
+                normSnippet.includes(t) ||
+                normChain.includes(t)
+            );
+          }
+
+          return false;
+        });
       }
 
       if (params.hasAudio) {
@@ -208,5 +277,16 @@ export async function fetchMafatihItem(id: string): Promise<MafatihDetail | null
       }
     }
   }
+
+  // Fallback: direct static item JSON file if available
+  try {
+    const res = await fetch(`/mafatih_items/${encodeURIComponent(id)}.json`);
+    if (res.ok) {
+      const data: MafatihDetail = await res.json();
+      itemCache.set(id, data);
+      return data;
+    }
+  } catch {}
+
   return null;
 }
