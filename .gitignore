@@ -22,6 +22,7 @@ android/build/
 *.sqlite
 *.sqlite3
 *.jar
+!**/gradle-wrapper.jar
 /scripts/
 recovered.sql
 DRAFT_firestore.rules
