@@ -17,9 +17,6 @@ concurrency:
   group: android-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
-permissions:
-  contents: read
-
 jobs:
   build-android:
     name: Build Android APK & Play Store Bundle
@@ -64,8 +61,11 @@ jobs:
       - name: Configure Android SDK Environment
         run: |
           set -e
-          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+          ANDROID_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "sdk.dir=$ANDROID_PATH" > android/local.properties
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses 2>/dev/null || true
+          fi
 
       - name: Set up Gradle 8.14.3
         uses: gradle/actions/setup-gradle@v4
@@ -77,48 +77,30 @@ jobs:
         run: |
           chmod +x android/gradlew
 
+      - name: Decode Custom Keystore if Configured
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+          echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+
       - name: Build Direct Installation APK (assembleDebug)
-        if: ${{ github.event.inputs.build_target != 'playstore_bundle' }}
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'playstore_bundle' }}
         working-directory: ./android
         run: |
           echo "Executing Gradle assembleDebug..."
           ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Build Android App Bundle for Google Play (bundleRelease)
-        if: ${{ github.event.inputs.build_target != 'direct_install_apk' }}
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
           echo "Executing Gradle bundleRelease..."
           ./gradlew bundleRelease --no-daemon --stacktrace
-
-      - name: Sign & Prepare Play Store Bundle
-        run: |
-          set -e
-          # Locate generated AAB bundle
-          AAB_FILE=$(find android/app/build/outputs/bundle -name "*.aab" 2>/dev/null | head -n 1)
-          if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
-            echo "Found AAB file at: $AAB_FILE"
-            
-            # Check if custom repository signing secrets exist
-            if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
-              echo "Signing with repository secret keystore..."
-              echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android_keystore.jks
-              jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-                -keystore android_keystore.jks \
-                -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-                -keypass "${{ secrets.KEY_PASSWORD }}" \
-                "$AAB_FILE" "${{ secrets.KEY_ALIAS }}"
-            else
-              echo "Signing AAB with generated production upload key for Google Play Console compatibility..."
-              keytool -genkey -v -keystore android_upload_keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 \
-                -storepass "tafseerenamoona" -keypass "tafseerenamoona" \
-                -dname "CN=Quran Study, OU=Mobile, O=Tafseer-e-Namoona, L=Global, S=Global, C=US"
-              jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-                -keystore android_upload_keystore.jks \
-                -storepass "tafseerenamoona" -keypass "tafseerenamoona" \
-                "$AAB_FILE" upload
-            fi
-          fi
 
       - name: Collect and Verify Distribution Artifacts
         run: |
