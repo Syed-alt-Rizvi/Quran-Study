@@ -1,25 +1,25 @@
-name: Continuous Integration
+name: Continuous Integration & Android Release
 
 on:
   push:
     branches: [main, master]
-    paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - ".gitattributes"
-      - "firestore.rules"
-      - "firebase-blueprint.json"
   pull_request:
     branches: [main, master]
-    paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - ".gitattributes"
   workflow_dispatch:
+    inputs:
+      build_target:
+        description: "Build Target"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - direct_install_apk
+          - playstore_bundle
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -66,3 +66,185 @@ jobs:
           # Syntax validate compiled server bundle
           node -c dist/server.cjs
           echo "✓ Client assets and server bundle verified successfully."
+
+  build-android:
+    name: Build Android APK & Play Store Bundle
+    needs: quality-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Node Dependencies
+        run: |
+          npm ci --prefer-offline || npm install --legacy-peer-deps
+
+      - name: Compile Web Application
+        run: |
+          npm run build
+
+      - name: Generate Mobile Asset Graphics
+        run: |
+          node prepare-assets.cjs
+          npx capacitor-assets generate --android --iconBackgroundColor '#059669' --iconBackgroundColorDark '#047857' --splashBackgroundColor '#059669' --splashBackgroundColorDark '#047857' || true
+
+      - name: Sync Capacitor Android
+        run: |
+          npx cap sync android
+          # Exclude backend server bundle from Android client webview assets
+          rm -f android/app/src/main/assets/public/server.cjs || true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Configure Android SDK Environment
+        run: |
+          set -e
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+
+      - name: Set up Gradle 8.14.3
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+          build-root-directory: ./android
+
+      - name: Validate Gradle Wrapper Permissions
+        run: |
+          chmod +x android/gradlew
+
+      - name: Build Direct Installation APK (assembleDebug)
+        if: ${{ github.event.inputs.build_target != 'playstore_bundle' }}
+        working-directory: ./android
+        run: |
+          echo "Executing Gradle assembleDebug..."
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Build Android App Bundle for Google Play (bundleRelease)
+        if: ${{ github.event.inputs.build_target != 'direct_install_apk' }}
+        working-directory: ./android
+        run: |
+          echo "Executing Gradle bundleRelease..."
+          ./gradlew bundleRelease --no-daemon --stacktrace
+
+      - name: Sign & Prepare Play Store Bundle
+        run: |
+          set -e
+          # Locate generated AAB bundle
+          AAB_FILE=$(find android/app/build/outputs/bundle -name "*.aab" 2>/dev/null | head -n 1)
+          if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
+            echo "Found AAB file at: $AAB_FILE"
+            
+            # Check if custom repository signing secrets exist
+            if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+              echo "Signing with repository secret keystore..."
+              echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android_keystore.jks
+              jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+                -keystore android_keystore.jks \
+                -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+                -keypass "${{ secrets.KEY_PASSWORD }}" \
+                "$AAB_FILE" "${{ secrets.KEY_ALIAS }}"
+            else
+              echo "Signing AAB with generated production upload key for Google Play Console compatibility..."
+              keytool -genkey -v -keystore android_upload_keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 \
+                -storepass "tafseerenamoona" -keypass "tafseerenamoona" \
+                -dname "CN=Quran Study, OU=Mobile, O=Tafseer-e-Namoona, L=Global, S=Global, C=US"
+              jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+                -keystore android_upload_keystore.jks \
+                -storepass "tafseerenamoona" -keypass "tafseerenamoona" \
+                "$AAB_FILE" upload
+            fi
+          fi
+
+      - name: Collect and Verify Distribution Artifacts
+        run: |
+          set -e
+          mkdir -p dist-mobile/apk dist-mobile/bundle
+
+          # 1. Direct Install APK verification & collection
+          DEBUG_APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" dist-mobile/apk/Shia-Markaz-DirectInstall.apk
+            cp "$DEBUG_APK" dist-mobile/apk/app-debug.apk
+            echo "✓ Direct-install APK ready: $(ls -lh dist-mobile/apk/Shia-Markaz-DirectInstall.apk)"
+          elif [ "${{ github.event.inputs.build_target }}" != "playstore_bundle" ]; then
+            echo "::error::Expected Debug APK at $DEBUG_APK but file was not found!"
+            exit 1
+          fi
+
+          # 2. Google Play Store AAB collection
+          AAB_FILE=$(find android/app/build/outputs/bundle -name "*.aab" 2>/dev/null | head -n 1)
+          if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
+            cp "$AAB_FILE" dist-mobile/bundle/Shia-Markaz-PlayStore.aab
+            echo "✓ Play Store Bundle ready: $(ls -lh dist-mobile/bundle/Shia-Markaz-PlayStore.aab)"
+          elif [ "${{ github.event.inputs.build_target }}" != "direct_install_apk" ]; then
+            echo "::error::Expected Play Store AAB file but none was found!"
+            exit 1
+          fi
+
+          # 3. Create comprehensive distribution documentation
+          cat << 'EOF' > dist-mobile/README.txt
+======================================================
+SHIA MARKAZ - ANDROID INSTALLATION & PLAY STORE GUIDE
+======================================================
+
+1. DIRECT INSTALLATION ON ANDROID DEVICES (Sideload):
+   - File: apk/Shia-Markaz-DirectInstall.apk
+   - Compatibility: Android 7.0 (API 24) to Android 15 (API 35)
+   - Instructions:
+     1. Download Shia-Markaz-DirectInstall.apk directly to your Android device.
+     2. Open your device's Files or Downloads app.
+     3. Tap on the APK file.
+     4. If prompted, select "Settings" and toggle "Allow from this source".
+     5. Tap "Install". The complete Shia Markaz app is now installed!
+
+2. GOOGLE PLAY STORE CONSOLE UPLOAD:
+   - File: bundle/Shia-Markaz-PlayStore.aab
+   - Format: Android App Bundle (.aab)
+   - Application ID: com.tafseerenamoona.app
+   - Instructions:
+     1. Open Google Play Console (https://play.google.com/console).
+     2. Select your application or click "Create app".
+     3. In the left navigation, go to "Release" -> "Production" (or "Testing" -> "Internal testing").
+     4. Click "Create new release".
+     5. Drag and drop Shia-Markaz-PlayStore.aab into the "App bundles" upload area.
+     6. Complete your release notes, click "Next", and then "Save and publish".
+======================================================
+EOF
+
+      - name: Upload Direct Install APK Artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ hashFiles('dist-mobile/apk/*.apk') != '' }}
+        with:
+          name: Shia-Markaz-DirectInstall-APK
+          path: dist-mobile/apk/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload Google Play Store Bundle Artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ hashFiles('dist-mobile/bundle/*.aab') != '' }}
+        with:
+          name: Shia-Markaz-PlayStore-AAB
+          path: dist-mobile/bundle/*.aab
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload Complete Android Release Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shia-Markaz-Android-Full-Package
+          path: dist-mobile/**
+          retention-days: 30
+          if-no-files-found: error

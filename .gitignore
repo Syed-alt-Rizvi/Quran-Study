@@ -13,7 +13,7 @@ dist/kauthar.json
 *mafatih_full_data.json
 src/db/imam_science_data.json
 android/app/src/main/assets/public/
-ios/App/App/public/
+ios/
 android/.gradle/
 android/app/build/
 android/build/

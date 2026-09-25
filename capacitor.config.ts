@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.tafseerenamoona.app',
-  appName: 'Quran Study',
+  appName: 'Shia Markaz',
   webDir: 'dist',
   plugins: {
     CapacitorHttp: {

@@ -26,9 +26,11 @@ async function prepare() {
 
   const iconOk = isValidPng(iconPng);
   const splashOk = isValidPng(splashPng);
+  const iconNeedsUpdate = !iconOk || !fs.existsSync(iconPng) || (fs.existsSync(iconSvg) && fs.statSync(iconSvg).mtimeMs > fs.statSync(iconPng).mtimeMs);
+  const splashNeedsUpdate = !splashOk || !fs.existsSync(splashPng) || (fs.existsSync(splashSvg) && fs.statSync(splashSvg).mtimeMs > fs.statSync(splashPng).mtimeMs);
 
-  if (iconOk && splashOk) {
-    console.log('✓ Assets already have valid PNG headers.');
+  if (!iconNeedsUpdate && !splashNeedsUpdate) {
+    console.log('✓ Assets are up-to-date and have valid PNG headers.');
     return;
   }
 
@@ -41,11 +43,11 @@ async function prepare() {
   }
 
   if (sharp) {
-    if (!iconOk && fs.existsSync(iconSvg)) {
+    if (iconNeedsUpdate && fs.existsSync(iconSvg)) {
       await sharp(iconSvg).resize(1024, 1024).png().toFile(iconPng);
       console.log('✓ Generated icon.png from SVG');
     }
-    if (!splashOk && fs.existsSync(splashSvg)) {
+    if (splashNeedsUpdate && fs.existsSync(splashSvg)) {
       await sharp(splashSvg).resize(2732, 2732).png().toFile(splashPng);
       console.log('✓ Generated splash.png from SVG');
     }
