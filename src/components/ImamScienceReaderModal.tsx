@@ -91,7 +91,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
         })
         .catch(() => {
           // Fallback to static offline file if bundled
-          return fetch(`/imam_science_articles/${article.slug}.json`)
+          return fetch(getApiUrl(`/imam_science_articles/${article.slug}.json`))
             .then(res => res.json())
             .then(data => {
               if (data && data.content) {
@@ -245,7 +245,7 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
           </div>
 
           {/* Sticky Reader Header */}
-          <header className={`sticky top-0 z-30 flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3 border-b border-black/5 dark:border-white/10 backdrop-blur-md transition-colors pt-safe ${
+          <header className={`sticky top-0 z-30 flex items-center justify-between app-header-safe pb-2.5 sm:pb-3 border-b border-black/5 dark:border-white/10 backdrop-blur-md transition-colors ${
             readerTheme === 'twilight' ? 'bg-[#0a0f1d]/90' : readerTheme === 'paper' ? 'bg-[#faf7f0]/90 dark:bg-[#111726]/90' : 'bg-white/90 dark:bg-slate-950/90'
           }`}>
             {/* Left: Back & Category Pill */}

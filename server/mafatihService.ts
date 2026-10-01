@@ -64,13 +64,16 @@ const ALIASES: Record<string, string> = {
   kisa: "h_kisa",
   ahad: "maf_ziy128",
   waritha: "maf_ziy73a",
+  wareeth: "maf_ziy73a",
   mashlool: "maf_dua43",
   sabah: "maf_dua39",
   jawshan: "maf_dua47",
   joshan: "maf_dua47",
-  mujir: "maf_dua44",
-  mujeer: "maf_dua44",
-  iftitah: "maf_dua45",
+  mujir: "maf_dua45",
+  mujeer: "maf_dua45",
+  iftitah: "maf_aamal30",
+  yastasheer: "maf_dua44",
+  adilah: "maf_dua46",
   samata: "maf_dua41",
   simaat: "maf_dua41",
   yasin: "surah_yasin",
@@ -392,12 +395,15 @@ export async function getOrFetchMafatihItem(id: string): Promise<MafatihDetail |
       const html = await res.text();
       const detail = parseMafatihHtml(html, resolvedId, metaFallback);
 
-      // Save to disk cache (.cache/mafatih_items)
-      try {
-        if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
-        fs.writeFileSync(cachePath, JSON.stringify(detail, null, 2), "utf8");
-      } catch (err) {
-        console.error(`Failed to write disk cache for ${resolvedId}:`, err);
+      // Save to disk cache (.cache/mafatih_items) only if valid content was retrieved
+      const hasValidContent = (detail.verses && detail.verses.length > 0) || (detail.introduction && detail.introduction.length > 50);
+      if (hasValidContent) {
+        try {
+          if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+          fs.writeFileSync(cachePath, JSON.stringify(detail, null, 2), "utf8");
+        } catch (err) {
+          console.error(`Failed to write disk cache for ${resolvedId}:`, err);
+        }
       }
 
       // Save to in-memory cache

@@ -18,6 +18,7 @@ import { ImpactStyle } from '@capacitor/haptics';
 import { registerModal } from '../utils/modalBackHandler';
 import SignInModal from './SignInModal';
 import ReportModal from './ReportModal';
+import { getApiUrl } from '../utils/apiBase';
 
 interface Discussion {
   id: string;
@@ -119,8 +120,16 @@ export default function GlobalDiscussions() {
       setDiscussions(docs);
       setLoading(false);
     }, (error) => {
-      console.error("Firestore Error:", error);
-      setLoading(false);
+      console.warn("Firestore listener notice:", error);
+      fetch(getApiUrl('/api/discussions'))
+        .then(res => res.ok ? res.json() : [])
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setDiscussions(data);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
     });
 
     return () => {

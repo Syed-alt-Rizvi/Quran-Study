@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
+import os from "os";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import { db } from "./src/db";
 import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema";
@@ -15,6 +17,12 @@ import {
   getScrapeStatus,
   startBackgroundScraper
 } from "./server/mafatihService";
+import {
+  getOrFetchNamoonaSurah,
+  getNamoonaAyah,
+  getNamoonaHtml,
+  startNamoonaBackgroundCrawler
+} from "./server/namoonaService";
 
 async function startServer() {
   const app = express();
@@ -23,6 +31,20 @@ async function startServer() {
   app.use(cors());
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // Support custom domain forwarding (with or without iframe masking) and CORS
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, Pragma');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+    res.removeHeader('X-Frame-Options');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+    next();
+  });
 
   // Request error handler for payload size and body parsing errors
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -39,6 +61,37 @@ async function startServer() {
   // API routes FIRST
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  const getAppBuildId = () => {
+    if (process.env.BUILD_TIME) return process.env.BUILD_TIME;
+    const candidates = [
+      path.join(process.cwd(), "dist", "build_id.txt"),
+      path.join(process.cwd(), "public", "build_id.txt")
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        try {
+          const val = fs.readFileSync(p, "utf8").trim();
+          if (val) return val;
+        } catch (e) {}
+      }
+    }
+    return "1.2.0";
+  };
+
+  app.get("/api/version", (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.removeHeader('ETag');
+    res.removeHeader('Last-Modified');
+    res.json({
+      version: getAppBuildId(),
+      serverTime: new Date().toISOString(),
+      app: "Shia Markaz"
+    });
   });
 
   // Google Play Compliance Public Routes
@@ -228,21 +281,63 @@ async function startServer() {
     } catch (e) {
       console.error("Failed to start Mafatih background scraper:", e);
     }
+
+    // Start background crawler for Tafseer Namoona surahs
+    try {
+      startNamoonaBackgroundCrawler();
+    } catch (e) {
+      console.error("Failed to start Namoona background crawler:", e);
+    }
   })();
 
 
-  // API route for proxying HTML to bypass CORS on the web
+  // Fast cached API route for proxying HTML to bypass CORS on the web
   app.get("/api/tafseer/proxy/:id", async (req, res) => {
     try {
-      const id = req.params.id;
-      const fetchRes = await fetch(`https://www.tafseerenamoona.net/surahs/${id}`);
-      if (!fetchRes.ok) {
-        return res.status(fetchRes.status).json({ error: "Failed to fetch from tafseerenamoona.net" });
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id) || id < 1 || id > 114) {
+        return res.status(400).json({ error: "Invalid surah number" });
       }
-      const html = await fetchRes.text();
+      const html = await getNamoonaHtml(id);
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
       res.send(html);
     } catch (e: any) {
-      console.error(e);
+      console.error(`[TafseerProxy] Error fetching Surah ${req.params.id}:`, e.message);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Tafseer Namoona Pre-parsed JSON API (10x faster, clean JSON, disk-cached)
+  app.get("/api/tafseer/namoona/:surah", async (req, res) => {
+    try {
+      const s = parseInt(req.params.surah, 10);
+      if (isNaN(s) || s < 1 || s > 114) {
+        return res.status(400).json({ error: "Invalid surah number" });
+      }
+      const surahData = await getOrFetchNamoonaSurah(s);
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.json(surahData);
+    } catch (e: any) {
+      console.error(`[TafseerNamoona] Error fetching Surah ${req.params.surah}:`, e.message);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.get("/api/tafseer/namoona/:surah/:ayah", async (req, res) => {
+    try {
+      const s = parseInt(req.params.surah, 10);
+      const a = parseInt(req.params.ayah, 10);
+      if (isNaN(s) || isNaN(a) || s < 1 || s > 114 || a < 1) {
+        return res.status(400).json({ error: "Invalid surah or ayah number" });
+      }
+      const ayahData = await getNamoonaAyah(s, a);
+      if (!ayahData) {
+        return res.status(404).json({ error: `Ayah ${a} not found in Tafseer Namoona for Surah ${s}` });
+      }
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.json(ayahData);
+    } catch (e: any) {
+      console.error(`[TafseerNamoona] Error fetching Surah ${req.params.surah} Ayah ${req.params.ayah}:`, e.message);
       res.status(500).json({ error: e.message });
     }
   });
@@ -563,39 +658,326 @@ async function startServer() {
     res.json({ message: "Background scraper initiated", status: getScrapeStatus() });
   });
 
-  // Audio proxy to bypass strict CORS if needed
+  // High-performance disk-cached Audio proxy with full Range & 206 Partial Content support
+  const AUDIO_CACHE_DIR = path.join(os.tmpdir(), "shia_markaz_cache", "mafatih_audio");
+  if (!fs.existsSync(AUDIO_CACHE_DIR)) {
+    try {
+      fs.mkdirSync(AUDIO_CACHE_DIR, { recursive: true });
+    } catch (e) {}
+  }
+
   app.get("/api/mafatih/audio-proxy", async (req, res) => {
     try {
       const audioUrl = req.query.url as string;
       if (!audioUrl || !audioUrl.startsWith("http")) {
         return res.status(400).send("Invalid audio URL");
       }
-      const upstream = await fetch(audioUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShiaQuranApp/1.0',
-          'Referer': 'https://www.ya-mahdi.net/'
+
+      // Hash URL for stable, collision-free local filename
+      const urlHash = crypto.createHash("md5").update(audioUrl).digest("hex");
+      const ext = audioUrl.toLowerCase().includes(".m4a") ? ".m4a" : ".mp3";
+      const cachedFile = path.join(AUDIO_CACHE_DIR, `${urlHash}${ext}`);
+      const mimeType = ext === ".m4a" ? "audio/mp4" : "audio/mpeg";
+
+      // Helper to stream file from local disk with byte range support
+      const streamLocalFile = () => {
+        const stat = fs.statSync(cachedFile);
+        const totalSize = stat.size;
+        const range = req.headers.range;
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Range, Content-Type, Accept");
+        res.setHeader("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges");
+        res.setHeader("Accept-Ranges", "bytes");
+        res.setHeader("Cache-Control", "public, max-age=604800");
+        res.setHeader("Content-Type", mimeType);
+
+        if (range) {
+          const parts = range.replace(/bytes=/, "").split("-");
+          const start = parseInt(parts[0], 10);
+          const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
+
+          if (isNaN(start) || start >= totalSize || end >= totalSize || start > end) {
+            res.setHeader("Content-Range", `bytes */${totalSize}`);
+            return res.status(416).send("Requested Range Not Satisfiable");
+          }
+
+          const chunkSize = end - start + 1;
+          res.status(206);
+          res.setHeader("Content-Range", `bytes ${start}-${end}/${totalSize}`);
+          res.setHeader("Content-Length", chunkSize);
+
+          const stream = fs.createReadStream(cachedFile, { start, end });
+          stream.pipe(res);
+        } else {
+          res.status(200);
+          res.setHeader("Content-Length", totalSize);
+          const stream = fs.createReadStream(cachedFile);
+          stream.pipe(res);
         }
+      };
+
+      // 1. If already cached and valid, stream immediately from disk
+      if (fs.existsSync(cachedFile)) {
+        try {
+          const stat = fs.statSync(cachedFile);
+          if (stat.size > 2000) {
+            return streamLocalFile();
+          }
+        } catch (e) {}
+      }
+
+      // 2. Fetch from remote upstream with browser headers and Range forwarding
+      const forwardHeaders: Record<string, string> = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Referer": "https://www.ya-mahdi.net/",
+        "Accept": "*/*"
+      };
+
+      if (req.headers.range) {
+        forwardHeaders["Range"] = req.headers.range as string;
+      }
+
+      const upstream = await fetch(audioUrl, {
+        headers: forwardHeaders
       });
-      if (!upstream.ok) {
+
+      if (!upstream.ok && upstream.status !== 206) {
         return res.status(upstream.status).send("Failed to fetch audio stream");
       }
-      const contentType = upstream.headers.get("content-type") || "audio/mp4";
-      res.setHeader("Content-Type", contentType);
+
       res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Range, Content-Type, Accept");
+      res.setHeader("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges");
+      res.setHeader("Accept-Ranges", "bytes");
+      res.setHeader("Cache-Control", "public, max-age=604800");
+
+      const contentType = upstream.headers.get("content-type") || mimeType;
+      res.setHeader("Content-Type", contentType);
+
+      if (upstream.headers.has("content-length")) {
+        res.setHeader("Content-Length", upstream.headers.get("content-length")!);
+      }
+      if (upstream.headers.has("content-range")) {
+        res.setHeader("Content-Range", upstream.headers.get("content-range")!);
+      }
+
+      res.status(upstream.status);
+
       if (upstream.body) {
-        const arrayBuf = await upstream.arrayBuffer();
-        res.send(Buffer.from(arrayBuf));
+        const reader = upstream.body.getReader();
+        req.on("close", () => {
+          reader.cancel().catch(() => {});
+        });
+
+        // If whole stream was requested, cache it to disk in background
+        const shouldCache = !req.headers.range || req.headers.range === "bytes=0-";
+        const tempFile = `${cachedFile}.tmp.${Date.now()}`;
+        let writeStream: fs.WriteStream | null = null;
+        if (shouldCache) {
+          try {
+            writeStream = fs.createWriteStream(tempFile);
+          } catch (e) {}
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(value);
+          if (writeStream) {
+            writeStream.write(value);
+          }
+        }
+        res.end();
+
+        if (writeStream) {
+          writeStream.end(() => {
+            try {
+              if (fs.existsSync(tempFile) && fs.statSync(tempFile).size > 2000) {
+                fs.renameSync(tempFile, cachedFile);
+              } else if (fs.existsSync(tempFile)) {
+                fs.unlinkSync(tempFile);
+              }
+            } catch (e) {}
+          });
+        }
       } else {
-        res.status(404).send("Empty audio stream");
+        res.end();
       }
     } catch (e: any) {
-      res.status(500).send(e.message);
+      if (!res.headersSent) {
+        res.status(500).send(e.message);
+      }
     }
   });
 
-  // Always serve PWA service worker, manifest, and static data files with correct MIME types
-  app.get(['/sw.js', '/registerSW.js', '/manifest.webmanifest', '/mafatih_index.json'], (req, res, next) => {
+  // Fast static serving for individual Mafatih item files
+  app.get('/mafatih_items/:filename', (req, res, next) => {
+    const rawFilename = path.basename(req.params.filename);
+    const candidateDirs = [
+      path.join(process.cwd(), 'dist', 'mafatih_items'),
+      path.join(process.cwd(), 'public', 'mafatih_items'),
+      path.join(os.tmpdir(), 'shia_markaz_cache', 'mafatih_items')
+    ];
+
+    for (const dir of candidateDirs) {
+      if (!fs.existsSync(dir)) continue;
+      // 1. Direct match
+      const directPath = path.join(dir, rawFilename);
+      if (fs.existsSync(directPath)) {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.sendFile(directPath);
+      }
+      // 2. Case-insensitive fallback (e.g. Linux container case match)
+      try {
+        const lowerName = rawFilename.toLowerCase();
+        const files = fs.readdirSync(dir);
+        const match = files.find(f => f.toLowerCase() === lowerName);
+        if (match) {
+          const matchedPath = path.join(dir, match);
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.sendFile(matchedPath);
+        }
+      } catch (err) {}
+    }
+    next();
+  });
+
+  // Fast static and on-demand serving for Tafseer Namoona surah files
+  app.get('/tafseer_namoona/:filename', async (req, res) => {
+    const rawFilename = path.basename(req.params.filename);
+    const candidateDirs = [
+      path.join(process.cwd(), 'dist', 'tafseer_namoona'),
+      path.join(process.cwd(), 'public', 'tafseer_namoona'),
+    ];
+
+    for (const dir of candidateDirs) {
+      const directPath = path.join(dir, rawFilename);
+      if (fs.existsSync(directPath)) {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+        return res.sendFile(directPath);
+      }
+    }
+
+    // If not yet generated, attempt on-demand fetch and cache
+    const match = rawFilename.match(/^surah_(\d+)\.json$/i);
+    if (match) {
+      const surahNum = parseInt(match[1], 10);
+      if (surahNum >= 1 && surahNum <= 114) {
+        try {
+          const surahData = await getOrFetchNamoonaSurah(surahNum);
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=604800');
+          return res.json(surahData);
+        } catch (fetchErr: any) {
+          console.warn(`[TafseerRoute] Failed to fetch Surah ${surahNum} on demand:`, fetchErr?.message);
+        }
+      }
+    }
+
+    return res.status(404).json({ error: 'Tafseer Namoona file not found' });
+  });
+
+  // Fast static and on-demand serving for Tafseer Al-Kauthar ayah files and maps
+  app.get('/tafseer_kauthar/:filename', async (req, res, next) => {
+    const rawFilename = path.basename(req.params.filename);
+    const candidateDirs = [
+      path.join(process.cwd(), 'dist', 'tafseer_kauthar'),
+      path.join(process.cwd(), 'public', 'tafseer_kauthar'),
+    ];
+
+    for (const dir of candidateDirs) {
+      const directPath = path.join(dir, rawFilename);
+      if (fs.existsSync(directPath)) {
+        try {
+          const content = fs.readFileSync(directPath, 'utf8');
+          const parsed = JSON.parse(content);
+          if (parsed && (parsed.ur || parsed.tafseer_text) && parsed.ur.length > 30) {
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.setHeader('Cache-Control', 'public, max-age=604800');
+            return res.send(content);
+          }
+        } catch (e) {}
+      }
+    }
+
+    // Check maps directory if requested
+    const mapMatch = rawFilename.match(/^map_s(\d+)\.json$/i);
+    if (mapMatch) {
+      const s = parseInt(mapMatch[1], 10);
+      for (const dir of candidateDirs) {
+        const mapPath = path.join(dir, 'maps', rawFilename);
+        if (fs.existsSync(mapPath)) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=604800');
+          return res.sendFile(mapPath);
+        }
+      }
+    }
+
+    // On-demand fetch if not yet on disk: matches s{surah}_a{ayah}.json
+    const match = rawFilename.match(/^s(\d+)_a(\d+)\.json$/i);
+    if (match) {
+      const s = parseInt(match[1], 10);
+      const a = parseInt(match[2], 10);
+      if (s >= 1 && s <= 114 && a >= 1) {
+        try {
+          const item = await fetchTafseerAlKauthar(s, a);
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=604800');
+          return res.json(item);
+        } catch (fetchErr: any) {
+          console.warn(`[TafseerKautharRoute] Failed on-demand s${s}_a${a}:`, fetchErr?.message);
+        }
+      }
+    }
+
+    next();
+  });
+
+  // Environment check for development vs production
+  const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith("server.cjs");
+
+  // Always serve genuine PWA service worker with zero-cache headers when built
+  app.get('/sw.js', (req, res, next) => {
+    const distSw = path.join(process.cwd(), 'dist', 'sw.js');
+    if (fs.existsSync(distSw)) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+      res.removeHeader('ETag');
+      res.removeHeader('Last-Modified');
+      return res.sendFile(distSw);
+    }
+
+    if (!isProd) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      return res.send(`
+        self.addEventListener('install', () => self.skipWaiting());
+        self.addEventListener('activate', (e) => {
+          e.waitUntil(
+            self.registration.unregister().then(() => self.clients.matchAll()).then(clients => {
+              clients.forEach(client => client.navigate(client.url));
+            })
+          );
+        });
+      `);
+    }
+    next();
+  });
+
+  // Always serve PWA manifest and static data files with correct MIME types
+  app.get(['/registerSW.js', '/manifest.webmanifest', '/mafatih_index.json'], (req, res, next) => {
     const filename = req.path.replace(/^\//, '');
     const candidatePaths = [
       path.join(process.cwd(), 'dist', filename),
@@ -604,18 +986,20 @@ async function startServer() {
     ];
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
-        if (filename.endsWith('.js')) {
-          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-        } else if (filename.endsWith('.webmanifest')) {
-          res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+        if (filename.endsWith('.js') || filename.endsWith('.webmanifest')) {
+          res.setHeader('Content-Type', filename.endsWith('.js') ? 'application/javascript; charset=utf-8' : 'application/manifest+json; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+          res.setHeader('Surrogate-Control', 'no-store');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          res.removeHeader('ETag');
+          res.removeHeader('Last-Modified');
         } else if (filename.endsWith('.json')) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
           res.setHeader('Cache-Control', 'public, max-age=3600');
         }
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
         return res.sendFile(p);
       }
     }
@@ -631,9 +1015,14 @@ async function startServer() {
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
         res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+        res.setHeader('Surrogate-Control', 'no-store');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+        res.removeHeader('ETag');
+        res.removeHeader('Last-Modified');
         return res.sendFile(p);
       }
     }
@@ -641,7 +1030,6 @@ async function startServer() {
   });
 
   // Vite middleware for development
-  const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith("server.cjs");
   if (!isProd) {
     const vite = await createViteServer({
       server: {
@@ -656,17 +1044,40 @@ async function startServer() {
     // Ensure HTML and service workers are not cached stale so older clients seamlessly update
     app.use(express.static(distPath, {
       setHeaders: (res, filePath) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+        res.removeHeader('X-Frame-Options');
+
         if (filePath.endsWith('index.html') || filePath.endsWith('sw.js') || filePath.endsWith('manifest.webmanifest')) {
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+          res.setHeader('Surrogate-Control', 'no-store');
           res.setHeader('Pragma', 'no-cache');
           res.setHeader('Expires', '0');
+          res.removeHeader('ETag');
+          res.removeHeader('Last-Modified');
         }
       }
     }));
     app.get('*', (req, res) => {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      // Never return index.html for API routes, Tafseer assets, or JSON endpoints
+      if (
+        req.path.startsWith('/api/') ||
+        req.path.startsWith('/tafseer_') ||
+        req.path.startsWith('/mafatih_') ||
+        req.path.endsWith('.json')
+      ) {
+        return res.status(404).json({ error: "Endpoint or asset not found" });
+      }
+
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+      res.removeHeader('X-Frame-Options');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('Surrogate-Control', 'no-store');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
+      res.removeHeader('ETag');
+      res.removeHeader('Last-Modified');
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

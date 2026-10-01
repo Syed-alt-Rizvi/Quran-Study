@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useSettingsStore } from '../store';
-import { BookOpen, X } from 'lucide-react';
+import { BookOpen, X, ArrowLeft } from 'lucide-react';
+import { registerModal } from '../utils/modalBackHandler';
 
 export default function DuaScreen({ 
   onContinueExit,
@@ -10,7 +12,13 @@ export default function DuaScreen({
   onContinueExit: () => void;
   onCancel?: () => void;
 }) {
-  const { isDarkMode } = useSettingsStore();
+  const isDarkMode = useSettingsStore(s => s.isDarkMode);
+
+  useEffect(() => {
+    if (onCancel) {
+      return registerModal(onCancel);
+    }
+  }, [onCancel]);
 
   return (
     <motion.div
@@ -19,23 +27,46 @@ export default function DuaScreen({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-slate-950 overflow-y-auto"
     >
-      <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full py-12 relative">
-        {onCancel && (
-          <button
-            onClick={onCancel}
-            className="absolute top-6 right-6 p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-full bg-slate-200/60 dark:bg-slate-800/60 transition-colors"
-            title="Return to Quran"
-          >
-            <X size={20} />
-          </button>
-        )}
+      {/* Root-Safe Top Header */}
+      <header className="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 app-header-safe pb-2.5 sm:pb-3 gpu-layer">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {onCancel && (
+              <button
+                onClick={onCancel}
+                className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Return to Quran"
+                aria-label="Back"
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+              Dua e Khatm e Quraan
+            </span>
+          </div>
 
-        <h2 className="text-xl md:text-2xl font-bold text-emerald-700 dark:text-emerald-500 mb-8 text-center uppercase tracking-widest">
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="p-2 -mr-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Return to App"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full py-8 relative">
+        <h2 className="text-xl md:text-2xl font-bold text-emerald-700 dark:text-emerald-500 mb-8 text-center uppercase tracking-widest font-serif">
           Dua e Khatm e Quraan
         </h2>
         
         <div className="space-y-8 text-center w-full">
-          <p className="font-arabic text-3xl md:text-4xl text-emerald-800 dark:text-emerald-400">
+          <p className="font-arabic text-3xl md:text-4xl text-emerald-800 dark:text-emerald-400 leading-normal">
             بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
           </p>
           
@@ -48,11 +79,11 @@ export default function DuaScreen({
           </p>
         </div>
 
-        <div className="mt-12 pt-6 border-t-[0.5px] border-slate-200 dark:border-slate-800 w-full flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="mt-12 pt-6 border-t-[0.5px] border-slate-200 dark:border-slate-800 w-full flex flex-col sm:flex-row items-center justify-center gap-3 pb-safe">
           {onCancel && (
             <button
               onClick={onCancel}
-              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
               <BookOpen size={18} />
               <span>Return to Quran</span>
@@ -60,7 +91,7 @@ export default function DuaScreen({
           )}
           <button
             onClick={onContinueExit}
-            className="w-full sm:w-auto px-6 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium transition-colors"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium transition-colors cursor-pointer"
           >
             Close App
           </button>

@@ -33,7 +33,7 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
     }
 
     // Load static dataset first for instant render
-    fetch('/imam_science_data.json')
+    fetch(getApiUrl('/imam_science_data.json'))
       .then(res => {
         if (!res.ok) throw new Error('Static data missing');
         return res.json();

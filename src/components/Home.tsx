@@ -5,7 +5,8 @@ import { fetchSurahs, SurahMeta, prefetchSurah, prefetchJuz } from '../api';
 import staticSurahs from '../surahList.json';
 import { 
   Search, BookOpen, Settings, Microscope, ArrowRight, 
-  MessageCircle, AlertTriangle, KeyRound, Edit3, Check, X
+  MessageCircle, AlertTriangle, KeyRound, Edit3, Check, X,
+  LogOut
 } from "lucide-react";
 import GlobalDiscussions from "./GlobalDiscussions";
 import ImamScienceFeed from "./ImamScienceFeed";
@@ -182,31 +183,43 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   }, [q]);
 
   return (
-    <div className="min-h-screen pb-24 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen pb-32 text-slate-900 dark:text-slate-100">
       {/* Clean Minimalist Header */}
-      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-4 py-2.5 sm:py-3 gpu-layer">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-2.5">
+      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 app-header-safe pb-2.5 sm:pb-3 gpu-layer">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-arabic font-bold text-sm sm:text-base shadow-xs select-none ring-1 ring-emerald-600/30 shrink-0">
               ش
             </div>
-            <div>
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-tight">
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-tight truncate">
                 Shia Markaz
               </h1>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
-                Holy Quran &amp; Mafatih Al Jinan
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate">
+                Holy Quran &amp; Mafatih
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-right">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-right shrink-0">
             <PWAInstallButton variant="compact" />
-            <span className="text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-              {activeTab === 'quran' && 'Quran Reader'}
-              {activeTab === 'mafatih' && 'Mafatih Al Jinan'}
-              {activeTab === 'science' && 'Imams & Science'}
-              {activeTab === 'discuss' && 'Discussions'}
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                onExit();
+              }}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+              title="Exit App (Dua e Khatm e Quran)"
+              aria-label="Exit App and Recite Dua e Khatm e Quran"
+            >
+              <LogOut size={16} className="shrink-0" />
+              <span className="hidden sm:inline text-[11px] font-medium">Exit</span>
+            </button>
+            <span className="hidden min-[380px]:inline text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate max-w-[110px] sm:max-w-none">
+              {activeTab === 'quran' && 'Quran'}
+              {activeTab === 'mafatih' && 'Mafatih'}
+              {activeTab === 'science' && 'Science'}
+              {activeTab === 'discuss' && 'Community'}
             </span>
           </div>
         </div>

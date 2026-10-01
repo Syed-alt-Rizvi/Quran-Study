@@ -9,9 +9,11 @@ export const hapticImpact = async (style: ImpactStyle = ImpactStyle.Light) => {
   if (Capacitor.isNativePlatform()) {
     try {
       await Haptics.impact({ style });
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
+  } else if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(style === ImpactStyle.Heavy ? 15 : 8);
+    } catch (e) {}
   }
 };
 
@@ -22,9 +24,11 @@ export const hapticSelection = async () => {
       await Haptics.selectionStart();
       await Haptics.selectionChanged();
       await Haptics.selectionEnd();
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
+  } else if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(5);
+    } catch (e) {}
   }
 };
 

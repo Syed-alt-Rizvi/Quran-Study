@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { fetchJuzDetail, JuzDetail, Ayah } from '../api';
-import { fetchTafseer } from '../services/tafseerScraper';
+import { fetchTafseer, clearAyahTafseerCache } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
@@ -53,6 +53,14 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
   const [lazyTafseer, setLazyTafseer] = useState<any>(null);
   const [lazyLoading, setLazyLoading] = useState(false);
   const ayahRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pressTimer.current) {
+        clearTimeout(pressTimer.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (autoScrollAudio && isActivePlaying && isAudioPlaying && ayahRef.current) {
@@ -375,6 +383,7 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
                       <button
                         type="button"
                         onClick={() => {
+                          clearAyahTafseerCache(surahId, ayah.numberInSurah);
                           setLazyTafseer(null);
                         }}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer"
@@ -567,7 +576,7 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
   if (error || !juz) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
-        <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 px-4 py-4">
+        <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 app-header-safe pb-3.5">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <button 
               onClick={onBack}
@@ -608,7 +617,7 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-36 sm:pb-32 pb-safe">
-      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 px-4 py-4">
+      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 app-header-safe pb-3.5">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-4">
             <button 

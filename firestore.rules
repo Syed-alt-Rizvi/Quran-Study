@@ -87,5 +87,12 @@ service cloud.firestore {
       allow create: if true;
       allow delete: if true;
     }
+
+    // User data transfer & sync profiles for cross-site forwarding & multi-device sync
+    match /user_sync_profiles/{syncId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if true;
+    }
   }
 }

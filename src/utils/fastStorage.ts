@@ -12,26 +12,38 @@ function getDb(): Promise<IDBDatabase> {
 
   dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
     if (typeof indexedDB === 'undefined') {
+      dbPromise = null;
       reject(new Error('IndexedDB not available'));
       return;
     }
 
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    try {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
 
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
+      request.onsuccess = () => {
+        resolve(request.result);
+      };
 
-    request.onerror = () => {
-      reject(request.error);
-    };
+      request.onerror = () => {
+        dbPromise = null;
+        reject(request.error || new Error('IndexedDB open error'));
+      };
+
+      request.onblocked = () => {
+        dbPromise = null;
+        reject(new Error('IndexedDB open blocked'));
+      };
+    } catch (e) {
+      dbPromise = null;
+      reject(e);
+    }
   });
 
   return dbPromise;

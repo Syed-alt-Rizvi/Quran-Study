@@ -31,11 +31,35 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: Au
   const [isLoopingAyah, setIsLoopingAyah] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
 
+  const [fallbackAttempted, setFallbackAttempted] = useState(false);
+
   const currentAyah = playlist[currentIndex];
 
-  const audioSrc = currentAyah?.audio
+  // Reset fallback attempt when track changes
+  useEffect(() => {
+    setFallbackAttempted(false);
+  }, [currentIndex, playlist]);
+
+  const fallbackFolderMap: Record<string, string> = {
+    'ar.alafasy': 'Alafasy_128kbps',
+    'ar.abdulbasitmurattal': 'Abdul_Basit_Murattal_192kbps',
+    'ar.abdurrahmaansudais': 'Abdurrahmaan_As-Sudais_192kbps',
+    'ar.minshawi': 'Minshawy_Murattal_128kbps'
+  };
+
+  const getFallbackAudioUrl = () => {
+    if (!currentAyah) return '';
+    const folder = fallbackFolderMap[reciter] || 'Alafasy_128kbps';
+    const s = String(currentAyah.surahNumber || 1).padStart(3, '0');
+    const a = String(currentAyah.numberInSurah || 1).padStart(3, '0');
+    return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
+  };
+
+  const primaryAudioSrc = currentAyah?.audio
     ? currentAyah.audio.replace(/\/\d+\/ar\.[^/]+/, `/${['ar.abdulbasitmurattal', 'ar.abdurrahmaansudais'].includes(reciter) ? '192' : '128'}/${reciter}`)
     : '';
+
+  const audioSrc = fallbackAttempted ? getFallbackAudioUrl() : primaryAudioSrc;
 
   const reciterNames: Record<string, string> = {
     'ar.alafasy': 'Mishary Alafasy',
@@ -90,6 +114,14 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: Au
   };
 
   // Synchronize audio playback & pause Mafatih audio if Quran audio starts
+  useEffect(() => {
+    const handlePauseQuran = () => {
+      pause();
+    };
+    window.addEventListener('pause-quran-audio', handlePauseQuran);
+    return () => window.removeEventListener('pause-quran-audio', handlePauseQuran);
+  }, [pause]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioSrc) return;
@@ -205,6 +237,17 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: Au
         // Ignore if MediaSession fails in WebView
       }
     }
+
+    return () => {
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+        try {
+          navigator.mediaSession.setActionHandler('play', null);
+          navigator.mediaSession.setActionHandler('pause', null);
+          navigator.mediaSession.setActionHandler('previoustrack', null);
+          navigator.mediaSession.setActionHandler('nexttrack', null);
+        } catch {}
+      }
+    };
   }, [currentAyah, currentIndex, playlist.length, play, pause, prev, next]);
 
   if (playlist.length === 0 || !currentAyah) {
@@ -394,8 +437,12 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: Au
           src={audioSrc} 
           onEnded={handleEnded} 
           onError={(e) => {
-            console.warn("Audio failed to load from source:", e);
-            pause();
+            console.warn("Audio failed to load from source:", audioSrc, e);
+            if (!fallbackAttempted) {
+              setFallbackAttempted(true);
+            } else {
+              pause();
+            }
           }}
         />
       )}

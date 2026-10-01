@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Share2, PlusSquare, Smartphone, Check, X, Sparkles, WifiOff, Volume2 } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
+import { registerModal } from '../utils/modalBackHandler';
 
 interface PWAInstallModalProps {
   isOpen: boolean;
@@ -10,8 +11,14 @@ interface PWAInstallModalProps {
 }
 
 export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClose }) => {
-  const { isInstallable, isInstalled, isIOS, isAndroid, install } = usePWAInstall();
+  const { isInstallable, isInstalled, isIOS, isAndroid, isInIframe, install } = usePWAInstall();
   const [installing, setInstalling] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      return registerModal(onClose);
+    }
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -77,6 +84,28 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Conditional Install Instructions */}
+          {isInIframe && !isInstalled && (
+            <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-center space-y-2">
+              <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
+                Framed Domain Window Detected
+              </p>
+              <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                Browsers require opening the direct application window to trigger 1-tap home screen installation:
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open('https://quran-study.ai.studio', '_top');
+                  }
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+              >
+                Open Fullscreen App to Install PWA
+              </button>
+            </div>
+          )}
+
           {isInstalled ? (
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-center">
               <div className="flex items-center justify-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold text-sm">

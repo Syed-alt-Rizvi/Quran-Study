@@ -1,6 +1,31 @@
 import staticSurahs from './surahList.json';
 import { fastStorage } from './utils/fastStorage';
 
+async function fetchWithTimeout(url: string, timeoutMs = 12000, retries = 1): Promise<Response> {
+  let lastError: any;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) return res;
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, 250));
+        continue;
+      }
+      return res;
+    } catch (e: any) {
+      clearTimeout(timer);
+      lastError = e;
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, 250));
+      }
+    }
+  }
+  throw lastError || new Error(`Network request failed for ${url}`);
+}
+
 async function safeJson(res: Response) {
   const text = await res.text();
   try { return JSON.parse(text); } 
@@ -108,9 +133,27 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
     } catch {}
 
     // Fetch Arabic (quran-uthmani), English (en.asad), Urdu (ur.jalandhry), and Audio (ar.alafasy)
-    const response = await fetch(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`);
+    let response: Response;
+    try {
+      response = await fetchWithTimeout(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`, 12000, 1);
+    } catch (netErr) {
+      // Offline / network failure: check if fastStorage has any cached detail
+      const fallbackCached = await fastStorage.get<SurahDetail>(cacheKey);
+      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+        surahDetailCache.set(id, fallbackCached);
+        return fallbackCached;
+      }
+      throw netErr;
+    }
     
-    if (!response.ok) throw new Error('Failed to fetch surah details');
+    if (!response.ok) {
+      const fallbackCached = await fastStorage.get<SurahDetail>(cacheKey);
+      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+        surahDetailCache.set(id, fallbackCached);
+        return fallbackCached;
+      }
+      throw new Error('Failed to fetch surah details');
+    }
     
     const json = await safeJson(response);
     const data = json.data;
@@ -186,14 +229,31 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
       }
     } catch {}
 
-    const [arabicResponse, englishResponse, urduResponse, audioResponse] = await Promise.all([
-      fetch(`https://api.alquran.cloud/v1/juz/${id}/quran-uthmani`),
-      fetch(`https://api.alquran.cloud/v1/juz/${id}/en.asad`),
-      fetch(`https://api.alquran.cloud/v1/juz/${id}/ur.jalandhry`),
-      fetch(`https://api.alquran.cloud/v1/juz/${id}/ar.alafasy`)
-    ]);
+    let responses: [Response, Response, Response, Response];
+    try {
+      responses = await Promise.all([
+        fetchWithTimeout(`https://api.alquran.cloud/v1/juz/${id}/quran-uthmani`, 12000, 1),
+        fetchWithTimeout(`https://api.alquran.cloud/v1/juz/${id}/en.asad`, 12000, 1),
+        fetchWithTimeout(`https://api.alquran.cloud/v1/juz/${id}/ur.jalandhry`, 12000, 1),
+        fetchWithTimeout(`https://api.alquran.cloud/v1/juz/${id}/ar.alafasy`, 12000, 1)
+      ]);
+    } catch (netErr) {
+      const fallbackCached = await fastStorage.get<JuzDetail>(cacheKey);
+      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+        juzDetailCache.set(id, fallbackCached);
+        return fallbackCached;
+      }
+      throw netErr;
+    }
+    
+    const [arabicResponse, englishResponse, urduResponse, audioResponse] = responses;
     
     if (!arabicResponse.ok || !englishResponse.ok || !urduResponse.ok || !audioResponse.ok) {
+      const fallbackCached = await fastStorage.get<JuzDetail>(cacheKey);
+      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+        juzDetailCache.set(id, fallbackCached);
+        return fallbackCached;
+      }
       throw new Error('Failed to fetch juz details');
     }
     

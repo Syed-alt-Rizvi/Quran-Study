@@ -8,24 +8,28 @@ import {
   Code, Mail, Copy, Info, Shield, FileText,
   ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
   Smartphone, Vibrate, ExternalLink,
-  Microscope, MessageCircle
+  Microscope, MessageCircle, LogOut, RefreshCw
 } from 'lucide-react';
 import { useSettingsStore, AppTab } from '../store';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import { PWAInstallButton } from './PWAInstallButton';
+import DataTransferModal from './common/DataTransferModal';
+
+import { registerModal } from '../utils/modalBackHandler';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectSurah?: (surahId: number, ayahNumber?: number) => void;
   onSelectMafatihItem?: (itemId: string) => void;
+  onExitApp?: () => void;
 }
 
 type TabCategory = 'display' | 'quran' | 'mafatih' | 'audio' | 'library' | 'about';
 
-export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafatihItem }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafatihItem, onExitApp }: SidebarProps) {
   const { 
     isDarkMode, toggleDarkMode, 
     fontSize, setFontSize, 
@@ -66,9 +70,79 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     isOpen: false,
     tab: 'privacy',
   });
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
+
+  const handleManualCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    setUpdateMessage(null);
+    hapticSelection();
+    try {
+      const bundled = typeof __APP_BUILD_ID__ !== 'undefined' ? String(__APP_BUILD_ID__) : '1.2.0';
+      const urls = [
+        `/api/version?_t=${Date.now()}`,
+        `https://quran-study.ai.studio/api/version?_t=${Date.now()}`
+      ];
+      let serverVer: string | null = null;
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache, no-store' }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.version) {
+              serverVer = String(data.version);
+              break;
+            }
+          }
+        } catch {}
+      }
+
+      if (serverVer && serverVer !== bundled && bundled !== 'dev') {
+        setUpdateMessage('New published version found! Reloading latest build...');
+        if ('caches' in window) {
+          try {
+            const keys = await caches.keys();
+            for (const k of keys) {
+              await caches.delete(k).catch(() => {});
+            }
+          } catch {}
+        }
+        if ('serviceWorker' in navigator) {
+          try {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const reg of registrations) {
+              await reg.update().catch(() => {});
+              if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+          } catch {}
+        }
+        setTimeout(() => {
+          window.location.href = window.location.pathname + '?_v=' + Date.now();
+        }, 500);
+      } else {
+        setUpdateMessage('App is on the latest published build!');
+        setTimeout(() => setUpdateMessage(null), 3500);
+      }
+    } catch {
+      setUpdateMessage('Could not verify server version. Please check connection.');
+      setTimeout(() => setUpdateMessage(null), 3000);
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   const upiId = '9906275833@superyes';
   const upiLink = `upi://pay?pa=9906275833@superyes&pn=Syed%20Murtaza%20Razavee&cu=INR&tn=Shia%20Quran%20Support`;
+
+  useEffect(() => {
+    if (isOpen) {
+      return registerModal(onClose);
+    }
+  }, [isOpen, onClose]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
@@ -189,7 +263,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
           className="fixed inset-y-0 right-0 z-[65] w-full max-w-md bg-slate-50 dark:bg-slate-950 shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 pb-safe"
         >
           {/* Top Header */}
-          <div className="px-5 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+          <div className="px-5 modal-header-safe pb-3 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center font-arabic font-bold text-sm shadow-xs border border-emerald-400/30">
@@ -203,14 +277,30 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
               </div>
 
-              <button
-                id="sidebar-close-btn"
-                onClick={() => { hapticImpact(ImpactStyle.Light); onClose(); }}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label="Close settings"
-              >
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-1">
+                {onExitApp && (
+                  <button
+                    onClick={() => {
+                      hapticImpact(ImpactStyle.Light);
+                      onClose();
+                      onExitApp();
+                    }}
+                    className="p-2 rounded-xl text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                    title="Exit App (Dua e Khatm e Quran)"
+                    aria-label="Exit App and Recite Dua e Khatm e Quran"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                )}
+                <button
+                  id="sidebar-close-btn"
+                  onClick={() => { hapticImpact(ImpactStyle.Light); onClose(); }}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  aria-label="Close settings"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* User Profile & Greeting Bar */}
@@ -952,6 +1042,36 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {/* TAB 4: LIBRARY, SAVED & HABITS */}
             {activeTab === 'library' && (
               <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Transfer & Cloud Sync Banner for Forwarded / Secondary Sites */}
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-indigo-50/80 via-white to-emerald-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 border border-indigo-200/80 dark:border-indigo-900/40 shadow-xs space-y-2.5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                        <RefreshCw size={16} />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-100 block">
+                          Transfer Data to Forwarded Site
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          Sync bookmarks, notes & progress across domains
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    id="open-data-transfer-modal-btn"
+                    onClick={() => {
+                      hapticSelection();
+                      setIsTransferModalOpen(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs shadow-xs flex items-center justify-between transition-all cursor-pointer"
+                  >
+                    <span>Open Transfer & Sync Tools</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+
                 {/* Daily Study Activity */}
                 <div className="rounded-2xl p-4 bg-gradient-to-br from-emerald-500/10 via-slate-50 to-amber-500/10 dark:from-emerald-950/40 dark:via-slate-900 dark:to-amber-950/20 border border-emerald-500/20 dark:border-emerald-800/40 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
@@ -1389,16 +1509,47 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* App Information & Version */}
-                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center space-y-1">
+                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center space-y-2">
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Shia Quran & Tafseer</p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Tafseer-e-Namoona & Tafseer Al-Kauthar
                   </p>
                   <div>
                     <p className="text-[10px] text-slate-400">
-                      Version 1.2.0 • Offline Ready
+                      Build {typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : '1.2.0'} • Offline Ready
                     </p>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleManualCheckUpdate}
+                    disabled={isCheckingUpdate}
+                    className="w-full mt-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-60"
+                  >
+                    <RefreshCw size={13} className={isCheckingUpdate ? 'animate-spin' : ''} />
+                    <span>{isCheckingUpdate ? 'Checking for updates...' : 'Check for Published Updates'}</span>
+                  </button>
+
+                  {updateMessage && (
+                    <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 animate-in fade-in duration-200">
+                      {updateMessage}
+                    </p>
+                  )}
+
+                  {onExitApp && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        hapticImpact(ImpactStyle.Medium);
+                        onClose();
+                        onExitApp();
+                      }}
+                      className="w-full mt-2 py-2.5 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <LogOut size={15} />
+                      <span>Exit App (Dua e Khatm e Quraan)</span>
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -1413,6 +1564,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
       isOpen={privacyModal.isOpen}
       onClose={() => setPrivacyModal(p => ({ ...p, isOpen: false }))}
       initialTab={privacyModal.tab}
+    />
+
+    {/* Cross-Domain Data Transfer & Cloud Sync Modal */}
+    <DataTransferModal
+      isOpen={isTransferModalOpen}
+      onClose={() => setIsTransferModalOpen(false)}
     />
   </>
   );

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF6EE" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
     <meta name="theme-color" content="#059669" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,6 +20,54 @@
     <meta property="og:type" content="website" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <script>
+      (function() {
+        function adjustLayoutToResolution() {
+          try {
+            var isFramed = window.self !== window.top;
+            var ua = navigator.userAgent || '';
+            var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            var isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+
+            // True viewport detection
+            var clientW = document.documentElement.clientWidth || window.innerWidth || 980;
+            var clientH = document.documentElement.clientHeight || window.innerHeight || 600;
+            
+            // Set dynamic viewport units so mobile browser bars never clip UI
+            document.documentElement.style.setProperty('--app-vw', clientW + 'px');
+            document.documentElement.style.setProperty('--app-vh', clientH + 'px');
+
+            if (isFramed && (isMobileUA || isTouch)) {
+              // Physical screen dimensions
+              var sW = window.screen ? window.screen.width : 390;
+              var sH = window.screen ? window.screen.height : 844;
+              var isLandscape = clientW > clientH;
+              var targetWidth = isLandscape ? Math.max(sW, sH) : Math.min(sW, sH);
+              
+              if (targetWidth > 0 && clientW > targetWidth * 1.25) {
+                var zoomRatio = +(clientW / targetWidth).toFixed(2);
+                if (zoomRatio >= 1.25 && zoomRatio <= 4.0) {
+                  document.documentElement.style.zoom = zoomRatio;
+                  document.documentElement.classList.add('framed-mobile-zoom');
+                  return;
+                }
+              }
+            }
+            
+            document.documentElement.style.zoom = '';
+            document.documentElement.classList.remove('framed-mobile-zoom');
+          } catch(e) {}
+        }
+
+        adjustLayoutToResolution();
+        window.addEventListener('resize', adjustLayoutToResolution);
+        window.addEventListener('orientationchange', adjustLayoutToResolution);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', adjustLayoutToResolution);
+        }
+        document.addEventListener('DOMContentLoaded', adjustLayoutToResolution);
+      })();
+    </script>
     <link rel="preconnect" href="https://api.alquran.cloud" crossorigin>
     <link rel="dns-prefetch" href="https://api.alquran.cloud">
     <link rel="preconnect" href="https://cdn.islamic.network" crossorigin>

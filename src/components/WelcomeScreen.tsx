@@ -32,7 +32,7 @@ export default function WelcomeScreen({ onComplete }: { key?: string; onComplete
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-amber-50 p-6 select-none"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-amber-50 p-6 pt-safe pb-safe select-none"
     >
       <div className="flex flex-col items-center space-y-8 w-full max-w-md text-center">
         <AnimatePresence mode="wait">

@@ -1,6 +1,7 @@
 import { getApiUrl } from '../utils/apiBase';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorHttp } from '@capacitor/core';
+import { fastStorage } from '../utils/fastStorage';
 
 export interface TafseerContent {
   ur: string;
@@ -9,6 +10,7 @@ export interface TafseerContent {
   tafseer_title?: string;
   surah?: number;
   ayah?: number;
+  ayah_range?: string;
 }
 
 // In-memory cache
@@ -25,13 +27,21 @@ export function parseKautharHtml(html: string, surah: number, ayah: number): Taf
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
+    // Extract ayah range label from #msg2 before removing it
+    let extractedRange = '';
+    const msg2El = doc.querySelector('#msg2');
+    if (msg2El) {
+      extractedRange = msg2El.textContent?.trim() || '';
+    }
+
     // Remove unwanted scripts, styles, buttons, forms, nav, and message headers
-    doc.querySelectorAll('script, style, iframe, form, button, a.btn, #msg2, #suraname, header, footer, nav, .breadcrumb').forEach(el => el.remove());
+    doc.querySelectorAll('script, style, iframe, form, button, a.btn, a.sp, .btn-with-arrow, #msg2, #suraname, header, footer, nav, .breadcrumb').forEach(el => el.remove());
+    doc.querySelectorAll('a[href*="tafseer.php"]').forEach(el => el.remove());
 
     // Remove navigation rows with آگے / پیچھے / اگلی آیت
     doc.querySelectorAll('section.section .container > .row, section.section .container .row').forEach(el => {
       const text = el.textContent || '';
-      if ((text.includes('پیچھے') && text.includes('آگے')) || el.querySelector('#msg2, #suraname')) {
+      if ((text.includes('پیچھے') && text.includes('آگے')) || (text.startsWith('تفسیر قرآن سورہ') && !text.includes('تشریح کلمات') && !text.includes('تفسیرآیات'))) {
         el.remove();
       }
     });
@@ -51,7 +61,7 @@ export function parseKautharHtml(html: string, surah: number, ayah: number): Taf
     if (rows.length > 0) {
       rows.forEach(r => {
         const t = (r.textContent || '').trim().replace(/[ \t]+/g, ' ');
-        if (t) {
+        if (t && !t.startsWith('تفسیر قرآن سورہ') && !t.includes('پیچھے') && !t.includes('آگے')) {
           urduText += t + '\n\n';
         }
       });
@@ -74,6 +84,7 @@ export function parseKautharHtml(html: string, surah: number, ayah: number): Taf
       tafseer_text: cleanHtml.trim(),
       en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
       tafseer_title: "تفسیر الکوثر — علامہ شیخ محسن علی نجفی",
+      ayah_range: extractedRange || undefined
     };
   } catch (err) {
     console.warn('[parseKautharHtml] Error parsing Tafseer HTML:', err);
@@ -91,17 +102,111 @@ export async function fetchTafseer(
     const kKey = `tafseer_kauthar_${surahNumber}_${ayahNumber}`;
     if (memoryCache[kKey]) return memoryCache[kKey];
 
-    // 1. Check localStorage first
+    // 1a. Check fastStorage (IndexedDB - instant 0ms, unlimited storage)
+    try {
+      const fastCached = await fastStorage.get<TafseerContent>(kKey);
+      if (fastCached && (fastCached.ur || fastCached.tafseer_text)) {
+        memoryCache[kKey] = fastCached;
+        return fastCached;
+      }
+    } catch (e) {}
+
+    // 1b. Check localStorage
     const localData = localStorage.getItem(kKey);
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
         if (parsed && (parsed.ur || parsed.tafseer_text)) {
           memoryCache[kKey] = parsed;
+          fastStorage.set(kKey, parsed).catch(() => {});
           return parsed;
         }
+      } catch (e) {}
+    }
+
+    // 1c. Check if preceding adjacent ayah is already cached and covers this ayah
+    if (ayahNumber > 1) {
+      for (let prevA = ayahNumber - 1; prevA >= Math.max(1, ayahNumber - 4); prevA--) {
+        const prevKey = `tafseer_kauthar_${surahNumber}_${prevA}`;
+        const prevCached = memoryCache[prevKey] || (await fastStorage.get<TafseerContent>(prevKey).catch(() => null));
+        if (prevCached && prevCached.ur && prevCached.ur.length > 50 && prevCached.ayah_range) {
+          const match = prevCached.ayah_range.match(/(\d+)\s*[-–]\s*(\d+)/);
+          if (match) {
+            const startA = parseInt(match[1], 10);
+            const endA = parseInt(match[2], 10);
+            if (ayahNumber >= startA && ayahNumber <= endA) {
+              const item = { ...prevCached, ayah: ayahNumber };
+              memoryCache[kKey] = item;
+              fastStorage.set(kKey, item).catch(() => {});
+              return item;
+            }
+          }
+        }
+      }
+    }
+
+    // Helper to store an item across memory, fastStorage, and localStorage
+    const cacheKautharItem = (item: TafseerContent, targetAyah = ayahNumber) => {
+      const key = `tafseer_kauthar_${surahNumber}_${targetAyah}`;
+      memoryCache[key] = item;
+      fastStorage.set(key, item).catch(() => {});
+      try {
+        localStorage.setItem(key, JSON.stringify(item));
+      } catch (e) {}
+    };
+
+    // 2. Try static pre-bundled or server on-demand JSON route
+    try {
+      const staticRes = await fetch(getApiUrl(`/tafseer_kauthar/s${surahNumber}_a${ayahNumber}.json`));
+      if (staticRes.ok) {
+        const data = await staticRes.json();
+        if (data && (data.ur || data.tafseer_text) && (data.ur?.length > 30 || data.tafseer_text?.length > 50)) {
+          cacheKautharItem(data, ayahNumber);
+          return data;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Try backend API proxy route with smart range mapping
+    const endpoint = getApiUrl(`/api/tafseer/kauthar/${surahNumber}/${ayahNumber}`);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        let item: TafseerContent | null = null;
+
+        if (Capacitor.isNativePlatform()) {
+          const nativeRes = await CapacitorHttp.get({ url: endpoint, connectTimeout: 15000, readTimeout: 20000 });
+          if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
+            item = typeof nativeRes.data === 'string' ? JSON.parse(nativeRes.data) : nativeRes.data;
+          }
+        } else {
+          const apiRes = await fetch(endpoint);
+          if (apiRes.ok) {
+            item = await apiRes.json();
+          }
+        }
+
+        if (item && (item.ur || item.tafseer_text) && (item.ur?.length > 30 || item.tafseer_text?.length > 50)) {
+          cacheKautharItem(item, ayahNumber);
+
+          // If the item covers a range (e.g. 1 - 2, 16 - 18), cache it for all ayahs in that range
+          if (item.ayah_range) {
+            const match = item.ayah_range.match(/(\d+)\s*[-–]\s*(\d+)/);
+            if (match) {
+              const startA = parseInt(match[1], 10);
+              const endA = parseInt(match[2], 10);
+              if (!isNaN(startA) && !isNaN(endA)) {
+                for (let a = startA; a <= endA; a++) {
+                  cacheKautharItem({ ...item, ayah: a }, a);
+                }
+              }
+            }
+          }
+          return item;
+        }
       } catch (e) {
-        // ignore JSON parse error
+        if (attempt === 0) {
+          await new Promise(r => setTimeout(r, 400));
+        }
       }
     }
 
@@ -109,7 +214,7 @@ export async function fetchTafseer(
     const ano = String(surahNumber).padStart(3, '0') + String(ayahNumber).padStart(3, '0');
     const balaghDirectUrl = `https://balaghulquran.com/tafseer.php?sno=${sno}&ano=${ano}`;
 
-    // 2. On Native Mobile (Capacitor), fetch directly from balaghulquran.com without CORS constraints
+    // 4. On Native Mobile (Capacitor), fetch directly from balaghulquran.com without CORS constraints
     if (Capacitor.isNativePlatform()) {
       try {
         const nativeRes = await CapacitorHttp.get({
@@ -125,10 +230,7 @@ export async function fetchTafseer(
           const rawData = typeof nativeRes.data === 'string' ? nativeRes.data : JSON.stringify(nativeRes.data);
           const parsed = parseKautharHtml(rawData, surahNumber, ayahNumber);
           if (parsed && (parsed.ur || parsed.tafseer_text)) {
-            memoryCache[kKey] = parsed;
-            try {
-              localStorage.setItem(kKey, JSON.stringify(parsed));
-            } catch (e) {}
+            cacheKautharItem(parsed, ayahNumber);
             return parsed;
           }
         }
@@ -137,54 +239,12 @@ export async function fetchTafseer(
       }
     }
 
-    // 3. Fallback: try static pre-bundled or pre-scraped json
-    try {
-      const staticRes = await fetch(`/tafseer_kauthar/s${surahNumber}_a${ayahNumber}.json`);
-      if (staticRes.ok) {
-        const data = await staticRes.json();
-        if (data && (data.ur || data.tafseer_text)) {
-          memoryCache[kKey] = data;
-          try {
-            localStorage.setItem(kKey, JSON.stringify(data));
-          } catch (e) {}
-          return data;
-        }
-      }
-    } catch (e) {}
-
-    // 4. Try backend API proxy route
-    try {
-      const endpoint = getApiUrl(`/api/tafseer/kauthar/${surahNumber}/${ayahNumber}`);
-      let item: TafseerContent | null = null;
-
-      if (Capacitor.isNativePlatform()) {
-        const nativeRes = await CapacitorHttp.get({ url: endpoint, connectTimeout: 6000, readTimeout: 6000 });
-        if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
-          item = typeof nativeRes.data === 'string' ? JSON.parse(nativeRes.data) : nativeRes.data;
-        }
-      } else {
-        const apiRes = await fetch(endpoint);
-        if (apiRes.ok) {
-          item = await apiRes.json();
-        }
-      }
-
-      if (item && (item.ur || item.tafseer_text)) {
-        memoryCache[kKey] = item;
-        try {
-          localStorage.setItem(kKey, JSON.stringify(item));
-        } catch (e) {}
-        return item;
-      }
-    } catch (e) {
-      console.warn(`[TafseerScraper] Backend API route failed for Al-Kauthar:`, e);
-    }
-
-    // 5. Fallback for Web Browser: fetch via web CORS proxies
+    // 5. Fallback for Web Browser: fetch via reliable web CORS proxies
     if (!Capacitor.isNativePlatform()) {
       const corsProxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(balaghDirectUrl)}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(balaghDirectUrl)}`
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(balaghDirectUrl)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(balaghDirectUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(balaghDirectUrl)}`
       ];
 
       for (const proxyUrl of corsProxies) {
@@ -194,16 +254,11 @@ export async function fetchTafseer(
             const html = await res.text();
             const parsed = parseKautharHtml(html, surahNumber, ayahNumber);
             if (parsed && (parsed.ur || parsed.tafseer_text)) {
-              memoryCache[kKey] = parsed;
-              try {
-                localStorage.setItem(kKey, JSON.stringify(parsed));
-              } catch (e) {}
+              cacheKautharItem(parsed, ayahNumber);
               return parsed;
             }
           }
-        } catch (proxyErr) {
-          // continue to next proxy
-        }
+        } catch (proxyErr) {}
       }
     }
 
@@ -213,41 +268,222 @@ export async function fetchTafseer(
 
   const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v6`;
   
-  // 1. Check in-memory cache
+  // Tier 1: In-memory cache
   if (memoryCache[cacheKey]) {
     return memoryCache[cacheKey];
   }
   
-  // 2. Check localStorage
+  // Tier 2: fastStorage (IndexedDB) + localStorage
+  try {
+    const fastCached = await fastStorage.get<TafseerContent>(cacheKey);
+    if (fastCached && (fastCached.ur || fastCached.en)) {
+      memoryCache[cacheKey] = fastCached;
+      return fastCached;
+    }
+  } catch (e) {}
+
   const localData = localStorage.getItem(cacheKey);
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
-      memoryCache[cacheKey] = parsed;
-      return parsed;
-    } catch (e) {
-      // ignore
-    }
-  }
-  
-  // 3. Fetch HTML
-  let html = "";
-  try {
-    if (Capacitor.isNativePlatform()) {
-      const url = `https://www.tafseerenamoona.net/surahs/${surahNumber}`;
-      const response = await CapacitorHttp.get({ url });
-      html = response.data;
-    } else {
-      const response = await fetch(getApiUrl(`/api/tafseer/proxy/${surahNumber}`));
-      if (!response.ok) throw new Error("Failed to fetch proxy");
-      html = await response.text();
-    }
-  } catch (e) {
-    console.error("Failed to fetch tafseer HTML:", e);
-    throw new Error("Network error while fetching tafseer");
+      if (parsed && (parsed.ur || parsed.en)) {
+        memoryCache[cacheKey] = parsed;
+        fastStorage.set(cacheKey, parsed).catch(() => {});
+        return parsed;
+      }
+    } catch (e) {}
   }
 
-  // 4. Parse RSC payload
+  // Helper to store an entire surah's ayahs into caches simultaneously
+  const cacheSurahAyahs = (surahData: Record<number, TafseerContent>) => {
+    for (const [aStr, content] of Object.entries(surahData)) {
+      const aNum = Number(aStr);
+      if (!isNaN(aNum) && content) {
+        const aKey = `tafseer_${surahNumber}_${aNum}_v6`;
+        memoryCache[aKey] = content;
+        fastStorage.set(aKey, content).catch(() => {});
+        try {
+          localStorage.setItem(aKey, JSON.stringify(content));
+        } catch (e) {}
+      }
+    }
+  };
+
+  // Helper to purge poisoned or legacy Workbox/browser caches
+  const purgePoisonedCaches = async () => {
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      try {
+        const keys = await window.caches.keys();
+        for (const k of keys) {
+          if (k.toLowerCase().includes('tafseer') || k.toLowerCase().includes('namoona')) {
+            await window.caches.delete(k);
+          }
+        }
+      } catch (e) {}
+    }
+  };
+
+  // Tier 3: Pre-bundled or disk-cached static JSON file (Instant, offline-ready, 0 network dependencies)
+  try {
+    let text = '';
+    const staticRes = await fetch(getApiUrl(`/tafseer_namoona/surah_${surahNumber}.json`));
+    if (staticRes.ok) {
+      text = await staticRes.text();
+    }
+
+    // Safeguard: If service worker or server returned HTML index.html, purge caches and re-fetch fresh
+    if (!text || text.trim().startsWith('<') || text.includes('<!DOCTYPE')) {
+      await purgePoisonedCaches();
+      // Bypass any service worker cache or HTTP stale cache with reload directive and cache-buster
+      const freshRes = await fetch(getApiUrl(`/tafseer_namoona/surah_${surahNumber}.json?v=v5&t=${Date.now()}`), {
+        cache: 'reload'
+      }).catch(() => null);
+      if (freshRes && freshRes.ok) {
+        text = await freshRes.text();
+      }
+    }
+
+    if (text && !text.trim().startsWith('<') && !text.includes('<!DOCTYPE')) {
+      const surahBundle = JSON.parse(text);
+      if (surahBundle && typeof surahBundle === 'object' && Object.keys(surahBundle).length > 0) {
+        cacheSurahAyahs(surahBundle);
+        const item = surahBundle[ayahNumber] || surahBundle[String(ayahNumber)];
+        if (item && (item.ur || item.en)) {
+          return item;
+        }
+      }
+    }
+  } catch (e) {}
+
+  // Tier 4: Server Pre-parsed JSON API (10x faster, clean JSON, disk-cached on server)
+  try {
+    // 4a. Attempt to fetch the whole surah first (caches all ayahs of this surah in one trip)
+    const surahEndpoint = getApiUrl(`/api/tafseer/namoona/${surahNumber}?v=v5`);
+    let surahBundle: Record<number, TafseerContent> | null = null;
+
+    if (Capacitor.isNativePlatform()) {
+      const nativeRes = await CapacitorHttp.get({
+        url: surahEndpoint,
+        connectTimeout: 20000,
+        readTimeout: 35000,
+      });
+      if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
+        surahBundle = typeof nativeRes.data === 'string' ? JSON.parse(nativeRes.data) : nativeRes.data;
+      }
+    } else {
+      const res = await fetch(surahEndpoint);
+      if (res.ok) {
+        const text = await res.text();
+        if (text && !text.trim().startsWith('<') && !text.includes('<!DOCTYPE')) {
+          surahBundle = JSON.parse(text);
+        }
+      }
+    }
+
+    if (surahBundle && typeof surahBundle === 'object' && Object.keys(surahBundle).length > 0) {
+      cacheSurahAyahs(surahBundle);
+      const item = surahBundle[ayahNumber] || surahBundle[String(ayahNumber)];
+      if (item && (item.ur || item.en)) {
+        return item;
+      }
+    }
+
+    // 4b. Fallback: fetch individual ayah endpoint
+    const ayahEndpoint = getApiUrl(`/api/tafseer/namoona/${surahNumber}/${ayahNumber}?v=v5`);
+    let serverAyah: TafseerContent | null = null;
+
+    if (Capacitor.isNativePlatform()) {
+      const nativeRes = await CapacitorHttp.get({
+        url: ayahEndpoint,
+        connectTimeout: 15000,
+        readTimeout: 25000,
+      });
+      if (nativeRes.status >= 200 && nativeRes.status < 300 && nativeRes.data) {
+        serverAyah = typeof nativeRes.data === 'string' ? JSON.parse(nativeRes.data) : nativeRes.data;
+      }
+    } else {
+      const res = await fetch(ayahEndpoint);
+      if (res.ok) {
+        const text = await res.text();
+        if (text && !text.trim().startsWith('<') && !text.includes('<!DOCTYPE')) {
+          serverAyah = JSON.parse(text);
+        }
+      }
+    }
+
+    if (serverAyah && (serverAyah.ur || serverAyah.en)) {
+      memoryCache[cacheKey] = serverAyah;
+      fastStorage.set(cacheKey, serverAyah).catch(() => {});
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(serverAyah));
+      } catch (e) {}
+      return serverAyah;
+    }
+  } catch (e) {}
+
+  // Tier 5: Fetch HTML from server proxy, native direct, or CORS proxies with deduplication
+  const fetchHtmlPayload = async (): Promise<string> => {
+    // 5a. Try server HTML proxy
+    try {
+      const proxyUrl = getApiUrl(`/api/tafseer/proxy/${surahNumber}`);
+      const response = await fetch(proxyUrl);
+      if (response.ok) {
+        const text = await response.text();
+        if (text && text.length > 500) return text;
+      }
+    } catch (e) {}
+
+    // 5b. Native direct fetch via CapacitorHttp with browser headers
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const directUrl = `https://www.tafseerenamoona.net/surahs/${surahNumber}`;
+        const response = await CapacitorHttp.get({
+          url: directUrl,
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          },
+          connectTimeout: 12000,
+          readTimeout: 15000,
+        });
+        if (response.status >= 200 && response.status < 300 && response.data) {
+          const raw = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+          if (raw.length > 500) return raw;
+        }
+      } catch (e) {}
+    }
+
+    // 5c. Web CORS proxies as fallback for web and PWA
+    const corsProxies = [
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://www.tafseerenamoona.net/surahs/${surahNumber}`)}`,
+      `https://corsproxy.io/?url=${encodeURIComponent(`https://www.tafseerenamoona.net/surahs/${surahNumber}`)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.tafseerenamoona.net/surahs/${surahNumber}`)}`
+    ];
+
+    for (const pUrl of corsProxies) {
+      try {
+        const pRes = await fetch(pUrl);
+        if (pRes.ok) {
+          const pText = await pRes.text();
+          if (pText && pText.length > 500) return pText;
+        }
+      } catch (e) {}
+    }
+
+    throw new Error(`Unable to reach Tafseer Namoona source.`);
+  };
+
+  let html = "";
+  try {
+    html = await fetchHtmlPayload();
+  } catch (e) {
+    console.error("Failed to fetch tafseer HTML:", e);
+    throw new Error(`تفسیرِ نمونہ: سورہ ${surahNumber} آیت ${ayahNumber} کا مواد لوڈ نہیں ہو سکا۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔`);
+  }
+
+  // Tier 6: Parse RSC payload from HTML
   const parts = html.split('self.__next_f.push(');
   let fullPayload = "";
   for (let i = 1; i < parts.length; i++) {
@@ -286,9 +522,7 @@ export async function fetchTafseer(
         if (parsed && Array.isArray(parsed) && typeof parsed[1] === 'string') {
           fullPayload += parsed[1];
         }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
   }
 
@@ -322,6 +556,7 @@ export async function fetchTafseer(
   };
 
   let foundTafseer: TafseerContent | null = null;
+  const parsedSurahMap: Record<number, TafseerContent> = {};
   
   // Custom parser to properly extract tafseer_topics array without breaking on inner brackets
   let searchIdx = 0;
@@ -385,11 +620,7 @@ export async function fetchTafseer(
           titleUr = resolveRef(titleUr);
           
           if (detailsUr && detailsUr.trim().length > 0) {
-            combinedUrdu += `**${titleUr || 'Tafseer'}**
-
-${detailsUr}
-
-`;
+            combinedUrdu += `**${titleUr || 'Tafseer'}**\n\n${detailsUr}\n\n`;
           }
           
           // ENGLISH
@@ -399,11 +630,7 @@ ${detailsUr}
           titleEn = resolveRef(titleEn);
           
           if (detailsEn && detailsEn.trim().length > 0) {
-            combinedEnglish += `**${titleEn || 'Tafseer'}**
-
-${detailsEn}
-
-`;
+            combinedEnglish += `**${titleEn || 'Tafseer'}**\n\n${detailsEn}\n\n`;
           }
         }
         
@@ -411,32 +638,15 @@ ${detailsEn}
         const cleanEnglish = combinedEnglish.trim();
         
         if (cleanUrdu || cleanEnglish) {
-          const aKey = `tafseer_${surahNumber}_${currentAyah}_v6`;
-          const content: TafseerContent = { ur: cleanUrdu, en: cleanEnglish };
+          const content: TafseerContent = {
+            ur: cleanUrdu,
+            en: cleanEnglish,
+            surah: surahNumber,
+            ayah: currentAyah,
+            tafseer_title: 'تفسیرِ نمونہ — آیت اللہ ناصر مکارم شیرازی',
+          };
           
-          memoryCache[aKey] = content;
-          
-          try {
-            localStorage.setItem(aKey, JSON.stringify(content));
-          } catch (storageError: any) {
-            if (storageError.name === 'QuotaExceededError' || storageError.message?.includes('quota')) {
-              // Clear older localStorage cache to free up space
-              const keys = Object.keys(localStorage);
-              for (const key of keys) {
-                if (key.startsWith('tafseer_')) {
-                  localStorage.removeItem(key);
-                }
-              }
-              // Try saving again
-              try {
-                localStorage.setItem(aKey, JSON.stringify(content));
-              } catch (e) {
-                console.warn('LocalStorage is full, utilizing memory cache only.');
-              }
-            } else {
-              console.warn('Failed to save to localStorage', storageError);
-            }
-          }
+          parsedSurahMap[currentAyah] = content;
           
           if (currentAyah === ayahNumber) {
             foundTafseer = content;
@@ -448,11 +658,16 @@ ${detailsEn}
     }
   }
 
+  // Store all parsed ayahs for instant access for the rest of the surah
+  if (Object.keys(parsedSurahMap).length > 0) {
+    cacheSurahAyahs(parsedSurahMap);
+  }
+
   if (foundTafseer) {
     return foundTafseer;
   }
   
-  throw new Error("Tafseer not found for this Ayah.");
+  throw new Error(`تفسیرِ نمونہ: سورہ ${surahNumber} آیت ${ayahNumber} کی تفسیر دستیاب نہیں ہو سکی۔`);
 }
 
 export function clearTafseerCache() {
@@ -464,6 +679,33 @@ export function clearTafseerCache() {
   }
   for (const key of Object.keys(memoryCache)) {
     delete memoryCache[key];
+  }
+}
+
+export async function clearAyahTafseerCache(surahNumber: number, ayahNumber: number) {
+  const cacheKey = `tafseer_${surahNumber}_${ayahNumber}_v6`;
+  const kKey = `tafseer_kauthar_${surahNumber}_${ayahNumber}`;
+  
+  delete memoryCache[cacheKey];
+  delete memoryCache[kKey];
+
+  try {
+    localStorage.removeItem(cacheKey);
+    localStorage.removeItem(kKey);
+  } catch (e) {}
+
+  await fastStorage.del(cacheKey).catch(() => {});
+  await fastStorage.del(kKey).catch(() => {});
+
+  if (typeof window !== 'undefined' && 'caches' in window) {
+    try {
+      const keys = await window.caches.keys();
+      for (const k of keys) {
+        if (k.toLowerCase().includes('tafseer') || k.toLowerCase().includes('namoona')) {
+          await window.caches.delete(k);
+        }
+      }
+    } catch (e) {}
   }
 }
 

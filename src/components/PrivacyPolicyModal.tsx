@@ -22,10 +22,13 @@ export default function PrivacyPolicyModal({
   const [dataDeleted, setDataDeleted] = useState(false);
 
   useEffect(() => {
+    if (deleteConfirmOpen) {
+      return registerModal(() => setDeleteConfirmOpen(false));
+    }
     if (isOpen) {
       return registerModal(onClose);
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, deleteConfirmOpen]);
 
   useEffect(() => {
     if (isOpen) {

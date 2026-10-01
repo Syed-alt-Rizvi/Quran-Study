@@ -1,9 +1,22 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import { defineConfig } from 'vite';
 
 export default defineConfig(async ({ command }): Promise<any> => {
+  // Generate unified build identifier
+  const buildId = process.env.BUILD_TIME || Date.now().toString();
+
+  // Ensure public/build_id.txt exists so server and client always match
+  try {
+    const publicDir = path.resolve(__dirname, 'public');
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(publicDir, 'build_id.txt'), buildId, 'utf-8');
+  } catch (e) {}
+
   const plugins: any[] = [
     react(), 
     tailwindcss(),
@@ -15,6 +28,7 @@ export default defineConfig(async ({ command }): Promise<any> => {
       plugins.push(
         VitePWA({
           registerType: 'autoUpdate',
+          injectRegister: false,
           includeAssets: ['pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png', 'favicon.ico', 'manifest.webmanifest'],
           manifest: {
             id: '/',
@@ -50,11 +64,85 @@ export default defineConfig(async ({ command }): Promise<any> => {
             ]
           },
           workbox: {
+            cleanupOutdatedCaches: true,
             clientsClaim: true,
             skipWaiting: true,
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
-            globIgnores: ['**/kauthar.json', '**/tafseer_kauthar/**', '**/tafseer_kauthar_refined/**'],
-            maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
+            navigateFallback: null,
+            // Exclude html from precache so index.html is NEVER locked into an outdated CacheFirst state
+            globPatterns: ['**/*.{js,css,ico,png,svg,webmanifest,woff,woff2}'],
+            globIgnores: ['**/index.html', '**/kauthar.json', '**/tafseer_kauthar/**', '**/tafseer_kauthar_refined/**'],
+            maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+            runtimeCaching: [
+              {
+                // Navigation requests (HTML): Always try network first (1.5s timeout) so newly published updates load immediately on launch!
+                urlPattern: ({ request }) => request.mode === 'navigate',
+                handler: 'NetworkFirst',
+                options: {
+                  cacheName: 'app-shell-html-cache',
+                  networkTimeoutSeconds: 1.5,
+                  cacheableResponse: {
+                    statuses: [0, 200]
+                  }
+                }
+              },
+              {
+                urlPattern: /\/mafatih_index\.json$/,
+                handler: 'StaleWhileRevalidate',
+                options: {
+                  cacheName: 'mafatih-index-cache',
+                  expiration: {
+                    maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+                  }
+                }
+              },
+              {
+                urlPattern: /\/mafatih_items\/.*\.json$/,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'mafatih-items-cache',
+                  expiration: {
+                    maxEntries: 600,
+                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  }
+                }
+              },
+              {
+                urlPattern: /\/tafseer_namoona\/.*\.json$/,
+                handler: 'StaleWhileRevalidate',
+                options: {
+                  cacheName: 'tafseer-namoona-v5-cache',
+                  expiration: {
+                    maxEntries: 114,
+                    maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200]
+                  }
+                }
+              },
+              {
+                urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'google-fonts-cache',
+                  expiration: {
+                    maxEntries: 30,
+                    maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                  }
+                }
+              },
+              {
+                urlPattern: /^https:\/\/api\.alquran\.cloud\/.*/i,
+                handler: 'StaleWhileRevalidate',
+                options: {
+                  cacheName: 'quran-api-cache',
+                  expiration: {
+                    maxEntries: 200,
+                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  }
+                }
+              }
+            ]
           }
         })
       );
@@ -65,6 +153,9 @@ export default defineConfig(async ({ command }): Promise<any> => {
 
   return {
     plugins,
+    define: {
+      __APP_BUILD_ID__: JSON.stringify(buildId),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -105,4 +196,3 @@ export default defineConfig(async ({ command }): Promise<any> => {
     },
   };
 });
-

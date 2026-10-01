@@ -3,7 +3,7 @@ import {
   Search, Headphones, BookOpen, Bookmark, BookmarkCheck, X, ChevronRight, ChevronLeft, RefreshCw,
   Compass, ScrollText, Sun, Repeat, Feather, Moon, BookMarked, LayoutGrid, SlidersHorizontal
 } from 'lucide-react';
-import { MafatihSummary, MafatihCategory, fetchMafatihCategories, fetchMafatihItems } from '../mafatihApi';
+import { MafatihSummary, MafatihCategory, fetchMafatihCategories, fetchMafatihItems, getFullIndex, prefetchMafatihItem } from '../mafatihApi';
 import { useSettingsStore } from '../store';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
@@ -155,7 +155,7 @@ const FEATURED_ITEMS: FeaturedItem[] = [
     hasAudio: true,
   },
   {
-    id: 'maf_dua46',
+    id: 'maf_dua51',
     label: 'Dua Tawassul',
     arabic: 'دُعَاء التَّوَسُّل',
     occasion: 'Tuesday Nights',
@@ -199,7 +199,7 @@ const FEATURED_ITEMS: FeaturedItem[] = [
     hasAudio: true,
   },
   {
-    id: 'maf_ziy85',
+    id: 'maf_ziy73a',
     label: 'Ziyarat Waritha',
     arabic: 'زِيَارَة وَارِث',
     occasion: 'Heritage of the Prophets',
@@ -287,26 +287,24 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
     return counts;
   }, [allCatalogItems, mafatihBookmarks.length]);
 
-  const loadCatalog = useCallback(() => {
-    setLoading(true);
-    fetchMafatihItems({ limit: 400 })
-      .then((itemsRes) => {
-        setItems(itemsRes.items);
-        setAllCatalogItems(itemsRes.items);
-        setTotalCount(itemsRes.total);
-        setLoading(false);
+  // Load complete 1,307-item catalog once into memory for instant filtering and accurate counts
+  useEffect(() => {
+    let mounted = true;
+    getFullIndex()
+      .then((fullList) => {
+        if (!mounted) return;
+        setAllCatalogItems(fullList);
+        // Preload top featured supplications into cache during idle time
+        FEATURED_ITEMS.slice(0, 4).forEach(item => prefetchMafatihItem(item.id));
       })
-      .catch((err) => {
-        console.warn('Mafatih catalog loading notice:', err);
-        setLoading(false);
-      });
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  useEffect(() => {
-    loadCatalog();
-  }, [loadCatalog]);
-
-  // Search & Filter execution
+  // Search & Filter execution with instant local response
   useEffect(() => {
     let mounted = true;
     const timeout = setTimeout(() => {
@@ -344,7 +342,7 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
       }).catch(() => {
         if (mounted) setLoading(false);
       });
-    }, 150);
+    }, searchQuery ? 120 : 0);
 
     return () => {
       mounted = false;
@@ -763,7 +761,21 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
               </button>
             )}
             <button
-              onClick={() => loadCatalog()}
+              onClick={() => {
+                setLoading(true);
+                getFullIndex().then(full => {
+                  setAllCatalogItems(full);
+                  fetchMafatihItems({
+                    category: selectedCategory === 'bookmarked' ? undefined : selectedCategory,
+                    hasAudio: audioOnly,
+                    limit: 300
+                  }).then(res => {
+                    setItems(res.items);
+                    setTotalCount(res.total);
+                    setLoading(false);
+                  });
+                });
+              }}
               className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
             >
               <RefreshCw size={13} />
@@ -777,6 +789,8 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
             <div
               key={item.id}
               onClick={() => handleSelect(item.id)}
+              onMouseEnter={() => prefetchMafatihItem(item.id)}
+              onTouchStart={() => prefetchMafatihItem(item.id)}
               className="surah-card-render group p-4 bg-white dark:bg-slate-900 hover:bg-emerald-50/30 dark:hover:bg-slate-850 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400/60 dark:hover:border-emerald-600/60 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
             >
               <div className="space-y-1.5">

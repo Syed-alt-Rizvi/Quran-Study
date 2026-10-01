@@ -122,6 +122,9 @@
         "$ref": "#/entities/Report"
       },
       "description": "Flagged spam or violation reports."
+    },
+    "user_sync_profiles/{syncId}": {
+      "description": "User bookmarks, notes, reading progress, and settings for cross-site transfer and cloud backup."
     }
   }
 }
