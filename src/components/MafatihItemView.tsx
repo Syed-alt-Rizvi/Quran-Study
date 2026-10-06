@@ -11,6 +11,7 @@ import { useAudioStore } from '../audioStore';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../utils/apiBase';
+import { getArabicFontFamily } from '../utils/arabicFonts';
 
 interface MafatihItemViewProps {
   itemId: string;
@@ -96,14 +97,26 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
         className="py-3 px-5 sm:px-6 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 text-amber-900 dark:text-amber-200 flex items-start gap-3 text-xs"
       >
         <Compass size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-        <div className="space-y-1 flex-1">
+        <div className="space-y-1.5 flex-1">
           {verse.arabic && (
-            <p dir="rtl" className="font-arabic text-sm font-medium text-right leading-[1.8]" style={{ fontFamily: arabicFont }}>
+            <p 
+              dir="rtl" 
+              className="font-arabic font-medium text-right leading-[1.8]" 
+              style={{ 
+                fontSize: `${Math.max(18, Math.round(mafatihFontSize * 0.5))}px`, 
+                fontFamily: arabicFont 
+              }}
+            >
               {verse.arabic}
             </p>
           )}
           {verse.translation && (
-            <p className="text-xs leading-relaxed text-amber-800/90 dark:text-amber-300/80 italic">
+            <p 
+              className="leading-relaxed text-amber-800/90 dark:text-amber-300/80 italic font-serif"
+              style={{
+                fontSize: `${Math.max(14, Math.round(mafatihFontSize * 0.4))}px`
+              }}
+            >
               {verse.translation}
             </p>
           )}
@@ -116,7 +129,7 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
     <div
       ref={(el) => registerRef(verse.index, el)}
       id={`verse-${verse.index}`}
-      className={`surah-card-render group relative py-4 sm:py-5 px-3.5 sm:px-8 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
+      className={`surah-card-render group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
         isBookmarked
           ? 'bg-emerald-50/40 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-600 shadow-sm'
           : 'bg-white dark:bg-slate-900/90 border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-300 dark:hover:border-emerald-700/60 shadow-2xs'
@@ -158,8 +171,13 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
       {verse.arabic && (
         <p
           dir="rtl"
-          className="font-arabic text-right leading-[2.2] text-slate-900 dark:text-slate-100 select-text mb-3"
-          style={{ fontSize: `${mafatihFontSize}px`, fontFamily: arabicFont }}
+          lang="ar"
+          className="font-arabic text-right leading-[2.5] text-slate-900 dark:text-slate-100 select-text mb-3"
+          style={{ 
+            fontSize: `${mafatihFontSize}px`, 
+            fontFamily: getArabicFontFamily(arabicFont),
+            wordSpacing: '0.1em'
+          }}
         >
           {verse.arabic}
         </p>
@@ -167,7 +185,13 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
 
       {mafatihShowTranslation && verse.translation && (
         <div className="pt-3 border-t border-slate-200/50 dark:border-slate-800/50 mt-2">
-          <p className="text-sm sm:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+          <p 
+            className="leading-relaxed text-slate-700 dark:text-slate-300 font-normal"
+            style={{
+              fontSize: `${Math.max(15, Math.round(mafatihFontSize * 0.44))}px`,
+              lineHeight: 1.75
+            }}
+          >
             {verse.translation}
           </p>
         </div>
@@ -840,14 +864,14 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   <span className="text-slate-500 dark:text-slate-400 font-medium">Arabic Script Size:</span>
                   <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800">
                     <button
-                      onClick={() => setMafatihFontSize(Math.max(mafatihFontSize - 2, 20))}
+                      onClick={() => setMafatihFontSize(Math.max(mafatihFontSize - 3, 28))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
                       A-
                     </button>
-                    <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{mafatihFontSize}px</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{mafatihFontSize}px</span>
                     <button
-                      onClick={() => setMafatihFontSize(Math.min(mafatihFontSize + 2, 44))}
+                      onClick={() => setMafatihFontSize(Math.min(mafatihFontSize + 3, 96))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
                       A+
@@ -909,8 +933,8 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
         </AnimatePresence>
       </header>
 
-      {/* Main Content Area */}
-      <main className="max-w-4xl mx-auto px-3 sm:px-6 py-4 space-y-6">
+      {/* Main Content Area - Full-Width Responsive Container */}
+      <main className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6 space-y-4">
         {/* Introduction Section (only when separate verses exist) */}
         {item.introduction && item.verses && item.verses.length > 0 && (
           <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2">
@@ -934,12 +958,12 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
         )}
 
         {/* Majestic Bismillah Invocation */}
-        <div className="relative text-center py-8 px-4 sm:px-8 rounded-3xl border border-emerald-300/70 dark:border-emerald-800/60 bg-gradient-to-b from-emerald-50/80 via-white to-teal-50/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/20 shadow-xs transition-all duration-300 overflow-hidden">
+        <div className="relative text-center py-6 sm:py-8 px-4 sm:px-8 rounded-2xl sm:rounded-3xl border border-emerald-300/70 dark:border-emerald-800/60 bg-gradient-to-b from-emerald-50/80 via-white to-teal-50/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/20 shadow-xs transition-all duration-300 overflow-hidden">
           <h2 
             dir="rtl"
             className="font-arabic text-slate-900 dark:text-slate-100 font-normal leading-[1.8] select-text"
             style={{ 
-              fontSize: `${Math.max(mafatihFontSize * 1.25, 32)}px`,
+              fontSize: `${Math.max(Math.round(mafatihFontSize * 1.1), 30)}px`,
               fontFamily: arabicFont 
             }}
           >
@@ -948,14 +972,17 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
           <p 
             dir="rtl" 
-            className="font-arabic text-emerald-700/80 dark:text-emerald-400/80 text-sm mt-1"
-            style={{ fontFamily: arabicFont }}
+            className="font-arabic text-emerald-700/80 dark:text-emerald-400/80 mt-1"
+            style={{ 
+              fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.46))}px`,
+              fontFamily: arabicFont 
+            }}
           >
             اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَآلِ مُحَمَّدٍ
           </p>
 
           {mafatihShowTranslation && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 font-serif italic">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2.5 font-serif italic">
               In the Name of Allah, the Entirely Merciful, the Especially Merciful
             </p>
           )}
@@ -985,15 +1012,14 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
             </div>
 
             <div 
-              className="text-slate-800 dark:text-slate-200 leading-[2] sm:leading-[2.2] space-y-4 select-text whitespace-pre-line text-sm sm:text-base font-serif"
-              style={{ fontSize: `${Math.max(15, Math.min(22, mafatihFontSize * 0.75))}px` }}
+              className="text-slate-800 dark:text-slate-200 leading-[2] sm:leading-[2.2] space-y-4 select-text whitespace-pre-line font-serif text-sm sm:text-base"
             >
               {item.introduction || 'This supplication content is available in the complete Mafatih Al Jinan volume.'}
             </div>
           </div>
         ) : (
           /* Progressive Verses List */
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {item.verses.slice(0, visibleCount).map((verse) => {
               if (verse.index === 1 && hasFirstVerseBismillah && cleanArabicText(verse.arabic).length < 35 && !verse.translation?.trim()) {
                 return null;

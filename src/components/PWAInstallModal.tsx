@@ -65,6 +65,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
 
         {/* Benefits List */}
         <div className="p-5 space-y-4">
+          {/* Clean PWA Benefits List */}
           <div className="grid grid-cols-3 gap-2.5 text-center">
             <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
               <Sparkles size={18} className="mx-auto text-emerald-600 dark:text-emerald-400 mb-1" />
@@ -83,29 +84,6 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
             </div>
           </div>
 
-          {/* Conditional Install Instructions */}
-          {isInIframe && !isInstalled && (
-            <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-center space-y-2">
-              <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
-                Framed Domain Window Detected
-              </p>
-              <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                Browsers require opening the direct application window to trigger 1-tap home screen installation:
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.open('https://quran-study.ai.studio', '_top');
-                  }
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
-              >
-                Open Fullscreen App to Install PWA
-              </button>
-            </div>
-          )}
-
           {isInstalled ? (
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-center">
               <div className="flex items-center justify-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold text-sm">
@@ -115,6 +93,33 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
                 You are currently running Shia Markaz in standalone mode.
               </p>
+            </div>
+          ) : isInIframe ? (
+            /* Framed / Masked Domain Breakout Flow to enable native browser PWA installation */
+            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+                <Sparkles size={16} />
+                <span>Install Standalone PWA</span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Mobile browsers require launching directly to install the native Progressive Web App with offline Quran and audio playback:
+              </p>
+              <button
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Medium);
+                  try {
+                    if (window.top) {
+                      window.top.location.href = window.location.href;
+                      return;
+                    }
+                  } catch {}
+                  window.open(window.location.href, '_top');
+                }}
+                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
+              >
+                <Download size={18} />
+                <span>Launch &amp; Install PWA (1-Tap)</span>
+              </button>
             </div>
           ) : isInstallable ? (
             /* Android / Chromium 1-Click Install */

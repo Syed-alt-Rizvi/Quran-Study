@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { CalendarNotificationSettings } from './types/calendar';
 
 interface Bookmark {
   surahId: number;
@@ -18,7 +19,25 @@ interface HabitStats {
   dailyTafseerRead: Record<string, number>;
 }
 
-export type AppTab = 'quran' | 'mafatih' | 'science' | 'discuss';
+export type AppTab = 'quran' | 'mafatih' | 'calendar' | 'adhan' | 'science' | 'discuss';
+
+export interface UserLocation {
+  name: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  timezone?: string;
+  description?: string;
+}
+
+export interface AdhanSettings {
+  autoPlayFajr: boolean;
+  autoPlayDhuhr: boolean;
+  autoPlayMaghrib: boolean;
+  repeatCount: number; // Plays adhan three times as specified by user
+  volume: number;
+  notificationsEnabled: boolean;
+}
 
 interface SettingsState {
   isDarkMode: boolean;
@@ -52,6 +71,16 @@ interface SettingsState {
   scienceCategory: string;
   mafatihBookmarks: string[];
   mafatihRecentIds: string[];
+
+  // Shia Calendar & Notifications Settings
+  hijriOffset: number; // -2 to +2 days for local moon sighting adjustment
+  calendarNotificationSettings: CalendarNotificationSettings;
+
+  // Shia Adhan & Global Map Location Settings
+  userLocation: UserLocation;
+  adhanSettings: AdhanSettings;
+  setUserLocation: (loc: UserLocation) => void;
+  updateAdhanSettings: (partial: Partial<AdhanSettings>) => void;
 
   toggleDarkMode: () => void;
   setFontSize: (size: number) => void;
@@ -89,13 +118,16 @@ interface SettingsState {
   isMafatihBookmarked: (id: string) => boolean;
   addMafatihRecent: (id: string) => void;
   clearMafatihRecents: () => void;
+
+  setHijriOffset: (offset: number) => void;
+  updateCalendarNotificationSettings: (partial: Partial<CalendarNotificationSettings>) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       isDarkMode: false,
-      fontSize: 32,
+      fontSize: 38, // Comfortable large natural default for effortless reading
       arabicFont: 'Amiri',
       englishFont: 'Inter',
       hasSeenWelcome: false,
@@ -107,7 +139,7 @@ export const useSettingsStore = create<SettingsState>()(
       translationLanguages: ['en'],
       tafseerLanguages: ['ur'],
       tafseerProvider: 'namoona',
-      tafseerZoom: 100,
+      tafseerZoom: 100, // Standard 100% natural zoom
       readProgress: {},
       reminderTime: null,
       reminderSound: 'bismillah.ogg',
@@ -116,13 +148,49 @@ export const useSettingsStore = create<SettingsState>()(
       userName: '',
       defaultAppTab: 'quran',
       hapticsEnabled: true,
-      mafatihFontSize: 28,
+      mafatihFontSize: 36, // Comfortable natural default for supplications
       mafatihShowTranslation: true,
       mafatihDefaultSpeed: 1,
       globalAudioSpeed: 1,
       scienceCategory: 'all',
       mafatihBookmarks: [],
       mafatihRecentIds: ['maf_dua46b', 'maf_dua40', 'maf_ziy86'],
+
+      hijriOffset: 0,
+      calendarNotificationSettings: {
+        enabled: true,
+        notifyOnEids: true,
+        notifyOnWiladats: true,
+        notifyOnShahadats: true,
+        notifyOnUrs: true,
+        notifyOnFastingDays: true,
+        notifyDayBefore: true,
+        notificationTime: '08:00',
+      },
+
+      userLocation: {
+        name: 'Karbala',
+        country: 'Iraq',
+        latitude: 32.6160,
+        longitude: 44.0249,
+        timezone: 'Asia/Baghdad',
+        description: 'Holy Shrine of Imam Hussain (a.s)'
+      },
+      adhanSettings: {
+        autoPlayFajr: true,
+        autoPlayDhuhr: true,
+        autoPlayMaghrib: true,
+        repeatCount: 3, // Plays adhan three times as specified
+        volume: 0.9,
+        notificationsEnabled: true
+      },
+      setUserLocation: (loc) => set({ userLocation: loc }),
+      updateAdhanSettings: (partial) => set((state) => ({
+        adhanSettings: {
+          ...state.adhanSettings,
+          ...partial
+        }
+      })),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setFontSize: (size) => set({ fontSize: size }),
       setArabicFont: (font) => set({ arabicFont: font }),
@@ -139,7 +207,7 @@ export const useSettingsStore = create<SettingsState>()(
           : [...state.tafseerLanguages, lang]
       })),
       setTafseerProvider: (provider) => set({ tafseerProvider: provider }),
-      setTafseerZoom: (zoom) => set({ tafseerZoom: Math.max(70, Math.min(250, zoom)) }),
+      setTafseerZoom: (zoom) => set({ tafseerZoom: Math.max(70, Math.min(400, zoom)) }),
       toggleAutoScrollAudio: () => set((state) => ({ autoScrollAudio: !state.autoScrollAudio })),
       setAutoScrollAudio: (val) => set({ autoScrollAudio: val }),
       setHasSeenWelcome: (seen) => set({ hasSeenWelcome: seen }),
@@ -211,13 +279,69 @@ export const useSettingsStore = create<SettingsState>()(
         };
       }),
       clearMafatihRecents: () => set({ mafatihRecentIds: [] }),
+      setHijriOffset: (offset) => set({ hijriOffset: Math.max(-2, Math.min(2, offset)) }),
+      updateCalendarNotificationSettings: (partial) => set((state) => ({
+        calendarNotificationSettings: {
+          ...state.calendarNotificationSettings,
+          ...partial
+        }
+      })),
     }),
     {
       name: 'quran-app-settings',
-      version: 2,
+      version: 5,
       migrate: (persistedState: any, version: number) => {
-        // Automatically migrate legacy formats or cross-version updates
-        return persistedState || {};
+        const state = persistedState || {};
+        // Restore standard comfortable font sizes and natural zoom
+        if (!state.fontSize || state.fontSize > 44) {
+          state.fontSize = 38;
+        }
+        if (!state.mafatihFontSize || state.mafatihFontSize > 42) {
+          state.mafatihFontSize = 36;
+        }
+        if (!state.tafseerZoom || state.tafseerZoom > 200) {
+          state.tafseerZoom = 100;
+        }
+        if (state.hijriOffset === undefined) {
+          state.hijriOffset = 0;
+        }
+        if (!state.calendarNotificationSettings) {
+          state.calendarNotificationSettings = {
+            enabled: true,
+            notifyOnEids: true,
+            notifyOnWiladats: true,
+            notifyOnShahadats: true,
+            notifyOnUrs: true,
+            notifyOnFastingDays: true,
+            notifyDayBefore: true,
+            notificationTime: '08:00',
+          };
+        }
+        if (!state.userLocation) {
+          state.userLocation = {
+            name: 'Karbala',
+            country: 'Iraq',
+            latitude: 32.6160,
+            longitude: 44.0249,
+            timezone: 'Asia/Baghdad',
+            description: 'Holy Shrine of Imam Hussain (a.s)'
+          };
+        }
+        if (!state.adhanSettings) {
+          state.adhanSettings = {
+            autoPlayFajr: true,
+            autoPlayDhuhr: true,
+            autoPlayMaghrib: true,
+            repeatCount: 1,
+            volume: 0.9,
+            notificationsEnabled: true
+          };
+        } else {
+          if (state.adhanSettings.autoPlayFajr === undefined) state.adhanSettings.autoPlayFajr = true;
+          if (state.adhanSettings.autoPlayDhuhr === undefined) state.adhanSettings.autoPlayDhuhr = true;
+          if (state.adhanSettings.autoPlayMaghrib === undefined) state.adhanSettings.autoPlayMaghrib = true;
+        }
+        return state;
       },
       storage: {
         getItem: (name) => {

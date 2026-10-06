@@ -240,6 +240,7 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Duas & Supplications');
   const [audioOnly, setAudioOnly] = useState(false);
+  const [mafatihSort, setMafatihSort] = useState<'default' | 'name' | 'audio'>('default');
   const [totalCount, setTotalCount] = useState(0);
   const [categoryViewMode, setCategoryViewMode] = useState<'slider' | 'grid'>('slider');
   const scrollRailRef = useRef<HTMLDivElement>(null);
@@ -349,6 +350,16 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
       clearTimeout(timeout);
     };
   }, [selectedCategory, searchQuery, audioOnly, allCatalogItems, mafatihBookmarks]);
+
+  const sortedItems = useMemo(() => {
+    if (mafatihSort === 'name') {
+      return [...items].sort((a, b) => a.title.localeCompare(b.title));
+    }
+    if (mafatihSort === 'audio') {
+      return [...items].sort((a, b) => (b.hasAudio ? 1 : 0) - (a.hasAudio ? 1 : 0));
+    }
+    return items;
+  }, [items, mafatihSort]);
 
   const handleSelect = (id: string) => {
     hapticImpact(ImpactStyle.Light);
@@ -784,8 +795,48 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {items.map((item) => (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {totalCount} {totalCount === 1 ? 'supplication' : 'supplications'} found
+            </span>
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              <span className="text-[10px] uppercase font-bold text-slate-400 px-1">Sort:</span>
+              <button
+                onClick={() => { hapticImpact(ImpactStyle.Light); setMafatihSort('default'); }}
+                className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all ${
+                  mafatihSort === 'default'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                Default
+              </button>
+              <button
+                onClick={() => { hapticImpact(ImpactStyle.Light); setMafatihSort('name'); }}
+                className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all ${
+                  mafatihSort === 'name'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                A-Z
+              </button>
+              <button
+                onClick={() => { hapticImpact(ImpactStyle.Light); setMafatihSort('audio'); }}
+                className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all ${
+                  mafatihSort === 'audio'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                Audio First
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {sortedItems.map((item) => (
             <div
               key={item.id}
               onClick={() => handleSelect(item.id)}
@@ -838,6 +889,7 @@ export default function MafatihView({ onSelectItem }: MafatihViewProps) {
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
     </div>

@@ -93,9 +93,10 @@ export const fetchSurahs = async (): Promise<SurahMeta[]> => {
     if (response.ok) {
       const data = await safeJson(response);
       if (data?.data && Array.isArray(data.data)) {
+        const sorted = [...data.data].sort((a: any, b: any) => a.number - b.number);
         surahMetaCache.length = 0;
-        surahMetaCache.push(...data.data);
-        fastStorage.set('shia-quran-surahs-cache', data.data);
+        surahMetaCache.push(...sorted);
+        fastStorage.set('shia-quran-surahs-cache', sorted);
       }
     }
   } catch (e) {

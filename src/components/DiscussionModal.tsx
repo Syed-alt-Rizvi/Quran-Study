@@ -87,15 +87,19 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
   // Load draft
   useEffect(() => {
     if (isOpen) {
-      const draft = localStorage.getItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`);
-      if (draft) setContent(draft);
+      try {
+        const draft = localStorage.getItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`);
+        if (draft) setContent(draft);
+      } catch (e) {}
     }
   }, [isOpen, surah.number, ayah.numberInSurah]);
 
   // Save draft
   useEffect(() => {
     if (isOpen) {
-      localStorage.setItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`, content);
+      try {
+        localStorage.setItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`, content);
+      } catch (e) {}
     }
   }, [content, isOpen, surah.number, ayah.numberInSurah]);
 
@@ -173,7 +177,9 @@ export default function DiscussionModal({ isOpen, onClose, ayah, surah }: Discus
         }
       });
       setContent('');
-      localStorage.removeItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`);
+      try {
+        localStorage.removeItem(`draft-discussion-${surah.number}-${ayah.numberInSurah}`);
+      } catch (e) {}
       hapticNotification('SUCCESS');
     } catch (e) {
       console.error(e);

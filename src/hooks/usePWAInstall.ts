@@ -13,16 +13,11 @@ export function usePWAInstall() {
   const [isInIframe, setIsInIframe] = useState(false);
 
   useEffect(() => {
-    // Detect iframe context (e.g. GoDaddy masked forwarding) only on custom/live domains
+    // Detect iframe context (e.g. GoDaddy masked forwarding)
     try {
-      const isDevOrPreview =
-        typeof window !== 'undefined' &&
-        (window.location.hostname.includes('run.app') ||
-         window.location.hostname.includes('localhost') ||
-         window.location.hostname.includes('127.0.0.1'));
-      setIsInIframe(!isDevOrPreview && typeof window !== 'undefined' && window.self !== window.top);
+      setIsInIframe(typeof window !== 'undefined' && window.self !== window.top);
     } catch {
-      setIsInIframe(false);
+      setIsInIframe(true);
     }
 
     // Detect standalone mode (already installed or running in native Capacitor shell)

@@ -6,43 +6,56 @@ export interface GuestProfile {
 }
 
 export const getGuestProfile = (): GuestProfile | null => {
-  const stored = localStorage.getItem('guest_profile');
-  if (stored) {
-    try {
+  try {
+    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('guest_profile') : null;
+    if (stored) {
       return JSON.parse(stored);
-    } catch (e) {
-      return null;
     }
+  } catch (e) {
+    return null;
   }
   return null;
 };
 
 export const saveGuestProfile = (displayName: string): GuestProfile => {
-  let userId = localStorage.getItem('guest_device_id');
-  if (!userId) {
-    userId = uuidv4();
-    localStorage.setItem('guest_device_id', userId);
+  let userId = '';
+  try {
+    userId = typeof localStorage !== 'undefined' ? (localStorage.getItem('guest_device_id') || '') : '';
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('guest_device_id', userId);
+    }
+    const profile: GuestProfile = { userId, displayName };
+    localStorage.setItem('guest_profile', JSON.stringify(profile));
+    return profile;
+  } catch {
+    return { userId: userId || uuidv4(), displayName };
   }
-  const profile: GuestProfile = { userId, displayName };
-  localStorage.setItem('guest_profile', JSON.stringify(profile));
-  return profile;
 };
 
 export const clearGuestProfile = () => {
-  localStorage.removeItem('guest_profile');
+  try {
+    localStorage.removeItem('guest_profile');
+  } catch {}
 };
 
 export const hasAcceptedGuidelines = (): boolean => {
-  return localStorage.getItem('shia_quran_guidelines_accepted') === 'true';
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem('shia_quran_guidelines_accepted') === 'true';
+  } catch {
+    return true;
+  }
 };
 
 export const acceptGuidelines = () => {
-  localStorage.setItem('shia_quran_guidelines_accepted', 'true');
+  try {
+    localStorage.setItem('shia_quran_guidelines_accepted', 'true');
+  } catch {}
 };
 
 export const getBlockedUserIds = (): string[] => {
   try {
-    const raw = localStorage.getItem('shia_quran_blocked_users');
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('shia_quran_blocked_users') : null;
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -51,17 +64,21 @@ export const getBlockedUserIds = (): string[] => {
 
 export const blockUserId = (userId: string) => {
   if (!userId) return;
-  const current = getBlockedUserIds();
-  if (!current.includes(userId)) {
-    const updated = [...current, userId];
-    localStorage.setItem('shia_quran_blocked_users', JSON.stringify(updated));
-  }
+  try {
+    const current = getBlockedUserIds();
+    if (!current.includes(userId)) {
+      const updated = [...current, userId];
+      localStorage.setItem('shia_quran_blocked_users', JSON.stringify(updated));
+    }
+  } catch {}
 };
 
 export const unblockUserId = (userId: string) => {
-  const current = getBlockedUserIds();
-  const updated = current.filter(id => id !== userId);
-  localStorage.setItem('shia_quran_blocked_users', JSON.stringify(updated));
+  try {
+    const current = getBlockedUserIds();
+    const updated = current.filter(id => id !== userId);
+    localStorage.setItem('shia_quran_blocked_users', JSON.stringify(updated));
+  } catch {}
 };
 
 export const isUserBlocked = (userId: string): boolean => {
@@ -71,7 +88,7 @@ export const isUserBlocked = (userId: string): boolean => {
 
 export const getReportedDiscussionIds = (): string[] => {
   try {
-    const raw = localStorage.getItem('shia_quran_reported_discussions');
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('shia_quran_reported_discussions') : null;
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -80,12 +97,12 @@ export const getReportedDiscussionIds = (): string[] => {
 
 export const reportDiscussion = (discussionId: string, reason: string) => {
   if (!discussionId) return;
-  const current = getReportedDiscussionIds();
-  if (!current.includes(discussionId)) {
-    const updated = [...current, discussionId];
-    localStorage.setItem('shia_quran_reported_discussions', JSON.stringify(updated));
-  }
   try {
+    const current = getReportedDiscussionIds();
+    if (!current.includes(discussionId)) {
+      const updated = [...current, discussionId];
+      localStorage.setItem('shia_quran_reported_discussions', JSON.stringify(updated));
+    }
     const reportsRaw = localStorage.getItem('shia_quran_report_details') || '[]';
     const reports = JSON.parse(reportsRaw);
     reports.push({ discussionId, reason, timestamp: new Date().toISOString() });
@@ -99,16 +116,23 @@ export const isDiscussionReported = (discussionId: string): boolean => {
 };
 
 export const deleteGuestAccountAndAllData = () => {
-  localStorage.removeItem('guest_profile');
-  localStorage.removeItem('guest_device_id');
-  localStorage.removeItem('shia_quran_guidelines_accepted');
-  localStorage.removeItem('shia_quran_blocked_users');
-  localStorage.removeItem('shia_quran_reported_discussions');
-  localStorage.removeItem('shia_quran_report_details');
-  localStorage.removeItem('shia-quran-settings');
-  localStorage.removeItem('quran-app-settings');
-  localStorage.removeItem('shia-quran-has-seen-welcome');
-  localStorage.removeItem('shia-quran-active-surah');
-  localStorage.removeItem('shia-quran-active-juz');
-  localStorage.removeItem('shia-quran-surahs-cache');
+  try {
+    const keys = [
+      'guest_profile',
+      'guest_device_id',
+      'shia_quran_guidelines_accepted',
+      'shia_quran_blocked_users',
+      'shia_quran_reported_discussions',
+      'shia_quran_report_details',
+      'shia-quran-settings',
+      'quran-app-settings',
+      'shia-quran-has-seen-welcome',
+      'shia-quran-active-surah',
+      'shia-quran-active-juz',
+      'shia-quran-surahs-cache'
+    ];
+    for (const k of keys) {
+      localStorage.removeItem(k);
+    }
+  } catch {}
 };

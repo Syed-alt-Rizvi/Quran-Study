@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Moon, Sun, Type, Bookmark, BookOpen, Headphones, 
@@ -8,14 +8,13 @@ import {
   Code, Mail, Copy, Info, Shield, FileText,
   ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
   Smartphone, Vibrate, ExternalLink,
-  Microscope, MessageCircle, LogOut, RefreshCw
+  Microscope, MessageCircle, LogOut, RefreshCw, Calendar
 } from 'lucide-react';
 import { useSettingsStore, AppTab } from '../store';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import { PWAInstallButton } from './PWAInstallButton';
-import DataTransferModal from './common/DataTransferModal';
 
 import { registerModal } from '../utils/modalBackHandler';
 
@@ -70,7 +69,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     isOpen: false,
     tab: 'privacy',
   });
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
@@ -229,6 +227,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
   const todayTafseer = habitStats?.dailyTafseerRead?.[todayStr] || 0;
 
   const notesList = Object.entries(tafseerNotes || {}).filter(([_, note]) => note && note.trim().length > 0);
+
+  const sortedBookmarks = useMemo(() => {
+    return [...bookmarks].sort((a, b) => {
+      if (a.surahId !== b.surahId) return a.surahId - b.surahId;
+      return a.ayahNumber - b.ayahNumber;
+    });
+  }, [bookmarks]);
 
   const tabs: { id: TabCategory; label: string; icon: any; badge?: number }[] = [
     { id: 'display', label: 'App', icon: Sliders },
@@ -416,6 +421,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     {[
                       { id: 'quran' as AppTab, label: 'Holy Quran', desc: 'Surahs & Juz', icon: BookOpen },
                       { id: 'mafatih' as AppTab, label: 'Mafatih Al Jinan', desc: 'Duas & Ziyaraat', icon: KeyRound },
+                      { id: 'adhan' as AppTab, label: 'Shia Adhan & Map', desc: 'Prayer Times & Adhan', icon: Compass },
+                      { id: 'calendar' as AppTab, label: 'Calander', desc: 'Shia Dates & Eids', icon: Calendar },
                       { id: 'science' as AppTab, label: 'Imams & Science', desc: 'Hadith Discoveries', icon: Microscope },
                       { id: 'discuss' as AppTab, label: 'Community', desc: 'Discussions', icon: MessageCircle },
                     ].map((tabOption) => {
@@ -611,11 +618,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-slate-400">24px</span>
+                    <span className="text-xs font-bold text-slate-400">22px</span>
                     <input
                       id="arabic-font-size-slider"
                       type="range"
-                      min="24"
+                      min="22"
                       max="64"
                       step="2"
                       value={fontSize}
@@ -786,7 +793,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       type="range"
                       min="70"
                       max="250"
-                      step="5"
+                      step="10"
                       value={tafseerZoom}
                       onChange={(e) => setTafseerZoom(Number(e.target.value))}
                       className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
@@ -797,7 +804,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <div className="pt-2 text-right border-t border-slate-100 dark:border-slate-800">
                     <p 
                       className="font-urdu leading-relaxed text-slate-800 dark:text-slate-200 transition-[font-size] duration-150"
-                      style={{ fontSize: `${Math.round(16 * (tafseerZoom / 100))}px` }}
+                      style={{ fontSize: `${Math.round(18 * (tafseerZoom / 100))}px` }}
                     >
                       تفسیرِ قرآن اور علمی نکات کا نمونہ متن برائے مطالعہ و تحقیق
                     </p>
@@ -851,18 +858,18 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-slate-400">20px</span>
+                    <span className="text-xs font-bold text-slate-400">22px</span>
                     <input
                       id="mafatih-font-size-slider"
                       type="range"
-                      min="20"
-                      max="44"
+                      min="22"
+                      max="64"
                       step="2"
                       value={mafatihFontSize}
                       onChange={(e) => setMafatihFontSize(Number(e.target.value))}
                       className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                     />
-                    <span className="text-xs font-bold text-slate-400">44px</span>
+                    <span className="text-xs font-bold text-slate-400">64px</span>
                   </div>
 
                   <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
@@ -1042,36 +1049,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {/* TAB 4: LIBRARY, SAVED & HABITS */}
             {activeTab === 'library' && (
               <div className="space-y-5 animate-in fade-in duration-200">
-                {/* Transfer & Cloud Sync Banner for Forwarded / Secondary Sites */}
-                <div className="rounded-2xl p-4 bg-gradient-to-br from-indigo-50/80 via-white to-emerald-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 border border-indigo-200/80 dark:border-indigo-900/40 shadow-xs space-y-2.5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                        <RefreshCw size={16} />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-100 block">
-                          Transfer Data to Forwarded Site
-                        </span>
-                        <span className="text-[11px] text-slate-400">
-                          Sync bookmarks, notes & progress across domains
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    id="open-data-transfer-modal-btn"
-                    onClick={() => {
-                      hapticSelection();
-                      setIsTransferModalOpen(true);
-                    }}
-                    className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs shadow-xs flex items-center justify-between transition-all cursor-pointer"
-                  >
-                    <span>Open Transfer & Sync Tools</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
-
                 {/* Daily Study Activity */}
                 <div className="rounded-2xl p-4 bg-gradient-to-br from-emerald-500/10 via-slate-50 to-amber-500/10 dark:from-emerald-950/40 dark:via-slate-900 dark:to-amber-950/20 border border-emerald-500/20 dark:border-emerald-800/40 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
@@ -1126,7 +1103,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
 
                   {bookmarks.length > 0 ? (
                     <div className="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                      {bookmarks.map((b, bIdx) => (
+                      {sortedBookmarks.map((b, bIdx) => (
                         <div
                           key={`bookmark-${b.surahId}-${b.ayahNumber}-${bIdx}`}
                           className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500/50 transition-all group shadow-xs"
@@ -1564,12 +1541,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
       isOpen={privacyModal.isOpen}
       onClose={() => setPrivacyModal(p => ({ ...p, isOpen: false }))}
       initialTab={privacyModal.tab}
-    />
-
-    {/* Cross-Domain Data Transfer & Cloud Sync Modal */}
-    <DataTransferModal
-      isOpen={isTransferModalOpen}
-      onClose={() => setIsTransferModalOpen(false)}
     />
   </>
   );

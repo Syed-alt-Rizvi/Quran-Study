@@ -9,6 +9,22 @@ const currentBuildId = typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID_
 
 // Auto-recover from stale chunks when a new build is published in AI Studio
 if (typeof window !== 'undefined') {
+  const triggerSafeChunkReload = () => {
+    try {
+      const now = Date.now();
+      const last = parseInt(sessionStorage.getItem('last_chunk_reload') || '0', 10);
+      if (now - last > 20000) {
+        sessionStorage.setItem('last_chunk_reload', String(now));
+        if ('caches' in window) {
+          window.caches.keys().then((keys) => {
+            keys.forEach((k) => window.caches.delete(k).catch(() => {}));
+          }).catch(() => {});
+        }
+        window.location.reload();
+      }
+    } catch {}
+  };
+
   window.addEventListener('unhandledrejection', (event) => {
     // Gracefully absorb benign network, aborted audio, or background fetch rejections
     if (!event.reason || event.reason?.name === 'AbortError' || event.reason?.message?.includes?.('aborted')) {
@@ -21,7 +37,7 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('vite:preloadError', (event) => {
     console.warn('Vite preload error (new build published), reloading newest assets...', event);
-    window.location.reload();
+    triggerSafeChunkReload();
   });
 
   window.addEventListener('error', (event) => {
@@ -32,7 +48,7 @@ if (typeof window !== 'undefined') {
        event.message.includes('Loading chunk'))
     ) {
       console.warn('Stale asset chunk error caught, refreshing to newest published build...');
-      window.location.reload();
+      triggerSafeChunkReload();
     }
   });
 
@@ -52,81 +68,72 @@ if (typeof window !== 'undefined') {
   } catch {}
 }
 
-// Clean up any stale service workers in development to prevent module interception
-if ('serviceWorker' in navigator) {
-  if (import.meta.env.DEV) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const registration of registrations) {
-        registration.unregister().catch(() => {});
+// PWA Service Worker Registration & Cache Sanitization
+if ('serviceWorker' in navigator && typeof window !== 'undefined') {
+  if ('caches' in window) {
+    window.caches.keys().then((keys) => {
+      for (const key of keys) {
+        if (
+          key === 'tafseer-namoona-cache' ||
+          key === 'tafseer-namoona-v2-cache' ||
+          key === 'tafseer-namoona-api-cache'
+        ) {
+          window.caches.delete(key).catch(() => {});
+        }
       }
     }).catch(() => {});
-  } else {
-    // Production PWA Service Worker Registration & Cache Sanitization
-    if ('caches' in window) {
-      window.caches.keys().then((keys) => {
-        for (const key of keys) {
-          if (
-            key === 'tafseer-namoona-cache' ||
-            key === 'tafseer-namoona-v2-cache' ||
-            key === 'tafseer-namoona-api-cache'
-          ) {
-            window.caches.delete(key).catch(() => {});
-          }
-        }
-      }).catch(() => {});
-    }
-
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then((registration) => {
-        // If a worker is already waiting, tell it to take over immediately
-        if (registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        }
-
-        // Proactively check for new builds right away
-        registration.update().catch(() => {});
-
-        // Re-check for updates whenever user returns to the tab or focuses the app
-        const checkForUpdates = () => {
-          registration.update().catch(() => {});
-        };
-
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            checkForUpdates();
-          }
-        });
-        window.addEventListener('focus', checkForUpdates);
-
-        // Periodically check for published updates every 30 seconds
-        setInterval(checkForUpdates, 30 * 1000);
-
-        registration.addEventListener('updatefound', () => {
-          const installingWorker = registration.installing;
-          if (installingWorker) {
-            installingWorker.addEventListener('statechange', () => {
-              if (installingWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  installingWorker.postMessage({ type: 'SKIP_WAITING' });
-                }
-              }
-            });
-          }
-        });
-      }).catch((err) => {
-        console.warn('PWA service worker registration notice:', err);
-      });
-    });
-
-    // Reload when controller changes to activate the newest build seamlessly
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
-        refreshing = true;
-        window.location.reload();
-      }
-    });
   }
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then((registration) => {
+      // If a worker is already waiting, tell it to take over immediately
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      // Proactively check for new builds right away
+      registration.update().catch(() => {});
+
+      // Re-check for updates whenever user returns to the tab or focuses the app
+      const checkForUpdates = () => {
+        registration.update().catch(() => {});
+      };
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          checkForUpdates();
+        }
+      });
+      window.addEventListener('focus', checkForUpdates);
+
+      // Periodically check for published updates every 30 seconds
+      setInterval(checkForUpdates, 30 * 1000);
+
+      registration.addEventListener('updatefound', () => {
+        const installingWorker = registration.installing;
+        if (installingWorker) {
+          installingWorker.addEventListener('statechange', () => {
+            if (installingWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                installingWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            }
+          });
+        }
+      });
+    }).catch((err) => {
+      console.warn('PWA service worker registration notice:', err);
+    });
+  });
+
+  // Reload when controller changes to activate the newest build seamlessly
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 }
 
 createRoot(document.getElementById('root')!).render(

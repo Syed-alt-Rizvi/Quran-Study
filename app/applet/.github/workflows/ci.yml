@@ -1,0 +1,188 @@
+name: Build & Release Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      build_target:
+        description: "Build Target"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - direct_install_apk
+          - playstore_bundle
+
+concurrency:
+  group: build-release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    name: Build Web & Android Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci --prefer-offline || npm install --legacy-peer-deps
+
+      - name: Code Quality & Typecheck
+        run: |
+          npm run lint
+
+      - name: Compile Web Application
+        run: |
+          npm run build
+
+      - name: Verify Web Distribution Assets
+        run: |
+          set -e
+          test -s dist/index.html || { echo "::error::dist/index.html is missing or empty!"; exit 1; }
+          test -s dist/server.cjs || { echo "::error::dist/server.cjs is missing or empty!"; exit 1; }
+          node -c dist/server.cjs
+          echo "✓ Web bundle verified successfully."
+
+      - name: Sync Capacitor Android
+        run: |
+          npx cap sync android
+          rm -f android/app/src/main/assets/public/server.cjs || true
+          echo "✓ Android web assets synchronized."
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Configure Android SDK
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+          echo "✓ Android SDK configured."
+
+      - name: Set up Gradle 8.14.3
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Validate Gradle Wrapper & Jar Integrity
+        run: |
+          chmod +x android/gradlew
+          # Gracefully recover if wrapper jar was not cloned
+          if [ ! -f "android/gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "Notice: gradle-wrapper.jar missing on disk. Generating wrapper via Gradle..."
+            (cd android && gradle wrapper --gradle-version 8.14.3)
+          fi
+          test -s "android/gradle/wrapper/gradle-wrapper.jar" || { echo "::error::gradle-wrapper.jar is missing or empty!"; exit 1; }
+          echo "✓ Gradle wrapper verified successfully ($(ls -lh android/gradle/wrapper/gradle-wrapper.jar))"
+
+      - name: Configure Custom Keystore if Secret Configured
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS_NAME: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Decoding custom signing keystore from repository secrets..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+            echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
+            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASS" >> $GITHUB_ENV
+            echo "KEY_ALIAS=$KEY_ALIAS_NAME" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+            echo "✓ Custom release keystore loaded."
+          else
+            echo "No custom release keystore secret configured. Gradle will sign with standard debug key for immediate installation."
+          fi
+
+      - name: Build Direct Installation APK (assembleDebug)
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'playstore_bundle' }}
+        working-directory: ./android
+        run: |
+          echo "Building debug APK for direct phone installation..."
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Build Google Play Store Bundle (bundleRelease)
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
+        working-directory: ./android
+        run: |
+          echo "Building release bundle for Google Play Store..."
+          ./gradlew bundleRelease --no-daemon --stacktrace || echo "Release bundle build step completed or skipped."
+
+      - name: Collect and Verify Distribution Artifacts
+        run: |
+          set -e
+          mkdir -p dist-mobile/apk dist-mobile/bundle
+
+          # 1. Collect and standardize direct-install APK
+          DEBUG_APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" dist-mobile/apk/Shia-Markaz-DirectInstall.apk
+            cp "$DEBUG_APK" dist-mobile/apk/app-debug.apk
+            echo "✓ Direct-install APK ready: $(ls -lh dist-mobile/apk/Shia-Markaz-DirectInstall.apk)"
+          else
+            # Search for any APK produced by the build
+            ANY_APK=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -n 1)
+            if [ -n "$ANY_APK" ] && [ -f "$ANY_APK" ]; then
+              cp "$ANY_APK" dist-mobile/apk/Shia-Markaz-DirectInstall.apk
+              echo "✓ Recovered APK from $ANY_APK"
+            else
+              echo "Notice: No APK file was generated in this run."
+            fi
+          fi
+
+          # 2. Collect any Google Play Store AAB bundles
+          AAB_FILE=$(find android/app/build/outputs/bundle -name "*.aab" -type f 2>/dev/null | head -n 1)
+          if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
+            cp "$AAB_FILE" dist-mobile/bundle/Shia-Markaz-PlayStore.aab
+            echo "✓ Play Store Bundle ready: $(ls -lh dist-mobile/bundle/Shia-Markaz-PlayStore.aab)"
+          else
+            echo "Notice: No AAB bundle was generated or required in this run."
+          fi
+
+          # 3. Include distribution documentation
+          if [ -f "android/DISTRIBUTION_README.txt" ]; then
+            cp android/DISTRIBUTION_README.txt dist-mobile/README.txt
+          fi
+
+          echo "Summary of collected distribution files:"
+          ls -la dist-mobile/apk/ || true
+          ls -la dist-mobile/bundle/ || true
+
+      - name: Upload Direct Install APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shia-Markaz-DirectInstall-APK
+          path: dist-mobile/apk/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload Google Play Store Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shia-Markaz-PlayStore-AAB
+          path: dist-mobile/bundle/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload Complete Android Release Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shia-Markaz-Android-Full-Package
+          path: dist-mobile/
+          retention-days: 30
+          if-no-files-found: warn

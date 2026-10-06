@@ -2,8 +2,8 @@
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
-  --font-sans: "Playfair Display", serif;
-  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
   --font-arabic: "Amiri", serif;
   
   /* Luxury Alabaster to Obsidian scale (replaces slate) */
@@ -80,24 +80,6 @@
     display: flex;
     flex-direction: column;
   }
-}
-
-/* GoDaddy Masked Frame Mobile Auto-Scale Support */
-html.framed-mobile-zoom {
-  width: 100vw !important;
-  overflow-x: hidden !important;
-}
-
-html.framed-mobile-zoom body {
-  width: 100% !important;
-  max-width: 100vw !important;
-  overflow-x: hidden !important;
-}
-
-html.framed-mobile-zoom #root {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
 }
 
 /* Safe-area insets and universal fluid utilities */
@@ -301,8 +283,35 @@ html.framed-mobile-zoom #root {
 }
 
 .ayah-arabic-text {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: isolate;
   forced-color-adjust: none;
-  text-rendering: optimizeLegibility;
+  text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0 !important;
+  word-spacing: normal !important;
+  line-height: 2.6 !important;
+  font-feature-settings: "liga" 1, "calt" 1;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* ==========================================================================
+   Universal Standard Fluid Container & Text Safeguards
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 

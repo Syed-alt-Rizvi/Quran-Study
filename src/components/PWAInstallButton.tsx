@@ -14,7 +14,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
   className = '',
   variant = 'compact'
 }) => {
-  const { isInstalled, isInstallable, install } = usePWAInstall();
+  const { isInstalled, isInstallable, isInIframe, install } = usePWAInstall();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // If already running inside installed standalone mode, suppress

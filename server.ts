@@ -5,24 +5,24 @@ import fs from "fs";
 import os from "os";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
-import { db } from "./src/db";
-import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema";
+import { db } from "./src/db/index.ts";
+import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema.ts";
 import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper";
+import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper.ts";
 import {
   getMafatihCategories,
   getMafatihItemsList,
   getOrFetchMafatihItem,
   getScrapeStatus,
   startBackgroundScraper
-} from "./server/mafatihService";
+} from "./server/mafatihService.ts";
 import {
   getOrFetchNamoonaSurah,
   getNamoonaAyah,
   getNamoonaHtml,
   startNamoonaBackgroundCrawler
-} from "./server/namoonaService";
+} from "./server/namoonaService.ts";
 
 async function startServer() {
   const app = express();
@@ -92,6 +92,179 @@ async function startServer() {
       serverTime: new Date().toISOString(),
       app: "Shia Markaz"
     });
+  });
+
+  // Dedicated PWA Manifest endpoints ensuring 100% PWA installability compliance
+  app.get(["/manifest.webmanifest", "/manifest.json"], (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "manifest.webmanifest"),
+      path.join(process.cwd(), "dist", "manifest.webmanifest"),
+      path.join(process.cwd(), "public", "manifest.json"),
+      path.join(process.cwd(), "dist", "manifest.json")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=3600");
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).json({ error: "Manifest not found" });
+  });
+
+  // Dedicated PWA Service Worker endpoint
+  app.get("/sw.js", (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "sw.js"),
+      path.join(process.cwd(), "dist", "sw.js")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+        res.setHeader("Service-Worker-Allowed", "/");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).send("// Service worker not found");
+  });
+
+  // In-memory LRU/map caches for Google Maps & AlAdhan to minimize quota consumption
+  const mapsGeocodeCache = new Map<string, any>();
+  const mapsReverseCache = new Map<string, any>();
+  const mapsTimezoneCache = new Map<string, any>();
+  const prayerTimesCache = new Map<string, any>();
+
+  const getMapsApiKey = () => {
+    return process.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCztQlQZWeWLux5dyPZJOcLtGmb-7VIthU";
+  };
+
+  // 1. AlAdhan Shia Ithna Ashari (Method 0) Prayer Times Proxy
+  app.get("/api/prayer-times", async (req, res) => {
+    try {
+      const { latitude, longitude, date, method = "0" } = req.query;
+      if (!latitude || !longitude) {
+        return res.status(400).json({ error: "Missing latitude or longitude" });
+      }
+      const now = new Date();
+      const d = now.getDate().toString().padStart(2, '0');
+      const m = (now.getMonth() + 1).toString().padStart(2, '0');
+      const y = now.getFullYear();
+      const dateStr = (date as string) || `${d}-${m}-${y}`;
+      const roundedLat = (Math.round(Number(latitude) * 1000) / 1000).toFixed(3);
+      const roundedLng = (Math.round(Number(longitude) * 1000) / 1000).toFixed(3);
+      const cacheKey = `${dateStr}_${roundedLat}_${roundedLng}_${method}`;
+
+      if (prayerTimesCache.has(cacheKey)) {
+        return res.json(prayerTimesCache.get(cacheKey));
+      }
+
+      const aladhanUrl = `https://api.aladhan.com/v1/timings/${encodeURIComponent(dateStr)}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
+      const response = await fetch(aladhanUrl, { headers: { 'User-Agent': 'ShiaMarkaz/1.0' } });
+      if (!response.ok) {
+        return res.status(response.status).json({ error: "Failed to fetch from AlAdhan API" });
+      }
+      const data = await response.json();
+      prayerTimesCache.set(cacheKey, data);
+      res.setHeader('Cache-Control', 'public, max-age=1800'); // Cache for 30 minutes
+      return res.json(data);
+    } catch (err: any) {
+      console.error("Prayer times error:", err);
+      return res.status(500).json({ error: err.message || "Failed to calculate prayer times" });
+    }
+  });
+
+  // 2. Google Maps Geocoding Proxy (Forward Search for City/Town/Village)
+  app.get("/api/maps/geocode", async (req, res) => {
+    try {
+      const address = (req.query.address as string)?.trim();
+      if (!address) {
+        return res.status(400).json({ error: "Missing address query" });
+      }
+      const normalizedQuery = address.toLowerCase();
+      if (mapsGeocodeCache.has(normalizedQuery)) {
+        return res.json(mapsGeocodeCache.get(normalizedQuery));
+      }
+
+      const apiKey = getMapsApiKey();
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === 'OK' || data.status === 'ZERO_RESULTS') {
+        mapsGeocodeCache.set(normalizedQuery, data);
+      }
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache geocoded cities for 24h
+      return res.json(data);
+    } catch (err: any) {
+      console.error("Maps geocode error:", err);
+      return res.status(500).json({ error: err.message || "Geocoding request failed" });
+    }
+  });
+
+  // 3. Google Maps Reverse Geocoding Proxy (Coordinate Trace on Map Click / GPS)
+  app.get("/api/maps/reverse-geocode", async (req, res) => {
+    try {
+      const latlng = (req.query.latlng as string)?.trim();
+      if (!latlng) {
+        return res.status(400).json({ error: "Missing latlng coordinate" });
+      }
+      const [latStr, lngStr] = latlng.split(',');
+      const lat = Math.round(Number(latStr) * 1000) / 1000;
+      const lng = Math.round(Number(lngStr) * 1000) / 1000;
+      const cacheKey = `${lat.toFixed(3)},${lng.toFixed(3)}`;
+
+      if (mapsReverseCache.has(cacheKey)) {
+        return res.json(mapsReverseCache.get(cacheKey));
+      }
+
+      const apiKey = getMapsApiKey();
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${encodeURIComponent(cacheKey)}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === 'OK' || data.status === 'ZERO_RESULTS') {
+        mapsReverseCache.set(cacheKey, data);
+      }
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.json(data);
+    } catch (err: any) {
+      console.error("Maps reverse-geocode error:", err);
+      return res.status(500).json({ error: err.message || "Reverse geocoding request failed" });
+    }
+  });
+
+  // 4. Google Maps Time Zone Proxy
+  app.get("/api/maps/timezone", async (req, res) => {
+    try {
+      const location = (req.query.location as string)?.trim();
+      const timestamp = (req.query.timestamp as string) || Math.floor(Date.now() / 1000).toString();
+      if (!location) {
+        return res.status(400).json({ error: "Missing location" });
+      }
+      const [latStr, lngStr] = location.split(',');
+      const lat = Math.round(Number(latStr) * 100) / 100;
+      const lng = Math.round(Number(lngStr) * 100) / 100;
+      const cacheKey = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+
+      if (mapsTimezoneCache.has(cacheKey)) {
+        return res.json(mapsTimezoneCache.get(cacheKey));
+      }
+
+      const apiKey = getMapsApiKey();
+      const url = `https://maps.googleapis.com/maps/api/timezone/json?location=${encodeURIComponent(cacheKey)}&timestamp=${timestamp}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === 'OK') {
+        mapsTimezoneCache.set(cacheKey, data);
+      }
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.json(data);
+    } catch (err: any) {
+      console.error("Maps timezone error:", err);
+      return res.status(500).json({ error: err.message || "Timezone request failed" });
+    }
   });
 
   // Google Play Compliance Public Routes

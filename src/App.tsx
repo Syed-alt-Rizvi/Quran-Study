@@ -7,6 +7,9 @@ import { AnimatePresence } from 'motion/react';
 import { popModal } from './utils/modalBackHandler';
 import { trackAppLaunchAndTelemetry } from './utils/telemetry';
 import { checkUrlForTransfer, importUserData } from './utils/dataTransfer';
+import { checkAndDispatchCalendarNotifications } from './utils/calendarNotifications';
+import ActiveAdhanNotification from './components/ActiveAdhanNotification';
+import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
 import { Loader2 } from 'lucide-react';
 
 // Code-split heavy views for instantaneous first paint
@@ -25,6 +28,9 @@ const ViewLoadingFallback = () => (
 
 export default function App() {
   const { isDarkMode, englishFont, hasSeenWelcome, setHasSeenWelcome } = useSettingsStore();
+  
+  // Continuous global Shia Adhan announcement scheduler & seasonal day-to-day shift tracker
+  useGlobalAdhanScheduler();
   
   // Safe initial check checking both localStorage and store so the user is never stuck
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -53,26 +59,6 @@ export default function App() {
   const [selectedMafatihItem, setSelectedMafatihItem] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [isMobileInFrame, setIsMobileInFrame] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const isPreviewOrDev =
-          window.location.hostname.includes('run.app') ||
-          window.location.hostname.includes('localhost') ||
-          window.location.hostname.includes('127.0.0.1');
-
-        if (!isPreviewOrDev) {
-          const isFramed = window.self !== window.top;
-          const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
-          if (isFramed && isMobileDevice) {
-            setIsMobileInFrame(true);
-          }
-        }
-      } catch {}
-    }
-  }, []);
 
   // Sync dark mode class with root documentElement and body
   useEffect(() => {
@@ -113,6 +99,18 @@ export default function App() {
 
     // Check if user opened a transfer link or sync code from primary/secondary site
     checkUrlForTransfer();
+
+    // Check today/tomorrow special Shia events and dispatch notifications if enabled
+    const state = useSettingsStore.getState();
+    if (state.calendarNotificationSettings?.enabled) {
+      checkAndDispatchCalendarNotifications(
+        state.calendarNotificationSettings,
+        state.hijriOffset || 0,
+        (notifiedDate) => {
+          state.updateCalendarNotificationSettings({ lastNotifiedDate: notifiedDate });
+        }
+      );
+    }
 
     // Listen for cross-window / iframe data transfer from parent window (for masked forwarding)
     const handleMessage = (e: MessageEvent) => {
@@ -320,37 +318,8 @@ export default function App() {
       className={`min-h-screen w-full ${isDarkMode ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30`}
       style={{ fontFamily: englishFont }}
     >
-      {isMobileInFrame && (
-        <div className="bg-emerald-800 text-white px-3.5 py-2 text-xs flex items-center justify-between gap-2 shadow-md z-50 sticky top-0 border-b border-emerald-600/40">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="shrink-0 font-bold bg-white/20 px-1.5 py-0.5 rounded text-[10px]">Mobile View</span>
-            <span className="truncate text-[11px] text-emerald-100">Tap to open native fullscreen mobile app:</span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  try {
-                    window.open(window.location.href, '_top');
-                  } catch {
-                    window.location.href = 'https://quran-study.ai.studio';
-                  }
-                }
-              }}
-              className="px-2.5 py-1 bg-white text-emerald-900 rounded-lg font-bold text-[11px] hover:bg-emerald-50 transition active:scale-95 cursor-pointer shadow-xs"
-            >
-              Open Mobile
-            </button>
-            <button
-              onClick={() => setIsMobileInFrame(false)}
-              className="text-emerald-300 hover:text-white p-1 text-xs cursor-pointer"
-              title="Dismiss"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Global Shia Adhan Playing Overlay Banner */}
+      <ActiveAdhanNotification />
 
       <Suspense fallback={<ViewLoadingFallback />}>
         <AnimatePresence mode="wait">

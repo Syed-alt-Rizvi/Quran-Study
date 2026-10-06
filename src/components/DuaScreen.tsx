@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { useSettingsStore } from '../store';
 import { BookOpen, X, ArrowLeft } from 'lucide-react';
 import { registerModal } from '../utils/modalBackHandler';
+import { getArabicFontFamily } from '../utils/arabicFonts';
 
 export default function DuaScreen({ 
   onContinueExit,
@@ -13,6 +14,7 @@ export default function DuaScreen({
   onCancel?: () => void;
 }) {
   const isDarkMode = useSettingsStore(s => s.isDarkMode);
+  const arabicFont = useSettingsStore(s => s.arabicFont);
 
   useEffect(() => {
     if (onCancel) {
@@ -66,15 +68,30 @@ export default function DuaScreen({
         </h2>
         
         <div className="space-y-8 text-center w-full">
-          <p className="font-arabic text-3xl md:text-4xl text-emerald-800 dark:text-emerald-400 leading-normal">
+          <p 
+            dir="rtl"
+            lang="ar"
+            className="ayah-arabic-text font-arabic text-2xl sm:text-3xl text-emerald-800 dark:text-emerald-400 leading-normal font-normal text-center"
+            style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+          >
             بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
           </p>
           
-          <p className="font-arabic text-2xl md:text-3xl leading-[2.5] md:leading-[2.5] text-slate-800 dark:text-slate-100 px-4 text-justify" dir="rtl">
+          <p 
+            dir="rtl"
+            lang="ar"
+            className="ayah-arabic-text font-arabic text-xl sm:text-2xl leading-[2.5] md:leading-[2.6] text-slate-800 dark:text-slate-100 px-2 sm:px-4 text-center font-normal" 
+            style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+          >
             اَللّٰهُمَّ اِنِّي قَدْ قَرَاْتُ مَا قَضَيْتَ مِنْ كِتَابِكَ الَّذِيْ اَنْزَلْتَهُ عَلٰى نَبِيِّكَ الصَّادِقِ صَلَّى اللهُ عَلَيْهِ وَاٰلِهِ فَلَكَ الْحَمْدُ رَبَّنَا اَللّٰهُمَّ اجْعَلْنِيْ مِمَّنْ يُحِلُّ حَلَالَهُ، وَيُحَرِّمُ حَرَامَهُ، وَيُؤْمِنُ بِمُحْكَمِهِ وَمُتَشَابِهِهِ، وَاجْعَلْهُ لِيْ اُنْسًا فِيْ قَبْرِيْ، وَاُنْسًا فِيْ حَشْرِيْ وَاجْعَلْنِيْ مِمَّنْ تُرَقِّيْهِ بِكُلِّ اٰيَةٍ قَرَاَهَا دَرَجَةً فِيْ اَعْلٰى عِلِّيِّيْنَ،
           </p>
 
-          <p className="font-arabic text-3xl md:text-4xl text-emerald-800 dark:text-emerald-400 mt-6">
+          <p 
+            dir="rtl"
+            lang="ar"
+            className="ayah-arabic-text font-arabic text-2xl sm:text-3xl text-emerald-800 dark:text-emerald-400 mt-6 font-normal text-center"
+            style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+          >
             اٰمِيْنَ رَبَّ الْعَالَمِيْنَ۔
           </p>
         </div>

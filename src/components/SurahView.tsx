@@ -10,6 +10,7 @@ import Markdown from 'react-markdown';
 import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, MessageSquare, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
+import { getArabicFontFamily } from '../utils/arabicFonts';
 
 interface SurahViewProps {
   key?: string;
@@ -133,10 +134,10 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
       <div 
         id={`ayah-${ayah.numberInSurah}`}
         ref={ayahRef}
-        className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3 sm:px-8 transition-all duration-200 rounded-2xl sm:rounded-[1.75rem] border ${
+        className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
           isActivePlaying || isLastRead
             ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/70 dark:border-emerald-600/70 shadow-md ring-1 ring-emerald-400/30'
-            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90 shadow-xs hover:border-slate-300 dark:hover:border-slate-700'
+            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700'
         }`}
         style={{
           forcedColorAdjust: 'none',
@@ -243,10 +244,12 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         </AnimatePresence>
 
         <p 
-          className="ayah-arabic-text font-arabic text-right leading-loose select-none mb-3 font-normal"
+          dir="rtl"
+          lang="ar"
+          className="ayah-arabic-text font-arabic text-right leading-[2.5] select-none mb-3 font-normal"
           style={{ 
             fontSize: `${fontSize}px`, 
-            fontFamily: arabicFont,
+            fontFamily: getArabicFontFamily(arabicFont),
             color: isDarkMode ? '#F8FAFC' : '#0F172A',
             forcedColorAdjust: 'none',
           }}
@@ -257,42 +260,26 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         {/* Clean, high-contrast Ayah Tabs with subtle divider */}
         <div className="flex items-center justify-center gap-3 mt-4 mb-2">
           <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
             {showTranslation && (
               <button 
                 onClick={() => setActiveTab(activeTab === 'translation' ? 'none' : 'translation')}
-                className="px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-semibold rounded-full border transition-all"
-                style={{
-                  backgroundColor: activeTab === 'translation' 
-                    ? '#059669' 
-                    : (isDarkMode ? '#1e293b' : '#f1f5f9'),
-                  color: activeTab === 'translation' 
-                    ? '#ffffff' 
-                    : (isDarkMode ? '#cbd5e1' : '#334155'),
-                  borderColor: activeTab === 'translation' 
-                    ? '#059669' 
-                    : (isDarkMode ? '#334155' : '#cbd5e1'),
-                  forcedColorAdjust: 'none',
-                }}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                  activeTab === 'translation'
+                    ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
                 Translation
               </button>
             )}
             <button 
               onClick={() => setActiveTab(activeTab === 'tafseer' ? 'none' : 'tafseer')}
-              className="px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-semibold rounded-full border transition-all"
-              style={{
-                backgroundColor: activeTab === 'tafseer' 
-                  ? '#059669' 
-                  : (isDarkMode ? '#1e293b' : '#f1f5f9'),
-                color: activeTab === 'tafseer' 
-                  ? '#ffffff' 
-                  : (isDarkMode ? '#cbd5e1' : '#334155'),
-                borderColor: activeTab === 'tafseer' 
-                  ? '#059669' 
-                  : (isDarkMode ? '#334155' : '#cbd5e1'),
-                forcedColorAdjust: 'none',
-              }}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                activeTab === 'tafseer'
+                  ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
             >
               Tafseer
             </button>
@@ -313,7 +300,13 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                 {translationLanguages.includes('en') && (
                   <div className="relative pt-2">
                     <span className="block text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest mb-1">English</span>
-                    <p className="leading-relaxed text-slate-700 dark:text-slate-300 text-[15px]">
+                    <p 
+                      className="leading-relaxed text-slate-700 dark:text-slate-300 font-normal"
+                      style={{
+                        fontSize: `${Math.max(15, Math.round(fontSize * 0.44))}px`,
+                        lineHeight: 1.75
+                      }}
+                    >
                       {ayah.translationEn}
                     </p>
                   </div>
@@ -321,7 +314,13 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                 {translationLanguages.includes('ur') && (
                   <div className="relative pt-2">
                     <span className="block text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest text-right mb-1">اردو</span>
-                    <p className="leading-relaxed text-slate-700 dark:text-slate-300 text-lg font-arabic text-right">
+                    <p 
+                      className="leading-relaxed text-slate-700 dark:text-slate-300 font-arabic text-right font-normal"
+                      style={{
+                        fontSize: `${Math.max(18, Math.round(fontSize * 0.55))}px`,
+                        lineHeight: 2.2
+                      }}
+                    >
                       {ayah.translationUr}
                     </p>
                   </div>
@@ -355,7 +354,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                         title="Zoom Out / کم زوم"
                         onClick={() => {
                           hapticSelection();
-                          setTafseerZoom(tafseerZoom - 15);
+                          setTafseerZoom(tafseerZoom - 20);
                         }}
                         disabled={tafseerZoom <= 70}
                         className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
@@ -368,7 +367,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                         title="Reset Zoom / اصل سائز"
                         onClick={() => {
                           hapticSelection();
-                          setTafseerZoom(100);
+                          setTafseerZoom(130);
                         }}
                         className="px-1.5 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 transition-colors"
                       >
@@ -380,9 +379,9 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                         title="Zoom In / زیادہ زوم (بزرگوں اور کمزور نظر کے لیے)"
                         onClick={() => {
                           hapticSelection();
-                          setTafseerZoom(tafseerZoom + 15);
+                          setTafseerZoom(tafseerZoom + 20);
                         }}
-                        disabled={tafseerZoom >= 250}
+                        disabled={tafseerZoom >= 400}
                         className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
                         <ZoomIn size={13} />
@@ -392,8 +391,8 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                   <div 
                     className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 transition-[font-size] duration-150"
                     style={{
-                      fontSize: `${Math.round(15 * (tafseerZoom / 100))}px`,
-                      lineHeight: 1.85
+                      fontSize: `${Math.round(16 * (tafseerZoom / 100))}px`,
+                      lineHeight: 1.8
                     }}
                   >
                     {lazyLoading ? (
@@ -428,8 +427,8 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                           <div 
                             className="tafseer-html-content text-slate-800 dark:text-slate-200 font-urdu leading-loose" 
                             style={{
-                              fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
-                              lineHeight: 2.1
+                              fontSize: `${Math.round(18 * (tafseerZoom / 100))}px`,
+                              lineHeight: 2.2
                             }}
                             dangerouslySetInnerHTML={{ __html: lazyTafseer.tafseer_text }} 
                           />
@@ -438,8 +437,8 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                             dir="rtl" 
                             className="font-arabic leading-loose text-right text-slate-800 dark:text-slate-200"
                             style={{
-                              fontSize: `${Math.round(17 * (tafseerZoom / 100))}px`,
-                              lineHeight: 2.1
+                              fontSize: `${Math.round(18 * (tafseerZoom / 100))}px`,
+                              lineHeight: 2.2
                             }}
                           >
                             <h5 dir="ltr" className="font-semibold text-slate-800 dark:text-slate-200 mb-2 text-left">Urdu</h5>
@@ -478,7 +477,7 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { fontSize } = useSettingsStore();
+  const { fontSize, setFontSize, arabicFont } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
   const hasScrolledTargetRef = useRef(false);
@@ -640,37 +639,76 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-36 sm:pb-32 pb-safe">
-      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 app-header-safe pb-3.5">
-        <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex flex-1 items-center gap-4">
+      <header className="sticky top-0 z-30 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 app-header-safe pb-3">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2">
             <button 
               onClick={() => { hapticImpact(ImpactStyle.Light); onBack(); }}
-              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Return to Quran List"
+              aria-label="Back"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={22} />
             </button>
+            <div className="hidden sm:block text-left">
+              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">{surah.englishName}</h1>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight">{surah.name}</p>
+            </div>
           </div>
-          <div className="text-center">
-            <h1 className="font-bold text-lg text-slate-900 dark:text-slate-100">{surah.englishName}</h1>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-arabic">{surah.name}</p>
+
+          <div className="text-center sm:hidden min-w-0">
+            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{surah.englishName}</h1>
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-arabic truncate">{surah.name}</p>
           </div>
-          <div className="flex-1 flex justify-end">
+
+          <div className="flex items-center gap-2">
+            {/* Quick Arabic Font Size Adjuster for Older People */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-0.5 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  setFontSize(Math.max(fontSize - 3, 28));
+                }}
+                disabled={fontSize <= 28}
+                title="Decrease Verse Text Size"
+                className="px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+              >
+                A-
+              </button>
+              <span className="text-[12px] font-mono font-bold px-1.5 text-slate-700 dark:text-slate-300 select-none">
+                {fontSize}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  setFontSize(Math.min(fontSize + 3, 96));
+                }}
+                disabled={fontSize >= 96}
+                title="Increase Verse Text Size (Extra Big for Older People)"
+                className="px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+              >
+                A+
+              </button>
+            </div>
+
             <button 
               onClick={() => { hapticImpact(ImpactStyle.Heavy); handlePlaySurah(); }}
-              className={`p-2 rounded-full transition-colors flex items-center gap-2 text-sm font-medium pr-4 ${
+              className={`p-2 rounded-full transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium pr-3.5 cursor-pointer ${
                 isThisSurahPlaying 
                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' 
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
               }`}
             >
               {isThisSurahPlaying ? (
                 <>
-                  <PauseCircle size={20} fill="currentColor" />
+                  <PauseCircle size={18} fill="currentColor" />
                   <span>Pause</span>
                 </>
               ) : (
                 <>
-                  <PlayCircle size={20} fill="currentColor" className="ml-1" />
+                  <PlayCircle size={18} fill="currentColor" className="ml-0.5" />
                   <span>Play</span>
                 </>
               )}
@@ -679,32 +717,36 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
         </div>
       </header>
 
-      <main className="max-w-4xl lg:max-w-5xl mx-auto px-2.5 sm:px-4 py-4 sm:py-8 md:py-12">
-        <div className="bg-white dark:bg-slate-900 sm:shadow-sm sm:rounded-2xl sm:border-[0.5px] border-slate-200 dark:border-slate-800 p-2 sm:p-8 md:p-12 relative">
-          {surah.number !== 1 && surah.number !== 9 && (
-            <div className="text-center mb-10 pb-8 border-b-[0.5px] border-slate-200 dark:border-slate-800">
-              <h2 
-                className="font-arabic text-slate-900 dark:text-slate-100" 
-                style={{ fontSize: `${fontSize * 1.5}px` }}
-              >
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-              </h2>
-            </div>
-          )}
-
-          <div className="flex flex-col">
-            {surah.ayahs.map((ayah, index) => {
-              const isLast = index === surah.ayahs.length - 1;
-              return (
-                <AyahCard 
-                  key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
-                  ayah={ayah} 
-                  surah={surah} 
-                  isLast={isLast}
-                />
-              );
-            })}
+      {/* Main Full-Width Content Container: Eliminates Wasted Empty Space */}
+      <main className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6">
+        {surah.number !== 1 && surah.number !== 9 && (
+          <div className="text-center mb-4 sm:mb-6 py-4 sm:py-6 px-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl sm:rounded-3xl shadow-2xs">
+            <h2 
+              dir="rtl"
+              lang="ar"
+              className="font-arabic text-slate-900 dark:text-slate-100 font-normal leading-[2.2]" 
+              style={{ 
+                fontSize: `${Math.max(Math.round(fontSize * 1.1), 32)}px`,
+                fontFamily: getArabicFontFamily(arabicFont)
+              }}
+            >
+              بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+            </h2>
           </div>
+        )}
+
+        <div className="flex flex-col space-y-3 sm:space-y-4">
+          {surah.ayahs.map((ayah, index) => {
+            const isLast = index === surah.ayahs.length - 1;
+            return (
+              <AyahCard 
+                key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
+                ayah={ayah} 
+                surah={surah} 
+                isLast={isLast}
+              />
+            );
+          })}
         </div>
 
         {/* Citation Box at the bottom */}
