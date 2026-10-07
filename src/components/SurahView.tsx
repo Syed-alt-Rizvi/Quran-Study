@@ -1,7 +1,7 @@
 import { getApiUrl } from '../utils/apiBase';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
-import { useState, useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { fetchSurahDetail, SurahDetail, Ayah } from '../api';
 import { fetchTafseer, clearAyahTafseerCache } from '../services/tafseerScraper';
 import { useSettingsStore } from '../store';

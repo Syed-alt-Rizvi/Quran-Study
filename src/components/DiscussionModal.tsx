@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Send, Loader2, User, LogIn, Flag, UserX, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Ayah, SurahDetail } from '../api';
 import { motion, AnimatePresence } from 'motion/react';

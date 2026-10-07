@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSettingsStore } from '../store';
 import { getShiaPrayerTimes, ShiaPrayerTimings } from '../utils/shiaPrayerTimes';
-import { shiaAdhanPlayer } from '../utils/shiaAdhanPlayer';
+import { shiaAdhanPlayer, scheduleNativeAdhanAlarms } from '../utils/shiaAdhanPlayer';
 
 function getLocalDateKey(date: Date = new Date()): string {
   const y = date.getFullYear();
@@ -20,10 +20,12 @@ export function useGlobalAdhanScheduler() {
     try {
       const result = await getShiaPrayerTimes(userLocation.latitude, userLocation.longitude, date);
       setCurrentTimings(result);
+      // Sync native Android device alarms (runs locally without any external push server)
+      scheduleNativeAdhanAlarms(result, adhanSettings);
     } catch (err) {
       console.warn('Global adhan scheduler failed to refresh timings:', err);
     }
-  }, [userLocation.latitude, userLocation.longitude]);
+  }, [userLocation.latitude, userLocation.longitude, adhanSettings]);
 
   // Initial load on mount or coordinate change
   useEffect(() => {
@@ -33,19 +35,19 @@ export function useGlobalAdhanScheduler() {
     refreshTimingsForDate(today);
   }, [userLocation.latitude, userLocation.longitude, refreshTimingsForDate]);
 
-  // Continuous background second-by-second ticker
+  // Unthrottled ticker using Web Worker (persists even when tab is backgrounded)
   useEffect(() => {
-    const ticker = setInterval(() => {
+    const handleTick = () => {
       const now = new Date();
       const dateStr = getLocalDateKey(now);
 
-      // Midnight Rollover Detection: Automatically compensate for seasonal adhan shift on day change
+      // Midnight Rollover Detection: Automatically refresh timings on date change
       if (dateStr !== lastDateRef.current) {
         lastDateRef.current = dateStr;
         refreshTimingsForDate(now);
       }
 
-      // Check scheduled adhan times for exact minute announcement
+      // Check scheduled adhan times
       if (currentTimings) {
         shiaAdhanPlayer.checkScheduledTimes(
           {
@@ -61,9 +63,50 @@ export function useGlobalAdhanScheduler() {
           }
         );
       }
-    }, 1000);
+    };
 
-    return () => clearInterval(ticker);
+    let worker: Worker | null = null;
+    let fallbackInterval: any = null;
+
+    try {
+      const workerCode = `
+        let timer = null;
+        self.onmessage = function(e) {
+          if (e.data === 'start') {
+            if (!timer) {
+              timer = setInterval(function() {
+                self.postMessage('tick');
+              }, 1000);
+            }
+          } else if (e.data === 'stop') {
+            if (timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+          }
+        };
+      `;
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      worker = new Worker(workerUrl);
+      worker.onmessage = () => {
+        handleTick();
+      };
+      worker.postMessage('start');
+    } catch {
+      // Graceful fallback to standard interval if Web Workers are restricted
+      fallbackInterval = setInterval(handleTick, 1000);
+    }
+
+    return () => {
+      if (worker) {
+        worker.postMessage('stop');
+        worker.terminate();
+      }
+      if (fallbackInterval) {
+        clearInterval(fallbackInterval);
+      }
+    };
   }, [currentTimings, adhanSettings, refreshTimingsForDate]);
 
   return {

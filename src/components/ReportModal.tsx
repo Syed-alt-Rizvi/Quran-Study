@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flag, X, ShieldAlert, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { reportDiscussion, getGuestProfile } from '../utils/guestAuth';

@@ -8,7 +8,6 @@ import { popModal } from './utils/modalBackHandler';
 import { trackAppLaunchAndTelemetry } from './utils/telemetry';
 import { checkUrlForTransfer, importUserData } from './utils/dataTransfer';
 import { checkAndDispatchCalendarNotifications } from './utils/calendarNotifications';
-import ActiveAdhanNotification from './components/ActiveAdhanNotification';
 import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
 import { Loader2 } from 'lucide-react';
 
@@ -318,9 +317,6 @@ export default function App() {
       className={`min-h-screen w-full ${isDarkMode ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30`}
       style={{ fontFamily: englishFont }}
     >
-      {/* Global Shia Adhan Playing Overlay Banner */}
-      <ActiveAdhanNotification />
-
       <Suspense fallback={<ViewLoadingFallback />}>
         <AnimatePresence mode="wait">
           {showWelcome ? (
