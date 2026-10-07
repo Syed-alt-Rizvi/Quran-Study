@@ -63,10 +63,10 @@ jobs:
           rm -f android/app/src/main/assets/public/server.cjs || true
           echo "✓ Android web assets synchronized."
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: "17"
+          java-version: "21"
           distribution: "temurin"
 
       - name: Configure Android SDK
