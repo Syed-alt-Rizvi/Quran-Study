@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_ayah_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_rounded"
+    android:padding="14dp">
+
+    <!-- Header Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="✨ Ayah of the Day"
+            android:textColor="@color/widget_gold"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_ayah_ref"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Surah Al-Fatiha (1:1)"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Quran Arabic Verse -->
+    <TextView
+        android:id="@+id/widget_ayah_arabic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+        android:textColor="@color/widget_text_white"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="6dp" />
+
+    <!-- English Translation -->
+    <TextView
+        android:id="@+id/widget_ayah_translation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="In the name of Allah, the Entirely Merciful, the Especially Merciful."
+        android:textColor="@color/widget_text_muted"
+        android:textSize="11sp"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="3" />
+
+    <!-- Bottom Action Button -->
+    <Button
+        android:id="@+id/widget_btn_read_quran"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:text="Read in Shia Markaz"
+        android:textColor="@color/widget_text_white"
+        android:textSize="11sp"
+        android:background="@drawable/widget_button_rounded"
+        android:layout_marginTop="6dp" />
+</LinearLayout>

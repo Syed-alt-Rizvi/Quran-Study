@@ -130,7 +130,7 @@ export const useSettingsStore = create<SettingsState>()(
       fontSize: 38, // Comfortable large natural default for effortless reading
       arabicFont: 'Amiri',
       englishFont: 'Inter',
-      hasSeenWelcome: false,
+      hasSeenWelcome: true,
       bookmarks: [],
       lastRead: null,
       habitStats: { dailyAyahsRead: {}, dailyTafseerRead: {} },

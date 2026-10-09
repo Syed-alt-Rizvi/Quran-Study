@@ -29,6 +29,32 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Shia Prayer Times Widget -->
+        <receiver
+            android:name=".ShiaPrayerWidgetProvider"
+            android:label="Shia Prayer &amp; Markaz"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_shia_prayer_info" />
+        </receiver>
+
+        <!-- Daily Ayah of the Day Widget -->
+        <receiver
+            android:name=".DailyAyahWidgetProvider"
+            android:label="Daily Quran Ayah"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_daily_ayah_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->

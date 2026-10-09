@@ -21,7 +21,13 @@ export const getApiUrl = (path: string): string => {
     } catch {}
   }
 
-  // 3. In web browsers (including custom domains like shiatafseer.in or localhost),
-  // relative paths ALWAYS work directly without cross-origin issues or dead hardcoded domains!
+  // 3. In native mobile apps (Capacitor APK), localhost has no Express server.
+  // Route to the deployed cloud backend if running natively.
+  if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
+    const cloudBackend = 'https://ais-dev-jx76sn2jydycu7xlncbv7z-1063163461455.asia-southeast1.run.app';
+    return `${cloudBackend}${cleanPath}`;
+  }
+
+  // 4. In web browsers (including custom domains or preview), relative paths work directly!
   return cleanPath;
 };

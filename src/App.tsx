@@ -121,6 +121,23 @@ export default function App() {
     };
     window.addEventListener('message', handleMessage);
 
+    // Listen for Android AppWidget quick launch intents
+    const handleWidgetTab = (e: any) => {
+      const tab = e.detail;
+      if (tab === 'quran') {
+        setSelectedMafatihItem(null);
+        setSelectedJuz(null);
+        setSelectedSurah(null);
+        useSettingsStore.getState().setDefaultAppTab('quran');
+      } else if (tab === 'mafatih') {
+        setSelectedSurah(null);
+        setSelectedJuz(null);
+        setSelectedMafatihItem(null);
+        useSettingsStore.getState().setDefaultAppTab('mafatih');
+      }
+    };
+    window.addEventListener('open-app-tab', handleWidgetTab);
+
     const hash = window.location.hash.replace(/^#/, '').trim();
     if (!hash) return () => window.removeEventListener('message', handleMessage);
 

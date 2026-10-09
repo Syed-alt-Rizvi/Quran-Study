@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { 
   ArrowLeft, Play, Pause, RotateCcw, RotateCw, Volume2, VolumeX,
   Copy, Check, Bookmark, BookmarkCheck, Sliders, 
@@ -228,63 +229,38 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   const [volume, setVolume] = useState<number>(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
-  const [fallbackAttempted, setFallbackAttempted] = useState(false);
+  const isNative = typeof window !== 'undefined' && Capacitor.isNativePlatform();
+  const [useDirectUrl, setUseDirectUrl] = useState(false);
 
-  // Compute resolved stream URL: High-speed disk-cached proxy first, with direct fallback
-  const primaryAudioSrc = useMemo(() => {
+  // Compute resolved stream URL:
+  // On native Capacitor Android APK, direct audioUrl connects natively without browser restrictions!
+  // On Web browsers, use high-speed proxy with byte-range and disk-caching support, with direct fallback!
+  const audioSrc = useMemo(() => {
+    if (isNative || useDirectUrl) {
+      return audioUrl;
+    }
     return getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(audioUrl)}`);
-  }, [audioUrl]);
+  }, [audioUrl, isNative, useDirectUrl]);
 
-  const fallbackAudioSrc = audioUrl;
-  const audioSrc = fallbackAttempted ? fallbackAudioSrc : primaryAudioSrc;
-
-  // Reset fallback attempt when track changes
+  // Reset state when track changes
   useEffect(() => {
-    setFallbackAttempted(false);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setIsBuffering(false);
+    setUseDirectUrl(false);
   }, [audioUrl]);
 
-  // Synchronize audio playback & pause Quran audio if Mafatih audio starts (flawless Quran-like logic)
+  // When source switches to fallback while user wanted to play, auto-resume
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioSrc) return;
-
-    let isMounted = true;
-
-    const attemptPlay = () => {
-      if (!isMounted || !isPlaying) return;
-      window.dispatchEvent(new CustomEvent('pause-quran-audio'));
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(e => {
-          if (e.name !== 'AbortError') {
-            console.warn("Mafatih audio playback issue:", e);
-          }
-        });
-      }
-    };
-
-    if (isPlaying) {
-      if (audio.readyState >= 2) {
-        attemptPlay();
-      } else {
-        const onCanPlay = () => {
-          attemptPlay();
-          audio.removeEventListener('canplay', onCanPlay);
-        };
-        audio.addEventListener('canplay', onCanPlay);
-        return () => {
-          isMounted = false;
-          audio.removeEventListener('canplay', onCanPlay);
-        };
-      }
-    } else {
-      audio.pause();
+    if (isPlaying && useDirectUrl) {
+      try {
+        audio.load();
+        audio.play().catch(() => {});
+      } catch {}
     }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isPlaying, audioSrc]);
+  }, [useDirectUrl]);
 
   // Audio Event Listeners (buffering, timeupdate, metadata, ended, error)
   useEffect(() => {
@@ -299,6 +275,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
     const onWaiting = () => setIsBuffering(true);
     const onPlaying = () => setIsBuffering(false);
     const onCanPlay = () => setIsBuffering(false);
+    const onLoadedData = () => setIsBuffering(false);
     const onEnded = () => {
       if (!isLooping) setIsPlaying(false);
     };
@@ -311,11 +288,11 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
       }
     };
     const onError = (e: any) => {
-      console.warn("Mafatih audio failed from source:", audioSrc, e);
-      setIsBuffering(false);
-      if (!fallbackAttempted) {
-        setFallbackAttempted(true);
+      console.warn("Mafatih audio error from source:", audioSrc, e);
+      if (!useDirectUrl && !isNative) {
+        setUseDirectUrl(true);
       } else {
+        setIsBuffering(false);
         setIsPlaying(false);
       }
     };
@@ -325,6 +302,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
     audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('loadeddata', onLoadedData);
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
@@ -336,12 +314,13 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('loadeddata', onLoadedData);
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('error', onError);
     };
-  }, [audioSrc, fallbackAttempted, isLooping]);
+  }, [audioSrc, isLooping, useDirectUrl, isNative]);
 
   // Pause if Quran audio starts playing
   useEffect(() => {
@@ -366,9 +345,10 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
           album: (item.categoryChain || []).join(' › ') || item.mainCategory,
         });
         navigator.mediaSession.setActionHandler('play', () => {
-          setIsPlaying(true);
+          togglePlay();
         });
         navigator.mediaSession.setActionHandler('pause', () => {
+          if (audioRef.current) audioRef.current.pause();
           setIsPlaying(false);
         });
         navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-10));
@@ -396,11 +376,40 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
   const togglePlay = () => {
     hapticImpact(ImpactStyle.Light);
+    const audio = audioRef.current;
+    if (!audio) return;
+
     if (isPlaying) {
+      audio.pause();
       setIsPlaying(false);
+      setIsBuffering(false);
     } else {
       useAudioStore.getState().pause(); // Pause Quran audio
+      window.dispatchEvent(new CustomEvent('pause-quran-audio'));
       setIsPlaying(true);
+      if (audio.readyState < 2) {
+        setIsBuffering(true);
+      }
+
+      // Start playing directly within user click gesture!
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsBuffering(false);
+          })
+          .catch((e) => {
+            if (e.name !== 'AbortError') {
+              console.warn("Direct play failed, switching to direct URL fallback:", e);
+              if (!useDirectUrl && !isNative) {
+                setUseDirectUrl(true);
+              } else {
+                setIsPlaying(false);
+                setIsBuffering(false);
+              }
+            }
+          });
+      }
     }
   };
 

@@ -351,12 +351,26 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
         (i.code && i.code.toLowerCase() === cleanId.toLowerCase())
       ) || null;
 
-      // Attempt 1: Fetch from backend API endpoint (which serves from disk cache /tmp/shia_markaz_cache/mafatih_items)
-      for (let attempt = 0; attempt < 2; attempt++) {
+      // Attempt 1: Instant static bundled asset read (0-5ms in both Web & APK)
+      const targetLower = targetId.toLowerCase();
+      const cleanLower = cleanId.toLowerCase();
+      const metaCode = meta?.code?.toLowerCase() || '';
+
+      const staticCandidateSet = new Set<string>();
+      [targetLower, cleanLower, metaCode, targetId, cleanId].filter(Boolean).forEach((code) => {
+        const enc = encodeURIComponent(code);
+        staticCandidateSet.add(`/mafatih_items/${enc}.json`);
+        staticCandidateSet.add(getApiUrl(`/mafatih_items/${enc}.json`));
+        if (typeof window !== 'undefined') {
+          try {
+            staticCandidateSet.add(new URL(`mafatih_items/${enc}.json`, window.location.href).href);
+          } catch {}
+        }
+      });
+
+      for (const url of Array.from(staticCandidateSet)) {
         try {
-          const res = await fetch(getApiUrl(`/api/mafatih/items/${encodeURIComponent(targetId)}`), {
-            signal: callerSignal
-          });
+          const res = await fetch(url, { signal: callerSignal });
           if (res.ok) {
             const raw = await res.json();
             if (raw && ((raw.verses && raw.verses.length > 0) || raw.introduction || raw.title)) {
@@ -365,21 +379,21 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
               itemCache.set(cleanId, detail);
               itemCache.set(targetId.toLowerCase(), detail);
               if (detail.code) itemCache.set(detail.code, detail);
-              // Store in fastStorage IndexedDB for permanent instant offline access
               fastStorage.set(`mafatih_detail_${targetId.toLowerCase()}`, detail).catch(() => {});
               return detail;
             }
           }
-        } catch {
-          if (attempt === 0) {
-            await new Promise(r => setTimeout(r, 200));
-          }
-        }
+        } catch {}
       }
 
-      // Attempt 2: Fallback check on static file in case deployed with static assets
+      // Attempt 2: Backend API fallback (quick 3.5s timeout if running with backend)
       try {
-        const res = await fetch(getApiUrl(`/mafatih_items/${encodeURIComponent(targetId)}.json`));
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(getApiUrl(`/api/mafatih/items/${encodeURIComponent(targetId)}`), {
+          signal: callerSignal || controller.signal
+        });
+        clearTimeout(timeout);
         if (res.ok) {
           const raw = await res.json();
           if (raw && ((raw.verses && raw.verses.length > 0) || raw.introduction || raw.title)) {

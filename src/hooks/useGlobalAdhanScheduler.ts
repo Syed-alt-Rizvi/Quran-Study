@@ -98,7 +98,23 @@ export function useGlobalAdhanScheduler() {
       fallbackInterval = setInterval(handleTick, 1000);
     }
 
+    const onVisibilityOrFocus = () => {
+      handleTick();
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibilityOrFocus);
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onVisibilityOrFocus);
+    }
+
     return () => {
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibilityOrFocus);
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', onVisibilityOrFocus);
+      }
       if (worker) {
         worker.postMessage('stop');
         worker.terminate();

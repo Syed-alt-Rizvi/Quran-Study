@@ -90,6 +90,7 @@ class ShiaAdhanPlayerService {
   private repeatCount = 1;
   private currentRepeat = 0;
   private isUnlocked = false;
+  private pendingPrayer: string | null = null;
   private lastPlayedDate: { fajr: string; dhuhr: string; maghrib: string } = {
     fajr: '',
     dhuhr: '',
@@ -101,6 +102,20 @@ class ShiaAdhanPlayerService {
       this.loadLastPlayedDate();
       this.initAudio();
       this.setupGlobalUnlockListeners();
+
+      // Listen for Capacitor native scheduled alarm triggers
+      import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
+        LocalNotifications.addListener('localNotificationReceived', (notification) => {
+          if (notification?.extra?.type === 'adhan') {
+            this.playAdhan(notification.extra.prayer || 'Shia Adhan', 1);
+          }
+        });
+        LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+          if (action?.notification?.extra?.type === 'adhan') {
+            this.playAdhan(action.notification.extra.prayer || 'Shia Adhan', 1);
+          }
+        });
+      }).catch(() => {});
     }
   }
 
@@ -169,6 +184,11 @@ class ShiaAdhanPlayerService {
   private setupGlobalUnlockListeners() {
     const unlock = () => {
       this.unlockAudio();
+      if (this.pendingPrayer && !this.isPlaying) {
+        const prayer = this.pendingPrayer;
+        this.pendingPrayer = null;
+        this.playAdhan(prayer, this.repeatCount || 1);
+      }
     };
 
     ['click', 'touchstart', 'pointerdown', 'keydown'].forEach((evt) => {
@@ -271,16 +291,18 @@ class ShiaAdhanPlayerService {
       }
       this.isPlaying = true;
       this.isUnlocked = true;
+      this.pendingPrayer = null;
 
-      // System notification if permission granted
-      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification(`Shia Adhan: ${prayerName}`, {
-            body: `It is now time for ${prayerName} prayer.`,
-            icon: '/icons/icon-192.webp',
-            tag: `adhan-${prayerName}`
+      // In PWA, if tab/screen is hidden, notify user via service worker
+      if (typeof document !== 'undefined' && document.hidden && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((reg) => {
+          reg.showNotification(`Shia Adhan: ${prayerName}`, {
+            body: `It is now time for ${prayerName} prayer. (Ja'fari Method)`,
+            icon: '/pwa-192x192.png',
+            tag: `adhan-${prayerName}`,
+            requireInteraction: true
           });
-        } catch {}
+        }).catch(() => {});
       }
 
       this.notify();
@@ -288,6 +310,7 @@ class ShiaAdhanPlayerService {
     } catch (err) {
       console.warn('Playback blocked by browser policy:', err);
       this.isPlaying = false;
+      this.pendingPrayer = prayerName;
       this.notify();
       return false;
     }
@@ -356,9 +379,12 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - fajrMins;
       // Trigger if current time is within [0, 5] minutes of Fajr and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.fajr !== todayKey) {
-        this.lastPlayedDate.fajr = todayKey;
-        this.saveLastPlayedDate();
-        this.playAdhan('Fajr (Subh)', repeats);
+        this.playAdhan('Fajr (Subh)', repeats).then(ok => {
+          if (ok) {
+            this.lastPlayedDate.fajr = todayKey;
+            this.saveLastPlayedDate();
+          }
+        });
         return;
       }
     }
@@ -369,9 +395,12 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - dhuhrMins;
       // Trigger if current time is within [0, 5] minutes of Dhuhr and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.dhuhr !== todayKey) {
-        this.lastPlayedDate.dhuhr = todayKey;
-        this.saveLastPlayedDate();
-        this.playAdhan('Dhuhr (Zuhr)', repeats);
+        this.playAdhan('Dhuhr (Zuhr)', repeats).then(ok => {
+          if (ok) {
+            this.lastPlayedDate.dhuhr = todayKey;
+            this.saveLastPlayedDate();
+          }
+        });
         return;
       }
     }
@@ -382,9 +411,12 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - maghribMins;
       // Trigger if current time is within [0, 5] minutes of Maghrib and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.maghrib !== todayKey) {
-        this.lastPlayedDate.maghrib = todayKey;
-        this.saveLastPlayedDate();
-        this.playAdhan('Maghrib', repeats);
+        this.playAdhan('Maghrib', repeats).then(ok => {
+          if (ok) {
+            this.lastPlayedDate.maghrib = todayKey;
+            this.saveLastPlayedDate();
+          }
+        });
         return;
       }
     }
@@ -404,6 +436,18 @@ export async function scheduleNativeAdhanAlarms(
     if (perm.display !== 'granted') {
       await LocalNotifications.requestPermissions();
     }
+
+    // Create high-importance Android notification channel with authentic Shia Adhan audio
+    await LocalNotifications.createChannel({
+      id: 'shia_adhan_alarm',
+      name: 'Shia Adhan Prayer Calls',
+      description: 'Authentic Shia Ithna-Ashari Adhan Announcements',
+      importance: 5,
+      visibility: 1,
+      sound: 'shia_adhan.mp3',
+      vibration: true,
+      lights: true
+    }).catch(() => {});
 
     // Cancel existing adhan alarms
     await LocalNotifications.cancel({
@@ -429,10 +473,11 @@ export async function scheduleNativeAdhanAlarms(
       if (targetDate.getTime() > now.getTime()) {
         notificationsToSchedule.push({
           id: p.id,
-          title: `🕌 Shia Adhan: ${p.name}`,
+          title: `Shia Adhan: ${p.name}`,
           body: `It is now time for ${p.name} prayer. (Ja'fari Method)`,
+          channelId: 'shia_adhan_alarm',
+          sound: 'shia_adhan.mp3',
           schedule: { at: targetDate, allowWhileIdle: true },
-          sound: undefined,
           extra: { prayer: p.name, type: 'adhan' }
         });
       }

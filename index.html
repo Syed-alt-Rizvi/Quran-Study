@@ -1,76 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF6EE" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
-    <meta name="theme-color" content="#059669" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Shia Markaz" />
-    <link rel="icon" type="image/png" href="/pwa-192x192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <title>Shia Markaz</title>
-    <meta name="description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications & ziyaraat with audio recitations, scientific insights from the Ahlulbayt (a.s), and community discussions." />
-    <meta property="og:title" content="Shia Markaz" />
-    <meta property="og:description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications & ziyaraat with audio recitations, scientific insights from the Ahlulbayt (a.s), and community discussions." />
-    <meta property="og:type" content="website" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="preconnect" href="https://api.alquran.cloud" crossorigin>
-    <link rel="dns-prefetch" href="https://api.alquran.cloud">
-    <link rel="preconnect" href="https://cdn.islamic.network" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.islamic.network">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Shia Markaz - Holy Quran, Shia Tafseer & Adhan</title>
+    <meta name="description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications, and prayer times with Shia Adhan." />
+    <meta property="og:title" content="Shia Markaz - Holy Quran, Shia Tafseer & Adhan" />
+    <meta property="og:description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), authentic Mafatih Al Jinan supplications, and prayer times with Shia Adhan." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Aref+Ruqaa:wght@400;700&family=Lateef:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Scheherazade+New:wght@400;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Aref+Ruqaa:wght@400;700&family=Lateef:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Scheherazade+New:wght@400;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Aref+Ruqaa:wght@400;700&family=Lateef:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Scheherazade+New:wght@400;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
-    </noscript>
-    <script>
-      (function() {
-        function matchFramedResolution() {
-          if (typeof window === 'undefined') return;
-          try {
-            var isFramed = window.self !== window.top;
-            if (!isFramed) {
-              document.documentElement.style.zoom = '';
-              return;
-            }
-            var isTouchOrMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || 
-              ('ontouchstart' in window && Math.max(window.screen.width, window.screen.height) < 1366);
-
-            if (isTouchOrMobile) {
-              var isLandscape = Math.abs(window.orientation) === 90 || Math.abs(window.orientation) === 270;
-              var screenDim = isLandscape 
-                ? Math.max(window.screen.width, window.screen.height) 
-                : Math.min(window.screen.width, window.screen.height);
-              var frameWidth = window.innerWidth || document.documentElement.clientWidth;
-
-              if (screenDim > 0 && frameWidth > screenDim * 1.15) {
-                var scale = frameWidth / screenDim;
-                document.documentElement.style.zoom = scale;
-              } else {
-                document.documentElement.style.zoom = '';
-              }
-            } else {
-              document.documentElement.style.zoom = '';
-            }
-          } catch (e) {}
-        }
-        matchFramedResolution();
-        window.addEventListener('resize', matchFramedResolution, { passive: true });
-        window.addEventListener('orientationchange', matchFramedResolution, { passive: true });
-      })();
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Scheherazade+New:wght@400;600;700&display=swap" rel="stylesheet">
   </head>
-  <body>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

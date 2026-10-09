@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import os from "os";
 import crypto from "crypto";
+import { Readable } from "stream";
 import { createServer as createViteServer } from "vite";
 import { db } from "./src/db/index.ts";
 import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema.ts";
@@ -447,20 +448,6 @@ async function startServer() {
     } catch (e) {
       console.error("Failed to seed database:", e);
     }
-
-    // Start background scraper for Mafatih Al Jinan supplications
-    try {
-      startBackgroundScraper();
-    } catch (e) {
-      console.error("Failed to start Mafatih background scraper:", e);
-    }
-
-    // Start background crawler for Tafseer Namoona surahs
-    try {
-      startNamoonaBackgroundCrawler();
-    } catch (e) {
-      console.error("Failed to start Namoona background crawler:", e);
-    }
   })();
 
 
@@ -866,6 +853,10 @@ async function startServer() {
         res.setHeader("Cache-Control", "public, max-age=604800");
         res.setHeader("Content-Type", mimeType);
 
+        if (req.method === "HEAD") {
+          return res.end();
+        }
+
         if (range) {
           const parts = range.replace(/bytes=/, "").split("-");
           const start = parseInt(parts[0], 10);
@@ -938,14 +929,15 @@ async function startServer() {
       }
 
       res.status(upstream.status);
+      res.flushHeaders();
+
+      if (req.method === "HEAD") {
+        return res.end();
+      }
 
       if (upstream.body) {
-        const reader = upstream.body.getReader();
-        req.on("close", () => {
-          reader.cancel().catch(() => {});
-        });
+        const nodeStream = Readable.fromWeb(upstream.body as any);
 
-        // If whole stream was requested, cache it to disk in background
         const shouldCache = !req.headers.range || req.headers.range === "bytes=0-";
         const tempFile = `${cachedFile}.tmp.${Date.now()}`;
         let writeStream: fs.WriteStream | null = null;
@@ -955,18 +947,19 @@ async function startServer() {
           } catch (e) {}
         }
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          res.write(value);
+        req.on("close", () => {
+          nodeStream.destroy();
           if (writeStream) {
-            writeStream.write(value);
+            writeStream.end();
+            try {
+              if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+            } catch (e) {}
           }
-        }
-        res.end();
+        });
 
         if (writeStream) {
-          writeStream.end(() => {
+          nodeStream.pipe(writeStream);
+          writeStream.on("finish", () => {
             try {
               if (fs.existsSync(tempFile) && fs.statSync(tempFile).size > 2000) {
                 fs.renameSync(tempFile, cachedFile);
@@ -975,7 +968,14 @@ async function startServer() {
               }
             } catch (e) {}
           });
+          writeStream.on("error", () => {
+            try {
+              if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+            } catch (e) {}
+          });
         }
+
+        nodeStream.pipe(res);
       } else {
         res.end();
       }
@@ -1207,7 +1207,7 @@ async function startServer() {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: process.env.DISABLE_HMR === "true" ? false : undefined,
+        hmr: false,
       },
       appType: "spa",
     });
@@ -1276,6 +1276,12 @@ async function startServer() {
   };
   process.on("SIGTERM", handleTermination);
   process.on("SIGINT", handleTermination);
+  process.on("unhandledRejection", (reason) => {
+    console.warn("Unhandled Promise Rejection:", reason);
+  });
+  process.on("uncaughtException", (err) => {
+    console.error("Uncaught Exception:", err);
+  });
 }
 
 startServer();

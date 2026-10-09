@@ -349,52 +349,26 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                     shiaAdhanPlayer.playAdhan(nextPrayer.nameEn, adhanSettings.repeatCount || 1);
                   }
                 }}
-                className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white text-xs font-medium transition-all flex items-center gap-1.5"
-                title={playerStatus.isPlaying ? 'Stop' : 'Listen to Adhan'}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  playerStatus.isPlaying
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    : 'bg-white/10 hover:bg-white/15 text-slate-200'
+                }`}
+                title={playerStatus.isPlaying ? 'Stop' : 'Play Adhan'}
               >
                 {playerStatus.isPlaying ? (
                   <>
-                    <Pause size={14} className="fill-white" />
-                    <span>Stop</span>
+                    <Pause size={13} className="fill-current" />
+                    <span>Stop Adhan</span>
                   </>
                 ) : (
                   <>
-                    <Play size={14} className="fill-white" />
+                    <Play size={13} className="fill-current" />
                     <span>Play Adhan</span>
                   </>
                 )}
               </button>
             </div>
-
-            {/* In-Card Clean Playback Progress */}
-            {playerStatus.isPlaying && (
-              <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-                  <span>{formatAudioTime(playerStatus.currentTime)}</span>
-                  <span>{playerStatus.duration ? formatAudioTime(playerStatus.duration) : '4:53'}</span>
-                </div>
-
-                {playerStatus.duration > 0 && (
-                  <div 
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const ratio = (e.clientX - rect.left) / rect.width;
-                      shiaAdhanPlayer.seek(ratio * playerStatus.duration);
-                    }}
-                    className="w-full h-1 bg-slate-800 rounded-full overflow-hidden cursor-pointer"
-                  >
-                    <div 
-                      className="h-full bg-emerald-400 transition-all"
-                      style={{ width: `${(playerStatus.currentTime / playerStatus.duration) * 100}%` }}
-                    />
-                  </div>
-                )}
-
-                <p className="font-arabic text-sm text-center text-emerald-200/90 pt-1" dir="rtl">
-                  حَيَّ عَلَى خَيْرِ الْعَمَلِ • أَشْهَدُ أَنَّ عَلِيًّا وَلِيُّ اللَّهِ
-                </p>
-              </div>
-            )}
           </div>
         )}
 
