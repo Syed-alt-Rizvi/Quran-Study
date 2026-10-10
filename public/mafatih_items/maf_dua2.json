@@ -1,0 +1,162 @@
+{
+  "id": "maf_dua2",
+  "code": "maf_dua2",
+  "title": "Taqibaat e Namaz e Zuhr",
+  "mainCategory": "Taqibaat e Namaz",
+  "mainCategoryCode": "maf_taqee",
+  "categoryChain": [
+    "Taqibaat e Namaz",
+    "Taqibaat e Namaz e Zuhr"
+  ],
+  "audioUrl": null,
+  "introduction": "TAQIBAAT E NAMAZ E ZOHR\n\nSubsequent to the Noon (Zohr) Prayer, say the following supplicatory prayer, as is quoted from Misbah al-Mutahajjid:\n\nYou may then repeat the following litany ten times:\n\nYou may then say the following supplicatory prayer:",
+  "versesCount": 29,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ الْعَظِيْمُ الْحَلِيْمُ",
+      "translation": "There is no god save Allah, the All-great and Most Forbearing."
+    },
+    {
+      "index": 2,
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ رَبُّ الْعَرْشِ الْكَرِيْمُ",
+      "translation": "There is no god save Allah, the Lord of the Throne of Honor."
+    },
+    {
+      "index": 3,
+      "arabic": "اَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِيْنَ",
+      "translation": "All praise be to Allah, the Lord of the worlds."
+    },
+    {
+      "index": 4,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ مُوْجِبَاتِ رَحْمَتِكَ",
+      "translation": "O Allah, I ask You for the motives of Your mercy,"
+    },
+    {
+      "index": 5,
+      "arabic": "وَ عَزَاۤئِمَ مَغْفِرَتِكَ",
+      "translation": "the determining causes of Your forgiveness,"
+    },
+    {
+      "index": 6,
+      "arabic": "وَ الْغَنِيْمَةَ مِنْ كُلِّ بِرٍّ",
+      "translation": "the advantage of each act of kindness,"
+    },
+    {
+      "index": 7,
+      "arabic": "وَ السَّلَامَةَ مِنْ كُلِّ اِثْمٍ",
+      "translation": "and the safeguarding against each and every sin."
+    },
+    {
+      "index": 8,
+      "arabic": "اَللّٰهُمَّ لَا تَدَعْ لِيْ ذَنْبًا اِلَّا غَفَرْتَهُ",
+      "translation": "O Allah, (please) do not leave any of my offenses unforgiven,"
+    },
+    {
+      "index": 9,
+      "arabic": "وَ لَا هَمًّا اِلَّا فَرَّجْتَهُ",
+      "translation": "any of my misfortunes unrelieved,"
+    },
+    {
+      "index": 10,
+      "arabic": "وَ لَا سُقْمًا اِلَّا شَفَيْتَهُ",
+      "translation": "any of my ailments unhealed,"
+    },
+    {
+      "index": 11,
+      "arabic": "وَ لَا عَيْبًا اِلَّا سَتَرْتَهُ",
+      "translation": "any of my defects uncovered,"
+    },
+    {
+      "index": 12,
+      "arabic": "وَ لَا رِزْقًا اِلَّا بَسَطْتَهُ",
+      "translation": "any (item of my) sustenance not including (me),"
+    },
+    {
+      "index": 13,
+      "arabic": "وَ لَا خَوْفًا اِلَّا اٰمَنْتَهُ",
+      "translation": "any fear (that I experience) unsecured,"
+    },
+    {
+      "index": 14,
+      "arabic": "وَ لَا سُوۤءًا اِلَّا صَرَفْتَهُ",
+      "translation": "any evil (that comes upon me) uncontrollable,"
+    },
+    {
+      "index": 15,
+      "arabic": "وَ لَا حَاجَةً هِيَ لَكَ رِضًا وَ لِيَ فِيْهَا صَلَاحٌ اِلَّا قَضَيْتَهَا",
+      "translation": "and any need that achieves Your satisfaction and my benefit unanswered."
+    },
+    {
+      "index": 16,
+      "arabic": "يَاۤ اَرْحَمَ الرَّاحِمِيْنَ،",
+      "translation": "O most Merciful of all those who show mercy."
+    },
+    {
+      "index": 17,
+      "arabic": "اٰمِيْنَ رَبَّ الْعَالَمِيْنَ۔",
+      "translation": "(please) Respond, O Lord of the worlds."
+    },
+    {
+      "index": 18,
+      "arabic": "بِاللّٰهِ اعْتَصَمْتُ",
+      "translation": "With Allah I seek protection,"
+    },
+    {
+      "index": 19,
+      "arabic": "وَ بِاللّٰهِ اَثِقُ",
+      "translation": "in Allah I trust,"
+    },
+    {
+      "index": 20,
+      "arabic": "وَ عَلَى اللّٰهِ اَتَوَكَّلُ",
+      "translation": "and upon Allah I rely."
+    },
+    {
+      "index": 21,
+      "arabic": "اَللّٰهُمَّ اِنْ عَظُمَتْ ذُنُوْبِيْ فَاَنْتَ اَعْظَمُ",
+      "translation": "O Allah! if my sins are enormous, surely You are more Tremendous."
+    },
+    {
+      "index": 22,
+      "arabic": "وَ اِنْ كَبُرَ [كَثُرَ] تَفْرِيْطِيْ فَاَنْتَ اَكْبَرُ",
+      "translation": "If my transgression has exceeded all limits, surely You are Greater."
+    },
+    {
+      "index": 23,
+      "arabic": "وَ اِنْ دَامَ بُخْلِيْ فَاَنْتَ اَجْوَدُ",
+      "translation": "If my stinginess has perpetuated, surely You are more Generous."
+    },
+    {
+      "index": 24,
+      "arabic": "اَللّٰهُمَّ اغْفِرْ لِيْ عَظِيْمَ ذُنُوْبِيْ بِعَظِيْمِ عَفْوِكَ",
+      "translation": "O Allah, (please) forgive my enormous sins out of Your tremendous pardon,"
+    },
+    {
+      "index": 25,
+      "arabic": "وَ كَثِيْرَ تَفْرِيْطِيْ بِظَاهِرِ كَرَمِكَ",
+      "translation": "forgive my limitless transgression out of Your obvious generosity,"
+    },
+    {
+      "index": 26,
+      "arabic": "وَ اقْمَعْ بُخْلِيْ بِفَضْلِ جُوْدِكَ",
+      "translation": "and impede my stinginess by the virtue of Your magnanimity."
+    },
+    {
+      "index": 27,
+      "arabic": "اَللّٰهُمَّ مَا بِنَا مِنْ نِعْمَةٍ فَمِنْكَ",
+      "translation": "O Allah, You are certainly the source of each and every favor that covers us."
+    },
+    {
+      "index": 28,
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "There is no god save You."
+    },
+    {
+      "index": 29,
+      "arabic": "اَسْتَغْفِرُكَ وَ اَتُوْبُ اِلَيْكَ۔",
+      "translation": "I pray Your forgiveness and I repent before You."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua2&lang=en"
+}

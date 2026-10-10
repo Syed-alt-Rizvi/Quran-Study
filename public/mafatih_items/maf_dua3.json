@@ -1,0 +1,122 @@
+{
+  "id": "maf_dua3",
+  "code": "maf_dua3",
+  "title": "Taqibaat e Namaz e Asr",
+  "mainCategory": "Taqibaat e Namaz",
+  "mainCategoryCode": "maf_taqee",
+  "categoryChain": [
+    "Taqibaat e Namaz",
+    "Taqibaat e Namaz e Asr"
+  ],
+  "audioUrl": null,
+  "introduction": "TAQIBAAT E NAMAZ E ASR\n\nAs quoted from Misbah al-Mutahajjid\n\nSubsequent to the Afternoon (Asr) Prayer, say the following supplicatory prayer, as is quoted from Misbah al-Mutahajjid:\n\nYou may then say the following supplicatory prayer:\n\nImam Ja’far al-Sadiq(a.s.) is reported as saying: Anyone who implores Almighty Allah’s forgiveness (i.e. Astaghfirullah) seventy times after the Asr Prayer will have seven hundred of his sins forgiven.\n\nImam Muhammad al-Taqi (al-Jawad) (a.s.) is also reported as saying: Anyone who recites Surah al-Qadr (No. 97) ten times after the Asr Prayer will be granted the reward of the deeds of all creatures on that day.\n\nIt is also recommended to say Dua al-Ashraat every morning and evening. Yet, the best time for this supplication is the time after the Asr Prayers on Fridays.",
+  "versesCount": 21,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَسْتَغْفِرُ اللهَ الَّذِيْ لَاۤ اِلٰهَ اِلَّا هُوَ",
+      "translation": "I pray the forgiveness of Allah; there is no god save Him,"
+    },
+    {
+      "index": 2,
+      "arabic": "الْحَيُّ الْقَيُّوْمُ",
+      "translation": "the Ever-living, the Self-Subsisting,"
+    },
+    {
+      "index": 3,
+      "arabic": "اَلرَّحْمَنُ الرَّحِيْمُ",
+      "translation": "the All- compassionate, the All-merciful,"
+    },
+    {
+      "index": 4,
+      "arabic": "ذُو [ذَا] الْجَلَالِ وَ الْاِكْرَامِ",
+      "translation": "and the Lord of Majesty and Honor."
+    },
+    {
+      "index": 5,
+      "arabic": "وَ اَسْاَلُهُ اَنْ يَتُوْبَ عَلَيَّ",
+      "translation": "And I ask Him to accept my repentance,"
+    },
+    {
+      "index": 6,
+      "arabic": "تَوْبَةَ عَبْدٍ ذَلِيْلٍ خَاضِعٍ",
+      "translation": "like His acceptance of the repentance of a slave who is submissive, acquiescent,"
+    },
+    {
+      "index": 7,
+      "arabic": "فَقِيْرٍ بَاۤئِسٍ",
+      "translation": "poor, miserable,"
+    },
+    {
+      "index": 8,
+      "arabic": "مِسْكِيْنٍ مُسْتَكِيْنٍ مُسْتَجِيْرٍ",
+      "translation": "despondent, dejected, seeking refuge (with Him),"
+    },
+    {
+      "index": 9,
+      "arabic": "لَا يَمْلِكُ لِنَفْسِهِ نَفْعًا وَ لَا ضَرًّا",
+      "translation": "not controlling for himself any harm or profit,"
+    },
+    {
+      "index": 10,
+      "arabic": "وَ لَا مَوْتًا وَ لَا حَيَاةً وَ لَا نُشُوْرًا",
+      "translation": "and not controlling death nor life nor raising (the dead) to life."
+    },
+    {
+      "index": 11,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَعُوْذُ بِكَ مِنْ نَفْسٍ لَا تَشْبَعُ",
+      "translation": "O Allah, I surely seek Your protection against a self that never has enough,"
+    },
+    {
+      "index": 12,
+      "arabic": "وَ مِنْ قَلْبٍ لَا يَخْشَعُ",
+      "translation": "a heart that does not feel apprehension,"
+    },
+    {
+      "index": 13,
+      "arabic": "وَ مِنْ عِلْمٍ لَا يَنْفَعُ،",
+      "translation": "knowledge that does not avail,"
+    },
+    {
+      "index": 14,
+      "arabic": "وَ مِنْ صَلَاةٍ لَا تُرْفَعُ",
+      "translation": "a prayer that is not accepted,"
+    },
+    {
+      "index": 15,
+      "arabic": "وَ مِنْ دُعَاۤءٍ لَا يُسْمَعُ",
+      "translation": "and a supplication that is not responded."
+    },
+    {
+      "index": 16,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ الْيُسْرَ بَعْدَ الْعُسْرِ",
+      "translation": "O Allah, I surely beseech You for easiness after difficulty,"
+    },
+    {
+      "index": 17,
+      "arabic": "وَ الْفَرَجَ بَعْدَ الْكَرْبِ",
+      "translation": "relief after misfortune,"
+    },
+    {
+      "index": 18,
+      "arabic": "وَ الرَّخَاۤءَ بَعْدَ الشِّدَّةِ",
+      "translation": "and comfort after hardship."
+    },
+    {
+      "index": 19,
+      "arabic": "اَللّٰهُمَّ مَا بِنَا مِنْ نِعْمَةٍ فَمِنْكَ",
+      "translation": "O Allah, You are certainly the source of each-and every favor that covers us."
+    },
+    {
+      "index": 20,
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "There is no god save You."
+    },
+    {
+      "index": 21,
+      "arabic": "اَسْتَغْفِرُكَ وَ اَتُوْبُ اِلَيْكَ۔",
+      "translation": "I pray Your forgiveness and repent before You."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua3&lang=en"
+}

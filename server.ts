@@ -828,9 +828,20 @@ async function startServer() {
 
   app.get("/api/mafatih/audio-proxy", async (req, res) => {
     try {
-      const audioUrl = req.query.url as string;
+      let audioUrl = req.query.url as string;
       if (!audioUrl || !audioUrl.startsWith("http")) {
         return res.status(400).send("Invalid audio URL");
+      }
+
+      // Upgrade insecure HTTP to HTTPS for known CDNs to prevent mixed-content blocking
+      if (audioUrl.startsWith("http://www.ya-mahdi.net")) {
+        audioUrl = audioUrl.replace("http://", "https://");
+      } else if (audioUrl.startsWith("http://ya-mahdi.net")) {
+        audioUrl = audioUrl.replace("http://", "https://");
+      } else if (audioUrl.startsWith("http://www.sibtayn.com")) {
+        audioUrl = audioUrl.replace("http://", "https://");
+      } else if (audioUrl.startsWith("http://sibtayn.com")) {
+        audioUrl = audioUrl.replace("http://", "https://");
       }
 
       // Hash URL for stable, collision-free local filename
@@ -938,44 +949,51 @@ async function startServer() {
       if (upstream.body) {
         const nodeStream = Readable.fromWeb(upstream.body as any);
 
-        const shouldCache = !req.headers.range || req.headers.range === "bytes=0-";
-        const tempFile = `${cachedFile}.tmp.${Date.now()}`;
-        let writeStream: fs.WriteStream | null = null;
-        if (shouldCache) {
-          try {
-            writeStream = fs.createWriteStream(tempFile);
-          } catch (e) {}
-        }
-
         req.on("close", () => {
           nodeStream.destroy();
-          if (writeStream) {
-            writeStream.end();
-            try {
-              if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-            } catch (e) {}
-          }
         });
 
-        if (writeStream) {
-          nodeStream.pipe(writeStream);
-          writeStream.on("finish", () => {
-            try {
-              if (fs.existsSync(tempFile) && fs.statSync(tempFile).size > 2000) {
-                fs.renameSync(tempFile, cachedFile);
-              } else if (fs.existsSync(tempFile)) {
-                fs.unlinkSync(tempFile);
-              }
-            } catch (e) {}
-          });
-          writeStream.on("error", () => {
-            try {
-              if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-            } catch (e) {}
-          });
-        }
+        nodeStream.on("error", (err) => {
+          console.warn("Audio proxy stream error:", err);
+          if (!res.headersSent) res.status(500).end();
+          else res.destroy();
+        });
 
+        // Direct pipe to client socket with zero obstruction
         nodeStream.pipe(res);
+
+        // Async background download to cache file on disk for future zero-latency playback
+        const shouldCache = !req.headers.range || req.headers.range === "bytes=0-";
+        if (shouldCache && !fs.existsSync(cachedFile)) {
+          const tempFile = `${cachedFile}.tmp.${Date.now()}`;
+          fetch(audioUrl, {
+            headers: {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+              "Referer": "https://www.ya-mahdi.net/",
+              "Accept": "*/*"
+            }
+          }).then((bgRes) => {
+            if (bgRes.ok && bgRes.body) {
+              const bgStream = Readable.fromWeb(bgRes.body as any);
+              const ws = fs.createWriteStream(tempFile);
+              bgStream.pipe(ws);
+              ws.on("finish", () => {
+                try {
+                  if (fs.existsSync(tempFile) && fs.statSync(tempFile).size > 2000) {
+                    fs.renameSync(tempFile, cachedFile);
+                  } else if (fs.existsSync(tempFile)) {
+                    fs.unlinkSync(tempFile);
+                  }
+                } catch (e) {}
+              });
+              ws.on("error", () => {
+                try {
+                  if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+                } catch (e) {}
+              });
+            }
+          }).catch(() => {});
+        }
       } else {
         res.end();
       }

@@ -78,7 +78,7 @@ export async function getFullIndex(): Promise<MafatihSummary[]> {
   if (indexCache && indexCache.length > 0) return indexCache;
   if (indexPromise) return indexPromise;
 
-  indexPromise = (async () => {
+  indexPromise = (async (): Promise<MafatihSummary[]> => {
     // 1. Try static JSON first (0ms, pre-bundled, offline ready)
     try {
       const res = await fetch(getApiUrl('/mafatih_index.json'));
@@ -86,7 +86,7 @@ export async function getFullIndex(): Promise<MafatihSummary[]> {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           indexCache = data;
-          return indexCache;
+          return data;
         }
       }
     } catch {}
@@ -98,7 +98,7 @@ export async function getFullIndex(): Promise<MafatihSummary[]> {
         const data = await res.json();
         if (data && Array.isArray(data.items) && data.items.length > 0) {
           indexCache = data.items;
-          return indexCache;
+          return data.items;
         }
       }
     } catch {}
@@ -296,6 +296,20 @@ function sanitizeMafatihDetail(raw: any, fallbackId: string, metaFallback?: Mafa
     ? raw.categoryChain.filter((c: any) => typeof c === 'string')
     : (metaFallback?.categoryChain || [raw.mainCategory || 'Supplications']);
 
+  let audioUrl = raw.audioUrl || metaFallback?.audioUrl || null;
+  if (audioUrl) {
+    audioUrl = String(audioUrl).trim();
+    if (audioUrl.startsWith("http://www.ya-mahdi.net")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://ya-mahdi.net")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://www.sibtayn.com")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://sibtayn.com")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    }
+  }
+
   return {
     id: String(raw.id || fallbackId),
     code: String(raw.code || raw.id || fallbackId),
@@ -303,7 +317,7 @@ function sanitizeMafatihDetail(raw: any, fallbackId: string, metaFallback?: Mafa
     mainCategory: String(raw.mainCategory || metaFallback?.mainCategory || 'General Recitations'),
     mainCategoryCode: String(raw.mainCategoryCode || metaFallback?.mainCategoryCode || 'general'),
     categoryChain,
-    audioUrl: raw.audioUrl || metaFallback?.audioUrl || null,
+    audioUrl,
     introduction: typeof raw.introduction === 'string' ? raw.introduction : (metaFallback?.snippet || ''),
     versesCount: verses.length,
     verses,
@@ -386,10 +400,10 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
         } catch {}
       }
 
-      // Attempt 2: Backend API fallback (quick 3.5s timeout if running with backend)
+      // Attempt 2: Backend API fallback (generous 15s timeout for dynamic live scraping)
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
+        const timeout = setTimeout(() => controller.abort(), 15000);
         const res = await fetch(getApiUrl(`/api/mafatih/items/${encodeURIComponent(targetId)}`), {
           signal: callerSignal || controller.signal
         });

@@ -1,0 +1,58 @@
+{
+  "id": "maf_dua46b",
+  "code": "maf_dua46b",
+  "title": "Dua e Faraj",
+  "mainCategory": "Everyday Recitations",
+  "mainCategoryCode": "maf_every",
+  "categoryChain": [
+    "Everyday Recitations",
+    "Every Day Recitations",
+    "Dua e Faraj"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/mahdi_sedghi/faraj-sedghi.m4a",
+  "introduction": "DUA E FARAJ",
+  "versesCount": 8,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ كُنْ لِوَلِيِّكَ الْحُجَّةِ بْنِ الْحَسَنِ",
+      "translation": "O Allah, (please) be for Your representative, al-Hujjah the son of al-Hasan,"
+    },
+    {
+      "index": 2,
+      "arabic": "صَلَوَاتُكَ عَلَيْهِ وَعَلٰى اٰبَاۤئِه",
+      "translation": "Your blessings be on him and on his forefathers,"
+    },
+    {
+      "index": 3,
+      "arabic": "فِىْ هٰذِهِ السَّاعَةِ وَ فِىْ كُلِّ سَاعَةٍ",
+      "translation": "now and at all times,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَلِيًّا وَّ حَافِظًا",
+      "translation": "protector, guardian,"
+    },
+    {
+      "index": 5,
+      "arabic": "وَّ قَاۤئِدًا وَّ نَاصِرًا",
+      "translation": "leader, helper,"
+    },
+    {
+      "index": 6,
+      "arabic": "وَّ دَلِيْلًا وَّ عَيْنًا",
+      "translation": "guide, and watcher"
+    },
+    {
+      "index": 7,
+      "arabic": "حَتّٰى تُسْكِنَهُ اَرْضَكَ طَوْعًا",
+      "translation": "so that You shall allow him to prevail on Your lands willingly"
+    },
+    {
+      "index": 8,
+      "arabic": "وَتُمَتِّعَهُ فِيْهَا طَوِيْلًا۔",
+      "translation": "and You shall make him enjoy it for a long time."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua46b&lang=en"
+}

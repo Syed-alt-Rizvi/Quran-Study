@@ -105,12 +105,12 @@ class ShiaAdhanPlayerService {
 
       // Listen for Capacitor native scheduled alarm triggers
       import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
-        LocalNotifications.addListener('localNotificationReceived', (notification) => {
+        LocalNotifications.addListener('localNotificationReceived', (notification: any) => {
           if (notification?.extra?.type === 'adhan') {
             this.playAdhan(notification.extra.prayer || 'Shia Adhan', 1);
           }
         });
-        LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+        LocalNotifications.addListener('localNotificationActionPerformed', (action: any) => {
           if (action?.notification?.extra?.type === 'adhan') {
             this.playAdhan(action.notification.extra.prayer || 'Shia Adhan', 1);
           }

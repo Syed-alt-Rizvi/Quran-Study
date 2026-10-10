@@ -11,7 +11,9 @@ try {
   app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig, 'fallback-app');
 }
 
-export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+export const db: Firestore = firebaseConfig.firestoreDatabaseId
+  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+  : getFirestore(app);
 export const auth: Auth = getAuth(app);
 export { app };
 

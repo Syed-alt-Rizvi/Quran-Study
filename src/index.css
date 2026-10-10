@@ -6,13 +6,21 @@
   }
 }
 
+.font-arabic {
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+}
+
 .font-quran {
-  font-family: 'Scheherazade New', 'Amiri', serif;
+  font-family: 'Amiri Quran', 'Scheherazade New', 'Amiri', serif;
   line-height: 2.2;
 }
 
 .font-amiri {
   font-family: 'Amiri', serif;
+}
+
+.ayah-arabic-text {
+  font-family: 'Amiri', 'Scheherazade New', serif;
 }
 
 /* Custom smooth scrollbar */

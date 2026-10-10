@@ -290,7 +290,7 @@ export default function App() {
 
           setIsExiting(true);
         })
-          .then((listener) => {
+          .then((listener: any) => {
             if (!isMounted) {
               listener?.remove?.();
             } else {

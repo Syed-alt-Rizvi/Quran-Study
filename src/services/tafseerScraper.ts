@@ -185,7 +185,7 @@ export async function fetchTafseer(
           }
         }
 
-        if (item && (item.ur || item.tafseer_text) && (item.ur?.length > 30 || item.tafseer_text?.length > 50)) {
+        if (item && (item.ur || item.tafseer_text) && ((item.ur?.length || 0) > 30 || (item.tafseer_text?.length || 0) > 50)) {
           cacheKautharItem(item, ayahNumber);
 
           // If the item covers a range (e.g. 1 - 2, 16 - 18), cache it for all ayahs in that range
@@ -382,7 +382,7 @@ export async function fetchTafseer(
 
     if (surahBundle && typeof surahBundle === 'object' && Object.keys(surahBundle).length > 0) {
       cacheSurahAyahs(surahBundle);
-      const item = surahBundle[ayahNumber] || surahBundle[String(ayahNumber)];
+      const item = (surahBundle as any)[ayahNumber] || (surahBundle as any)[String(ayahNumber)];
       if (item && (item.ur || item.en)) {
         return item;
       }

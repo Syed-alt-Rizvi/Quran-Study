@@ -232,15 +232,26 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   const isNative = typeof window !== 'undefined' && Capacitor.isNativePlatform();
   const [useDirectUrl, setUseDirectUrl] = useState(false);
 
+  // Clean audio URL to HTTPS for mixed content safety
+  const cleanAudioUrl = useMemo(() => {
+    let u = (audioUrl || '').trim();
+    if (u.startsWith('http://www.ya-mahdi.net')) u = u.replace('http://', 'https://');
+    else if (u.startsWith('http://ya-mahdi.net')) u = u.replace('http://', 'https://');
+    else if (u.startsWith('http://www.sibtayn.com')) u = u.replace('http://', 'https://');
+    else if (u.startsWith('http://sibtayn.com')) u = u.replace('http://', 'https://');
+    return u;
+  }, [audioUrl]);
+
   // Compute resolved stream URL:
   // On native Capacitor Android APK, direct audioUrl connects natively without browser restrictions!
   // On Web browsers, use high-speed proxy with byte-range and disk-caching support, with direct fallback!
   const audioSrc = useMemo(() => {
+    if (!cleanAudioUrl) return '';
     if (isNative || useDirectUrl) {
-      return audioUrl;
+      return cleanAudioUrl;
     }
-    return getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(audioUrl)}`);
-  }, [audioUrl, isNative, useDirectUrl]);
+    return getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(cleanAudioUrl)}`);
+  }, [cleanAudioUrl, isNative, useDirectUrl]);
 
   // Reset state when track changes
   useEffect(() => {
@@ -248,7 +259,16 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
     setCurrentTime(0);
     setIsBuffering(false);
     setUseDirectUrl(false);
-  }, [audioUrl]);
+  }, [cleanAudioUrl]);
+
+  // Pre-load audio container headers & initial bytes as soon as audioSrc changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !audioSrc) return;
+    try {
+      audio.load();
+    } catch {}
+  }, [audioSrc]);
 
   // When source switches to fallback while user wanted to play, auto-resume
   useEffect(() => {

@@ -1,0 +1,863 @@
+{
+  "id": "maf_dua51",
+  "code": "maf_dua51",
+  "title": "Dua Tawassul",
+  "mainCategory": "Duas & Supplications",
+  "mainCategoryCode": "maf_dua",
+  "categoryChain": [
+    "Duas & Supplications",
+    "Duas",
+    "Dua Tawassul"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/mohsin_farahmad/tavassol_farahmand.m4a",
+  "introduction": "DUA TAWASSUL\n\n‘Allamah al-Majlisi has quoted some considerable books to have mentioned that Muhammad ibn Baabwayh reported this supplication of Seeking Intercession (Dua al-tawassul) from the Holy Imams (a.s.). Commenting, he added, “Whenever I said this supplication for any matter, I could find the traces of response immediately.” The supplication is as follows:\n\nYou may now beseech Almighty Allah to grant your needs, and they will be settled, if Allah permits. According to another narration, you may say the following words thereafter:",
+  "versesCount": 169,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اِنِّىْ اَسْئَلُكَ وَاَتَوَجَّهُ اِلَيْكَ",
+      "translation": "O Allah, I beseech You and turn my face toward You"
+    },
+    {
+      "index": 2,
+      "arabic": "بِنَبِيِّكَ نَبِىِّ الرَّحْمَةِ",
+      "translation": "in the name of Your Prophet; the Prophet of Mercy,"
+    },
+    {
+      "index": 3,
+      "arabic": "مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَاٰلِهِ",
+      "translation": "Muhammad—may Allah send blessings to him and his Household."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا اَبَاالْقَاسِمِ",
+      "translation": "O Abu’l-Qasim!"
+    },
+    {
+      "index": 5,
+      "arabic": "يَا رَسُوْلَ اللهِ",
+      "translation": "O Allah’s Messenger!"
+    },
+    {
+      "index": 6,
+      "arabic": "يَا اِمامَ الرَّحْمَةِ",
+      "translation": "O Chief of Mercy!"
+    },
+    {
+      "index": 7,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 8,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "We are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 9,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 10,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 11,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 12,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 13,
+      "arabic": "يَا اَبَا الْحَسَنِ",
+      "translation": "O Abu’l-Hasan!"
+    },
+    {
+      "index": 14,
+      "arabic": "يَا اَمِيْرَ الْمُؤْمِنِيْنَ",
+      "translation": "O commander of the Believers!"
+    },
+    {
+      "index": 15,
+      "arabic": "يَا عَلِىَّ بْنَ اَبِيْ طَالِبٍ",
+      "translation": "O 'Ali, son of Abu-Talib!"
+    },
+    {
+      "index": 16,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 17,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 18,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "We are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 19,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 20,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 21,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 22,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 23,
+      "arabic": "يَا فَاطِمَةَ الزَّهْرَاۤءُ",
+      "translation": "O Fatimah, the Luminous Lady!"
+    },
+    {
+      "index": 24,
+      "arabic": "يَا بِنْتَ مُحَمَّدٍ",
+      "translation": "O daughter of Muhammad!"
+    },
+    {
+      "index": 25,
+      "arabic": "يَا قُرَّةَ عَيْنِ الرَّسُوْلِ",
+      "translation": "O delight of the Messenger’s eyes!"
+    },
+    {
+      "index": 26,
+      "arabic": "يَا سَيِّدَتَنَا وَمَوْلَاتَنَا",
+      "translation": "O our chief!"
+    },
+    {
+      "index": 27,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "We are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 28,
+      "arabic": "وَتَوَسَّلْنَا بِكِ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 29,
+      "arabic": "وَقَدَّمْنَاكِ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 30,
+      "arabic": "يَا وَجِيْهَةً عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 31,
+      "arabic": "اِشْفَعِىْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 32,
+      "arabic": "يَا اَبا مُحَمَّدٍ",
+      "translation": "O Abu-Muhammad!"
+    },
+    {
+      "index": 33,
+      "arabic": "يَا حَسَنَ بْنَ عَلِيٍّ",
+      "translation": "O Hasan the son of 'Ail!"
+    },
+    {
+      "index": 34,
+      "arabic": "اَيُّهَا الْمُجْتَبٰى",
+      "translation": "O well-Chosen one!"
+    },
+    {
+      "index": 35,
+      "arabic": "يَا بْنَ رَسُولِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 36,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 37,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 38,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 39,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 40,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 41,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 42,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 43,
+      "arabic": "يَا اَبا عَبْدِاللهِ",
+      "translation": "O Abu-'Abdullah!"
+    },
+    {
+      "index": 44,
+      "arabic": "يَا حُسَيْنَ بْنَ عَلِيٍّ",
+      "translation": "O Husayn the son of 'Ail!"
+    },
+    {
+      "index": 45,
+      "arabic": "اَيُّهَا الشَّهِيْدُ",
+      "translation": "O Martyr!"
+    },
+    {
+      "index": 46,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 47,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 48,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 49,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 50,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 51,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 52,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 53,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 54,
+      "arabic": "يَاۤ اَبَا الْحَسَنِ",
+      "translation": "O Abu’l-Hasan!"
+    },
+    {
+      "index": 55,
+      "arabic": "يَا عَلِىَّ بْنَ الْحُسَيْنِ",
+      "translation": "O 'Ali the son of al-Husayn!"
+    },
+    {
+      "index": 56,
+      "arabic": "يَا زَيْنَ الْعَابِدِيْنَ",
+      "translation": "O Ornament of the Worshippers!"
+    },
+    {
+      "index": 57,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 58,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 59,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 60,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 61,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 62,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 63,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 64,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 65,
+      "arabic": "يَا اَبا جَعْفَرٍ",
+      "translation": "0 Abu-Ja'far!"
+    },
+    {
+      "index": 66,
+      "arabic": "يَا مُحَمَّدَ بْنَ عَلِيٍّ",
+      "translation": "O Muhammad the son of 'Ali!"
+    },
+    {
+      "index": 67,
+      "arabic": "اَيُّهَا الْبَاقِرُ",
+      "translation": "O Cleaver [of knowledge]!"
+    },
+    {
+      "index": 68,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 69,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 70,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 71,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 72,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 73,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 74,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 75,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ۔",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 76,
+      "arabic": "يَا اَبَا عَبْدِ اللهِ",
+      "translation": "O Abu-'Abdullah!"
+    },
+    {
+      "index": 77,
+      "arabic": "يَا جَعْفَرَ بْنَ مُحَمَّدٍ",
+      "translation": "O Ja'far the son of Muhammad!"
+    },
+    {
+      "index": 78,
+      "arabic": "اَيُّهَا الصَّادِقُ",
+      "translation": "O Veracious!"
+    },
+    {
+      "index": 79,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 80,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 81,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 82,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 83,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 84,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 85,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 86,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ،",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 87,
+      "arabic": "يَا اَبَا الْحَسَنِ",
+      "translation": "O Abu’l-Hasan!"
+    },
+    {
+      "index": 88,
+      "arabic": "يَا مُوْسَى بْنَ جَعْفَرٍ",
+      "translation": "O Musa the son of Ja'far!"
+    },
+    {
+      "index": 89,
+      "arabic": "اَيُّهَا الْكَاظِمُ",
+      "translation": "O Suppressor [of rage]!"
+    },
+    {
+      "index": 90,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 91,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 92,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 93,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 94,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 95,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 96,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 97,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ،",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 98,
+      "arabic": "يَا اَبَا الْحَسَنِ",
+      "translation": "O Abu’l-Hasan!"
+    },
+    {
+      "index": 99,
+      "arabic": "يَا عَلِىَّ بْنَ مُوْسٰى",
+      "translation": "O 'Ali the son of Musa!"
+    },
+    {
+      "index": 100,
+      "arabic": "اَيُّهَا الرِّضَا",
+      "translation": "O Amicable!"
+    },
+    {
+      "index": 101,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 102,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 103,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 104,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 105,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 106,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 107,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 108,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 109,
+      "arabic": "يَا اَبَا جَعْفَرٍ",
+      "translation": "O Abu-Ja'far!"
+    },
+    {
+      "index": 110,
+      "arabic": "يَا مُحَمَّدَ بْنَ عَلِيٍّ",
+      "translation": "O Muhammad the son of 'Ali!"
+    },
+    {
+      "index": 111,
+      "arabic": "اَيُّهَا التَّقِىُّ الْجَوَادُ",
+      "translation": "O pious and magnanimous!"
+    },
+    {
+      "index": 112,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 113,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 114,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 115,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 116,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 117,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 118,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 119,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 120,
+      "arabic": "يَا اَبَا الْحَسَنِ",
+      "translation": "O Abu’l-Hasan!"
+    },
+    {
+      "index": 121,
+      "arabic": "يَا عَلِىَّ بْنَ مُحَمَّدٍ",
+      "translation": "O 'Ali the son of Muhammad!"
+    },
+    {
+      "index": 122,
+      "arabic": "اَيُّهَا الْهَادِى النَّقِىُّ",
+      "translation": "O guide and pure!"
+    },
+    {
+      "index": 123,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 124,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 125,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 126,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 127,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 128,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 129,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 130,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 131,
+      "arabic": "يَا اَبا مُحَمَّدٍ",
+      "translation": "O Abu-Muhammad!"
+    },
+    {
+      "index": 132,
+      "arabic": "يَا حَسَنَ بْنَ عَلِيٍّ",
+      "translation": "O Hasan the son of 'Ali!"
+    },
+    {
+      "index": 133,
+      "arabic": "اَيُّهَا الزَّكِىُّ الْعَسْكَرِىُّ",
+      "translation": "O immaculate resident of 'Askar [city]!"
+    },
+    {
+      "index": 134,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 135,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 136,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 137,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 138,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 139,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 140,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 141,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 142,
+      "arabic": "يَا وَصِىَّ الْحَسَنِ",
+      "translation": "O successor of al-Hasan!"
+    },
+    {
+      "index": 143,
+      "arabic": "وَالْخَلَفَ الْحُجَّةَ",
+      "translation": "O descendant [of the Infallibles] and Argument [of Allah]!"
+    },
+    {
+      "index": 144,
+      "arabic": "اَيُّهَا الْقَاۤئِمُ الْمُنْتَظَرُ الْمَهْدِىُّ",
+      "translation": "O Riser, Awaited, and Well-guided!"
+    },
+    {
+      "index": 145,
+      "arabic": "يَا بْنَ رَسُوْلِ اللهِ",
+      "translation": "O son of Allah’s Messenger!"
+    },
+    {
+      "index": 146,
+      "arabic": "يَا حُجَّةَ اللهِ عَلٰى خَلْقِهِ",
+      "translation": "O Allah’s Argument against His creatures!"
+    },
+    {
+      "index": 147,
+      "arabic": "يَا سَيِّدَنَا وَمَوْلٰنَا",
+      "translation": "O our master and chief!"
+    },
+    {
+      "index": 148,
+      "arabic": "اِنَّا تَوَجَّهْنَا وَاسْتَشْفَعْنَا",
+      "translation": "we are turning our faces toward you, seeking your intercession"
+    },
+    {
+      "index": 149,
+      "arabic": "وَتَوَسَّلْنَا بِكَ اِلَى اللهِ",
+      "translation": "and your advocacy for us before Allah;"
+    },
+    {
+      "index": 150,
+      "arabic": "وَقَدَّمْنَاكَ بَيْنَ يَدَىْ حَاجَاتِنَا",
+      "translation": "and we are presenting you [as our intermediary] for the settlement of our needs."
+    },
+    {
+      "index": 151,
+      "arabic": "يَا وَجِيْهًا عِنْدَ اللهِ",
+      "translation": "O well-esteemed with Allah,"
+    },
+    {
+      "index": 152,
+      "arabic": "اِشْفَعْ لَنَا عِنْدَ اللهِ",
+      "translation": "intercede for us before Allah."
+    },
+    {
+      "index": 153,
+      "arabic": "يَا سَادَتِىْ وَمَوَالِىَّ",
+      "translation": "O my chiefs and masters!"
+    },
+    {
+      "index": 154,
+      "arabic": "اِنِّىْ تَوَجَّهْتُ بِكُمْ",
+      "translation": "I am turning my face toward Allah in the names of you [all],"
+    },
+    {
+      "index": 155,
+      "arabic": "اَئِمَّتِىْ وَعُدَّتِىْ",
+      "translation": "for you are my leaders and my supporters"
+    },
+    {
+      "index": 156,
+      "arabic": "لِيَوْمِ فَقْرِىْ وَحَاجَتِىْ",
+      "translation": "on the day of my destitution and neediness"
+    },
+    {
+      "index": 157,
+      "arabic": "اِلَى اللهِ",
+      "translation": "before Allah."
+    },
+    {
+      "index": 158,
+      "arabic": "وَتَوَسَّلْتُ بِكُمْ اِلَى اللهِ",
+      "translation": "I am seeking your advocacy for me before Allah"
+    },
+    {
+      "index": 159,
+      "arabic": "وَاسْتَشْفَعْتُ بِكُمْ اِلَى اللهِ",
+      "translation": "and seeking your intercession for me before Allah;"
+    },
+    {
+      "index": 160,
+      "arabic": "فَاشْفَعُوْا لِىْ عِنْدَ اللهِ",
+      "translation": "so, (please) intercede for me before Allah"
+    },
+    {
+      "index": 161,
+      "arabic": "وَاسْتَنْقِذُوْنِىْ مِنْ ذُنُوْبِىْ عِنْدَ اللهِ",
+      "translation": "and save me from my sins before Allah,"
+    },
+    {
+      "index": 162,
+      "arabic": "فَاِنَّكُمْ وَسِيْلَتِىْ اِلَى اللهِ",
+      "translation": "for you are my means to Allah"
+    },
+    {
+      "index": 163,
+      "arabic": "وَبِحُبِّكُمْ وَبِقُرْبِكُمْ اَرْجُوْ نَجَاةً مِنَ اللهِ",
+      "translation": "and through my love for you and my seeking nearness to you do I hope for salvation from Allah."
+    },
+    {
+      "index": 164,
+      "arabic": "فَكُوْنُوْا عِنْدَ اللهِ رَجَاۤئِىْ",
+      "translation": "So, be my hope before Allah."
+    },
+    {
+      "index": 165,
+      "arabic": "يَا سَادَتِىْ يَا اَوْلِيَاۤءَ اللهِ",
+      "translation": "O my masters! O Allah’s intimate servants!"
+    },
+    {
+      "index": 166,
+      "arabic": "صَلَّى اللهُ عَلَيْهِمْ اَجْمَعِيْنَ",
+      "translation": "May Allah bless you all"
+    },
+    {
+      "index": 167,
+      "arabic": "وَلَعَنَ اللهُ اَعْدَاۤءَ اللهِ ظَالِمِيْهِمْ",
+      "translation": "and may Allah curse the enemies of Allah; those who wronged you,"
+    },
+    {
+      "index": 168,
+      "arabic": "مِنَ الْاَوَّلِيْنَ وَالْاٰخِرِيْنَ",
+      "translation": "from the past and the last generations."
+    },
+    {
+      "index": 169,
+      "arabic": "اٰمِيْنَ رَبَّ الْعَالَمِيْنَ۔",
+      "translation": "Respond to us, O Lord of the Worlds!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua51&lang=en"
+}

@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { BookMarked, Play, Pause, Search, Sparkles, Clock, Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { BookMarked, Play, Pause, Search, Sparkles, Clock, Heart, BookOpen } from 'lucide-react';
 import { MAFATIH_COLLECTION, MafatihItem } from '../data/mafatihData';
+import { getApiUrl } from '../utils/apiBase';
+import { useAudioStore } from '../audioStore';
 
-export const MafatihView: React.FC = () => {
+interface MafatihViewProps {
+  onSelectItem?: (id: string) => void;
+}
+
+export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'dua' | 'ziyarat' | 'munajat'>('all');
   const [activeItem, setActiveItem] = useState<MafatihItem>(MAFATIH_COLLECTION[0]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -12,8 +19,30 @@ export const MafatihView: React.FC = () => {
     ? MAFATIH_COLLECTION
     : MAFATIH_COLLECTION.filter(i => i.category === selectedCategory);
 
-  const toggleAudio = (url?: string) => {
-    if (!url) return;
+  useEffect(() => {
+    const handlePause = () => {
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      setIsPlaying(false);
+    };
+    window.addEventListener('pause-mafatih-audio', handlePause);
+    return () => {
+      window.removeEventListener('pause-mafatih-audio', handlePause);
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+    };
+  }, [currentAudio]);
+
+  const toggleAudio = (rawUrl?: string) => {
+    if (!rawUrl) return;
+
+    let url = rawUrl.trim();
+    if (url.startsWith('http://www.ya-mahdi.net')) url = url.replace('http://', 'https://');
+    else if (url.startsWith('http://ya-mahdi.net')) url = url.replace('http://', 'https://');
+    else if (url.startsWith('http://www.sibtayn.com')) url = url.replace('http://', 'https://');
+    else if (url.startsWith('http://sibtayn.com')) url = url.replace('http://', 'https://');
 
     if (isPlaying && currentAudio) {
       currentAudio.pause();
@@ -25,13 +54,29 @@ export const MafatihView: React.FC = () => {
       currentAudio.pause();
     }
 
-    const audio = new Audio(url);
+    // Pause Quran audio cleanly
+    useAudioStore.getState().pause();
+    window.dispatchEvent(new CustomEvent('pause-quran-audio'));
+
+    const isNative = typeof window !== 'undefined' && Capacitor.isNativePlatform();
+    const resolvedUrl = isNative ? url : getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(url)}`);
+
+    const audio = new Audio(resolvedUrl);
+    audio.preload = 'auto';
     audio.play().then(() => {
       setCurrentAudio(audio);
       setIsPlaying(true);
     }).catch(err => {
-      console.error(err);
-      setIsPlaying(false);
+      console.warn("Proxy playback failed, falling back to direct URL:", err);
+      const directAudio = new Audio(url);
+      directAudio.preload = 'auto';
+      directAudio.play().then(() => {
+        setCurrentAudio(directAudio);
+        setIsPlaying(true);
+      }).catch(e => {
+        console.error("Audio playback error:", e);
+        setIsPlaying(false);
+      });
     });
 
     audio.onended = () => {
@@ -160,15 +205,37 @@ export const MafatihView: React.FC = () => {
               </h3>
             </div>
 
-            {activeItem.audioUrl && (
-              <button
-                onClick={() => toggleAudio(activeItem.audioUrl)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs transition-all shadow"
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
-                <span>{isPlaying ? 'Pause Recitation' : 'Play Recitation'}</span>
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {onSelectItem && (
+                <button
+                  onClick={() => {
+                    const idMap: Record<string, string> = {
+                      'dua-kumayl': 'maf_dua40',
+                      'ziyarat-ashura': 'maf_ziy86',
+                      'dua-tawassul': 'maf_dua51',
+                      'dua-al-ahd': 'maf_ziy128',
+                      'h-kisa': 'h_kisa',
+                      'ziyarat-waritha': 'maf_ziy73a'
+                    };
+                    onSelectItem(idMap[activeItem.id] || activeItem.id);
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-all border border-slate-700 cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Read Full</span>
+                </button>
+              )}
+
+              {activeItem.audioUrl && (
+                <button
+                  onClick={() => toggleAudio(activeItem.audioUrl)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs transition-all shadow cursor-pointer"
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
+                  <span>{isPlaying ? 'Pause' : 'Play Audio'}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Description & Benefits */}
@@ -209,3 +276,5 @@ export const MafatihView: React.FC = () => {
     </div>
   );
 };
+
+export default MafatihView;

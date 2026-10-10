@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
 import { DatabaseSync } from 'node:sqlite';
-import * as schema from './schema.ts';
+import * as schema from './schema';
 import path from 'path';
 import os from 'os';
 

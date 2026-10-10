@@ -56,15 +56,24 @@ const mafatihItemCache = new Map<string, MafatihDetail>();
 const ALIASES: Record<string, string> = {
   kumayl: "maf_dua40",
   kumail: "maf_dua40",
+  "dua-kumayl": "maf_dua40",
+  "dua_kumayl": "maf_dua40",
   tawassul: "maf_dua51",
+  "dua-tawassul": "maf_dua51",
   ashura: "maf_ziy86",
+  "ziyarat-ashura": "maf_ziy86",
   nudba: "maf_ziy126a",
   nudbah: "maf_ziy126a",
   faraj: "maf_dua46b",
+  "dua-faraj": "maf_dua46b",
   kisa: "h_kisa",
+  "h-kisa": "h_kisa",
+  "hadith-kisa": "h_kisa",
   ahad: "maf_ziy128",
+  "dua-al-ahd": "maf_ziy128",
+  "dua-ahd": "maf_ziy128",
   waritha: "maf_ziy73a",
-  wareeth: "maf_ziy73a",
+  "ziyarat-waritha": "maf_ziy73a",
   mashlool: "maf_dua43",
   sabah: "maf_dua39",
   jawshan: "maf_dua47",
@@ -253,18 +262,42 @@ export function getMafatihItemsList(params: {
 export function parseMafatihHtml(html: string, id: string, metaFallback?: MafatihSummary | null): MafatihDetail {
   const $ = cheerio.load(html);
 
-  // 1. Audio URL
+  // 1. Audio URL extraction with comprehensive selectors, attributes, and regex fallbacks
   let audioUrl =
     $("#audioPlayer").attr("src") ||
+    $("#audioPlayer source").attr("src") ||
     $("audio source").attr("src") ||
-    $('audio').attr('src') ||
-    $('a[href$=".mp3"]').attr('href') ||
-    $('a[href$=".m4a"]').attr('href') ||
+    $("audio").attr("src") ||
+    $('a[href*=".mp3"]').attr("href") ||
+    $('a[href*=".m4a"]').attr("href") ||
+    $('source[src*=".mp3"]').attr("src") ||
+    $('source[src*=".m4a"]').attr("src") ||
     metaFallback?.audioUrl ||
     null;
 
-  if (audioUrl && !audioUrl.startsWith("http")) {
-    audioUrl = `${ROOT_URL}${audioUrl.replace(/^\/+/, "")}`;
+  // Regex fallback: find audio path embedded in inline JavaScript or script blocks
+  if (!audioUrl) {
+    const rawAudioMatch = html.match(/(?:https?:\/\/[^\s"'<>]+\.(?:m4a|mp3)|apps_audio\/[^\s"'<>]+\.(?:m4a|mp3)|\/apps_audio\/[^\s"'<>]+\.(?:m4a|mp3))/i);
+    if (rawAudioMatch) {
+      audioUrl = rawAudioMatch[0];
+    }
+  }
+
+  if (audioUrl) {
+    audioUrl = audioUrl.trim();
+    if (!audioUrl.startsWith("http")) {
+      audioUrl = `${ROOT_URL}${audioUrl.replace(/^\/+/, "")}`;
+    }
+    // Upgrade HTTP to HTTPS for known CDNs to eliminate mixed-content blocking
+    if (audioUrl.startsWith("http://www.ya-mahdi.net")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://ya-mahdi.net")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://www.sibtayn.com")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    } else if (audioUrl.startsWith("http://sibtayn.com")) {
+      audioUrl = audioUrl.replace("http://", "https://");
+    }
   }
 
   // 2. Title
@@ -381,7 +414,7 @@ export async function getOrFetchMafatihItem(id: string): Promise<MafatihDetail |
       const timeout = setTimeout(() => controller.abort(), 12000);
       const res = await fetch(fetchUrl, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShiaQuranApp/1.0",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
         signal: controller.signal,
@@ -395,12 +428,15 @@ export async function getOrFetchMafatihItem(id: string): Promise<MafatihDetail |
       const html = await res.text();
       const detail = parseMafatihHtml(html, resolvedId, metaFallback);
 
-      // Save to disk cache (.cache/mafatih_items) only if valid content was retrieved
+      // Save to disk cache (.cache/mafatih_items and public/mafatih_items) only if valid content was retrieved
       const hasValidContent = (detail.verses && detail.verses.length > 0) || (detail.introduction && detail.introduction.length > 50);
       if (hasValidContent) {
         try {
           if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
           fs.writeFileSync(cachePath, JSON.stringify(detail, null, 2), "utf8");
+
+          if (!fs.existsSync(PUBLIC_ITEMS_DIR)) fs.mkdirSync(PUBLIC_ITEMS_DIR, { recursive: true });
+          fs.writeFileSync(publicPath, JSON.stringify(detail, null, 2), "utf8");
         } catch (err) {
           console.error(`Failed to write disk cache for ${resolvedId}:`, err);
         }

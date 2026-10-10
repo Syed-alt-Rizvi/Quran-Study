@@ -23,8 +23,8 @@ export const MAFATIH_COLLECTION: MafatihItem[] = [
     recommendedTime: "Every Thursday night (Eve of Friday) and the 15th night of Sha'ban.",
     arabicExcerpt: "اللَّهُمَّ إِنِّي أَسْأَلُكَ بِرَحْمَتِكَ الَّتِي وَسِعَتْ كُلَّ شَيْءٍ، وَبِقُوَّتِكَ الَّتِي قَهَرْتَ بِهَا كُلَّ شَيْءٍ...",
     englishExcerpt: "O Allah, I beseech You by Your mercy which encompasses all things, and by Your power by which You have overcome all things...",
-    audioReciter: "Hajj Basim Karbalaei / Sayed Hani Al-Musawi",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Dua_Kumayl.mp3"
+    audioReciter: "Hajj Aba Thar Al-Halawaji",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/aba_thar/kumayal.m4a"
   },
   {
     id: "ziyarat-ashura",
@@ -36,8 +36,8 @@ export const MAFATIH_COLLECTION: MafatihItem[] = [
     recommendedTime: "Daily, and especially on the Day of Ashura and Arba'een.",
     arabicExcerpt: "السَّلاَمُ عَلَيْكَ يَا أَبَا عَبْدِ اللَّهِ، السَّلاَمُ عَلَيْكَ يَا ابْنَ رَسُولِ اللَّهِ، السَّلاَمُ عَلَيْكَ يَا خِيَرَةَ اللَّهِ وَابْنَ خِيَرَتِهِ...",
     englishExcerpt: "Peace be upon you, O Aba Abdillah! Peace be upon you, O son of the Messenger of Allah! Peace be upon you, O chosen of Allah and son of His chosen one...",
-    audioReciter: "Hajj Maytham Al-Tammar",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Ziyarat_Ashura.mp3"
+    audioReciter: "Hajj Mahdi Sedghi",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/mahdi_sedghi/ashura_sedqi.m4a"
   },
   {
     id: "dua-tawassul",
@@ -49,8 +49,8 @@ export const MAFATIH_COLLECTION: MafatihItem[] = [
     recommendedTime: "Tuesday nights and times of trial.",
     arabicExcerpt: "اللَّهُمَّ إِنِّي أَسْأَلُكَ وَأَتَوَجَّهُ إِلَيْكَ بِنَبِيِّكَ نَبِيِّ الرَّحْمَةِ مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ، يَا أَبَا الْقَاسِمِ...",
     englishExcerpt: "O Allah, I ask You and turn towards You through Your Prophet, the Prophet of Mercy, Muhammad (s.a.w.w)...",
-    audioReciter: "Sayed Walid Mazidi",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Dua_Tawassul.mp3"
+    audioReciter: "Mohsin Farahmand",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/mohsin_farahmad/tavassol_farahmand.m4a"
   },
   {
     id: "dua-al-ahd",
@@ -62,21 +62,21 @@ export const MAFATIH_COLLECTION: MafatihItem[] = [
     recommendedTime: "Every morning after Fajr prayer.",
     arabicExcerpt: "اللَّهُمَّ رَبَّ النُّورِ الْعَظِيمِ، وَرَبَّ الْكُرْسِيِّ الرَّفِيعِ، وَرَبَّ الْبَحْرِ الْمَسْجُورِ، وَمُنْزِلَ التَّوْرَاةِ وَالإِنْجِيلِ وَالزَّبُورِ...",
     englishExcerpt: "O Allah, Lord of the Supreme Light, Lord of the Lofty Throne, Lord of the Raging Sea, and Revealer of the Torah, the Gospel, and the Psalms...",
-    audioReciter: "Sayed Hani Al-Musawi",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Dua_Ahd.mp3"
+    audioReciter: "Aba Thar Al-Halawaji",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/aba_thar/ahd-abozarhalvaji128.m4a"
   },
   {
-    id: "munajat-amiralmuminin",
-    titleArabic: "مناجاة أمير المؤمنين في الكوفة",
-    titleEnglish: "Munajat of Imam Ali in Kufa",
-    category: "munajat",
-    description: "The intimate whispered prayer recited by Commander of the Faithful Ali (a.s) in the Great Mosque of Kufa, juxtaposing human frailty with divine sovereignty.",
-    benefits: "Induces profound humility, eases spiritual constriction, and draws down divine tenderness.",
-    recommendedTime: "During night vigil (Salat al-Layl) and spiritual solitude.",
-    arabicExcerpt: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الأَمَانَ يَوْمَ لا يَنْفَعُ مَالٌ وَلا بَنُونَ إِلا مَنْ أَتَى اللَّهَ بِقَلْبٍ سَلِيمٍ...",
-    englishExcerpt: "O Allah, I ask You for safety on the day when neither wealth nor sons shall avail, save him who comes to Allah with a serene heart...",
-    audioReciter: "Sheikh Husain Al-Akraf",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Munajat_Kufa.mp3"
+    id: "h-kisa",
+    titleArabic: "حديث الكساء",
+    titleEnglish: "Hadith al-Kisa",
+    category: "dua",
+    description: "The narration of the Cloak describing the gathering of the Prophet (s), Ali, Fatimah, Hasan, and Husayn (a.s) under the cloak, and the descent of Archangel Jibreel.",
+    benefits: "Brings tranquility, banishes grief, repels hardship, and attracts divine mercy upon gatherings.",
+    recommendedTime: "Family gatherings and Thursday evenings.",
+    arabicExcerpt: "عَنْ فَاطِمَةَ الزَّهْرَاءِ عَلَيْهَا السَّلاَمُ بِنْتِ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ قَالَتْ: دَخَلَ عَلَيَّ أَبِي رَسُولُ اللَّهِ فِي بَعْضِ الأَيَّامِ...",
+    englishExcerpt: "From Fatimah al-Zahra, daughter of the Messenger of Allah, who said: One day, my father the Messenger of Allah visited me...",
+    audioReciter: "Hajj Mahdi Mirdamad",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/mahdi_mirdamad/kisa_mirdamad.m4a"
   },
   {
     id: "ziyarat-waritha",
@@ -88,7 +88,7 @@ export const MAFATIH_COLLECTION: MafatihItem[] = [
     recommendedTime: "Thursdays, Fridays, and upon visiting the holy shrines.",
     arabicExcerpt: "السَّلاَمُ عَلَيْكَ يَا وَارِثَ آدَمَ صَفْوَةِ اللَّهِ، السَّلاَمُ عَلَيْكَ يَا وَارِثَ نُوحٍ نَبِيِّ اللَّهِ، السَّلاَمُ عَلَيْكَ يَا وَارِثَ إِبْرَاهِيمَ خَلِيلِ اللَّهِ...",
     englishExcerpt: "Peace be upon you, O inheritor of Adam, the chosen of Allah! Peace be upon you, O inheritor of Noah, the prophet of Allah! Peace be upon you, O inheritor of Abraham, the beloved friend of Allah...",
-    audioReciter: "Hajj Amer Al-Kadhimi",
-    audioUrl: "https://media.blubrry.com/al_islam/traffic.libsyn.com/shiavoice/Ziyarat_Waritha.mp3"
+    audioReciter: "Mahdi Samavati",
+    audioUrl: "https://www.ya-mahdi.net/apps_audio/mahdi_samavati/ziy_warisa_samavati.m4a"
   }
 ];
