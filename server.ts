@@ -949,51 +949,57 @@ async function startServer() {
       if (upstream.body) {
         const nodeStream = Readable.fromWeb(upstream.body as any);
 
+        const shouldCache = (!req.headers.range || req.headers.range === "bytes=0-") && !fs.existsSync(cachedFile);
+        let writeStream: fs.WriteStream | null = null;
+        let tempFile = '';
+
+        if (shouldCache) {
+          tempFile = `${cachedFile}.tmp.${Date.now()}`;
+          try {
+            writeStream = fs.createWriteStream(tempFile);
+          } catch {}
+        }
+
         req.on("close", () => {
           nodeStream.destroy();
+          if (writeStream) {
+            writeStream.end();
+            try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch {}
+          }
         });
 
         nodeStream.on("error", (err) => {
           console.warn("Audio proxy stream error:", err);
+          if (writeStream) {
+            writeStream.end();
+            try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch {}
+          }
           if (!res.headersSent) res.status(500).end();
           else res.destroy();
         });
 
-        // Direct pipe to client socket with zero obstruction
-        nodeStream.pipe(res);
+        if (writeStream) {
+          nodeStream.on("data", (chunk) => {
+            try { writeStream?.write(chunk); } catch {}
+          });
 
-        // Async background download to cache file on disk for future zero-latency playback
-        const shouldCache = !req.headers.range || req.headers.range === "bytes=0-";
-        if (shouldCache && !fs.existsSync(cachedFile)) {
-          const tempFile = `${cachedFile}.tmp.${Date.now()}`;
-          fetch(audioUrl, {
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Referer": "https://www.ya-mahdi.net/",
-              "Accept": "*/*"
-            }
-          }).then((bgRes) => {
-            if (bgRes.ok && bgRes.body) {
-              const bgStream = Readable.fromWeb(bgRes.body as any);
-              const ws = fs.createWriteStream(tempFile);
-              bgStream.pipe(ws);
-              ws.on("finish", () => {
+          nodeStream.on("end", () => {
+            if (writeStream) {
+              writeStream.end(() => {
                 try {
                   if (fs.existsSync(tempFile) && fs.statSync(tempFile).size > 2000) {
                     fs.renameSync(tempFile, cachedFile);
                   } else if (fs.existsSync(tempFile)) {
                     fs.unlinkSync(tempFile);
                   }
-                } catch (e) {}
-              });
-              ws.on("error", () => {
-                try {
-                  if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-                } catch (e) {}
+                } catch {}
               });
             }
-          }).catch(() => {});
+          });
         }
+
+        // Direct pipe to client socket with zero obstruction
+        nodeStream.pipe(res);
       } else {
         res.end();
       }

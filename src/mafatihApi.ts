@@ -333,15 +333,16 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
 
   const targetId = MAFATIH_ALIASES[cleanId.toLowerCase()] || cleanId;
 
-  // 1. Check in-memory L1 cache (0ms instant)
-  if (itemCache.has(targetId)) return itemCache.get(targetId)!;
-  if (itemCache.has(cleanId)) return itemCache.get(cleanId)!;
-  if (itemCache.has(targetId.toLowerCase())) return itemCache.get(targetId.toLowerCase())!;
+  // 1. Check in-memory L1 cache (0ms instant - only accept if valid verses exist)
+  const l1 = itemCache.get(targetId) || itemCache.get(cleanId) || itemCache.get(targetId.toLowerCase());
+  if (l1 && l1.verses && l1.verses.length > 0) {
+    return l1;
+  }
 
-  // 1b. Check IndexedDB persistent storage (0ms offline-first)
+  // 1b. Check IndexedDB persistent storage (0ms offline-first - only accept if valid verses exist)
   try {
     const cachedItem = await fastStorage.get<MafatihDetail>(`mafatih_detail_${targetId.toLowerCase()}`);
-    if (cachedItem && ((cachedItem.verses && cachedItem.verses.length > 0) || cachedItem.introduction)) {
+    if (cachedItem && cachedItem.verses && cachedItem.verses.length > 0) {
       itemCache.set(targetId, cachedItem);
       itemCache.set(cleanId, cachedItem);
       itemCache.set(targetId.toLowerCase(), cachedItem);
@@ -437,9 +438,7 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
           verses: [],
           sourceUrl: `https://www.ya-mahdi.net/view.php?cat=${encodeURIComponent(meta.id)}&lang=en`
         };
-        itemCache.set(targetId, fallbackDetail);
-        itemCache.set(cleanId, fallbackDetail);
-        itemCache.set(targetId.toLowerCase(), fallbackDetail);
+        // Return without poisoning memory cache so future calls can retry
         return fallbackDetail;
       }
 

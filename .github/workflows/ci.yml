@@ -69,12 +69,16 @@ jobs:
 
       - name: Sync Capacitor Android
         run: |
-          npx cap sync android
+          npx cap sync android || npx @capacitor/cli sync android
           rm -f android/app/src/main/assets/public/server.cjs || true
           mkdir -p android/app/src/main/res/raw
-          cp -f public/audio/shia_adhan.mp3 android/app/src/main/res/raw/shia_adhan.mp3
+          if [ -f "public/audio/shia_adhan.mp3" ]; then
+            cp -f public/audio/shia_adhan.mp3 android/app/src/main/res/raw/shia_adhan.mp3
+          fi
           mkdir -p android/app/src/main/assets/public/mafatih_items
-          cp -rf public/mafatih_items/* android/app/src/main/assets/public/mafatih_items/
+          if [ -d "public/mafatih_items" ]; then
+            cp -rf public/mafatih_items/* android/app/src/main/assets/public/mafatih_items/
+          fi
           echo "✓ Android web assets and raw adhan audio synchronized successfully."
 
       - name: Set up JDK 21
@@ -97,12 +101,12 @@ jobs:
       - name: Validate Gradle Wrapper & Jar Integrity
         run: |
           chmod +x android/gradlew
-          # Gracefully recover if wrapper jar was not cloned or is empty
+          # Regenerate or ensure wrapper jar if missing on disk
           if [ ! -s "android/gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "Notice: gradle-wrapper.jar missing on disk. Generating wrapper via Gradle..."
-            (cd android && gradle wrapper --gradle-version 8.14.3)
+            echo "Notice: gradle-wrapper.jar missing or empty. Generating wrapper via Gradle..."
+            (cd android && gradle wrapper --gradle-version 8.14.3 --distribution-type bin)
           fi
-          test -s "android/gradle/wrapper/gradle-wrapper.jar" || { echo "::error::gradle-wrapper.jar is missing or empty!"; exit 1; }
+          test -s "android/gradle/wrapper/gradle-wrapper.jar" || { echo "::error::gradle-wrapper.jar could not be verified!"; exit 1; }
           echo "✓ Gradle wrapper verified successfully ($(ls -lh android/gradle/wrapper/gradle-wrapper.jar))"
 
       - name: Configure Custom Keystore if Secret Configured
@@ -129,14 +133,14 @@ jobs:
         working-directory: ./android
         run: |
           echo "Building debug APK for direct phone installation..."
-          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Build Google Play Store Bundle (bundleRelease)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
           echo "Building release bundle for Google Play Store..."
-          ./gradlew bundleRelease --no-daemon --stacktrace || gradle bundleRelease --no-daemon --stacktrace
+          ./gradlew bundleRelease --no-daemon --stacktrace
 
       - name: Collect and Verify Distribution Artifacts
         run: |

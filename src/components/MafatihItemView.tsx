@@ -9,6 +9,7 @@ import {
 import { MafatihDetail, fetchMafatihItem, MafatihVerse } from '../mafatihApi';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
+import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../utils/apiBase';
@@ -207,279 +208,48 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
 // -------------------------------------------------------------
 interface MafatihAudioPlayerProps {
   item: MafatihDetail;
-  audioUrl: string;
-  defaultSpeed: number;
   isDarkMode: boolean;
-  onSpeedChanged: (speed: number) => void;
 }
 
 const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   item,
-  audioUrl,
-  defaultSpeed,
   isDarkMode,
-  onSpeedChanged
 }: MafatihAudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(defaultSpeed || 1);
-  const [isLooping, setIsLooping] = useState(false);
-  const [volume, setVolume] = useState<number>(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isBuffering, setIsBuffering] = useState(false);
-  const isNative = typeof window !== 'undefined' && Capacitor.isNativePlatform();
-  const [useDirectUrl, setUseDirectUrl] = useState(false);
+  const currentTrack = useMafatihAudioStore((s) => s.currentTrack);
+  const isPlaying = useMafatihAudioStore((s) => s.isPlaying);
+  const isBuffering = useMafatihAudioStore((s) => s.isBuffering);
+  const currentTime = useMafatihAudioStore((s) => s.currentTime);
+  const duration = useMafatihAudioStore((s) => s.duration);
+  const playbackSpeed = useMafatihAudioStore((s) => s.playbackSpeed);
+  const isLooping = useMafatihAudioStore((s) => s.isLooping);
+  const volume = useMafatihAudioStore((s) => s.volume);
+  const isMuted = useMafatihAudioStore((s) => s.isMuted);
 
-  // Clean audio URL to HTTPS for mixed content safety
-  const cleanAudioUrl = useMemo(() => {
-    let u = (audioUrl || '').trim();
-    if (u.startsWith('http://www.ya-mahdi.net')) u = u.replace('http://', 'https://');
-    else if (u.startsWith('http://ya-mahdi.net')) u = u.replace('http://', 'https://');
-    else if (u.startsWith('http://www.sibtayn.com')) u = u.replace('http://', 'https://');
-    else if (u.startsWith('http://sibtayn.com')) u = u.replace('http://', 'https://');
-    return u;
-  }, [audioUrl]);
+  const toggleTrack = useMafatihAudioStore((s) => s.toggleTrack);
+  const seek = useMafatihAudioStore((s) => s.seek);
+  const skip = useMafatihAudioStore((s) => s.skip);
+  const cycleSpeed = useMafatihAudioStore((s) => s.cycleSpeed);
+  const toggleLoop = useMafatihAudioStore((s) => s.toggleLoop);
+  const setVolume = useMafatihAudioStore((s) => s.setVolume);
+  const toggleMute = useMafatihAudioStore((s) => s.toggleMute);
 
-  // Compute resolved stream URL:
-  // On native Capacitor Android APK, direct audioUrl connects natively without browser restrictions!
-  // On Web browsers, use high-speed proxy with byte-range and disk-caching support, with direct fallback!
-  const audioSrc = useMemo(() => {
-    if (!cleanAudioUrl) return '';
-    if (isNative || useDirectUrl) {
-      return cleanAudioUrl;
-    }
-    return getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(cleanAudioUrl)}`);
-  }, [cleanAudioUrl, isNative, useDirectUrl]);
+  const isThisItemActive =
+    currentTrack?.id === item.id ||
+    (!!item.audioUrl && currentTrack?.audioUrl === item.audioUrl);
+  const isThisItemPlaying = isThisItemActive && isPlaying;
+  const isThisItemBuffering = isThisItemActive && isBuffering;
+  const activeCurrentTime = isThisItemActive ? currentTime : 0;
+  const activeDuration = isThisItemActive ? duration : 0;
 
-  // Reset state when track changes
-  useEffect(() => {
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setIsBuffering(false);
-    setUseDirectUrl(false);
-  }, [cleanAudioUrl]);
-
-  // Pre-load audio container headers & initial bytes as soon as audioSrc changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !audioSrc) return;
-    try {
-      audio.load();
-    } catch {}
-  }, [audioSrc]);
-
-  // When source switches to fallback while user wanted to play, auto-resume
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !audioSrc) return;
-    if (isPlaying && useDirectUrl) {
-      try {
-        audio.load();
-        audio.play().catch(() => {});
-      } catch {}
-    }
-  }, [useDirectUrl]);
-
-  // Audio Event Listeners (buffering, timeupdate, metadata, ended, error)
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const onPlay = () => {
-      setIsPlaying(true);
-      setIsBuffering(false);
-    };
-    const onPause = () => setIsPlaying(false);
-    const onWaiting = () => setIsBuffering(true);
-    const onPlaying = () => setIsBuffering(false);
-    const onCanPlay = () => setIsBuffering(false);
-    const onLoadedData = () => setIsBuffering(false);
-    const onEnded = () => {
-      if (!isLooping) setIsPlaying(false);
-    };
-    const onTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-    const onLoadedMetadata = () => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        setDuration(audio.duration);
-      }
-    };
-    const onError = (e: any) => {
-      console.warn("Mafatih audio error from source:", audioSrc, e);
-      if (!useDirectUrl && !isNative) {
-        setUseDirectUrl(true);
-      } else {
-        setIsBuffering(false);
-        setIsPlaying(false);
-      }
-    };
-
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    audio.addEventListener('waiting', onWaiting);
-    audio.addEventListener('playing', onPlaying);
-    audio.addEventListener('canplay', onCanPlay);
-    audio.addEventListener('loadeddata', onLoadedData);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('error', onError);
-
-    return () => {
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('waiting', onWaiting);
-      audio.removeEventListener('playing', onPlaying);
-      audio.removeEventListener('canplay', onCanPlay);
-      audio.removeEventListener('loadeddata', onLoadedData);
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('error', onError);
-    };
-  }, [audioSrc, isLooping, useDirectUrl, isNative]);
-
-  // Pause if Quran audio starts playing
-  useEffect(() => {
-    const handlePause = () => {
-      if (audioRef.current && !audioRef.current.paused) {
-        audioRef.current.pause();
-      }
-      setIsPlaying(false);
-    };
-    window.addEventListener('pause-mafatih-audio', handlePause);
-    return () => window.removeEventListener('pause-mafatih-audio', handlePause);
-  }, []);
-
-  // MediaSession API integration and audio unmount cleanup
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && item && audioSrc) {
-      try {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: item.title,
-          artist: 'Mafatih al-Jinan • Sheikh Abbas Qummi',
-          album: (item.categoryChain || []).join(' › ') || item.mainCategory,
-        });
-        navigator.mediaSession.setActionHandler('play', () => {
-          togglePlay();
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-          if (audioRef.current) audioRef.current.pause();
-          setIsPlaying(false);
-        });
-        navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-10));
-        navigator.mediaSession.setActionHandler('seekforward', () => skipSeconds(10));
-      } catch {}
-    }
-
-    return () => {
-      if (audio) {
-        try {
-          audio.pause();
-          audio.src = '';
-        } catch {}
-      }
-      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-        try {
-          navigator.mediaSession.setActionHandler('play', null);
-          navigator.mediaSession.setActionHandler('pause', null);
-          navigator.mediaSession.setActionHandler('seekbackward', null);
-          navigator.mediaSession.setActionHandler('seekforward', null);
-        } catch {}
-      }
-    };
-  }, [item, audioSrc]);
-
-  const togglePlay = () => {
+  const handleTogglePlay = () => {
     hapticImpact(ImpactStyle.Light);
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-      setIsBuffering(false);
-    } else {
-      useAudioStore.getState().pause(); // Pause Quran audio
-      window.dispatchEvent(new CustomEvent('pause-quran-audio'));
-      setIsPlaying(true);
-      if (audio.readyState < 2) {
-        setIsBuffering(true);
-      }
-
-      // Start playing directly within user click gesture!
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsBuffering(false);
-          })
-          .catch((e) => {
-            if (e.name !== 'AbortError') {
-              console.warn("Direct play failed, switching to direct URL fallback:", e);
-              if (!useDirectUrl && !isNative) {
-                setUseDirectUrl(true);
-              } else {
-                setIsPlaying(false);
-                setIsBuffering(false);
-              }
-            }
-          });
-      }
-    }
-  };
-
-  const skipSeconds = (sec: number) => {
-    hapticImpact(ImpactStyle.Light);
-    if (!audioRef.current) return;
-    const newTime = Math.max(0, Math.min(audioRef.current.currentTime + sec, duration || 99999));
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const handleSpeed = (speed: number) => {
-    hapticImpact(ImpactStyle.Light);
-    setPlaybackSpeed(speed);
-    onSpeedChanged(speed);
-    if (audioRef.current) audioRef.current.playbackRate = speed;
-  };
-
-  const cycleSpeed = () => {
-    const speeds = [0.75, 1, 1.25, 1.5];
-    const currentIndex = speeds.indexOf(playbackSpeed);
-    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
-    handleSpeed(nextSpeed);
-  };
-
-  const toggleLoop = () => {
-    hapticImpact(ImpactStyle.Light);
-    setIsLooping(prev => {
-      const next = !prev;
-      if (audioRef.current) audioRef.current.loop = next;
-      return next;
+    if (!item.audioUrl) return;
+    toggleTrack({
+      id: item.id,
+      title: item.title,
+      category: (item.categoryChain || []).join(' › ') || item.mainCategory,
+      audioUrl: item.audioUrl,
     });
-  };
-
-  const toggleMute = () => {
-    hapticImpact(ImpactStyle.Light);
-    setIsMuted(prev => {
-      const next = !prev;
-      if (audioRef.current) audioRef.current.muted = next;
-      return next;
-    });
-  };
-
-  const handleVolume = (v: number) => {
-    setVolume(v);
-    if (audioRef.current) {
-      audioRef.current.volume = v;
-      audioRef.current.muted = v === 0;
-    }
-    setIsMuted(v === 0);
   };
 
   const formatTime = (secs: number) => {
@@ -489,147 +259,155 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const progressPercent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const progressPercent = activeDuration > 0 ? Math.min(100, (activeCurrentTime / activeDuration) * 100) : 0;
 
   return (
-    <>
-      <audio
-        ref={audioRef}
-        src={audioSrc}
-        preload="auto"
-        loop={isLooping}
-      />
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-2xl gpu-layer">
-        <div className="max-w-4xl mx-auto flex flex-col space-y-2">
-          {/* Scrubber Progress Slider */}
-          <div className="flex items-center gap-3">
-            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 text-right shrink-0">
-              {formatTime(currentTime)}
-            </span>
-            <div className="relative flex-1 group py-1">
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-2xl gpu-layer">
+      <div className="max-w-4xl mx-auto flex flex-col space-y-2">
+        {/* Scrubber Progress Slider */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 text-right shrink-0">
+            {formatTime(activeCurrentTime)}
+          </span>
+          <div className="relative flex-1 group py-1">
+            <input
+              type="range"
+              min={0}
+              max={activeDuration || 100}
+              step={0.1}
+              value={activeCurrentTime}
+              onChange={(e) => {
+                const target = parseFloat(e.target.value);
+                if (isThisItemActive) {
+                  seek(target);
+                }
+              }}
+              style={{
+                background: `linear-gradient(to right, #059669 0%, #10b981 ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} 100%)`
+              }}
+              className="w-full h-2 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+              aria-label="Seek audio"
+            />
+          </div>
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 shrink-0">
+            {activeDuration > 0 ? `-${formatTime(Math.max(0, activeDuration - activeCurrentTime))}` : formatTime(activeDuration)}
+          </span>
+        </div>
+
+        {/* Controls Row */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isThisItemPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <div className="truncate">
+              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate block">
+                {item.title}
+              </span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate block">
+                {item.mainCategory}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                if (isThisItemActive) skip(-10);
+              }}
+              className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
+              title="Rewind 10 seconds"
+              aria-label="Rewind 10 seconds"
+            >
+              <RotateCcw size={18} />
+            </button>
+
+            <button
+              onClick={handleTogglePlay}
+              className="w-11 h-11 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-full shadow-lg shadow-emerald-700/25 transition-all shrink-0 flex items-center justify-center relative cursor-pointer"
+              title={isThisItemPlaying ? "Pause" : "Play Supplication"}
+              aria-label={isThisItemPlaying ? "Pause" : "Play"}
+            >
+              {isThisItemBuffering ? (
+                <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              ) : isThisItemPlaying ? (
+                <Pause size={20} fill="currentColor" />
+              ) : (
+                <Play size={20} fill="currentColor" className="ml-0.5" />
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                if (isThisItemActive) skip(10);
+              }}
+              className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
+              title="Forward 10 seconds"
+              aria-label="Forward 10 seconds"
+            >
+              <RotateCw size={18} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 justify-end flex-1 pl-2">
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                toggleLoop();
+              }}
+              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                isLooping
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+              title={isLooping ? "Repeat: ON" : "Repeat: OFF"}
+              aria-label="Toggle repeat"
+            >
+              <Repeat size={16} />
+            </button>
+
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                cycleSpeed();
+              }}
+              className={`px-2 py-0.5 text-xs font-mono font-semibold rounded-lg border transition-colors cursor-pointer ${
+                playbackSpeed !== 1
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                  : 'bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800'
+              }`}
+              title="Cycle Audio Speed (0.75x, 1x, 1.25x, 1.5x)"
+            >
+              {playbackSpeed}x
+            </button>
+
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  toggleMute();
+                }}
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
+                title={isMuted ? "Unmute" : "Mute"}
+                aria-label="Mute toggle"
+              >
+                {isMuted || volume === 0 ? <VolumeX size={17} /> : <Volume2 size={17} />}
+              </button>
               <input
                 type="range"
                 min={0}
-                max={duration || 100}
-                step={0.1}
-                value={currentTime}
-                onChange={(e) => {
-                  const target = parseFloat(e.target.value);
-                  setCurrentTime(target);
-                  if (audioRef.current) audioRef.current.currentTime = target;
-                }}
-                style={{
-                  background: `linear-gradient(to right, #059669 0%, #10b981 ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} 100%)`
-                }}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                aria-label="Seek audio"
+                max={1}
+                step={0.05}
+                value={isMuted ? 0 : volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-14 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+                title="Volume"
               />
-            </div>
-            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 shrink-0">
-              {duration > 0 ? `-${formatTime(Math.max(0, duration - currentTime))}` : formatTime(duration)}
-            </span>
-          </div>
-
-          {/* Controls Row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
-              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-              <div className="truncate">
-                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate block">
-                  {item.title}
-                </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate block">
-                  {item.mainCategory}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-              <button
-                onClick={() => skipSeconds(-10)}
-                className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
-                title="Rewind 10 seconds"
-                aria-label="Rewind 10 seconds"
-              >
-                <RotateCcw size={18} />
-              </button>
-
-              <button
-                onClick={togglePlay}
-                className="w-11 h-11 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-full shadow-lg shadow-emerald-700/25 transition-all shrink-0 flex items-center justify-center relative cursor-pointer"
-                title={isPlaying ? "Pause" : "Play Supplication"}
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                {isBuffering ? (
-                  <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                ) : isPlaying ? (
-                  <Pause size={20} fill="currentColor" />
-                ) : (
-                  <Play size={20} fill="currentColor" className="ml-0.5" />
-                )}
-              </button>
-
-              <button
-                onClick={() => skipSeconds(10)}
-                className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
-                title="Forward 10 seconds"
-                aria-label="Forward 10 seconds"
-              >
-                <RotateCw size={18} />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-1 sm:gap-2 shrink-0 justify-end flex-1 pl-2">
-              <button
-                onClick={toggleLoop}
-                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                  isLooping
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title={isLooping ? "Repeat: ON" : "Repeat: OFF"}
-                aria-label="Toggle repeat"
-              >
-                <Repeat size={16} />
-              </button>
-
-              <button
-                onClick={cycleSpeed}
-                className={`px-2 py-0.5 text-xs font-mono font-semibold rounded-lg border transition-colors cursor-pointer ${
-                  playbackSpeed !== 1
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                    : 'bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800'
-                }`}
-                title="Cycle Audio Speed (0.75x, 1x, 1.25x, 1.5x)"
-              >
-                {playbackSpeed}x
-              </button>
-
-              <div className="hidden sm:flex items-center gap-1.5">
-                <button
-                  onClick={toggleMute}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
-                  title={isMuted ? "Unmute" : "Mute"}
-                  aria-label="Mute toggle"
-                >
-                  {isMuted || volume === 0 ? <VolumeX size={17} /> : <Volume2 size={17} />}
-                </button>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={isMuted ? 0 : volume}
-                  onChange={(e) => handleVolume(parseFloat(e.target.value))}
-                  className="w-14 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                  title="Volume"
-                />
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 });
 
@@ -662,6 +440,30 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const [showJumpDrawer, setShowJumpDrawer] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [bookmarkedVerses, setBookmarkedVerses] = useState<Set<number>>(new Set());
+
+  // Mafatih Audio Store connection
+  const currentTrack = useMafatihAudioStore(s => s.currentTrack);
+  const isAudioPlaying = useMafatihAudioStore(s => s.isPlaying);
+  const isAudioBuffering = useMafatihAudioStore(s => s.isBuffering);
+  const toggleTrack = useMafatihAudioStore(s => s.toggleTrack);
+
+  const isCurrentTrackThisItem = !!item && (
+    currentTrack?.id === item.id ||
+    (!!item.audioUrl && currentTrack?.audioUrl === item.audioUrl)
+  );
+  const isThisItemPlaying = isCurrentTrackThisItem && isAudioPlaying;
+  const isThisItemBuffering = isCurrentTrackThisItem && isAudioBuffering;
+
+  const handleTogglePlay = useCallback(() => {
+    hapticImpact(ImpactStyle.Light);
+    if (!item?.audioUrl) return;
+    toggleTrack({
+      id: item.id,
+      title: item.title,
+      category: (item.categoryChain || []).join(' › ') || item.mainCategory,
+      audioUrl: item.audioUrl,
+    });
+  }, [item, toggleTrack]);
 
   // Verse refs for line jumping
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -821,6 +623,28 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
+            {/* Quick Audio Play Button in Sticky Header */}
+            {item.audioUrl && (
+              <button
+                onClick={handleTogglePlay}
+                className={`p-2 rounded-full transition-all cursor-pointer ${
+                  isThisItemPlaying
+                    ? 'bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-500/20'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+                title={isThisItemPlaying ? "Pause Recitation" : "Listen to Recitation"}
+                aria-label={isThisItemPlaying ? "Pause" : "Listen"}
+              >
+                {isThisItemBuffering ? (
+                  <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                ) : isThisItemPlaying ? (
+                  <Pause size={18} />
+                ) : (
+                  <Volume2 size={18} />
+                )}
+              </button>
+            )}
+
             {/* Jump to Line Button */}
             {item.verses && item.verses.length > 5 && (
               <button
@@ -966,7 +790,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
       <main className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6 space-y-4">
         {/* Introduction Section (only when separate verses exist) */}
         {item.introduction && item.verses && item.verses.length > 0 && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
                 Virtues &amp; Etiquette
@@ -983,6 +807,31 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
             }`}>
               {item.introduction}
             </p>
+            {item.audioUrl && (
+              <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={handleTogglePlay}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    isThisItemPlaying
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
+                  }`}
+                >
+                  {isThisItemBuffering ? (
+                    <div className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : isThisItemPlaying ? (
+                    <Pause size={14} />
+                  ) : (
+                    <Play size={14} className="fill-current" />
+                  )}
+                  <span>{isThisItemPlaying ? 'Pause Recitation' : 'Play Recitation Audio'}</span>
+                </button>
+                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                  {isThisItemPlaying ? 'Recitation in Progress' : 'Audio Available'}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
@@ -1090,10 +939,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
         <MafatihAudioPlayer
           key={`audio-${item.id}`}
           item={item}
-          audioUrl={item.audioUrl}
-          defaultSpeed={mafatihDefaultSpeed}
           isDarkMode={isDarkMode}
-          onSpeedChanged={setMafatihDefaultSpeed}
         />
       )}
     </div>

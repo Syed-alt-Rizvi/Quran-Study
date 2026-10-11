@@ -3,6 +3,17 @@
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
+            <certificates src="user" />
         </trust-anchors>
     </base-config>
+
+    <!-- Permit audio media streaming from Quran and Mafatih servers -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">sibtayn.com</domain>
+        <domain includeSubdomains="true">ya-mahdi.net</domain>
+        <domain includeSubdomains="true">duas.org</domain>
+        <domain includeSubdomains="true">everyayah.com</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
 </network-security-config>
