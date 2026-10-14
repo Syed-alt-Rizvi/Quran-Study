@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Capacitor } from '@capacitor/core';
 import { getApiUrl } from './utils/apiBase';
 import { useAudioStore } from './audioStore';
+import { getCanonicalMafatihId } from './mafatihApi';
 
 export interface MafatihAudioTrack {
   id: string;
@@ -39,13 +40,31 @@ interface MafatihAudioState {
 let globalAudio: HTMLAudioElement | null = null;
 let currentFallbackUsed = false;
 
-function cleanUrl(rawUrl: string): string {
+export function cleanUrl(rawUrl: string): string {
   let u = (rawUrl || '').trim();
   if (u.startsWith('http://www.ya-mahdi.net')) u = u.replace('http://', 'https://');
   else if (u.startsWith('http://ya-mahdi.net')) u = u.replace('http://', 'https://');
   else if (u.startsWith('http://www.sibtayn.com')) u = u.replace('http://', 'https://');
   else if (u.startsWith('http://sibtayn.com')) u = u.replace('http://', 'https://');
   return u;
+}
+
+export function isSameTrack(t1: MafatihAudioTrack | null, t2: MafatihAudioTrack | null): boolean {
+  if (!t1 || !t2) return false;
+  if (t1.id === t2.id) return true;
+  const c1 = getCanonicalMafatihId(t1.id);
+  const c2 = getCanonicalMafatihId(t2.id);
+  if (c1 && c2 && c1 === c2) return true;
+  if (t1.audioUrl && t2.audioUrl && cleanUrl(t1.audioUrl) === cleanUrl(t2.audioUrl)) return true;
+  const t1Clean = (t1.id || '').toLowerCase().replace(/[-_]/g, '');
+  const t2Clean = (t2.id || '').toLowerCase().replace(/[-_]/g, '');
+  if (t1Clean && t2Clean && t1Clean === t2Clean) return true;
+  if (t1.title && t2.title) {
+    const title1 = t1.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const title2 = t2.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (title1 && title2 && title1 === title2) return true;
+  }
+  return false;
 }
 
 function resolveStreamUrl(url: string, useDirectFallback = false): string {
@@ -203,7 +222,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
 
     toggleTrack: async (track: MafatihAudioTrack) => {
       const state = get();
-      if (state.currentTrack?.id === track.id && globalAudio) {
+      if (isSameTrack(state.currentTrack, track) && globalAudio) {
         if (state.isPlaying) {
           get().pause();
         } else {
@@ -224,7 +243,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
 
     resume: async () => {
-      if (globalAudio) {
+      if (globalAudio && globalAudio.src) {
         // Pause Quran audio
         useAudioStore.getState().pause();
         if (typeof window !== 'undefined') {
@@ -234,7 +253,11 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
         try {
           await globalAudio.play();
         } catch {
-          set({ isPlaying: false });
+          if (get().currentTrack) {
+            await get().playTrack(get().currentTrack!);
+          } else {
+            set({ isPlaying: false });
+          }
         }
       } else if (get().currentTrack) {
         await get().playTrack(get().currentTrack!);

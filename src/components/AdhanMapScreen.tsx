@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   MapPin, Search, Navigation, Volume2, Play, Pause, 
-  ArrowLeft, X, Loader2, Volume1, Bell, BellOff
+  ArrowLeft, X, Loader2, Volume1, Bell, BellOff,
+  ShieldCheck, Cpu, BatteryCharging, CheckCircle2, AlertCircle, RefreshCw, Smartphone
 } from 'lucide-react';
 import { 
   getShiaPrayerTimes, ShiaPrayerTimings, getNextShiaPrayer, format12Hour, 
   SHIA_PRAYER_NAMES, ShiaPrayerKey, calculateQibla
 } from '../utils/shiaPrayerTimes';
-import { shiaAdhanPlayer } from '../utils/shiaAdhanPlayer';
+import { shiaAdhanPlayer, AdhanNative } from '../utils/shiaAdhanPlayer';
+import { Capacitor } from '@capacitor/core';
 import { useSettingsStore } from '../store';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
@@ -41,12 +43,21 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
 
   // Audio player status
   const [playerStatus, setPlayerStatus] = useState(shiaAdhanPlayer.getStatus());
+  const [exactAlarmGranted, setExactAlarmGranted] = useState<boolean | null>(null);
+  const [batteryBypassed, setBatteryBypassed] = useState<boolean | null>(null);
+  const [testingNativeAlarm, setTestingNativeAlarm] = useState(false);
 
-  // Subscribe to adhan player events
+  // Subscribe to adhan player events and query native alarm system status
   useEffect(() => {
     const unsub = shiaAdhanPlayer.subscribe(() => {
       setPlayerStatus(shiaAdhanPlayer.getStatus());
     });
+
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      AdhanNative.checkExactAlarmPermission().then(res => setExactAlarmGranted(res.granted)).catch(() => {});
+      AdhanNative.checkBatteryOptimization().then(res => setBatteryBypassed(res.ignoringBatteryOptimizations)).catch(() => {});
+    }
+
     return unsub;
   }, []);
 
@@ -529,6 +540,100 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
             <span className="text-[11px] font-mono text-slate-400 shrink-0">
               {Math.round((adhanSettings.volume ?? 0.9) * 100)}%
             </span>
+          </div>
+
+          {/* OS-Level Scheduling & Battery Optimization Card */}
+          <div className="pt-3 border-t border-slate-200/70 dark:border-slate-800/70 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                <span>OS Background Scheduling &amp; Battery Safety</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-mono font-bold">
+                {Capacitor.isNativePlatform() ? 'AlarmClock Active' : 'Web Worker Sync'}
+              </span>
+            </div>
+
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Uses <code className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">AlarmManager.setAlarmClock()</code> and <code className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">UNCalendarNotificationTrigger</code> to wake the device CPU and bypass modern Android Doze Mode, OEM task killers, and iOS background restrictions.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+              {/* Rolling 48h Queue & Midnight Refresh Badge */}
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 size={13} className="text-emerald-500" />
+                  <span>48h Rolling Queue</span>
+                </div>
+                <p className="text-[10px] text-slate-400">
+                  Pre-queues 24–48 hours ahead with daily 00:02 AM automatic Midnight Refresh.
+                </p>
+              </div>
+
+              {/* Foreground Audio Service */}
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                  <Cpu size={13} className="text-emerald-500" />
+                  <span>START_STICKY Service</span>
+                </div>
+                <p className="text-[10px] text-slate-400">
+                  Persistent notification and CPU WakeLock prevent OS audio termination midway.
+                </p>
+              </div>
+            </div>
+
+            {/* Android Exact Alarm & Battery Permissions Controls */}
+            {Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android' && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {exactAlarmGranted === false && (
+                  <button
+                    onClick={async () => {
+                      hapticImpact(ImpactStyle.Light);
+                      const res = await AdhanNative.requestExactAlarmPermission();
+                      if (res.alreadyGranted) setExactAlarmGranted(true);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <AlertCircle size={12} />
+                    <span>Grant Exact Alarm Permission (Android 12+)</span>
+                  </button>
+                )}
+
+                {batteryBypassed === false && (
+                  <button
+                    onClick={async () => {
+                      hapticImpact(ImpactStyle.Light);
+                      await AdhanNative.requestIgnoreBatteryOptimization();
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-teal-500/15 border border-teal-500/40 text-teal-700 dark:text-teal-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <BatteryCharging size={12} />
+                    <span>Disable Battery Saver for Adhan</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={async () => {
+                    hapticImpact(ImpactStyle.Light);
+                    setTestingNativeAlarm(true);
+                    try {
+                      await AdhanNative.playAdhanNow({ prayerName: 'Adhan Foreground Test' });
+                      setTimeout(async () => {
+                        await AdhanNative.stopAdhanPlayback();
+                        setTestingNativeAlarm(false);
+                      }, 5000);
+                    } catch {
+                      setTestingNativeAlarm(false);
+                    }
+                  }}
+                  disabled={testingNativeAlarm}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ml-auto"
+                >
+                  {testingNativeAlarm ? <RefreshCw size={11} className="animate-spin" /> : <Play size={11} />}
+                  <span>{testingNativeAlarm ? 'Playing Foreground Service (5s)...' : 'Test Native Alarm Service'}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

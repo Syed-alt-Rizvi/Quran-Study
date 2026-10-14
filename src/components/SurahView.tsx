@@ -11,6 +11,7 @@ import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, C
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 import { getArabicFontFamily } from '../utils/arabicFonts';
+import { SURAH_URDU_MAP } from '../data/surahUrduNames';
 
 interface SurahViewProps {
   key?: string;
@@ -21,6 +22,7 @@ interface SurahViewProps {
 
 const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string | number; ayah: Ayah; surah: SurahDetail; isLast?: boolean }) {
   const isDarkMode = useSettingsStore(s => s.isDarkMode);
+  const appLanguage = useSettingsStore(s => s.appLanguage);
   const fontSize = useSettingsStore(s => s.fontSize);
   const arabicFont = useSettingsStore(s => s.arabicFont);
   const showTranslation = useSettingsStore(s => s.showTranslation);
@@ -270,7 +272,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Translation
+                {appLanguage === 'ur' ? 'ترجمہ' : 'Translation'}
               </button>
             )}
             <button 
@@ -281,7 +283,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Tafseer
+              {appLanguage === 'ur' ? 'تفسیر' : 'Tafseer'}
             </button>
           </div>
           <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
@@ -477,7 +479,7 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { fontSize, setFontSize, arabicFont } = useSettingsStore();
+  const { fontSize, setFontSize, arabicFont, appLanguage } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
   const hasScrolledTargetRef = useRef(false);
@@ -651,13 +653,21 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
               <ArrowLeft size={22} />
             </button>
             <div className="hidden sm:block text-left">
-              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">{surah.englishName}</h1>
+              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">
+                {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
+                  ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
+                  : surah.englishName}
+              </h1>
               <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight">{surah.name}</p>
             </div>
           </div>
 
           <div className="text-center sm:hidden min-w-0">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{surah.englishName}</h1>
+            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+              {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
+                ? SURAH_URDU_MAP[surah.number].urduName
+                : surah.englishName}
+            </h1>
             <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-arabic truncate">{surah.name}</p>
           </div>
 

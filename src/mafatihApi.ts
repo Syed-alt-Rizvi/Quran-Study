@@ -44,28 +44,58 @@ export interface MafatihCategory {
 export const MAFATIH_ALIASES: Record<string, string> = {
   kumayl: "maf_dua40",
   kumail: "maf_dua40",
+  "dua-kumayl": "maf_dua40",
+  "dua-kumail": "maf_dua40",
   tawassul: "maf_dua51",
+  "dua-tawassul": "maf_dua51",
   ashura: "maf_ziy86",
+  "ziyarat-ashura": "maf_ziy86",
   nudba: "maf_ziy126a",
   nudbah: "maf_ziy126a",
+  "dua-nudba": "maf_ziy126a",
+  "dua-nudbah": "maf_ziy126a",
   faraj: "maf_dua46b",
+  "dua-faraj": "maf_dua46b",
   kisa: "h_kisa",
+  "hadith-kisa": "h_kisa",
+  "hadith-e-kisa": "h_kisa",
   ahad: "maf_ziy128",
+  "dua-ahad": "maf_ziy128",
+  "dua-ahd": "maf_ziy128",
+  "dua-al-ahd": "maf_ziy128",
   waritha: "maf_ziy73a",
   wareeth: "maf_ziy73a",
+  "ziyarat-waritha": "maf_ziy73a",
   mashlool: "maf_dua43",
+  "dua-mashlool": "maf_dua43",
   sabah: "maf_dua39",
+  "dua-sabah": "maf_dua39",
   jawshan: "maf_dua47",
   joshan: "maf_dua47",
+  "dua-jawshan": "maf_dua47",
+  "dua-jawshan-kabir": "maf_dua47",
+  "dua-jawshan-kabeer": "maf_dua47",
   mujir: "maf_dua45",
   mujeer: "maf_dua45",
+  "dua-mujir": "maf_dua45",
+  "dua-mujeer": "maf_dua45",
   iftitah: "maf_aamal30",
+  "dua-iftitah": "maf_aamal30",
   yastasheer: "maf_dua44",
+  "dua-yastasheer": "maf_dua44",
   adilah: "maf_dua46",
+  "dua-adilah": "maf_dua46",
   samata: "maf_dua41",
   simaat: "maf_dua41",
+  "dua-simaat": "maf_dua41",
   yasin: "surah_yasin",
 };
+
+export function getCanonicalMafatihId(id: string): string {
+  if (!id) return '';
+  const clean = id.trim().toLowerCase();
+  return MAFATIH_ALIASES[clean] || clean;
+}
 
 const itemCache = new Map<string, MafatihDetail>();
 const pendingFetches = new Map<string, Promise<MafatihDetail | null>>();

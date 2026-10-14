@@ -1,0 +1,158 @@
+{
+  "id": "maf_dua62",
+  "code": "maf_dua62",
+  "title": "Dua e Mahdi",
+  "mainCategory": "Duas & Supplications",
+  "mainCategoryCode": "maf_dua",
+  "categoryChain": [
+    "Duas & Supplications",
+    "Duas",
+    "Dua e Mahdi"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/mahdi_sedghi/tofigh_altaa.m4a",
+  "introduction": "DUA AL MAHDI\n\nThe Supplication of Imam al-Mahdi(a.s.):\n\nAl-Kaf’ami, in al-Misbah, says “This is the supplicatory prayer of Imam al-Mahdi(a.s.):",
+  "versesCount": 28,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ ارْزُقْنَا تَوْفِيْقَ الطَّاعَةِ",
+      "translation": "O Allah, (please do) grant us success to obey (You),"
+    },
+    {
+      "index": 2,
+      "arabic": "وَ بُعْدَ الْمَعْصِيَةِ",
+      "translation": "remoteness from disobedience (to You),"
+    },
+    {
+      "index": 3,
+      "arabic": "وَ صِدْقَ النِّيَّةِ",
+      "translation": "true intention,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَ عِرْفَانَ الْحُرْمَةِ",
+      "translation": "and identification of sanctity."
+    },
+    {
+      "index": 5,
+      "arabic": "وَ اَكْرِمْنَا بِالْهُدٰى وَ الْاِسْتِقَامَةِ",
+      "translation": "(Please do) honor us with true guidance and straightforwardness,"
+    },
+    {
+      "index": 6,
+      "arabic": "وَ سَدِّدْ اَلْسِنَتَنَا بِالصَّوَابِ وَ الْحِكْمَةِ",
+      "translation": "dedicate our tongues to truth and wisdom,"
+    },
+    {
+      "index": 7,
+      "arabic": "وَ امْلَأْ قُلُوْبَنَا بِالْعِلْمِ وَ الْمَعْرِفَةِ",
+      "translation": "fill our hearts with knowledge and learning,"
+    },
+    {
+      "index": 8,
+      "arabic": "وَ طَهِّرْ بُطُوْنَنَا مِنَ الْحَرَامِ وَ الشُّبْهَةِ",
+      "translation": "purify our stomachs from illegally and suspiciously gotten food,"
+    },
+    {
+      "index": 9,
+      "arabic": "وَ اكْفُفْ اَيْدِيَنَا عَنِ الظُّلْمِ وَ السَّرِقَةِ",
+      "translation": "withhold our hands from oppression and larceny,"
+    },
+    {
+      "index": 10,
+      "arabic": "وَ اغْضُضْ اَبْصَارَنَا عَنِ الْفُجُوْرِ وَ الْخِيَانَةِ",
+      "translation": "turn our sights away from licentiousness and treachery,"
+    },
+    {
+      "index": 11,
+      "arabic": "وَ اسْدُدْ اَسْمَاعَنَا عَنِ اللَّغْوِ وَ الْغِيْبَةِ",
+      "translation": "and block our hearings against vainness and backbiting,"
+    },
+    {
+      "index": 12,
+      "arabic": "وَ تَفَضَّلْ عَلٰى عُلَمَاۤئِنَا بِالزُّهْدِ وَ النَّصِيْحَةِ",
+      "translation": "confer upon our scholars with asceticism and advice,"
+    },
+    {
+      "index": 13,
+      "arabic": "وَ عَلَى الْمُتَعَلِّمِيْنَ بِالْجُهْدِ وَ الرَّغْبَةِ",
+      "translation": "upon the learners with hard work and desire (to learning),"
+    },
+    {
+      "index": 14,
+      "arabic": "وَ عَلَى الْمُسْتَمِعِيْنَ بِالْاِتِّبَاعِ وَ الْمَوْعِظَةِ",
+      "translation": "upon the listeners with following and learning (lessons),"
+    },
+    {
+      "index": 15,
+      "arabic": "وَ عَلٰى مَرْضَى الْمُسْلِمِيْنَ بِالشِّفَاۤءِ وَ الرَّاحَةِ",
+      "translation": "upon the Muslim patients with cure and comfort,"
+    },
+    {
+      "index": 16,
+      "arabic": "وَ عَلٰى مَوْتَاهُمْ بِالرَّأْفَةِ وَ الرَّحْمَةِ،",
+      "translation": "upon the dead Muslims with kindness and mercy,"
+    },
+    {
+      "index": 17,
+      "arabic": "وَ عَلٰى مَشَايِخِنَا بِالْوَقَارِ وَ السَّكِيْنَةِ",
+      "translation": "upon our aged people with somberness and gentleness,"
+    },
+    {
+      "index": 18,
+      "arabic": "وَ عَلَى الشَّبَابِ بِالْاِنَابَةِ وَ التَّوْبَةِ",
+      "translation": "upon the youths with turning (to You) and repentance,"
+    },
+    {
+      "index": 19,
+      "arabic": "وَ عَلَى النِّسَاۤءِ بِالْحَيَاۤءِ وَ الْعِفَّةِ",
+      "translation": "upon the women with shyness and chastity,"
+    },
+    {
+      "index": 20,
+      "arabic": "وَ عَلَى الْاَغْنِيَاۤءِ بِالتَّوَاضُعِ وَ السَّعَةِ",
+      "translation": "upon the rich with modesty and ample giving,"
+    },
+    {
+      "index": 21,
+      "arabic": "وَ عَلَى الْفُقَرَاۤءِ بِالصَّبْرِ وَ الْقَنَاعَةِ",
+      "translation": "upon the poor with patience and satisfaction,"
+    },
+    {
+      "index": 22,
+      "arabic": "وَ عَلَى الْغُزَاةِ بِالنَّصْرِ وَ الْغَلَبَةِ",
+      "translation": "upon the warriors with triumph and supremacy,"
+    },
+    {
+      "index": 23,
+      "arabic": "وَ عَلَى الْاُسَرَاۤءِ بِالْخَلَاصِ وَ الرَّاحَةِ",
+      "translation": "upon the prisoners with release and comfort,"
+    },
+    {
+      "index": 24,
+      "arabic": "وَ عَلَى الْاُمَرَاۤءِ بِالْعَدْلِ وَ الشَّفَقَةِ",
+      "translation": "upon the rulers with justice and sympathy,"
+    },
+    {
+      "index": 25,
+      "arabic": "وَ عَلَى الرَّعِيَّةِ بِالْاِنْصَافِ وَ حُسْنِ السِّيْرَةِ",
+      "translation": "and upon the subjects with impartiality and good behavior."
+    },
+    {
+      "index": 26,
+      "arabic": "وَ بَارِكْ لِلْحُجَّاجِ وَ الزُّوَّارِ فِيْ الزَّادِ وَ النَّفَقَةِ",
+      "translation": "(Please do) bless the pilgrims to Mecca and the visitors (of the tombs of the saints) with provision and expenditure,"
+    },
+    {
+      "index": 27,
+      "arabic": "وَ اقْضِ مَاۤ اَوْجَبْتَ عَلَيْهِمْ مِنَ الْحَجِّ وَ الْعُمْرَةِ",
+      "translation": "and help them settle the Hajj and 'Umrah that You have made incumbent upon them,"
+    },
+    {
+      "index": 28,
+      "arabic": "بِفَضْلِكَ وَ رَحْمَتِكَ يَاۤ اَرْحَمَ الرَّاحِمِيْنَ۔",
+      "translation": "in the name of Your grace and mercy, O most merciful of all those who show mercy!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua62&lang=en"
+}

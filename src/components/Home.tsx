@@ -15,8 +15,10 @@ import CalendarView from "./CalendarView";
 import AdhanMapScreen from "./AdhanMapScreen";
 import HomeAdhanWidget from "./HomeAdhanWidget";
 import { useSettingsStore, AppTab } from '../store';
+import { t } from '../i18n';
 import { PWAInstallButton } from './PWAInstallButton';
 import { getArabicFontFamily } from '../utils/arabicFonts';
+import { SURAH_URDU_MAP, JUZ_URDU_NAMES } from '../data/surahUrduNames';
 
 const JUZ_NAMES = [
   'Alif Laam Meem', 'Sayaqool', 'Tilkal Rusul', 'Lan Tana Loo', 'Wal Mohsanat',
@@ -67,7 +69,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   const [loading, setLoading] = useState(() => surahs.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const { readProgress, lastRead, defaultAppTab, userName, setUserName, habitStats, arabicFont } = useSettingsStore();
+  const { readProgress, lastRead, defaultAppTab, userName, setUserName, habitStats, arabicFont, appLanguage } = useSettingsStore();
   const [activeTab, setActiveTab] = useState<AppTab>(defaultAppTab || 'quran');
   const [quranMode, setQuranMode] = useState<'surah' | 'juz'>('surah');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -167,12 +169,19 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
     let list = surahs;
     if (q) {
       const cleanQ = q.replace(/[^a-z0-9]/g, '');
+      const trimmedQuery = searchQuery.trim();
       list = surahs.filter(s => {
+        const urduInfo = SURAH_URDU_MAP[s.number];
+        const matchesUrdu = urduInfo && (
+          urduInfo.urduName.includes(trimmedQuery) ||
+          urduInfo.urduMeaning.includes(trimmedQuery)
+        );
         return (
           s.number.toString() === q ||
           s.englishName.toLowerCase().includes(q) ||
           (s.englishNameTranslation && s.englishNameTranslation.toLowerCase().includes(q)) ||
-          s.name.includes(searchQuery.trim()) ||
+          s.name.includes(trimmedQuery) ||
+          matchesUrdu ||
           (cleanQ.length > 0 && s.englishName.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cleanQ))
         );
       });
@@ -184,12 +193,17 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   
   const filteredJuzs = useMemo(() => {
     if (!q) return STATIC_JUZ_LIST;
-    return STATIC_JUZ_LIST.filter(j => 
-      `juz ${j.number}`.includes(q) || 
-      j.number.toString().includes(q) ||
-      j.name.toLowerCase().includes(q)
-    );
-  }, [q]);
+    const trimmedQuery = searchQuery.trim();
+    return STATIC_JUZ_LIST.filter(j => {
+      const urduJuz = JUZ_URDU_NAMES[j.number];
+      return (
+        `juz ${j.number}`.includes(q) || 
+        j.number.toString().includes(q) ||
+        j.name.toLowerCase().includes(q) ||
+        (urduJuz && urduJuz.includes(trimmedQuery))
+      );
+    });
+  }, [q, searchQuery]);
 
   return (
     <div className="min-h-screen pb-32 text-slate-900 dark:text-slate-100">
@@ -202,15 +216,26 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             </div>
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-tight truncate">
-                Shia Markaz
+                {t('app_title', appLanguage)}
               </h1>
               <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate">
-                Holy Quran &amp; Mafatih
+                {t('app_subtitle', appLanguage)}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-right shrink-0">
+            <button
+              id="header-lang-quick-toggle"
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                useSettingsStore.getState().setAppLanguage(appLanguage === 'ur' ? 'en' : 'ur');
+              }}
+              className="py-1 px-2.5 rounded-xl text-xs font-bold border border-emerald-300/80 dark:border-emerald-800/80 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+              title={appLanguage === 'ur' ? 'Switch to English' : 'اردو میں تبدیل کریں'}
+            >
+              <span className="text-[11px] font-semibold">{appLanguage === 'ur' ? 'English' : 'اردو'}</span>
+            </button>
             <PWAInstallButton variant="compact" />
             <button
               onClick={() => {
@@ -222,14 +247,14 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               aria-label="Exit App and Recite Dua e Khatm e Quran"
             >
               <LogOut size={16} className="shrink-0" />
-              <span className="hidden sm:inline text-[11px] font-medium">Exit</span>
+              <span className="hidden sm:inline text-[11px] font-medium">{t('exit', appLanguage)}</span>
             </button>
             <span className="hidden min-[380px]:inline text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate max-w-[110px] sm:max-w-none">
-              {activeTab === 'quran' && 'Quran'}
-              {activeTab === 'mafatih' && 'Mafatih'}
-              {activeTab === 'calendar' && 'Calander'}
-              {activeTab === 'science' && 'Science'}
-              {activeTab === 'discuss' && 'Community'}
+              {activeTab === 'quran' && t('tab_quran', appLanguage)}
+              {activeTab === 'mafatih' && t('tab_mafatih', appLanguage)}
+              {activeTab === 'calendar' && t('tab_calendar', appLanguage)}
+              {activeTab === 'science' && t('tab_science', appLanguage)}
+              {activeTab === 'discuss' && t('tab_discuss', appLanguage)}
             </span>
           </div>
         </div>
@@ -363,7 +388,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               </div>
               <input
                 type="text"
-                placeholder={quranMode === 'surah' ? 'Search Surah by name or number...' : 'Search Juz by number or title...'}
+                placeholder={quranMode === 'surah' ? t('search_surah_placeholder', appLanguage) : t('search_juz_placeholder', appLanguage)}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-shadow text-xs sm:text-sm truncate"
@@ -381,7 +406,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
-                  114 Surahs
+                  {t('quran_114_surahs', appLanguage)}
                 </button>
                 <button
                   onClick={() => { hapticImpact(ImpactStyle.Light); setQuranMode('juz'); }}
@@ -391,7 +416,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
-                  30 Juz
+                  {t('quran_30_juz', appLanguage)}
                 </button>
               </div>
             </div>
@@ -458,15 +483,21 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                           </div>
                         </div>
 
-                        {/* English text NEATLY BELOW with Ayahs count & revelation type */}
+                        {/* Title text NEATLY BELOW with Ayahs count & revelation type */}
                         <div className="w-full mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/70 flex items-baseline justify-between gap-1.5">
                           <h3 className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                            {surah.englishName}
+                            {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
+                              ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
+                              : surah.englishName}
                           </h3>
                           <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
-                            <span>{surah.numberOfAyahs} Ayahs</span>
+                            <span>{surah.numberOfAyahs} {t('ayahs', appLanguage)}</span>
                             <span>&bull;</span>
-                            <span>{surah.revelationType}</span>
+                            <span>
+                              {appLanguage === 'ur'
+                                ? (SURAH_URDU_MAP[surah.number]?.typeUrdu || (surah.revelationType === 'Meccan' ? 'مکی' : 'مدنی'))
+                                : surah.revelationType}
+                            </span>
                           </div>
                         </div>
 
@@ -484,13 +515,13 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               filteredJuzs.length === 0 ? (
                 <div className="text-center py-10 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                    No Juz found matching &ldquo;{searchQuery}&rdquo;
+                    {appLanguage === 'ur' ? `کوئی پارہ نہیں ملا برائے "${searchQuery}"` : `No Juz found matching "${searchQuery}"`}
                   </p>
                   <button
                     onClick={() => setSearchQuery('')}
                     className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
-                    Clear search
+                    {t('clear', appLanguage)}
                   </button>
                 </div>
               ) : (
@@ -518,13 +549,13 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                         </span>
                       </div>
 
-                      {/* English text NEATLY BELOW */}
+                      {/* Text NEATLY BELOW */}
                       <div className="w-full mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/70 flex items-baseline justify-between gap-1.5">
                         <h3 className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate">
-                          {juz.name}
+                          {appLanguage === 'ur' ? (JUZ_URDU_NAMES[juz.number] || juz.name) : juz.name}
                         </h3>
                         <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
-                          Juz {juz.number}
+                          {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
                         </p>
                       </div>
                     </button>
@@ -558,7 +589,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <BookOpen size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Quran</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_quran', appLanguage)}</span>
           </button>
 
           <button
@@ -570,7 +601,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <KeyRound size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Mafatih</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_mafatih', appLanguage)}</span>
           </button>
 
           <button
@@ -582,7 +613,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <Compass size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Adhan</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_adhan', appLanguage)}</span>
           </button>
 
           <button
@@ -594,7 +625,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <CalendarIcon size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Calendar</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_calendar', appLanguage)}</span>
           </button>
 
           <button
@@ -606,7 +637,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <Microscope size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Science</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_science', appLanguage)}</span>
           </button>
 
           <button
@@ -618,7 +649,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             }`}
           >
             <MessageCircle size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Discuss</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_discuss', appLanguage)}</span>
           </button>
 
           <button
@@ -626,7 +657,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             className="flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all min-w-0"
           >
             <Settings size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">Settings</span>
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_settings', appLanguage)}</span>
           </button>
         </div>
       </nav>

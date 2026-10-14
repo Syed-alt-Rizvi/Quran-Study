@@ -11,6 +11,7 @@ import {
   Microscope, MessageCircle, LogOut, RefreshCw, Calendar
 } from 'lucide-react';
 import { useSettingsStore, AppTab } from '../store';
+import { t } from '../i18n';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
@@ -50,7 +51,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     hapticsEnabled, toggleHaptics,
     mafatihFontSize, setMafatihFontSize,
     mafatihShowTranslation, toggleMafatihShowTranslation,
-    mafatihDefaultSpeed, setMafatihDefaultSpeed
+    mafatihDefaultSpeed, setMafatihDefaultSpeed,
+    appLanguage, setAppLanguage
   } = useSettingsStore();
 
   const [activeTab, setActiveTab] = useState<TabCategory>('display');
@@ -406,6 +408,71 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {/* TAB 1: GENERAL APP CONTROLS */}
             {activeTab === 'display' && (
               <div className="space-y-5 animate-in fade-in duration-200">
+                {/* SUB-SETTING: APP LANGUAGE & LOCALIZATION */}
+                <div className="p-4 rounded-2xl border border-emerald-300 dark:border-emerald-800/80 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-emerald-500/10 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/20 space-y-3.5 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Languages size={18} className="text-emerald-700 dark:text-emerald-400" />
+                      <div>
+                        <h3 className="font-bold text-xs text-slate-900 dark:text-slate-100">
+                          {t('app_language_title', appLanguage)} • {t('language', appLanguage)}
+                        </h3>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                          {appLanguage === 'ur' ? 'مکمل ایپ کی زبان تبدیل کریں' : 'Choose application UI language'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-600/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-mono font-bold">
+                      {appLanguage === 'ur' ? 'اردو' : 'English'}
+                    </span>
+                  </div>
+
+                  {/* Primary Language Selectors: English vs Urdu */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      id="display-lang-en-btn"
+                      onClick={() => {
+                        hapticSelection();
+                        setAppLanguage('en');
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
+                        appLanguage === 'en'
+                          ? 'bg-white dark:bg-slate-900 border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs'
+                          : 'bg-white/70 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-xs">English</span>
+                        {appLanguage === 'en' && <Check size={13} className="text-emerald-600 dark:text-emerald-400" />}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">
+                        Latin script &amp; translations
+                      </span>
+                    </button>
+
+                    <button
+                      id="display-lang-ur-btn"
+                      onClick={() => {
+                        hapticSelection();
+                        setAppLanguage('ur');
+                      }}
+                      className={`p-3 rounded-xl border text-right transition-all cursor-pointer relative ${
+                        appLanguage === 'ur'
+                          ? 'bg-white dark:bg-slate-900 border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs'
+                          : 'bg-white/70 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1 flex-row-reverse">
+                        <span className="font-bold text-xs font-arabic">اردو (Urdu)</span>
+                        {appLanguage === 'ur' && <Check size={13} className="text-emerald-600 dark:text-emerald-400" />}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight font-arabic">
+                        مکمل اردو انٹرفیس
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Default App Startup Tab */}
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
                   <div className="flex items-center justify-between">

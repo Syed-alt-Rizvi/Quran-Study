@@ -10,6 +10,11 @@
   font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic', serif;
 }
 
+.font-urdu {
+  font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Amiri', serif;
+  line-height: 2.1;
+}
+
 .font-quran {
   font-family: 'Amiri Quran', 'Scheherazade New', 'Amiri', serif;
   line-height: 2.2;

@@ -418,6 +418,8 @@ export default function App() {
         <AudioPlayer 
           onSelectSurah={handleSelectSurah}
           onSelectJuz={handleSelectJuz}
+          onSelectMafatihItem={handleSelectMafatihItem}
+          selectedMafatihItem={selectedMafatihItem}
           isOnHome={!selectedSurah && !selectedJuz && !selectedMafatihItem}
         />
       )}

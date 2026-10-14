@@ -3,14 +3,31 @@ import { Capacitor } from '@capacitor/core';
 export const getApiUrl = (path: string): string => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
 
-  // 1. Explicit environment variable takes precedence
+  // 1. Static assets (.json, .mp3, .m4a, images, or bundled public assets) MUST always load locally!
+  const isStaticAsset =
+    cleanPath.endsWith('.json') ||
+    cleanPath.endsWith('.mp3') ||
+    cleanPath.endsWith('.m4a') ||
+    cleanPath.endsWith('.png') ||
+    cleanPath.endsWith('.jpg') ||
+    cleanPath.endsWith('.svg') ||
+    cleanPath.startsWith('/audio/') ||
+    cleanPath.startsWith('/icons/') ||
+    cleanPath.startsWith('/tafseer_') ||
+    cleanPath.startsWith('/mafatih_items/');
+
+  if (isStaticAsset) {
+    return cleanPath;
+  }
+
+  // 2. Explicit environment variable takes precedence for backend API proxying
   const configured = import.meta.env.VITE_BACKEND_URL;
   if (configured) {
     const cleanBase = configured.replace(/\/+$/, '');
     return `${cleanBase}${cleanPath}`;
   }
 
-  // 2. Custom backend override saved in localStorage
+  // 3. Custom backend override saved in localStorage
   if (typeof window !== 'undefined') {
     try {
       const custom = localStorage.getItem('shia_custom_backend_url');
@@ -21,13 +38,6 @@ export const getApiUrl = (path: string): string => {
     } catch {}
   }
 
-  // 3. In native mobile apps (Capacitor APK), localhost has no Express server.
-  // Route to the deployed cloud backend if running natively.
-  if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
-    const cloudBackend = 'https://ais-dev-jx76sn2jydycu7xlncbv7z-1063163461455.asia-southeast1.run.app';
-    return `${cloudBackend}${cleanPath}`;
-  }
-
-  // 4. In web browsers (including custom domains or preview), relative paths work directly!
+  // 4. Default to relative clean path (works in web, PWA, and local webview)
   return cleanPath;
 };

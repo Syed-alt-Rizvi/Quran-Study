@@ -432,18 +432,16 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
         })}
       </div>
 
-      {/* Results Count Header */}
-      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
-        <span>Showing {Math.min(visibleLimit, filteredItems.length)} of {filteredItems.length} recitations</span>
-        {searchQuery && (
+      {searchQuery && (
+        <div className="flex justify-end px-1">
           <button
             onClick={() => setSearchQuery('')}
-            className="text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+            className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
           >
             Clear Search
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Main Grid: Responsive 2-column list */}
       {loading ? (
@@ -583,113 +581,6 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
           >
             Load More Recitations ({filteredItems.length - visibleLimit} remaining)
           </button>
-        </div>
-      )}
-
-      {/* Floating Serene Audio Bar in Catalog */}
-      {currentTrack && (isPlaying || currentTime > 0) && (
-        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-lg z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="bg-slate-900/95 text-white backdrop-blur-xl border border-emerald-500/40 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 ring-1 ring-emerald-500/20 gpu-layer">
-            {/* Progress line indicator */}
-            {duration > 0 && (
-              <div 
-                className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (duration <= 0) return;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                  seekAudio(percent * duration);
-                }}
-              >
-                <div 
-                  className="bg-emerald-400 h-full rounded-full transition-all duration-100"
-                  style={{ width: `${Math.min(100, (currentTime / duration) * 100)}%` }}
-                />
-              </div>
-            )}
-
-            <div className="flex items-center justify-between gap-2.5">
-              <div 
-                className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
-                onClick={() => handleSelectItem(currentTrack.id)}
-              >
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <Volume2 size={16} className={isPlaying ? "animate-pulse" : ""} />
-                </div>
-                <div className="truncate">
-                  <span className="text-xs font-bold text-slate-100 block truncate">
-                    {currentTrack.title || 'Playing Recitation'}
-                  </span>
-                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono">
-                    <span>
-                      {Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}
-                    </span>
-                    {duration > 0 && (
-                      <>
-                        <span className="text-slate-500">/</span>
-                        <span className="text-slate-400">
-                          {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => skipAudio(-10)}
-                  className="p-1.5 text-slate-400 hover:text-slate-100 rounded-lg transition-colors cursor-pointer"
-                  title="Rewind 10 seconds"
-                >
-                  <RotateCcw size={15} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => toggleTrack(currentTrack)}
-                  className="p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition-colors cursor-pointer"
-                  title={isPlaying ? "Pause" : "Play"}
-                >
-                  {isBuffering ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
-                  ) : isPlaying ? (
-                    <Pause size={16} />
-                  ) : (
-                    <Play size={16} className="fill-current ml-0.5" />
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => skipAudio(10)}
-                  className="p-1.5 text-slate-400 hover:text-slate-100 rounded-lg transition-colors cursor-pointer"
-                  title="Forward 10 seconds"
-                >
-                  <RotateCw size={15} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSelectItem(currentTrack.id)}
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
-                >
-                  Open
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => stopAudio()}
-                  className="p-1.5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                  title="Close Player"
-                >
-                  <X size={15} />
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

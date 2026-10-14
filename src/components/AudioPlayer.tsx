@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, X, LocateFixed, ChevronRight, Repeat, Volume2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, X, LocateFixed, ChevronRight, Repeat, Volume2, RotateCcw, RotateCw } from 'lucide-react';
 import { useAudioStore } from '../audioStore';
+import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { useSettingsStore } from '../store';
 import { hapticSelection, hapticImpact, ImpactStyle } from '../utils/haptics';
 
 interface AudioPlayerProps {
   onSelectSurah?: (surahId: number, targetAyah?: number) => void;
   onSelectJuz?: (juzId: number, targetAyah?: number, targetSurah?: number) => void;
+  onSelectMafatihItem?: (itemId: string) => void;
+  selectedMafatihItem?: string | null;
   isOnHome?: boolean;
 }
 
-export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: AudioPlayerProps) {
+export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafatihItem, selectedMafatihItem, isOnHome }: AudioPlayerProps) {
   const { 
     playlist, 
     currentIndex, 
@@ -250,8 +253,160 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, isOnHome }: Au
     };
   }, [currentAyah, currentIndex, playlist.length, play, pause, prev, next]);
 
-  if (playlist.length === 0 || !currentAyah) {
+  // Mafatih audio store subscription
+  const mafatihTrack = useMafatihAudioStore((s) => s.currentTrack);
+  const isMafatihPlaying = useMafatihAudioStore((s) => s.isPlaying);
+  const isMafatihBuffering = useMafatihAudioStore((s) => s.isBuffering);
+  const mafatihCurrentTime = useMafatihAudioStore((s) => s.currentTime);
+  const mafatihDuration = useMafatihAudioStore((s) => s.duration);
+  const toggleMafatihTrack = useMafatihAudioStore((s) => s.toggleTrack);
+  const seekMafatih = useMafatihAudioStore((s) => s.seek);
+  const skipMafatih = useMafatihAudioStore((s) => s.skip);
+  const stopMafatih = useMafatihAudioStore((s) => s.stop);
+
+  const hasQuranAudio = playlist.length > 0 && !!currentAyah;
+  const hasMafatihAudio = !!mafatihTrack && (isMafatihPlaying || mafatihCurrentTime > 0);
+
+  // If user is currently inside MafatihItemView reading any supplication,
+  // MafatihItemView displays its own docked dedicated reader player at the bottom.
+  const isReadingThisMafatihItem = !!selectedMafatihItem;
+
+  if (!hasQuranAudio && (!hasMafatihAudio || isReadingThisMafatihItem)) {
     return null;
+  }
+
+  // Render floating audio player for Mafatih when Quran is not playing
+  if (!hasQuranAudio && hasMafatihAudio && mafatihTrack) {
+    const mProgress = mafatihDuration > 0 ? Math.min(100, (mafatihCurrentTime / mafatihDuration) * 100) : 0;
+    const formatMTime = (secs: number) => {
+      if (isNaN(secs) || secs <= 0) return '00:00';
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
+
+    return (
+      <div 
+        id="global-mafatih-audio-bar"
+        onClick={() => {
+          if (mafatihTrack.id && onSelectMafatihItem) {
+            hapticSelection();
+            onSelectMafatihItem(mafatihTrack.id);
+          }
+        }}
+        className={`fixed ${isOnHome ? 'bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-300/60 dark:border-emerald-800/60 shadow-2xl rounded-2xl sm:rounded-full px-3.5 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-500/70 dark:hover:border-emerald-600/70 group/bar gpu-layer`}
+        title="Tap to read supplication text"
+      >
+        {/* Interactive Progress Bar */}
+        <div 
+          onClick={(e) => {
+            e.stopPropagation();
+            if (mafatihDuration <= 0) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const newPercent = Math.max(0, Math.min(1, clickX / rect.width));
+            seekMafatih(newPercent * mafatihDuration);
+            hapticSelection();
+          }}
+          className="w-full group/scrub py-1 -my-0.5 cursor-pointer"
+          title="Tap to seek"
+        >
+          <div className="w-full bg-slate-200/80 dark:bg-slate-800/80 h-1.5 group-hover/scrub:h-2 rounded-full overflow-hidden transition-all relative">
+            <div 
+              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 h-full rounded-full transition-all duration-100"
+              style={{ width: `${mProgress}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          {/* Track Info */}
+          <div className="flex items-center gap-2.5 overflow-hidden flex-1 p-1 -ml-1">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Volume2 size={16} className={isMafatihPlaying ? "animate-pulse" : ""} />
+            </div>
+            <div className="truncate min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 truncate">
+                  {mafatihTrack.title}
+                </span>
+                <span className="text-[10px] text-slate-400 shrink-0 font-mono">
+                  {formatMTime(mafatihCurrentTime)} {mafatihDuration > 0 ? `/ ${formatMTime(mafatihDuration)}` : ''}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+                {mafatihTrack.category || 'Supplication Recitation'} • Tap to read
+              </span>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                hapticImpact(ImpactStyle.Light);
+                skipMafatih(-10);
+              }}
+              className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 p-1.5 rounded-lg transition-colors cursor-pointer"
+              title="Rewind 10 seconds"
+              aria-label="Rewind 10 seconds"
+            >
+              <RotateCcw size={16} />
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                hapticImpact(ImpactStyle.Medium);
+                toggleMafatihTrack(mafatihTrack);
+              }}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-md active:scale-95 transition-all cursor-pointer"
+              title={isMafatihPlaying ? "Pause" : "Play"}
+              aria-label={isMafatihPlaying ? "Pause" : "Play"}
+            >
+              {isMafatihBuffering ? (
+                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              ) : isMafatihPlaying ? (
+                <Pause size={17} fill="currentColor" />
+              ) : (
+                <Play size={17} fill="currentColor" className="ml-0.5" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                hapticImpact(ImpactStyle.Light);
+                skipMafatih(10);
+              }}
+              className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 p-1.5 rounded-lg transition-colors cursor-pointer"
+              title="Forward 10 seconds"
+              aria-label="Forward 10 seconds"
+            >
+              <RotateCw size={16} />
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                hapticImpact(ImpactStyle.Light);
+                stopMafatih();
+              }}
+              className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1.5 ml-0.5 cursor-pointer"
+              title="Close player"
+              aria-label="Close"
+            >
+              <X size={17} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleEnded = () => {

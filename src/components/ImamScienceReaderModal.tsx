@@ -70,13 +70,15 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
     if (!article) return;
     setActiveContent(article.content || '');
 
-    // If content ends with ... or is under 600 chars while article wordCount > 150, fetch full content
+    // If content ends with ... or is very short, attempt background enhancement
     const isTruncated = !article.content || article.content.endsWith('...') || 
-      (article.wordCount && article.wordCount > 150 && article.content.length < 800);
+      (article.wordCount && article.wordCount > 150 && article.content.length < 400);
 
     if (isTruncated) {
-      setIsLoadingContent(true);
-      // Fetch full content via backend API first, falling back to static offline file if present
+      if (!article.content) {
+        setIsLoadingContent(true);
+      }
+      // Fetch full content via backend API first
       fetch(getApiUrl(`/api/imam-science/articles/${article.slug}`))
         .then(res => {
           if (!res.ok) throw new Error('API request failed');
@@ -85,22 +87,12 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
         .then(data => {
           if (data && data.content) {
             setActiveContent(data.content);
-          } else {
-            throw new Error('No content returned from API');
           }
         })
-        .catch(() => {
-          // Fallback to static offline file if bundled
-          return fetch(getApiUrl(`/imam_science_articles/${article.slug}.json`))
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.content) {
-                setActiveContent(data.content);
-              }
-            });
-        })
-        .catch(err => console.warn('Could not fetch full article text:', err))
+        .catch(() => {})
         .finally(() => setIsLoadingContent(false));
+    } else {
+      setIsLoadingContent(false);
     }
   }, [article?.slug, article?.content]);
 

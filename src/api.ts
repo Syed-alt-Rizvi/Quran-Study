@@ -75,6 +75,51 @@ const juzDetailCache = new Map<number, JuzDetail>();
 const pendingSurahRequests = new Map<number, Promise<SurahDetail>>();
 const pendingJuzRequests = new Map<number, Promise<JuzDetail>>();
 
+let offlineUrduCache: Record<string, string[]> | null = null;
+let offlineEnglishCache: Record<string, string[]> | null = null;
+
+export async function getOfflineUrduTranslation(surahNumber: number): Promise<string[] | null> {
+  if (offlineUrduCache && offlineUrduCache[String(surahNumber)]) {
+    return offlineUrduCache[String(surahNumber)];
+  }
+  try {
+    // Check IndexedDB first
+    const cached = await fastStorage.get<Record<string, string[]>>('quran_urdu_translation_offline');
+    if (cached) {
+      offlineUrduCache = cached;
+      return cached[String(surahNumber)] || null;
+    }
+    const res = await fetch('/quran_urdu_translation.json');
+    if (res.ok) {
+      offlineUrduCache = await res.json();
+      if (offlineUrduCache) {
+        fastStorage.set('quran_urdu_translation_offline', offlineUrduCache);
+        return offlineUrduCache[String(surahNumber)] || null;
+      }
+    }
+  } catch {}
+  return null;
+}
+
+export async function downloadAndCacheUrduQuran(onProgress?: (pct: number) => void): Promise<boolean> {
+  try {
+    if (onProgress) onProgress(10);
+    const res = await fetch('/quran_urdu_translation.json');
+    if (res.ok) {
+      if (onProgress) onProgress(50);
+      offlineUrduCache = await res.json();
+      if (offlineUrduCache) {
+        await fastStorage.set('quran_urdu_translation_offline', offlineUrduCache);
+        if (onProgress) onProgress(100);
+        return true;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to cache Urdu translation:', err);
+  }
+  return false;
+}
+
 export const fetchSurahs = async (): Promise<SurahMeta[]> => {
   if (surahMetaCache.length === 114) return surahMetaCache;
 
@@ -177,9 +222,9 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
         surahNumber: arabicData.number,
         surahName: arabicData.englishName,
         text: text,
-        translationEn: englishData.ayahs[index]?.text || '',
-        translationUr: urduData.ayahs[index]?.text || '',
-        audio: audioData.ayahs[index]?.audio,
+        translationEn: englishData?.ayahs?.[index]?.text || (offlineEnglishCache?.[String(arabicData.number)]?.[index]) || '',
+        translationUr: urduData?.ayahs?.[index]?.text || (offlineUrduCache?.[String(arabicData.number)]?.[index]) || '',
+        audio: audioData?.ayahs?.[index]?.audio,
       };
     });
 
@@ -285,9 +330,9 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
         surahNumber: sNum,
         surahName: ayah.surah?.englishName || 'Unknown',
         text: text,
-        translationEn: englishData.ayahs[index]?.text || '',
-        translationUr: urduData.ayahs[index]?.text || '',
-        audio: audioData.ayahs[index]?.audio,
+        translationEn: englishData?.ayahs?.[index]?.text || (sNum && offlineEnglishCache?.[String(sNum)]?.[ayah.numberInSurah - 1]) || '',
+        translationUr: urduData?.ayahs?.[index]?.text || (sNum && offlineUrduCache?.[String(sNum)]?.[ayah.numberInSurah - 1]) || '',
+        audio: audioData?.ayahs?.[index]?.audio,
       };
     });
 

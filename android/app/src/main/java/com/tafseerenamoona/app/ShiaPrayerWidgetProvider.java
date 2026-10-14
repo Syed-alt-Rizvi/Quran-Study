@@ -27,6 +27,15 @@ public class ShiaPrayerWidgetProvider extends AppWidgetProvider {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM", Locale.getDefault());
         views.setTextViewText(R.id.widget_date, sdf.format(new Date()));
 
+        // Bind authentic Shia prayer times from persistent storage
+        String fajr = AdhanStorage.getFajrToday(context);
+        String dhuhr = AdhanStorage.getDhuhrToday(context);
+        String maghrib = AdhanStorage.getMaghribToday(context);
+
+        if (fajr != null && !fajr.isEmpty()) views.setTextViewText(R.id.widget_fajr_time, fajr);
+        if (dhuhr != null && !dhuhr.isEmpty()) views.setTextViewText(R.id.widget_dhuhr_time, dhuhr);
+        if (maghrib != null && !maghrib.isEmpty()) views.setTextViewText(R.id.widget_maghrib_time, maghrib);
+
         // Intent to launch Holy Quran
         Intent quranIntent = new Intent(context, MainActivity.class);
         quranIntent.setAction("OPEN_TAB_QURAN");

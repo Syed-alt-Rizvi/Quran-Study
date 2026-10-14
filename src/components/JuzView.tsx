@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import { getArabicFontFamily } from '../utils/arabicFonts';
+import { JUZ_URDU_NAMES } from '../data/surahUrduNames';
 
 interface JuzViewProps {
   key?: string;
@@ -23,6 +24,7 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
   const surahId = ayah.surahNumber || 1;
 
   const isDarkMode = useSettingsStore(s => s.isDarkMode);
+  const appLanguage = useSettingsStore(s => s.appLanguage);
   const fontSize = useSettingsStore(s => s.fontSize);
   const arabicFont = useSettingsStore(s => s.arabicFont);
   const showTranslation = useSettingsStore(s => s.showTranslation);
@@ -267,7 +269,7 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
                   forcedColorAdjust: 'none',
                 }}
               >
-                Translation
+                {appLanguage === 'ur' ? 'ترجمہ' : 'Translation'}
               </button>
             )}
             <button 
@@ -286,7 +288,7 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
                 forcedColorAdjust: 'none',
               }}
             >
-              Tafseer
+              {appLanguage === 'ur' ? 'تفسیر' : 'Tafseer'}
             </button>
           </div>
           <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
@@ -477,7 +479,7 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
   const [juz, setJuz] = useState<JuzDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { fontSize, setFontSize } = useSettingsStore();
+  const { fontSize, setFontSize, appLanguage } = useSettingsStore();
   const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
   const hasScrolledTargetRef = useRef(false);
 
@@ -601,7 +603,9 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
             >
               <ArrowLeft size={24} />
             </button>
-            <span className="font-bold text-slate-800 dark:text-slate-200">Juz {juzId}</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200">
+              {appLanguage === 'ur' ? `پارہ ${juzId}` : `Juz ${juzId}`}
+            </span>
             <div className="w-8" />
           </div>
         </header>
@@ -646,14 +650,22 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
               <ArrowLeft size={22} />
             </button>
             <div className="hidden sm:block text-left">
-              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">Juz {juz.number}</h1>
-              <p className="text-[11px] text-slate-500 font-arabic leading-tight">الجزء {juz.number} • {juz.ayahs.length} Ayahs</p>
+              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">
+                {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
+              </h1>
+              <p className="text-[11px] text-slate-500 font-arabic leading-tight">
+                {appLanguage === 'ur' && JUZ_URDU_NAMES[juz.number] ? JUZ_URDU_NAMES[juz.number] : `الجزء ${juz.number}`} • {juz.ayahs.length} {appLanguage === 'ur' ? 'آیات' : 'Ayahs'}
+              </p>
             </div>
           </div>
 
           <div className="text-center sm:hidden min-w-0">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">Juz {juz.number}</h1>
-            <p className="text-[10px] text-slate-500 font-arabic truncate">الجزء {juz.number}</p>
+            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+              {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
+            </h1>
+            <p className="text-[10px] text-slate-500 font-arabic truncate">
+              {appLanguage === 'ur' && JUZ_URDU_NAMES[juz.number] ? JUZ_URDU_NAMES[juz.number] : `الجزء ${juz.number}`}
+            </p>
           </div>
 
           <div className="flex items-center gap-2">

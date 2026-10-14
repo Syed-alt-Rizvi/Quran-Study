@@ -91,6 +91,7 @@ class ShiaAdhanPlayerService {
   private currentRepeat = 0;
   private isUnlocked = false;
   private pendingPrayer: string | null = null;
+  private wakeLock: any = null;
   private lastPlayedDate: { fajr: string; dhuhr: string; maghrib: string } = {
     fajr: '',
     dhuhr: '',
@@ -102,6 +103,15 @@ class ShiaAdhanPlayerService {
       this.loadLastPlayedDate();
       this.initAudio();
       this.setupGlobalUnlockListeners();
+
+      // Ensure Screen WakeLock is maintained if app comes to foreground while playing
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && this.isPlaying) {
+            this.acquireWakeLock();
+          }
+        });
+      }
 
       // Listen for Capacitor native scheduled alarm triggers
       import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
@@ -116,6 +126,60 @@ class ShiaAdhanPlayerService {
           }
         });
       }).catch(() => {});
+    }
+  }
+
+  private async acquireWakeLock() {
+    if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && (navigator as any).wakeLock?.request) {
+      try {
+        this.wakeLock = await (navigator as any).wakeLock.request('screen');
+        this.wakeLock.addEventListener?.('release', () => {
+          this.wakeLock = null;
+        });
+      } catch {}
+    }
+  }
+
+  private releaseWakeLock() {
+    if (this.wakeLock) {
+      try {
+        this.wakeLock.release?.();
+      } catch {}
+      this.wakeLock = null;
+    }
+  }
+
+  private updateMediaSession(prayerName: string) {
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `Shia Adhan (${prayerName})`,
+          artist: "Ahlulbayt (a.s) Prayer Call • Ja'fari Method",
+          album: 'Shia Markaz Adhan',
+          artwork: [
+            { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          ]
+        });
+        navigator.mediaSession.playbackState = 'playing';
+        navigator.mediaSession.setActionHandler('play', () => {
+          this.resumeAdhan();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          this.pauseAdhan();
+        });
+        navigator.mediaSession.setActionHandler('stop', () => {
+          this.stopAdhan();
+        });
+      } catch {}
+    }
+  }
+
+  private clearMediaSession() {
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      try {
+        navigator.mediaSession.playbackState = 'none';
+      } catch {}
     }
   }
 
@@ -167,6 +231,8 @@ class ShiaAdhanPlayerService {
           this.isPlaying = false;
           this.currentPrayerName = null;
           this.currentRepeat = 0;
+          this.releaseWakeLock();
+          this.clearMediaSession();
           this.notify();
         }
       });
@@ -174,6 +240,8 @@ class ShiaAdhanPlayerService {
       this.audio.addEventListener('error', (e) => {
         console.warn('Adhan audio element error:', e);
         this.isPlaying = false;
+        this.releaseWakeLock();
+        this.clearMediaSession();
         this.notify();
       });
     } catch (e) {
@@ -293,6 +361,10 @@ class ShiaAdhanPlayerService {
       this.isUnlocked = true;
       this.pendingPrayer = null;
 
+      // Lock screen / background playback preservation
+      await this.acquireWakeLock();
+      this.updateMediaSession(prayerName);
+
       // In PWA, if tab/screen is hidden, notify user via service worker
       if (typeof document !== 'undefined' && document.hidden && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then((reg) => {
@@ -311,7 +383,28 @@ class ShiaAdhanPlayerService {
       console.warn('Playback blocked by browser policy:', err);
       this.isPlaying = false;
       this.pendingPrayer = prayerName;
+      this.releaseWakeLock();
+      this.clearMediaSession();
       this.notify();
+      return false;
+    }
+  }
+
+  public async resumeAdhan(): Promise<boolean> {
+    if (!this.audio) return false;
+    try {
+      if (this.audioCtx && this.audioCtx.state === 'suspended') {
+        await this.audioCtx.resume().catch(() => {});
+      }
+      await this.audio.play();
+      this.isPlaying = true;
+      await this.acquireWakeLock();
+      if (this.currentPrayerName) {
+        this.updateMediaSession(this.currentPrayerName);
+      }
+      this.notify();
+      return true;
+    } catch {
       return false;
     }
   }
@@ -321,6 +414,8 @@ class ShiaAdhanPlayerService {
       this.audio.pause();
     }
     this.isPlaying = false;
+    this.releaseWakeLock();
+    this.clearMediaSession();
     this.notify();
   }
 
@@ -332,6 +427,8 @@ class ShiaAdhanPlayerService {
     this.isPlaying = false;
     this.currentPrayerName = null;
     this.currentRepeat = 0;
+    this.releaseWakeLock();
+    this.clearMediaSession();
     this.notify();
   }
 
@@ -425,68 +522,208 @@ class ShiaAdhanPlayerService {
 
 export const shiaAdhanPlayer = new ShiaAdhanPlayerService();
 
-// Schedules native device alarms on Android via Capacitor without external push
+import { registerPlugin, Capacitor } from '@capacitor/core';
+
+export interface AdhanNativePlugin {
+  scheduleAlarms(options: {
+    todayDate: string;
+    fajrToday: string;
+    dhuhrToday: string;
+    maghribToday: string;
+    tomorrowDate: string;
+    fajrTomorrow: string;
+    dhuhrTomorrow: string;
+    maghribTomorrow: string;
+    autoPlayFajr: boolean;
+    autoPlayDhuhr: boolean;
+    autoPlayMaghrib: boolean;
+    latitude: number;
+    longitude: number;
+  }): Promise<{ success: boolean; message: string }>;
+  cancelAllAlarms(): Promise<{ success: boolean }>;
+  checkExactAlarmPermission(): Promise<{ granted: boolean; required: boolean; sdkInt: number }>;
+  requestExactAlarmPermission(): Promise<{ opened: boolean; alreadyGranted?: boolean }>;
+  checkBatteryOptimization(): Promise<{ ignoringBatteryOptimizations: boolean }>;
+  requestIgnoreBatteryOptimization(): Promise<{ requested: boolean; error?: string }>;
+  playAdhanNow(options?: { prayerName?: string }): Promise<{ success: boolean }>;
+  stopAdhanPlayback(): Promise<{ success: boolean }>;
+  getAlarmStatus(): Promise<any>;
+}
+
+export const AdhanNative = registerPlugin<AdhanNativePlugin>('AdhanNative');
+
+/**
+ * High-Precision Adhan Native Scheduler
+ * 
+ * Android Architecture:
+ * - Uses AlarmManager.setAlarmClock() for to-the-second execution bypassing Doze Mode & OEM task killers
+ * - BroadcastReceiver for ACTION_BOOT_COMPLETED & ACTION_TIMEZONE_CHANGED to auto-reschedule alarms
+ * - Foreground Service with START_STICKY, WakeLock, and persistent notification for reliable playback
+ * - Handles SCHEDULE_EXACT_ALARM (Android 12+) and USE_EXACT_ALARM (Android 14+)
+ * 
+ * iOS Architecture:
+ * - Schedules local notifications using UNCalendarNotificationTrigger specifications (48-hour rolling queue)
+ * - Critical Alerts entitlement (com.apple.developer.usernotifications.critical-alerts) allows bypassing hardware mute switch
+ * - Strictly avoids infinite background loops or background execution timers which iOS aggressively terminates
+ * 
+ * Midnight Refresh:
+ * - Rolling 48-hour queue (Today + Tomorrow)
+ * - Native 00:02 AM alarm that advances the queue and recalculates the next 48-hour prayer times
+ */
 export async function scheduleNativeAdhanAlarms(
-  timings: ShiaPrayerTimings,
-  settings: { autoPlayFajr?: boolean; autoPlayDhuhr?: boolean; autoPlayMaghrib?: boolean }
+  todayTimings: ShiaPrayerTimings,
+  tomorrowTimings?: ShiaPrayerTimings | null,
+  options?: {
+    autoPlayFajr?: boolean;
+    autoPlayDhuhr?: boolean;
+    autoPlayMaghrib?: boolean;
+    latitude?: number;
+    longitude?: number;
+    todayDateStr?: string;
+    tomorrowDateStr?: string;
+  }
 ) {
-  try {
-    const { LocalNotifications } = await import('@capacitor/local-notifications');
-    const perm = await LocalNotifications.checkPermissions();
-    if (perm.display !== 'granted') {
-      await LocalNotifications.requestPermissions();
+  const autoFajr = options?.autoPlayFajr !== false;
+  const autoDhuhr = options?.autoPlayDhuhr !== false;
+  const autoMaghrib = options?.autoPlayMaghrib !== false;
+  const lat = options?.latitude || 0;
+  const lng = options?.longitude || 0;
+
+  const now = new Date();
+  const formatYMD = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const todayStr = options?.todayDateStr || formatYMD(now);
+  const tomDate = new Date(now.getTime() + 86400000);
+  const tomorrowStr = options?.tomorrowDateStr || formatYMD(tomDate);
+
+  const fajrToday = todayTimings.fajr || '';
+  const dhuhrToday = todayTimings.dhuhr || '';
+  const maghribToday = todayTimings.maghrib || '';
+
+  const fajrTomorrow = tomorrowTimings?.fajr || fajrToday;
+  const dhuhrTomorrow = tomorrowTimings?.dhuhr || dhuhrToday;
+  const maghribTomorrow = tomorrowTimings?.maghrib || maghribToday;
+
+  // 1. Android: Native AlarmManager.setAlarmClock() via AdhanNativePlugin
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    try {
+      await AdhanNative.scheduleAlarms({
+        todayDate: todayStr,
+        fajrToday,
+        dhuhrToday,
+        maghribToday,
+        tomorrowDate: tomorrowStr,
+        fajrTomorrow,
+        dhuhrTomorrow,
+        maghribTomorrow,
+        autoPlayFajr: autoFajr,
+        autoPlayDhuhr: autoDhuhr,
+        autoPlayMaghrib: autoMaghrib,
+        latitude: lat,
+        longitude: lng,
+      });
+      return;
+    } catch (err) {
+      console.warn('AdhanNative.scheduleAlarms error, falling back to LocalNotifications:', err);
     }
+  }
 
-    // Create high-importance Android notification channel with authentic Shia Adhan audio
-    await LocalNotifications.createChannel({
-      id: 'shia_adhan_alarm',
-      name: 'Shia Adhan Prayer Calls',
-      description: 'Authentic Shia Ithna-Ashari Adhan Announcements',
-      importance: 5,
-      visibility: 1,
-      sound: 'shia_adhan.mp3',
-      vibration: true,
-      lights: true
-    }).catch(() => {});
-
-    // Cancel existing adhan alarms
-    await LocalNotifications.cancel({
-      notifications: [{ id: 800001 }, { id: 800002 }, { id: 800003 }]
-    }).catch(() => {});
-
-    const now = new Date();
-    const notificationsToSchedule = [];
-
-    const prayers = [
-      { id: 800001, name: 'Fajr (Subh)', time: timings.fajr, enabled: settings.autoPlayFajr !== false },
-      { id: 800002, name: 'Dhuhr (Zuhr)', time: timings.dhuhr, enabled: settings.autoPlayDhuhr !== false },
-      { id: 800003, name: 'Maghrib', time: timings.maghrib, enabled: settings.autoPlayMaghrib !== false },
-    ];
-
-    for (const p of prayers) {
-      if (!p.enabled) continue;
-      const cleanTime = p.time.split(' ')[0];
-      const [h, m] = cleanTime.split(':').map(Number);
-      if (isNaN(h) || isNaN(m)) continue;
-
-      const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
-      if (targetDate.getTime() > now.getTime()) {
-        notificationsToSchedule.push({
-          id: p.id,
-          title: `Shia Adhan: ${p.name}`,
-          body: `It is now time for ${p.name} prayer. (Ja'fari Method)`,
-          channelId: 'shia_adhan_alarm',
-          sound: 'shia_adhan.mp3',
-          schedule: { at: targetDate, allowWhileIdle: true },
-          extra: { prayer: p.name, type: 'adhan' }
-        });
+  // 2. iOS / Native Companion: UNCalendarNotificationTrigger via @capacitor/local-notifications
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      const perm = await LocalNotifications.checkPermissions();
+      if (perm.display !== 'granted') {
+        await LocalNotifications.requestPermissions();
       }
-    }
 
-    if (notificationsToSchedule.length > 0) {
-      await LocalNotifications.schedule({ notifications: notificationsToSchedule });
+      // iOS & Android Notification Channel
+      await LocalNotifications.createChannel({
+        id: 'shia_adhan_alarm',
+        name: 'Shia Adhan Prayer Calls',
+        description: 'Authentic Shia Ithna-Ashari Adhan Announcements',
+        importance: 5,
+        visibility: 1,
+        sound: 'shia_adhan.mp3',
+        vibration: true,
+        lights: true,
+      }).catch(() => {});
+
+      // Cancel existing 48-hour scheduled notifications
+      const existingIds = [800001, 800002, 800003, 800004, 800005, 800006];
+      await LocalNotifications.cancel({
+        notifications: existingIds.map((id) => ({ id })),
+      }).catch(() => {});
+
+      const notificationsToSchedule: any[] = [];
+
+      // Queue for Today and Tomorrow (48-Hour Rolling Window)
+      const dayConfigs = [
+        {
+          date: now,
+          fajr: fajrToday,
+          dhuhr: dhuhrToday,
+          maghrib: maghribToday,
+          idBase: 800000,
+          labelSuffix: 'Today',
+        },
+        {
+          date: tomDate,
+          fajr: fajrTomorrow,
+          dhuhr: dhuhrTomorrow,
+          maghrib: maghribTomorrow,
+          idBase: 800003,
+          labelSuffix: 'Tomorrow',
+        },
+      ];
+
+      for (const day of dayConfigs) {
+        const prayers = [
+          { id: day.idBase + 1, name: 'Fajr (Subh)', time: day.fajr, enabled: autoFajr },
+          { id: day.idBase + 2, name: 'Dhuhr (Zuhr)', time: day.dhuhr, enabled: autoDhuhr },
+          { id: day.idBase + 3, name: 'Maghrib', time: day.maghrib, enabled: autoMaghrib },
+        ];
+
+        for (const p of prayers) {
+          if (!p.enabled || !p.time) continue;
+          const cleanTime = p.time.split(' ')[0];
+          const [h, m] = cleanTime.split(':').map(Number);
+          if (isNaN(h) || isNaN(m)) continue;
+
+          const targetDate = new Date(
+            day.date.getFullYear(),
+            day.date.getMonth(),
+            day.date.getDate(),
+            h,
+            m,
+            0
+          );
+
+          if (targetDate.getTime() > now.getTime()) {
+            notificationsToSchedule.push({
+              id: p.id,
+              title: `Shia Adhan • ${p.name}`,
+              body: `It is now time for ${p.name} prayer. (Ja'fari Method)`,
+              channelId: 'shia_adhan_alarm',
+              sound: 'shia_adhan.mp3',
+              // On iOS, 'schedule: { at: targetDate }' maps to UNCalendarNotificationTrigger
+              schedule: { at: targetDate, allowWhileIdle: true },
+              extra: { prayer: p.name, type: 'adhan', critical: true },
+            });
+          }
+        }
+      }
+
+      if (notificationsToSchedule.length > 0) {
+        await LocalNotifications.schedule({ notifications: notificationsToSchedule });
+      }
+    } catch (e) {
+      console.warn('LocalNotifications scheduling error:', e);
     }
-  } catch {
-    // Non-native / Web environment
   }
 }

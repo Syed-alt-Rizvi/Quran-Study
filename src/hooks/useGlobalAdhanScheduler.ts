@@ -18,10 +18,28 @@ export function useGlobalAdhanScheduler() {
   // Function to refresh timings for the given date (accounts for seasonal shifts across 365 days)
   const refreshTimingsForDate = useCallback(async (date: Date) => {
     try {
-      const result = await getShiaPrayerTimes(userLocation.latitude, userLocation.longitude, date);
-      setCurrentTimings(result);
-      // Sync native Android device alarms (runs locally without any external push server)
-      scheduleNativeAdhanAlarms(result, adhanSettings);
+      const todayResult = await getShiaPrayerTimes(userLocation.latitude, userLocation.longitude, date);
+      setCurrentTimings(todayResult);
+
+      // Rolling 48-Hour Queue Calculation: Also pre-calculate tomorrow's timings
+      const tomorrowDate = new Date(date.getTime() + 86400000);
+      let tomorrowResult: ShiaPrayerTimings | null = null;
+      try {
+        tomorrowResult = await getShiaPrayerTimes(userLocation.latitude, userLocation.longitude, tomorrowDate);
+      } catch (tomErr) {
+        console.warn('Could not fetch tomorrow prayer times, falling back to today:', tomErr);
+      }
+
+      // Sync native OS alarms (AlarmManager.setAlarmClock on Android / UNCalendarNotificationTrigger on iOS)
+      await scheduleNativeAdhanAlarms(todayResult, tomorrowResult, {
+        autoPlayFajr: adhanSettings.autoPlayFajr,
+        autoPlayDhuhr: adhanSettings.autoPlayDhuhr,
+        autoPlayMaghrib: adhanSettings.autoPlayMaghrib,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        todayDateStr: getLocalDateKey(date),
+        tomorrowDateStr: getLocalDateKey(tomorrowDate)
+      });
     } catch (err) {
       console.warn('Global adhan scheduler failed to refresh timings:', err);
     }

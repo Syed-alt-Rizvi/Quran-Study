@@ -33,39 +33,47 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
     }
 
     // Load static dataset first for instant render
-    fetch(getApiUrl('/imam_science_data.json'))
-      .then(res => {
-        if (!res.ok) throw new Error('Static data missing');
-        return res.json();
-      })
-      .then(data => {
-        if (isCancelled) return;
-        if (data && data.articles) {
-          cachedArticles = data.articles;
-          setArticles(data.articles);
-          if (data.categories) {
-            cachedCategories = data.categories;
-            setCategories(data.categories);
-          }
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        // Failover gracefully to live API
-        fetch(getApiUrl('/api/imam-science/articles?limit=100'))
-          .then(res => res.json())
-          .then(data => {
-            if (isCancelled) return;
-            if (data && data.articles) {
+    const loadData = async () => {
+      const paths = ['/imam_science_data.json', './imam_science_data.json', getApiUrl('/imam_science_data.json')];
+      for (const p of paths) {
+        try {
+          const res = await fetch(p);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.articles && data.articles.length > 0) {
+              if (isCancelled) return;
               cachedArticles = data.articles;
               setArticles(data.articles);
+              if (data.categories) {
+                cachedCategories = data.categories;
+                setCategories(data.categories);
+              }
               setLoading(false);
+              return;
             }
-          })
-          .catch(() => {
-            if (!isCancelled) setLoading(false);
-          });
-      });
+          }
+        } catch {}
+      }
+
+      // Failover gracefully to live API
+      try {
+        const res = await fetch(getApiUrl('/api/imam-science/articles?limit=100'));
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.articles && data.articles.length > 0) {
+            if (isCancelled) return;
+            cachedArticles = data.articles;
+            setArticles(data.articles);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+
+      if (!isCancelled) setLoading(false);
+    };
+
+    loadData();
 
     return () => {
       isCancelled = true;

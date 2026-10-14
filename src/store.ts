@@ -82,6 +82,8 @@ interface SettingsState {
   setUserLocation: (loc: UserLocation) => void;
   updateAdhanSettings: (partial: Partial<AdhanSettings>) => void;
 
+  appLanguage: 'en' | 'ur';
+  setAppLanguage: (lang: 'en' | 'ur') => void;
   toggleDarkMode: () => void;
   setFontSize: (size: number) => void;
   setArabicFont: (font: string) => void;
@@ -191,6 +193,14 @@ export const useSettingsStore = create<SettingsState>()(
           ...partial
         }
       })),
+      appLanguage: 'en',
+      setAppLanguage: (lang: 'en' | 'ur') => set((state) => {
+        return {
+          appLanguage: lang,
+          translationLanguages: lang === 'ur' ? ['ur'] : ['en'],
+          tafseerLanguages: lang === 'ur' ? ['ur'] : state.tafseerLanguages
+        };
+      }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setFontSize: (size) => set({ fontSize: size }),
       setArabicFont: (font) => set({ arabicFont: font }),

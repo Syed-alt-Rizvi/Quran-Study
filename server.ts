@@ -130,6 +130,39 @@ async function startServer() {
     res.status(404).send("// Service worker not found");
   });
 
+  // Dedicated SEO Sitemap endpoint
+  app.get("/sitemap.xml", (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "sitemap.xml"),
+      path.join(process.cwd(), "dist", "sitemap.xml")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "application/xml; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).send("<!-- Sitemap not found -->");
+  });
+
+  // Dedicated SEO Robots.txt endpoint
+  app.get("/robots.txt", (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "robots.txt"),
+      path.join(process.cwd(), "dist", "robots.txt")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.sendFile(p);
+      }
+    }
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.send("User-agent: *\nAllow: /\nSitemap: https://quran-study.ai.studio/sitemap.xml\n");
+  });
+
   // In-memory LRU/map caches for Google Maps & AlAdhan to minimize quota consumption
   const mapsGeocodeCache = new Map<string, any>();
   const mapsReverseCache = new Map<string, any>();
@@ -587,6 +620,44 @@ async function startServer() {
       }
       
       const results = await query.orderBy(desc(discussions.createdAt)).limit(50).execute();
+      if (results.length === 0) {
+        return res.json([
+          {
+            discussion: {
+              id: "comm_seed_1",
+              content: "Ayat al-Kursi (2:255) is the grandest verse in the Holy Quran according to the Prophet (s.a.w.a) and Imam Ali (a.s). It establishes absolute divine sovereignty, living sustenance, and untired vigilance: 'Neither slumber overtakes Him nor sleep'. Reciting it every morning and after obligatory prayers anchors the soul in divine peace.",
+              author: "Syed Kumail Al-Musawi",
+              email: null,
+              createdAt: new Date().toISOString(),
+              replyToId: null,
+              isModerated: false,
+              isOfficialAnswer: true
+            },
+            ayahRef: {
+              surahNumber: 2,
+              ayahNumber: 255,
+              surahName: "Al-Baqarah"
+            }
+          },
+          {
+            discussion: {
+              id: "comm_seed_2",
+              content: "In Surah Yaseen (36:12): 'And all things We have recorded in a Manifest Imam (Imamin Mubeen)'. In numerous authentic Shia exegetical reports through Imam al-Baqir (a.s), when this verse descended, the Messenger of Allah pointed towards Amir al-Mu'minin Ali ibn Abi Talib (a.s) and declared: 'This is the Imam in whom Allah has deposited the knowledge of all things.'",
+              author: "Fatima Zahra Scholar Circle",
+              email: null,
+              createdAt: new Date().toISOString(),
+              replyToId: null,
+              isModerated: false,
+              isOfficialAnswer: true
+            },
+            ayahRef: {
+              surahNumber: 36,
+              ayahNumber: 12,
+              surahName: "Ya-Seen"
+            }
+          }
+        ]);
+      }
       res.json(results);
     } catch (e: any) {
       res.status(500).json({ error: e.message });
@@ -722,6 +793,21 @@ async function startServer() {
       )).limit(1).execute();
 
       if (found.length === 0) {
+        try {
+          const staticPath = path.join(process.cwd(), "public", "imam_science_data.json");
+          if (fs.existsSync(staticPath)) {
+            const data = JSON.parse(fs.readFileSync(staticPath, "utf-8"));
+            const art = data.articles?.find((a: any) => a.slug === slug || a.id === slug);
+            if (art) {
+              return res.json({
+                ...art,
+                categories: art.categories || [],
+                highlights: art.highlights || [],
+                headings: art.headings || []
+              });
+            }
+          }
+        } catch {}
         return res.status(404).json({ error: "Article not found" });
       }
 

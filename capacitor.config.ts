@@ -8,6 +8,11 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    LocalNotifications: {
+      smallIcon: "ic_lock_idle_alarm",
+      iconColor: "#047857",
+      sound: "shia_adhan.mp3",
+    },
   },
 };
 

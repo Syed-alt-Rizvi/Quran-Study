@@ -6,10 +6,10 @@ import {
   ScrollText, ListOrdered, X, Compass, RefreshCw,
   Repeat
 } from 'lucide-react';
-import { MafatihDetail, fetchMafatihItem, MafatihVerse } from '../mafatihApi';
+import { MafatihDetail, fetchMafatihItem, MafatihVerse, getFullIndex } from '../mafatihApi';
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
-import { useMafatihAudioStore } from '../mafatihAudioStore';
+import { useMafatihAudioStore, isSameTrack } from '../mafatihAudioStore';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../utils/apiBase';
@@ -233,9 +233,11 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   const setVolume = useMafatihAudioStore((s) => s.setVolume);
   const toggleMute = useMafatihAudioStore((s) => s.toggleMute);
 
-  const isThisItemActive =
-    currentTrack?.id === item.id ||
-    (!!item.audioUrl && currentTrack?.audioUrl === item.audioUrl);
+  const isThisItemActive = isSameTrack(currentTrack, {
+    id: item.id,
+    title: item.title,
+    audioUrl: item.audioUrl || '',
+  });
   const isThisItemPlaying = isThisItemActive && isPlaying;
   const isThisItemBuffering = isThisItemActive && isBuffering;
   const activeCurrentTime = isThisItemActive ? currentTime : 0;
@@ -243,12 +245,13 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
   const handleTogglePlay = () => {
     hapticImpact(ImpactStyle.Light);
-    if (!item.audioUrl) return;
+    const effectiveAudioUrl = item.audioUrl || (isThisItemActive ? currentTrack?.audioUrl : null);
+    if (!effectiveAudioUrl) return;
     toggleTrack({
       id: item.id,
       title: item.title,
       category: (item.categoryChain || []).join(' › ') || item.mainCategory,
-      audioUrl: item.audioUrl,
+      audioUrl: effectiveAudioUrl,
     });
   };
 
@@ -447,23 +450,25 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const isAudioBuffering = useMafatihAudioStore(s => s.isBuffering);
   const toggleTrack = useMafatihAudioStore(s => s.toggleTrack);
 
-  const isCurrentTrackThisItem = !!item && (
-    currentTrack?.id === item.id ||
-    (!!item.audioUrl && currentTrack?.audioUrl === item.audioUrl)
-  );
+  const isCurrentTrackThisItem = !!item && isSameTrack(currentTrack, {
+    id: item.id,
+    title: item.title,
+    audioUrl: item.audioUrl || '',
+  });
   const isThisItemPlaying = isCurrentTrackThisItem && isAudioPlaying;
   const isThisItemBuffering = isCurrentTrackThisItem && isAudioBuffering;
 
   const handleTogglePlay = useCallback(() => {
     hapticImpact(ImpactStyle.Light);
-    if (!item?.audioUrl) return;
+    const effectiveAudioUrl = item?.audioUrl || (isCurrentTrackThisItem ? currentTrack?.audioUrl : null);
+    if (!effectiveAudioUrl || !item) return;
     toggleTrack({
       id: item.id,
       title: item.title,
       category: (item.categoryChain || []).join(' › ') || item.mainCategory,
-      audioUrl: item.audioUrl,
+      audioUrl: effectiveAudioUrl,
     });
-  }, [item, toggleTrack]);
+  }, [item, isCurrentTrackThisItem, currentTrack, toggleTrack]);
 
   // Verse refs for line jumping
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -487,6 +492,19 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
         } else {
           setItem(data);
           addMafatihRecent(data.id);
+          // If detail was missing audioUrl, attempt index lookup
+          if (!data.audioUrl) {
+            getFullIndex().then(index => {
+              const found = index.find(i => 
+                i.id.toLowerCase() === data.id.toLowerCase() || 
+                (i.code && i.code.toLowerCase() === data.id.toLowerCase()) || 
+                i.id.toLowerCase() === itemId.toLowerCase()
+              );
+              if (found?.audioUrl) {
+                setItem(prev => prev ? { ...prev, audioUrl: found.audioUrl } : prev);
+              }
+            }).catch(() => {});
+          }
         }
         setLoading(false);
       })
@@ -624,7 +642,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
           <div className="flex items-center gap-1 shrink-0">
             {/* Quick Audio Play Button in Sticky Header */}
-            {item.audioUrl && (
+            {(item.audioUrl || isCurrentTrackThisItem) && (
               <button
                 onClick={handleTogglePlay}
                 className={`p-2 rounded-full transition-all cursor-pointer ${
@@ -935,7 +953,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
       </main>
 
       {/* Docked Isolated Audio Player */}
-      {item.audioUrl && (
+      {(item.audioUrl || isCurrentTrackThisItem) && (
         <MafatihAudioPlayer
           key={`audio-${item.id}`}
           item={item}
