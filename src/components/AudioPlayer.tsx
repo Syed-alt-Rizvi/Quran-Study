@@ -4,6 +4,7 @@ import { useAudioStore } from '../audioStore';
 import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { useSettingsStore } from '../store';
 import { hapticSelection, hapticImpact, ImpactStyle } from '../utils/haptics';
+import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
 
 interface AudioPlayerProps {
   onSelectSurah?: (surahId: number, targetAyah?: number) => void;
@@ -26,7 +27,8 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     stop 
   } = useAudioStore();
   
-  const { reciter, autoScrollAudio, toggleAutoScrollAudio } = useSettingsStore();
+  const { reciter, autoScrollAudio, toggleAutoScrollAudio, appLanguage } = useSettingsStore();
+  const isUrdu = appLanguage === 'ur';
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -279,23 +281,29 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
   if (!hasQuranAudio && hasMafatihAudio && mafatihTrack) {
     const mProgress = mafatihDuration > 0 ? Math.min(100, (mafatihCurrentTime / mafatihDuration) * 100) : 0;
     const formatMTime = (secs: number) => {
-      if (isNaN(secs) || secs <= 0) return '00:00';
+      if (isNaN(secs) || secs <= 0) return isUrdu ? toUrduNumerals('00:00') : '00:00';
       const m = Math.floor(secs / 60);
       const s = Math.floor(secs % 60);
-      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      const str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      return isUrdu ? toUrduNumerals(str) : str;
     };
+
+    const displayMTitle = isUrdu ? getMafatihUrduTitle(mafatihTrack.id, mafatihTrack.title) : mafatihTrack.title;
+    const displayMCat = isUrdu ? getMafatihUrduCategory(mafatihTrack.category) : (mafatihTrack.category || 'Supplication Recitation');
 
     return (
       <div 
         id="global-mafatih-audio-bar"
-        onClick={() => {
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest('button')) return;
           if (mafatihTrack.id && onSelectMafatihItem) {
             hapticSelection();
             onSelectMafatihItem(mafatihTrack.id);
           }
         }}
         className={`fixed ${isOnHome ? 'bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-300/60 dark:border-emerald-800/60 shadow-2xl rounded-2xl sm:rounded-full px-3.5 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-500/70 dark:hover:border-emerald-600/70 group/bar gpu-layer`}
-        title="Tap to read supplication text"
+        title={isUrdu ? "متن پڑھنے کے لیے ٹیپ کریں" : "Tap to read supplication text"}
+        dir={isUrdu ? "rtl" : "ltr"}
       >
         {/* Interactive Progress Bar */}
         <div 
@@ -309,7 +317,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
             hapticSelection();
           }}
           className="w-full group/scrub py-1 -my-0.5 cursor-pointer"
-          title="Tap to seek"
+          title={isUrdu ? "تلاش کریں" : "Tap to seek"}
         >
           <div className="w-full bg-slate-200/80 dark:bg-slate-800/80 h-1.5 group-hover/scrub:h-2 rounded-full overflow-hidden transition-all relative">
             <div 
@@ -328,14 +336,14 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
             <div className="truncate min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 truncate">
-                  {mafatihTrack.title}
+                  {displayMTitle}
                 </span>
-                <span className="text-[10px] text-slate-400 shrink-0 font-mono">
+                <span className="text-[10px] text-slate-400 shrink-0 font-mono tabular-nums">
                   {formatMTime(mafatihCurrentTime)} {mafatihDuration > 0 ? `/ ${formatMTime(mafatihDuration)}` : ''}
                 </span>
               </div>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
-                {mafatihTrack.category || 'Supplication Recitation'} • Tap to read
+                {displayMCat} • {isUrdu ? 'پڑھنے کے لیے ٹیپ کریں' : 'Tap to read'}
               </span>
             </div>
           </div>
@@ -346,12 +354,14 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 hapticImpact(ImpactStyle.Light);
                 skipMafatih(-10);
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 p-1.5 rounded-lg transition-colors cursor-pointer"
-              title="Rewind 10 seconds"
-              aria-label="Rewind 10 seconds"
+              title={isUrdu ? '۱۰ سیکنڈ پیچھے' : 'Rewind 10 seconds'}
+              aria-label={isUrdu ? '۱۰ سیکنڈ پیچھے' : 'Rewind 10 seconds'}
             >
               <RotateCcw size={16} />
             </button>
@@ -360,19 +370,21 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 hapticImpact(ImpactStyle.Medium);
                 toggleMafatihTrack(mafatihTrack);
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-md active:scale-95 transition-all cursor-pointer"
-              title={isMafatihPlaying ? "Pause" : "Play"}
-              aria-label={isMafatihPlaying ? "Pause" : "Play"}
+              title={isUrdu ? (isMafatihPlaying ? 'روکیں' : 'سنیں') : (isMafatihPlaying ? 'Pause' : 'Play')}
+              aria-label={isUrdu ? (isMafatihPlaying ? 'روکیں' : 'سنیں') : (isMafatihPlaying ? 'Pause' : 'Play')}
             >
               {isMafatihBuffering ? (
                 <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
               ) : isMafatihPlaying ? (
                 <Pause size={17} fill="currentColor" />
               ) : (
-                <Play size={17} fill="currentColor" className="ml-0.5" />
+                <Play size={17} fill="currentColor" className={isUrdu ? 'mr-0.5' : 'ml-0.5'} />
               )}
             </button>
 
@@ -380,26 +392,37 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 hapticImpact(ImpactStyle.Light);
                 skipMafatih(10);
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 p-1.5 rounded-lg transition-colors cursor-pointer"
-              title="Forward 10 seconds"
-              aria-label="Forward 10 seconds"
+              title={isUrdu ? '۱۰ سیکنڈ آگے' : 'Forward 10 seconds'}
+              aria-label={isUrdu ? '۱۰ سیکنڈ آگے' : 'Forward 10 seconds'}
             >
               <RotateCw size={16} />
             </button>
 
             <button
+              id="global-mafatih-stop-btn"
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
+                hapticImpact(ImpactStyle.Light);
+                stopMafatih();
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
                 hapticImpact(ImpactStyle.Light);
                 stopMafatih();
               }}
               className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1.5 ml-0.5 cursor-pointer"
-              title="Close player"
-              aria-label="Close"
+              title={isUrdu ? 'پلیئر بند کریں' : 'Close player'}
+              aria-label={isUrdu ? 'بند کریں' : 'Close'}
             >
               <X size={17} />
             </button>
@@ -461,7 +484,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 truncate font-semibold">
-              Ayah {currentAyah.numberInSurah}
+              {isUrdu ? `${t('ayah', appLanguage)} ${toUrduNumerals(currentAyah.numberInSurah)}` : `Ayah ${currentAyah.numberInSurah}`}
             </span>
             {duration > 0 && (
               <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSettingsStore } from './store';
 import Home from './components/Home';
 import AudioPlayer from './components/AudioPlayer';
@@ -10,14 +10,16 @@ import { checkUrlForTransfer, importUserData } from './utils/dataTransfer';
 import { checkAndDispatchCalendarNotifications } from './utils/calendarNotifications';
 import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
 import { Loader2 } from 'lucide-react';
+import { lazyWithRetry } from './utils/lazyWithRetry';
+import { App as CapacitorApp } from '@capacitor/app';
 
-// Code-split heavy views for instantaneous first paint
-const WelcomeScreen = lazy(() => import('./components/WelcomeScreen'));
-const SurahView = lazy(() => import('./components/SurahView'));
-const JuzView = lazy(() => import('./components/JuzView'));
-const Sidebar = lazy(() => import('./components/Sidebar'));
-const DuaScreen = lazy(() => import('./components/DuaScreen'));
-const MafatihItemView = lazy(() => import('./components/MafatihItemView'));
+// Code-split heavy views with resilient retry and chunk refresh logic
+const WelcomeScreen = lazyWithRetry(() => import('./components/WelcomeScreen'), 'WelcomeScreen');
+const SurahView = lazyWithRetry(() => import('./components/SurahView'), 'SurahView');
+const JuzView = lazyWithRetry(() => import('./components/JuzView'), 'JuzView');
+const Sidebar = lazyWithRetry(() => import('./components/Sidebar'), 'Sidebar');
+const DuaScreen = lazyWithRetry(() => import('./components/DuaScreen'), 'DuaScreen');
+const MafatihItemView = lazyWithRetry(() => import('./components/MafatihItemView'), 'MafatihItemView');
 
 const ViewLoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -57,7 +59,13 @@ export default function App() {
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null);
   const [selectedMafatihItem, setSelectedMafatihItem] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [hasOpenedSidebar, setHasOpenedSidebar] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+
+  const handleOpenSettings = () => {
+    setHasOpenedSidebar(true);
+    setIsSidebarOpen(true);
+  };
 
   // Sync dark mode class with root documentElement and body
   useEffect(() => {
@@ -77,18 +85,18 @@ export default function App() {
     }
   }, [hasSeenWelcome, showWelcome]);
 
-  // Idle prefetch secondary views so subsequent navigations are instant
+  // Idle prefetch secondary views so subsequent navigations are instant (with catch to avoid unhandled rejections)
   useEffect(() => {
     const preloader = () => {
-      import('./components/SurahView');
-      import('./components/JuzView');
-      import('./components/Sidebar');
-      import('./components/MafatihItemView');
+      import('./components/SurahView').catch(() => {});
+      import('./components/JuzView').catch(() => {});
+      import('./components/Sidebar').catch(() => {});
+      import('./components/MafatihItemView').catch(() => {});
     };
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       (window as any).requestIdleCallback(preloader, { timeout: 2000 });
     } else {
-      setTimeout(preloader, 800);
+      setTimeout(preloader, 1000);
     }
   }, []);
 
@@ -161,7 +169,7 @@ export default function App() {
         setSelectedMafatihItem(mId);
       }
     } else if (hash === 'settings') {
-      setIsSidebarOpen(true);
+      handleOpenSettings();
     }
   }, []);
 
@@ -272,34 +280,31 @@ export default function App() {
     let isMounted = true;
     const cleanupFns: Array<() => void> = [() => clearTimeout(telemetryTimer)];
 
-    import('@capacitor/app')
-      .then(({ App: CapacitorApp }) => {
-        if (!isMounted) return;
-        CapacitorApp.addListener('backButton', () => {
-          const handled = handleUniversalBack();
-          if (handled) {
-            if (window.location.hash) {
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            }
-            return;
+    try {
+      CapacitorApp.addListener('backButton', () => {
+        const handled = handleUniversalBack();
+        if (handled) {
+          if (window.location.hash) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
           }
+          return;
+        }
 
-          if (showWelcomeRef.current) {
-            return;
-          }
+        if (showWelcomeRef.current) {
+          return;
+        }
 
-          setIsExiting(true);
-        })
-          .then((listener: any) => {
-            if (!isMounted) {
-              listener?.remove?.();
-            } else {
-              cleanupFns.push(() => listener?.remove?.());
-            }
-          })
-          .catch(() => {});
+        setIsExiting(true);
       })
-      .catch(() => {});
+        .then((listener: any) => {
+          if (!isMounted) {
+            listener?.remove?.();
+          } else {
+            cleanupFns.push(() => listener?.remove?.());
+          }
+        })
+        .catch(() => {});
+    } catch (e) {}
 
     return () => {
       isMounted = false;
@@ -321,7 +326,6 @@ export default function App() {
 
   const handleExitComplete = async () => {
     try {
-      const { App: CapacitorApp } = await import('@capacitor/app');
       await CapacitorApp.exitApp();
     } catch (e) {
       console.warn("Could not exit app using capacitor", e);
@@ -388,31 +392,33 @@ export default function App() {
               onSelectSurah={handleSelectSurah} 
               onSelectJuz={handleSelectJuz}
               onSelectMafatihItem={handleSelectMafatihItem}
-              onOpenSettings={() => setIsSidebarOpen(true)} 
+              onOpenSettings={handleOpenSettings} 
               onExit={() => setIsExiting(true)}
             />
           )}
         </AnimatePresence>
       </Suspense>
 
-      <Suspense fallback={null}>
-        <Sidebar 
-          isOpen={isSidebarOpen} 
-          onClose={() => setIsSidebarOpen(false)}
-          onSelectSurah={(surahId, ayahNumber) => {
-            setIsSidebarOpen(false);
-            handleSelectSurah(surahId, ayahNumber);
-          }} 
-          onSelectMafatihItem={(itemId) => {
-            setIsSidebarOpen(false);
-            handleSelectMafatihItem(itemId);
-          }}
-          onExitApp={() => {
-            setIsSidebarOpen(false);
-            setIsExiting(true);
-          }}
-        />
-      </Suspense>
+      {hasOpenedSidebar && (
+        <Suspense fallback={null}>
+          <Sidebar 
+            isOpen={isSidebarOpen} 
+            onClose={() => setIsSidebarOpen(false)}
+            onSelectSurah={(surahId, ayahNumber) => {
+              setIsSidebarOpen(false);
+              handleSelectSurah(surahId, ayahNumber);
+            }} 
+            onSelectMafatihItem={(itemId) => {
+              setIsSidebarOpen(false);
+              handleSelectMafatihItem(itemId);
+            }}
+            onExitApp={() => {
+              setIsSidebarOpen(false);
+              setIsExiting(true);
+            }}
+          />
+        </Suspense>
+      )}
       
       {!showWelcome && !isExiting && (
         <AudioPlayer 

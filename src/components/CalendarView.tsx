@@ -16,6 +16,7 @@ import {
   checkAndDispatchCalendarNotifications, getNotificationPermission 
 } from '../utils/calendarNotifications';
 import { ShiaCalendarEvent, CalendarDay } from '../types/calendar';
+import { getMafatihUrduTitle } from '../utils/mafatihUrdu';
 
 interface CalendarViewProps {
   onSelectMafatihItem?: (itemId: string) => void;
@@ -127,8 +128,9 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
   const { 
     hijriOffset, setHijriOffset, 
     calendarNotificationSettings, updateCalendarNotificationSettings,
-    isDarkMode 
+    isDarkMode, appLanguage 
   } = useSettingsStore();
+  const isUrdu = appLanguage === 'ur';
 
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewMode, setViewMode] = useState<'month' | 'list'>('month');
@@ -402,7 +404,11 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                       className="px-2.5 py-1 rounded-lg bg-emerald-700/80 hover:bg-emerald-600 text-[11px] font-bold text-white flex items-center gap-1"
                     >
                       <KeyRound size={12} />
-                      <span>{todayData.events[0].recommendedDuas[0].title}</span>
+                      <span>
+                        {isUrdu
+                          ? getMafatihUrduTitle(todayData.events[0].recommendedDuas[0].mafatihId || '', todayData.events[0].recommendedDuas[0].title)
+                          : todayData.events[0].recommendedDuas[0].title}
+                      </span>
                     </button>
                   )}
                 </div>
@@ -945,24 +951,29 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                 <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                   <h4 className="font-bold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
                     <KeyRound size={14} />
-                    <span>Recommended Supplications &amp; Ziyarats in Mafatih</span>
+                    <span>
+                      {isUrdu ? 'مفاتیح الجنان سے مستحب ادعیہ و زیارات' : 'Recommended Supplications & Ziyarats in Mafatih'}
+                    </span>
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedEvent.recommendedDuas.map((dua, dIdx) => (
-                      <button
-                        key={`dua-btn-${dIdx}`}
-                        onClick={() => {
-                          if (dua.mafatihId && onSelectMafatihItem) {
-                            setSelectedEvent(null);
-                            onSelectMafatihItem(dua.mafatihId);
-                          }
-                        }}
-                        className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <BookOpen size={14} />
-                        <span>Open &ldquo;{dua.title}&rdquo;</span>
-                      </button>
-                    ))}
+                    {selectedEvent.recommendedDuas.map((dua, dIdx) => {
+                      const duaTitle = isUrdu ? getMafatihUrduTitle(dua.mafatihId || '', dua.title) : dua.title;
+                      return (
+                        <button
+                          key={`dua-btn-${dIdx}`}
+                          onClick={() => {
+                            if (dua.mafatihId && onSelectMafatihItem) {
+                              setSelectedEvent(null);
+                              onSelectMafatihItem(dua.mafatihId);
+                            }
+                          }}
+                          className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <BookOpen size={14} />
+                          <span>{isUrdu ? `${duaTitle} پڑھیں` : `Open "${dua.title}"`}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

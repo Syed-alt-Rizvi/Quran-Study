@@ -237,13 +237,15 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     });
   }, [bookmarks]);
 
+  const isUrdu = appLanguage === 'ur';
+
   const tabs: { id: TabCategory; label: string; icon: any; badge?: number }[] = [
-    { id: 'display', label: 'App', icon: Sliders },
-    { id: 'quran', label: 'Quran', icon: BookOpen },
-    { id: 'mafatih', label: 'Mafatih', icon: KeyRound },
-    { id: 'audio', label: 'Audio', icon: Headphones },
-    { id: 'library', label: 'Library', icon: Bookmark, badge: bookmarks.length },
-    { id: 'about', label: 'About', icon: Info },
+    { id: 'display', label: isUrdu ? 'ترتیبات' : 'App', icon: Sliders },
+    { id: 'quran', label: isUrdu ? 'قرآن' : 'Quran', icon: BookOpen },
+    { id: 'mafatih', label: isUrdu ? 'مفاتیح' : 'Mafatih', icon: KeyRound },
+    { id: 'audio', label: isUrdu ? 'آڈیو' : 'Audio', icon: Headphones },
+    { id: 'library', label: isUrdu ? 'کتب خانہ' : 'Library', icon: Bookmark, badge: bookmarks.length },
+    { id: 'about', label: isUrdu ? 'تعارف' : 'About', icon: Info },
   ];
 
   return (
@@ -278,9 +280,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-                    Shia Markaz Settings
+                    {isUrdu ? 'شیعہ مرکز ترتیبات' : 'Shia Markaz Settings'}
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Quran • Mafatih Al Jinan • Global Controls</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {isUrdu ? 'قرآنِ مجید • مفاتیح الجنان • ترتیبات' : 'Quran • Mafatih Al Jinan • Global Controls'}
+                  </p>
                 </div>
               </div>
 
@@ -917,7 +921,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Type size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Dua & Ziyarat Text Size</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {isUrdu ? 'دعاؤں کا فونٹ سائز' : 'Dua & Ziyarat Text Size'}
+                      </span>
                     </div>
                     <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
                       {mafatihFontSize}px
@@ -947,7 +953,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       اَللَّهُمَّ إِنِّي أَسْأَلُكَ بِرَحْمَتِكَ الَّتِي وَسِعَتْ كُلَّ شَيْءٍ
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
-                      Dua Kumayl sample verse preview
+                      {isUrdu ? 'دعائے کمیل کے نمونے کا پیش منظر' : 'Dua Kumayl sample verse preview'}
                     </p>
                   </div>
                 </div>
@@ -958,8 +964,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <div className="flex items-center gap-2.5">
                       <BookOpen size={17} className="text-emerald-600 dark:text-emerald-400" />
                       <div>
-                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Show English Translation</span>
-                        <span className="text-[11px] text-slate-400">Display English below supplication verses</span>
+                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">
+                          {isUrdu ? 'ترجمہ دکھائیں' : 'Show Translation'}
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          {isUrdu ? 'عربی کے نیچے ترجمہ دکھائیں' : 'Display translation below supplication verses'}
+                        </span>
                       </div>
                     </div>
                     <button
@@ -978,8 +988,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <div className="flex items-center gap-2.5">
                     <Headphones size={17} className="text-emerald-600 dark:text-emerald-400" />
                     <div>
-                      <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">Serene Audio Recitation</span>
-                      <span className="text-[11px] text-slate-400">High-fidelity recordings with loop mode and speed tuning</span>
+                      <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">
+                        {isUrdu ? 'روح پرور آڈیو تلاوت' : 'Serene Audio Recitation'}
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        {isUrdu ? 'تکرار اور رفتار کی تبدیلی کے ساتھ اعلیٰ معیار کی ریکارڈنگز' : 'High-fidelity recordings with loop mode and speed tuning'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -988,7 +1002,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
                   <div className="flex items-center gap-2">
                     <Headphones size={16} className="text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Default Audio Speed</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      {isUrdu ? 'بنیادی آڈیو رفتار' : 'Default Audio Speed'}
+                    </span>
                   </div>
                   <div className="grid grid-cols-4 gap-2">
                     {[0.75, 1.0, 1.25, 1.5].map((speed) => (
@@ -1014,18 +1030,20 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                      Quick Open Supplication
+                      {isUrdu ? 'دعاؤں تک فوری رسائی' : 'Quick Open Supplication'}
                     </span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Direct Launch</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      {isUrdu ? 'براہِ راست' : 'Direct Launch'}
+                    </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { id: 'maf_dua40', title: 'Dua Kumail', arabic: 'دعاء كميل' },
-                      { id: 'maf_dua51', title: 'Dua Tawassul', arabic: 'دعاء التوسل' },
-                      { id: 'maf_ziy86', title: 'Ziyarat Ashura', arabic: 'زيارة عاشوراء' },
-                      { id: 'maf_ziy126a', title: 'Dua Nudba', arabic: 'دعاء الندبة' },
-                      { id: 'maf_dua46b', title: 'Dua Al-Faraj', arabic: 'دعاء الفرج' },
-                      { id: 'h_kisa', title: 'Hadith al-Kisa', arabic: 'حديث الكساء' },
+                      { id: 'maf_dua40', title: isUrdu ? 'دعائے کمیل' : 'Dua Kumail', arabic: 'دعاء كميل' },
+                      { id: 'maf_dua51', title: isUrdu ? 'دعائے توسل' : 'Dua Tawassul', arabic: 'دعاء التوسل' },
+                      { id: 'maf_ziy86', title: isUrdu ? 'زیارتِ عاشورہ' : 'Ziyarat Ashura', arabic: 'زيارة عاشوراء' },
+                      { id: 'maf_ziy126a', title: isUrdu ? 'دعائے ندبہ' : 'Dua Nudba', arabic: 'دعاء الندبة' },
+                      { id: 'maf_dua46b', title: isUrdu ? 'دعائے فرج' : 'Dua Al-Faraj', arabic: 'دعاء الفرج' },
+                      { id: 'h_kisa', title: isUrdu ? 'حدیثِ کساء' : 'Hadith al-Kisa', arabic: 'حديث الكساء' },
                     ].map((item) => (
                       <button
                         key={`quick-mafatih-${item.id}`}

@@ -100,6 +100,7 @@ jobs:
 
       - name: Validate Gradle Wrapper & Jar Integrity
         run: |
+          sed -i 's/\r$//' android/gradlew || true
           chmod +x android/gradlew
           # Regenerate or ensure wrapper jar if missing on disk
           if [ ! -s "android/gradle/wrapper/gradle-wrapper.jar" ]; then

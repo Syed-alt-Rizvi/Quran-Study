@@ -76,6 +76,43 @@ function resolveStreamUrl(url: string, useDirectFallback = false): string {
   return getApiUrl(`/api/mafatih/audio-proxy?url=${encodeURIComponent(cleaned)}`);
 }
 
+// Helper to completely and safely destroy an HTMLAudioElement instance,
+// detaching all callbacks so that network aborts or setting src = '' never trigger phantom onerror/play cycles.
+function teardownAudioElement(audio: HTMLAudioElement | null) {
+  if (!audio) return;
+  try {
+    // 1. Detach all event listeners first
+    audio.onplay = null;
+    audio.onpause = null;
+    audio.onerror = null;
+    audio.onended = null;
+    audio.onwaiting = null;
+    audio.onplaying = null;
+    audio.oncanplay = null;
+    audio.ontimeupdate = null;
+    audio.onloadedmetadata = null;
+    audio.onabort = null;
+    audio.onemptied = null;
+    audio.onstalled = null;
+    audio.onsuspend = null;
+
+    // 2. Pause immediately
+    audio.pause();
+
+    // 3. Reset seek time
+    try {
+      audio.currentTime = 0;
+    } catch {}
+
+    // 4. Detach source and command the media engine to unload
+    audio.removeAttribute('src');
+    audio.src = '';
+    audio.load();
+  } catch (err) {
+    console.warn('Error during audio teardown:', err);
+  }
+}
+
 function updateMediaSession(track: MafatihAudioTrack, getStore: () => MafatihAudioState) {
   if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
   try {
@@ -84,11 +121,15 @@ function updateMediaSession(track: MafatihAudioTrack, getStore: () => MafatihAud
       artist: 'Mafatih al-Jinan • Sheikh Abbas Qummi',
       album: track.category || 'Supplications & Ziyaraat',
     });
+    navigator.mediaSession.playbackState = 'playing';
     navigator.mediaSession.setActionHandler('play', () => {
       getStore().resume();
     });
     navigator.mediaSession.setActionHandler('pause', () => {
       getStore().pause();
+    });
+    navigator.mediaSession.setActionHandler('stop', () => {
+      getStore().stop();
     });
     navigator.mediaSession.setActionHandler('seekbackward', () => {
       getStore().skip(-10);
@@ -100,34 +141,82 @@ function updateMediaSession(track: MafatihAudioTrack, getStore: () => MafatihAud
 }
 
 export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
-  // Listen for global Quran playback events to pause Mafatih playback
+  // Listen for global Quran playback events to pause or stop Mafatih playback
   if (typeof window !== 'undefined') {
     window.addEventListener('pause-mafatih-audio', () => {
       if (globalAudio && !globalAudio.paused) {
-        globalAudio.pause();
+        try {
+          globalAudio.pause();
+        } catch {}
       }
       set({ isPlaying: false, isBuffering: false });
+    });
+
+    window.addEventListener('stop-mafatih-audio', () => {
+      get().stop();
     });
   }
 
   const attachAudioListeners = (audio: HTMLAudioElement, track: MafatihAudioTrack) => {
-    audio.onplay = () => set({ isPlaying: true, isBuffering: false });
-    audio.onpause = () => set({ isPlaying: false });
-    audio.onwaiting = () => set({ isBuffering: true });
-    audio.onplaying = () => set({ isPlaying: true, isBuffering: false });
-    audio.oncanplay = () => set({ isBuffering: false });
-    audio.ontimeupdate = () => set({ currentTime: audio.currentTime || 0 });
+    audio.onplay = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ isPlaying: true, isBuffering: false });
+    };
+
+    audio.onpause = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ isPlaying: false });
+    };
+
+    audio.onwaiting = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ isBuffering: true });
+    };
+
+    audio.onplaying = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ isPlaying: true, isBuffering: false });
+    };
+
+    audio.oncanplay = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ isBuffering: false });
+    };
+
+    audio.ontimeupdate = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      set({ currentTime: audio.currentTime || 0 });
+    };
+
     audio.onloadedmetadata = () => {
+      if (globalAudio !== audio || !get().currentTrack) return;
       if (audio.duration && !isNaN(audio.duration)) {
         set({ duration: audio.duration });
       }
     };
+
     audio.onended = () => {
-      if (!get().isLooping) {
+      if (globalAudio !== audio || !get().currentTrack) return;
+      if (get().isLooping) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } else {
         set({ isPlaying: false, currentTime: 0 });
       }
     };
+
     audio.onerror = (e) => {
+      // CRITICAL SAFEGUARD: If audio has been stopped, replaced, or currentTrack is null, NEVER resurrect playback!
+      if (globalAudio !== audio || !get().currentTrack || !isSameTrack(get().currentTrack, track)) {
+        return;
+      }
+
+      // Check if source was cleared intentionally (empty src or page origin URL)
+      const currentSrc = audio.currentSrc || audio.src || '';
+      if (!currentSrc || currentSrc === window.location.href) {
+        return;
+      }
+
       console.warn('Mafatih Audio stream error encountered:', e);
       if (!currentFallbackUsed) {
         currentFallbackUsed = true;
@@ -136,15 +225,24 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
         try {
           audio.src = direct;
           audio.load();
-          audio.play().catch((err) => {
-            console.error('Direct audio fallback failed:', err);
-            set({ isPlaying: false, isBuffering: false });
-          });
+          // Only attempt playback if user is still actively playing and track is active
+          if (get().isPlaying && get().currentTrack) {
+            audio.play().catch((err) => {
+              console.error('Direct audio fallback failed:', err);
+              if (globalAudio === audio) {
+                set({ isPlaying: false, isBuffering: false });
+              }
+            });
+          }
         } catch {
-          set({ isPlaying: false, isBuffering: false });
+          if (globalAudio === audio) {
+            set({ isPlaying: false, isBuffering: false });
+          }
         }
       } else {
-        set({ isPlaying: false, isBuffering: false });
+        if (globalAudio === audio) {
+          set({ isPlaying: false, isBuffering: false });
+        }
       }
     };
   };
@@ -172,11 +270,10 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
       currentFallbackUsed = false;
       const targetSrc = resolveStreamUrl(track.audioUrl, false);
 
+      // Clean up previous audio instance completely before creating a new one
       if (globalAudio) {
-        try {
-          globalAudio.pause();
-          globalAudio.src = '';
-        } catch {}
+        teardownAudioElement(globalAudio);
+        globalAudio = null;
       }
 
       const audio = new Audio();
@@ -202,8 +299,11 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
 
       try {
         await audio.play();
-        set({ isBuffering: false });
+        if (globalAudio === audio && get().currentTrack) {
+          set({ isBuffering: false, isPlaying: true });
+        }
       } catch (err: any) {
+        if (globalAudio !== audio || !get().currentTrack) return;
         if (err?.name !== 'AbortError') {
           console.warn('Initial stream play failed, trying direct stream:', err);
           currentFallbackUsed = true;
@@ -211,10 +311,14 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
           audio.src = directSrc;
           try {
             await audio.play();
-            set({ isBuffering: false });
+            if (globalAudio === audio && get().currentTrack) {
+              set({ isBuffering: false, isPlaying: true });
+            }
           } catch (directErr) {
             console.error('All playback sources failed:', directErr);
-            set({ isPlaying: false, isBuffering: false });
+            if (globalAudio === audio) {
+              set({ isPlaying: false, isBuffering: false });
+            }
           }
         }
       }
@@ -243,20 +347,24 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
 
     resume: async () => {
+      const state = get();
+      if (!state.currentTrack) return;
+
+      // Pause Quran audio
+      useAudioStore.getState().pause();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('pause-quran-audio'));
+      }
+
       if (globalAudio && globalAudio.src) {
-        // Pause Quran audio
-        useAudioStore.getState().pause();
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('pause-quran-audio'));
-        }
-        set({ isPlaying: true });
+        set({ isPlaying: true, isBuffering: false });
         try {
           await globalAudio.play();
         } catch {
           if (get().currentTrack) {
             await get().playTrack(get().currentTrack!);
           } else {
-            set({ isPlaying: false });
+            set({ isPlaying: false, isBuffering: false });
           }
         }
       } else if (get().currentTrack) {
@@ -265,12 +373,12 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
 
     seek: (time: number) => {
-      if (globalAudio) {
+      if (globalAudio && !isNaN(time)) {
         try {
-          globalAudio.currentTime = time;
+          globalAudio.currentTime = Math.max(0, time);
         } catch {}
       }
-      set({ currentTime: time });
+      set({ currentTime: Math.max(0, time) });
     },
 
     skip: (seconds: number) => {
@@ -326,12 +434,20 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
 
     stop: () => {
       if (globalAudio) {
-        try {
-          globalAudio.pause();
-          globalAudio.src = '';
-        } catch {}
+        teardownAudioElement(globalAudio);
         globalAudio = null;
       }
+      currentFallbackUsed = false;
+
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+        try {
+          navigator.mediaSession.playbackState = 'none';
+          if (navigator.mediaSession.metadata) {
+            navigator.mediaSession.metadata = null;
+          }
+        } catch {}
+      }
+
       set({
         currentTrack: null,
         isPlaying: false,

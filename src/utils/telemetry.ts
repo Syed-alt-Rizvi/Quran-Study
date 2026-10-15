@@ -65,11 +65,9 @@ export async function trackAppLaunchAndTelemetry(): Promise<void> {
     }
 
     // Save user doc
-    await setDoc(userRef, baseData, { merge: true }).catch((err) => {
-      console.warn("Telemetry ping:", err);
-    });
+    await setDoc(userRef, baseData, { merge: true }).catch(() => {});
 
   } catch (error) {
-    console.warn("Telemetry init skipped:", error);
+    // Graceful silent fallback for offline / restricted mode
   }
 }

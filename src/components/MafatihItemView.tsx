@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react';
-import { Capacitor } from '@capacitor/core';
 import { 
   ArrowLeft, Play, Pause, RotateCcw, RotateCw, Volume2, VolumeX,
   Copy, Check, Bookmark, BookmarkCheck, Sliders, 
   ScrollText, ListOrdered, X, Compass, RefreshCw,
-  Repeat
+  Repeat, Square
 } from 'lucide-react';
 import { MafatihDetail, fetchMafatihItem, MafatihVerse, getFullIndex } from '../mafatihApi';
 import { useSettingsStore } from '../store';
-import { useAudioStore } from '../audioStore';
 import { useMafatihAudioStore, isSameTrack } from '../mafatihAudioStore';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { motion, AnimatePresence } from 'motion/react';
-import { getApiUrl } from '../utils/apiBase';
 import { getArabicFontFamily } from '../utils/arabicFonts';
+import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
+import { t } from '../i18n';
 
 interface MafatihItemViewProps {
   itemId: string;
@@ -45,16 +44,16 @@ function isInstructionLine(arabic?: string, translation?: string): boolean {
     }
   }
   if (translation && typeof translation === 'string') {
-    const t = translation.toLowerCase();
+    const text = translation.toLowerCase();
     if (
-      t.startsWith('then recite') ||
-      t.startsWith('then say') ||
-      t.startsWith('repeat') ||
-      t.startsWith('then prostrate') ||
-      t.startsWith('then perform') ||
-      t.includes('100 times') ||
-      t.includes('70 times') ||
-      t.includes('10 times')
+      text.startsWith('then recite') ||
+      text.startsWith('then say') ||
+      text.startsWith('repeat') ||
+      text.startsWith('then prostrate') ||
+      text.startsWith('then perform') ||
+      text.includes('100 times') ||
+      text.includes('70 times') ||
+      text.includes('10 times')
     ) {
       return true;
     }
@@ -63,8 +62,7 @@ function isInstructionLine(arabic?: string, translation?: string): boolean {
 }
 
 // -------------------------------------------------------------
-// MEMOIZED VERSE ROW
-// Prevents thousands of DOM nodes from re-rendering during state updates
+// MEMOIZED MINIMALIST VERSE ROW
 // -------------------------------------------------------------
 interface MafatihVerseRowProps {
   verse: MafatihVerse;
@@ -73,6 +71,7 @@ interface MafatihVerseRowProps {
   mafatihShowTranslation: boolean;
   isBookmarked: boolean;
   isCopied: boolean;
+  isUrdu: boolean;
   onCopy: (verse: MafatihVerse) => void;
   onToggleBookmark: (index: number) => void;
   registerRef: (index: number, el: HTMLDivElement | null) => void;
@@ -85,6 +84,7 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
   mafatihShowTranslation,
   isBookmarked,
   isCopied,
+  isUrdu,
   onCopy,
   onToggleBookmark,
   registerRef
@@ -96,17 +96,17 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
       <div
         ref={(el) => registerRef(verse.index, el)}
         id={`verse-${verse.index}`}
-        className="py-3 px-5 sm:px-6 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 text-amber-900 dark:text-amber-200 flex items-start gap-3 text-xs"
+        className="py-3 px-4 sm:px-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex items-start gap-3 text-xs"
       >
-        <Compass size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-        <div className="space-y-1.5 flex-1">
+        <Compass size={15} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+        <div className="space-y-1 flex-1">
           {verse.arabic && (
             <p 
               dir="rtl" 
               className="font-arabic font-medium text-right leading-[1.8]" 
               style={{ 
-                fontSize: `${Math.max(18, Math.round(mafatihFontSize * 0.5))}px`, 
-                fontFamily: arabicFont 
+                fontSize: `${Math.max(17, Math.round(mafatihFontSize * 0.5))}px`, 
+                fontFamily: getArabicFontFamily(arabicFont) 
               }}
             >
               {verse.arabic}
@@ -114,9 +114,9 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
           )}
           {verse.translation && (
             <p 
-              className="leading-relaxed text-amber-800/90 dark:text-amber-300/80 italic font-serif"
+              className="leading-relaxed text-slate-500 dark:text-slate-400 italic"
               style={{
-                fontSize: `${Math.max(14, Math.round(mafatihFontSize * 0.4))}px`
+                fontSize: `${Math.max(13, Math.round(mafatihFontSize * 0.4))}px`
               }}
             >
               {verse.translation}
@@ -131,40 +131,40 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
     <div
       ref={(el) => registerRef(verse.index, el)}
       id={`verse-${verse.index}`}
-      className={`surah-card-render group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
+      className={`relative py-4 px-3.5 sm:px-5 transition-colors rounded-2xl border ${
         isBookmarked
-          ? 'bg-emerald-50/40 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-600 shadow-sm'
-          : 'bg-white dark:bg-slate-900/90 border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-300 dark:hover:border-emerald-700/60 shadow-2xs'
+          ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-500/40'
+          : 'bg-white dark:bg-slate-900 border-slate-200/70 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
       }`}
     >
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-            {verse.index}
-          </span>
-        </div>
+        <span className="text-xs font-mono font-medium text-slate-400 dark:text-slate-500">
+          {isUrdu ? toUrduNumerals(verse.index) : verse.index}
+        </span>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => onCopy(verse)}
-            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
-            title="Copy verse and translation"
+            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer"
+            title={isUrdu ? 'سطر کاپی کریں' : 'Copy line'}
+            aria-label="Copy"
           >
             {isCopied ? (
-              <Check size={15} className="text-emerald-600 dark:text-emerald-400" />
+              <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Copy size={15} />
+              <Copy size={14} />
             )}
           </button>
           <button
             onClick={() => onToggleBookmark(verse.index)}
-            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
-            title={isBookmarked ? "Remove line bookmark" : "Bookmark line"}
+            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer"
+            title={isBookmarked ? (isUrdu ? 'محفوظ سطر ختم کریں' : 'Remove bookmark') : (isUrdu ? 'سطر محفوظ کریں' : 'Bookmark line')}
+            aria-label="Bookmark"
           >
             {isBookmarked ? (
-              <BookmarkCheck size={15} className="text-emerald-600 dark:text-emerald-400" />
+              <BookmarkCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Bookmark size={15} />
+              <Bookmark size={14} />
             )}
           </button>
         </div>
@@ -174,11 +174,11 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
         <p
           dir="rtl"
           lang="ar"
-          className="font-arabic text-right leading-[2.5] text-slate-900 dark:text-slate-100 select-text mb-3"
+          className="font-arabic text-right leading-[2.4] text-slate-900 dark:text-slate-100 select-text mb-2"
           style={{ 
             fontSize: `${mafatihFontSize}px`, 
             fontFamily: getArabicFontFamily(arabicFont),
-            wordSpacing: '0.1em'
+            wordSpacing: '0.08em'
           }}
         >
           {verse.arabic}
@@ -186,12 +186,12 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
       )}
 
       {mafatihShowTranslation && verse.translation && (
-        <div className="pt-3 border-t border-slate-200/50 dark:border-slate-800/50 mt-2">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 mt-2">
           <p 
-            className="leading-relaxed text-slate-700 dark:text-slate-300 font-normal"
+            className="leading-relaxed text-slate-600 dark:text-slate-300 font-normal"
             style={{
-              fontSize: `${Math.max(15, Math.round(mafatihFontSize * 0.44))}px`,
-              lineHeight: 1.75
+              fontSize: `${Math.max(14, Math.round(mafatihFontSize * 0.44))}px`,
+              lineHeight: 1.7
             }}
           >
             {verse.translation}
@@ -203,17 +203,18 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
 });
 
 // -------------------------------------------------------------
-// DEDICATED AUDIO PLAYER BAR
-// Completely encapsulates timeupdate events so verses never re-render
+// DEDICATED ISOLATED AUDIO PLAYER BAR
 // -------------------------------------------------------------
 interface MafatihAudioPlayerProps {
   item: MafatihDetail;
   isDarkMode: boolean;
+  isUrdu: boolean;
 }
 
 const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   item,
   isDarkMode,
+  isUrdu,
 }: MafatihAudioPlayerProps) {
   const currentTrack = useMafatihAudioStore((s) => s.currentTrack);
   const isPlaying = useMafatihAudioStore((s) => s.isPlaying);
@@ -232,6 +233,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   const toggleLoop = useMafatihAudioStore((s) => s.toggleLoop);
   const setVolume = useMafatihAudioStore((s) => s.setVolume);
   const toggleMute = useMafatihAudioStore((s) => s.toggleMute);
+  const stopAudio = useMafatihAudioStore((s) => s.stop);
 
   const isThisItemActive = isSameTrack(currentTrack, {
     id: item.id,
@@ -259,17 +261,20 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
     if (isNaN(secs) || secs <= 0) return '00:00';
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return isUrdu ? toUrduNumerals(str) : str;
   };
 
   const progressPercent = activeDuration > 0 ? Math.min(100, (activeCurrentTime / activeDuration) * 100) : 0;
+  const displayTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : item.title;
+  const displayCategory = isUrdu ? getMafatihUrduCategory(item.mainCategory) : item.mainCategory;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-2xl gpu-layer">
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800 shadow-xl gpu-layer">
       <div className="max-w-4xl mx-auto flex flex-col space-y-2">
         {/* Scrubber Progress Slider */}
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 text-right shrink-0">
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-12 text-right shrink-0 tabular-nums">
             {formatTime(activeCurrentTime)}
           </span>
           <div className="relative flex-1 group py-1">
@@ -288,11 +293,11 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
               style={{
                 background: `linear-gradient(to right, #059669 0%, #10b981 ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} ${progressPercent}%, ${isDarkMode ? '#334155' : '#e2e8f0'} 100%)`
               }}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
               aria-label="Seek audio"
             />
           </div>
-          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-10 shrink-0">
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 w-12 shrink-0 tabular-nums">
             {activeDuration > 0 ? `-${formatTime(Math.max(0, activeDuration - activeCurrentTime))}` : formatTime(activeDuration)}
           </span>
         </div>
@@ -300,42 +305,42 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
         {/* Controls Row */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isThisItemPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <div className={`w-2 h-2 rounded-full shrink-0 ${isThisItemPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
             <div className="truncate">
-              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate block">
-                {item.title}
+              <span className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate block">
+                {displayTitle}
               </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate block">
-                {item.mainCategory}
+              <span className="text-[10px] text-slate-400 truncate block">
+                {displayCategory}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 if (isThisItemActive) skip(-10);
               }}
-              className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
-              title="Rewind 10 seconds"
-              aria-label="Rewind 10 seconds"
+              className="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg transition-colors cursor-pointer"
+              title={isUrdu ? '۱۰ سیکنڈ پیچھے' : 'Rewind 10 seconds'}
+              aria-label="Rewind"
             >
-              <RotateCcw size={18} />
+              <RotateCcw size={16} />
             </button>
 
             <button
               onClick={handleTogglePlay}
-              className="w-11 h-11 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-full shadow-lg shadow-emerald-700/25 transition-all shrink-0 flex items-center justify-center relative cursor-pointer"
-              title={isThisItemPlaying ? "Pause" : "Play Supplication"}
-              aria-label={isThisItemPlaying ? "Pause" : "Play"}
+              className="w-9 h-9 bg-slate-900 text-white dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 rounded-full transition-colors shrink-0 flex items-center justify-center cursor-pointer"
+              title={isThisItemPlaying ? (isUrdu ? 'روکیں' : 'Pause') : (isUrdu ? 'سنیں' : 'Play')}
+              aria-label={isThisItemPlaying ? 'Pause' : 'Play'}
             >
               {isThisItemBuffering ? (
-                <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
               ) : isThisItemPlaying ? (
-                <Pause size={20} fill="currentColor" />
+                <Pause size={16} fill="currentColor" />
               ) : (
-                <Play size={20} fill="currentColor" className="ml-0.5" />
+                <Play size={16} fill="currentColor" className={isUrdu ? 'mr-0.5' : 'ml-0.5'} />
               )}
             </button>
 
@@ -344,29 +349,43 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
                 hapticImpact(ImpactStyle.Light);
                 if (isThisItemActive) skip(10);
               }}
-              className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-full transition-colors active:scale-95 cursor-pointer"
-              title="Forward 10 seconds"
-              aria-label="Forward 10 seconds"
+              className="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg transition-colors cursor-pointer"
+              title={isUrdu ? '۱۰ سیکنڈ آگے' : 'Forward 10 seconds'}
+              aria-label="Forward"
             >
-              <RotateCw size={18} />
+              <RotateCw size={16} />
             </button>
+
+            {isThisItemActive && (
+              <button
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  stopAudio();
+                }}
+                className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition-colors cursor-pointer"
+                title={isUrdu ? 'تلاوت ختم کریں' : 'Stop Recitation'}
+                aria-label="Stop"
+              >
+                <Square size={15} />
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0 justify-end flex-1 pl-2">
+          <div className="flex items-center gap-1.5 shrink-0 justify-end flex-1 pl-2">
             <button
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 toggleLoop();
               }}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                 isLooping
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
-              title={isLooping ? "Repeat: ON" : "Repeat: OFF"}
+              title={isLooping ? (isUrdu ? 'تکرار: فعال' : 'Repeat: ON') : (isUrdu ? 'تکرار: غیر فعال' : 'Repeat: OFF')}
               aria-label="Toggle repeat"
             >
-              <Repeat size={16} />
+              <Repeat size={15} />
             </button>
 
             <button
@@ -374,12 +393,8 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
                 hapticImpact(ImpactStyle.Light);
                 cycleSpeed();
               }}
-              className={`px-2 py-0.5 text-xs font-mono font-semibold rounded-lg border transition-colors cursor-pointer ${
-                playbackSpeed !== 1
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                  : 'bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800'
-              }`}
-              title="Cycle Audio Speed (0.75x, 1x, 1.25x, 1.5x)"
+              className="px-2 py-0.5 text-xs font-mono font-medium rounded border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-400 transition-colors cursor-pointer"
+              title={isUrdu ? 'آڈیو رفتار تبدیل کریں' : 'Cycle playback speed'}
             >
               {playbackSpeed}x
             </button>
@@ -390,11 +405,11 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
                   hapticImpact(ImpactStyle.Light);
                   toggleMute();
                 }}
-                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
-                title={isMuted ? "Unmute" : "Mute"}
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                title={isMuted ? (isUrdu ? 'آواز کھولیں' : 'Unmute') : (isUrdu ? 'آواز بند کریں' : 'Mute')}
                 aria-label="Mute toggle"
               >
-                {isMuted || volume === 0 ? <VolumeX size={17} /> : <Volume2 size={17} />}
+                {isMuted || volume === 0 ? <VolumeX size={15} /> : <Volume2 size={15} />}
               </button>
               <input
                 type="range"
@@ -403,8 +418,8 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
                 step={0.05}
                 value={isMuted ? 0 : volume}
                 onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="w-14 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                title="Volume"
+                className="w-12 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+                title={isUrdu ? 'آواز' : 'Volume'}
               />
             </div>
           </div>
@@ -415,40 +430,39 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 });
 
 // -------------------------------------------------------------
-// MAIN MAFATIH ITEM VIEW
-// Progressive rendering, error boundaries, safe area preservation
+// MAIN COMPONENT
 // -------------------------------------------------------------
 export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps) {
   const [item, setItem] = useState<MafatihDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isIntroExpanded, setIsIntroExpanded] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(60); // Progressive initial chunk
+  const [visibleCount, setVisibleCount] = useState(60);
 
-  // Granular settings store selectors (prevents unnecessary re-renders)
-  const isDarkMode = useSettingsStore(s => s.isDarkMode);
-  const arabicFont = useSettingsStore(s => s.arabicFont);
-  const mafatihFontSize = useSettingsStore(s => s.mafatihFontSize);
-  const mafatihShowTranslation = useSettingsStore(s => s.mafatihShowTranslation);
-  const mafatihDefaultSpeed = useSettingsStore(s => s.mafatihDefaultSpeed);
-  const setMafatihFontSize = useSettingsStore(s => s.setMafatihFontSize);
-  const setMafatihShowTranslation = useSettingsStore(s => s.setMafatihShowTranslation);
-  const setMafatihDefaultSpeed = useSettingsStore(s => s.setMafatihDefaultSpeed);
-  const isMafatihBookmarked = useSettingsStore(s => s.isMafatihBookmarked);
-  const addMafatihBookmark = useSettingsStore(s => s.addMafatihBookmark);
-  const removeMafatihBookmark = useSettingsStore(s => s.removeMafatihBookmark);
-  const addMafatihRecent = useSettingsStore(s => s.addMafatihRecent);
+  // Settings
+  const isDarkMode = useSettingsStore((s) => s.isDarkMode);
+  const arabicFont = useSettingsStore((s) => s.arabicFont);
+  const mafatihFontSize = useSettingsStore((s) => s.mafatihFontSize);
+  const mafatihShowTranslation = useSettingsStore((s) => s.mafatihShowTranslation);
+  const setMafatihFontSize = useSettingsStore((s) => s.setMafatihFontSize);
+  const setMafatihShowTranslation = useSettingsStore((s) => s.setMafatihShowTranslation);
+  const isMafatihBookmarked = useSettingsStore((s) => s.isMafatihBookmarked);
+  const addMafatihBookmark = useSettingsStore((s) => s.addMafatihBookmark);
+  const removeMafatihBookmark = useSettingsStore((s) => s.removeMafatihBookmark);
+  const addMafatihRecent = useSettingsStore((s) => s.addMafatihRecent);
+  const appLanguage = useSettingsStore((s) => s.appLanguage);
+  const isUrdu = appLanguage === 'ur';
 
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const [showJumpDrawer, setShowJumpDrawer] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [bookmarkedVerses, setBookmarkedVerses] = useState<Set<number>>(new Set());
 
-  // Mafatih Audio Store connection
-  const currentTrack = useMafatihAudioStore(s => s.currentTrack);
-  const isAudioPlaying = useMafatihAudioStore(s => s.isPlaying);
-  const isAudioBuffering = useMafatihAudioStore(s => s.isBuffering);
-  const toggleTrack = useMafatihAudioStore(s => s.toggleTrack);
+  // Audio Store
+  const currentTrack = useMafatihAudioStore((s) => s.currentTrack);
+  const isAudioPlaying = useMafatihAudioStore((s) => s.isPlaying);
+  const isAudioBuffering = useMafatihAudioStore((s) => s.isBuffering);
+  const toggleTrack = useMafatihAudioStore((s) => s.toggleTrack);
 
   const isCurrentTrackThisItem = !!item && isSameTrack(currentTrack, {
     id: item.id,
@@ -477,7 +491,6 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
     verseRefs.current[index] = el;
   }, []);
 
-  // Load item with AbortController for cancelable requests during rapid navigation
   const loadItem = useCallback(() => {
     const controller = new AbortController();
     setLoading(true);
@@ -488,20 +501,20 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
       .then((data) => {
         if (controller.signal.aborted) return;
         if (!data) {
-          setError('Could not load this supplication. Please try again.');
+          setError(isUrdu ? 'دعا لوڈ کرنے میں دشواری پیش آئی۔' : 'Could not load this supplication. Please try again.');
         } else {
           setItem(data);
           addMafatihRecent(data.id);
-          // If detail was missing audioUrl, attempt index lookup
           if (!data.audioUrl) {
-            getFullIndex().then(index => {
-              const found = index.find(i => 
-                i.id.toLowerCase() === data.id.toLowerCase() || 
-                (i.code && i.code.toLowerCase() === data.id.toLowerCase()) || 
-                i.id.toLowerCase() === itemId.toLowerCase()
+            getFullIndex().then((index) => {
+              const found = index.find(
+                (i) =>
+                  i.id.toLowerCase() === data.id.toLowerCase() ||
+                  (i.code && i.code.toLowerCase() === data.id.toLowerCase()) ||
+                  i.id.toLowerCase() === itemId.toLowerCase()
               );
               if (found?.audioUrl) {
-                setItem(prev => prev ? { ...prev, audioUrl: found.audioUrl } : prev);
+                setItem((prev) => (prev ? { ...prev, audioUrl: found.audioUrl } : prev));
               }
             }).catch(() => {});
           }
@@ -510,27 +523,25 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
       })
       .catch((err) => {
         if (controller.signal.aborted) return;
-        setError(err.message || 'Error loading supplication.');
+        setError(err.message || (isUrdu ? 'دعا لوڈ کرنے میں خرابی۔' : 'Error loading supplication.'));
         setLoading(false);
       });
 
     return () => controller.abort();
-  }, [itemId, addMafatihRecent]);
+  }, [itemId, addMafatihRecent, isUrdu]);
 
   useEffect(() => {
     return loadItem();
   }, [loadItem]);
 
-  // Progressive rendering for long supplications (800+ verses)
   useEffect(() => {
     if (!item?.verses || item.verses.length <= visibleCount) return;
     const timer = setTimeout(() => {
-      setVisibleCount(prev => Math.min(prev + 100, item.verses.length));
+      setVisibleCount((prev) => Math.min(prev + 100, item.verses.length));
     }, 120);
     return () => clearTimeout(timer);
   }, [item?.verses, visibleCount]);
 
-  // Check if verse 1 is already Bismillah to avoid duplicate callouts
   const hasFirstVerseBismillah = useMemo(() => {
     if (!item?.verses || item.verses.length === 0) return false;
     const firstArabic = cleanArabicText(item.verses[0]?.arabic || '');
@@ -539,11 +550,12 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
   const copyVerse = useCallback((verse: MafatihVerse) => {
     hapticImpact(ImpactStyle.Light);
-    const text = `${verse.arabic}\n\n${verse.translation}\n\n[${item?.title || ''} - Line ${verse.index}]`;
+    const itemTitle = isUrdu ? getMafatihUrduTitle(item?.id || '', item?.title || '') : (item?.title || '');
+    const text = `${verse.arabic}\n\n${verse.translation}\n\n[${itemTitle} - Line ${verse.index}]`;
     navigator.clipboard?.writeText?.(text);
     setCopiedIndex(verse.index);
     setTimeout(() => setCopiedIndex(null), 2000);
-  }, [item?.title]);
+  }, [item?.id, item?.title, isUrdu]);
 
   const toggleBookmark = useCallback((verseIndex: number) => {
     hapticImpact(ImpactStyle.Light);
@@ -558,7 +570,6 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const jumpToLine = useCallback((verseIndex: number) => {
     hapticImpact(ImpactStyle.Medium);
     setShowJumpDrawer(false);
-    // Ensure the target verse is rendered in the visible slice
     if (verseIndex > visibleCount && item?.verses) {
       setVisibleCount(Math.min(verseIndex + 50, item.verses.length));
     }
@@ -574,10 +585,10 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin" />
-        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 animate-pulse">
-          Opening recitation &amp; supplication text...
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-4" dir={isUrdu ? 'rtl' : 'ltr'}>
+        <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {isUrdu ? 'دعا و زیارت کا متن لوڈ ہو رہا ہے...' : 'Opening recitation & supplication text...'}
         </p>
       </div>
     );
@@ -585,80 +596,84 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
   if (error || !item) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-12 max-w-md mx-auto text-center space-y-4 pt-safe pb-safe">
-        <div className="p-3 bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 rounded-full w-12 h-12 mx-auto flex items-center justify-center">
-          <X size={24} />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-12 max-w-md mx-auto text-center space-y-4 pt-safe pb-safe" dir={isUrdu ? 'rtl' : 'ltr'}>
+        <div className="p-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-full w-10 h-10 mx-auto flex items-center justify-center">
+          <X size={20} />
         </div>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Unable to Load Recitation</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          {error || 'Supplication not found or network disconnected.'}
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          {isUrdu ? 'دعا لوڈ کرنے میں دشواری' : 'Unable to Load Recitation'}
+        </h2>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          {error || (isUrdu ? 'دعا دستیاب نہیں ہے یا انٹرنیٹ رابطہ منقطع ہے۔' : 'Supplication not found or network disconnected.')}
         </p>
         <div className="flex items-center justify-center gap-2 pt-2">
           <button
             onClick={onBack}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
           >
-            Return to Catalog
+            {t('return_to_catalog', appLanguage)}
           </button>
           <button
             onClick={() => loadItem()}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white dark:bg-emerald-600 rounded-xl text-xs font-medium cursor-pointer"
           >
             <RefreshCw size={13} />
-            <span>Try Again</span>
+            <span>{t('retry', appLanguage)}</span>
           </button>
         </div>
       </div>
     );
   }
 
-  const categoryPath = Array.isArray(item.categoryChain) && item.categoryChain.length > 0
-    ? item.categoryChain.join(' › ')
-    : (item.mainCategory || 'Mafatih Al Jinan');
+  const primaryTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : item.title;
+  const categoryLabel = isUrdu ? getMafatihUrduCategory(item.mainCategory) : (item.mainCategory || 'Mafatih Al Jinan');
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-36 sm:pb-32' : 'pb-16'} transition-colors duration-300`}>
+    <div 
+      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200`}
+      dir={isUrdu ? 'rtl' : 'ltr'}
+    >
       {/* Top Header Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 app-header-safe pb-3 shadow-xs gpu-layer">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 app-header-safe pb-3 shadow-2xs gpu-layer">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={onBack}
-              className="p-2 -ml-1 sm:-ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
-              title="Return to Catalog"
+              className="p-2 -ml-1 sm:-ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
+              title={t('return_to_catalog', appLanguage)}
               aria-label="Back"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} className={isUrdu ? 'rotate-180' : ''} />
             </button>
             <div className="truncate">
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate font-serif">
-                {item.title}
+              <h1 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
+                {primaryTitle}
               </h1>
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium truncate">
-                {categoryPath}
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                {categoryLabel}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
-            {/* Quick Audio Play Button in Sticky Header */}
+            {/* Quick Audio Play Button in Header */}
             {(item.audioUrl || isCurrentTrackThisItem) && (
               <button
                 onClick={handleTogglePlay}
-                className={`p-2 rounded-full transition-all cursor-pointer ${
+                className={`p-2 rounded-lg transition-colors cursor-pointer ${
                   isThisItemPlaying
-                    ? 'bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-500/20'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
-                title={isThisItemPlaying ? "Pause Recitation" : "Listen to Recitation"}
-                aria-label={isThisItemPlaying ? "Pause" : "Listen"}
+                title={isThisItemPlaying ? t('pause_audio', appLanguage) : t('play_audio', appLanguage)}
+                aria-label={isThisItemPlaying ? 'Pause' : 'Play'}
               >
                 {isThisItemBuffering ? (
                   <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
                 ) : isThisItemPlaying ? (
-                  <Pause size={18} />
+                  <Pause size={17} />
                 ) : (
-                  <Volume2 size={18} />
+                  <Volume2 size={17} />
                 )}
               </button>
             )}
@@ -671,18 +686,19 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   setShowJumpDrawer(!showJumpDrawer);
                   if (showSettingsDrawer) setShowSettingsDrawer(false);
                 }}
-                className={`p-2 rounded-full transition-colors cursor-pointer ${
+                className={`p-2 rounded-lg transition-colors cursor-pointer ${
                   showJumpDrawer
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
-                title="Jump to Line"
+                title={t('jump_to_line', appLanguage)}
+                aria-label="Jump to line"
               >
-                <ListOrdered size={18} />
+                <ListOrdered size={17} />
               </button>
             )}
 
-            {/* Bookmark Supplication Button */}
+            {/* Bookmark Button */}
             <button
               onClick={() => {
                 hapticImpact(ImpactStyle.Medium);
@@ -692,13 +708,14 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   addMafatihBookmark(item.id);
                 }
               }}
-              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
-              title={isCurrentItemBookmarked ? "Remove bookmark" : "Add to bookmarks"}
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title={isCurrentItemBookmarked ? t('remove_line_bookmark', appLanguage) : t('bookmark_line', appLanguage)}
+              aria-label="Bookmark"
             >
               {isCurrentItemBookmarked ? (
-                <BookmarkCheck size={18} className="text-emerald-500 fill-emerald-500/20" />
+                <BookmarkCheck size={17} className="text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <Bookmark size={18} />
+                <Bookmark size={17} />
               )}
             </button>
 
@@ -709,38 +726,43 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                 setShowSettingsDrawer(!showSettingsDrawer);
                 if (showJumpDrawer) setShowJumpDrawer(false);
               }}
-              className={`p-2 rounded-full transition-colors cursor-pointer ${
+              className={`p-2 rounded-lg transition-colors cursor-pointer ${
                 showSettingsDrawer
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
-              title="Reading Preferences"
+              title={t('reading_preferences', appLanguage)}
+              aria-label="Settings"
             >
-              <Sliders size={18} />
+              <Sliders size={17} />
             </button>
           </div>
         </div>
 
-        {/* Expandable Reading Preferences Drawer */}
+        {/* Reading Preferences Drawer */}
         <AnimatePresence>
           {showSettingsDrawer && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="max-w-4xl mx-auto pt-3 pb-2 border-t border-slate-200/60 dark:border-slate-800/60 mt-3 text-xs space-y-3 overflow-hidden"
+              className="max-w-4xl mx-auto pt-3 pb-1 border-t border-slate-200/60 dark:border-slate-800/60 mt-3 text-xs space-y-3 overflow-hidden"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <span className="text-slate-500 dark:text-slate-400 font-medium">Arabic Script Size:</span>
-                  <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800">
+                  <span className="text-slate-500 font-medium">
+                    {t('arabic_script_size', appLanguage)}:
+                  </span>
+                  <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200/70 dark:border-slate-800">
                     <button
-                      onClick={() => setMafatihFontSize(Math.max(mafatihFontSize - 3, 28))}
+                      onClick={() => setMafatihFontSize(Math.max(mafatihFontSize - 3, 26))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
                       A-
                     </button>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{mafatihFontSize}px</span>
+                    <span className="font-mono font-medium text-slate-800 dark:text-slate-200 tabular-nums">
+                      {isUrdu ? toUrduNumerals(mafatihFontSize) : mafatihFontSize}px
+                    </span>
                     <button
                       onClick={() => setMafatihFontSize(Math.min(mafatihFontSize + 3, 96))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
@@ -751,16 +773,18 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-slate-500 dark:text-slate-400 font-medium">Translation Display:</span>
+                  <span className="text-slate-500 font-medium">
+                    {t('translation_display', appLanguage)}:
+                  </span>
                   <button
                     onClick={() => setMafatihShowTranslation(!mafatihShowTranslation)}
-                    className={`w-full py-2 rounded-xl font-semibold transition-colors text-center border cursor-pointer ${
+                    className={`w-full py-2 rounded-xl font-medium transition-colors text-center border cursor-pointer ${
                       mafatihShowTranslation
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800'
+                        ? 'bg-slate-900 text-white dark:bg-emerald-600 border-slate-900 dark:border-emerald-600'
+                        : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200/70 dark:border-slate-800'
                     }`}
                   >
-                    {mafatihShowTranslation ? 'English Translation Visible' : 'Arabic Script Only'}
+                    {mafatihShowTranslation ? t('translation_visible', appLanguage) : t('arabic_only', appLanguage)}
                   </button>
                 </div>
               </div>
@@ -775,15 +799,17 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="max-w-4xl mx-auto pt-3 pb-3 border-t border-slate-200/60 dark:border-slate-800/60 mt-3 text-xs overflow-hidden"
+              className="max-w-4xl mx-auto pt-3 pb-2 border-t border-slate-200/60 dark:border-slate-800/60 mt-3 text-xs overflow-hidden"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">
-                  Jump to Line (1 - {item.verses.length})
+                <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs">
+                  {isUrdu
+                    ? `سطر پر جائیں (۱ تا ${toUrduNumerals(item.verses.length)})`
+                    : `Jump to Line (1 - ${item.verses.length})`}
                 </span>
                 <button
                   onClick={() => setShowJumpDrawer(false)}
-                  className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 cursor-pointer"
                 >
                   <X size={14} />
                 </button>
@@ -793,9 +819,9 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   <button
                     key={`jump-${v.index}`}
                     onClick={() => jumpToLine(v.index)}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-850 dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 font-mono text-xs transition-colors shrink-0 cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white dark:bg-slate-850 dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 font-mono text-xs transition-colors shrink-0 cursor-pointer tabular-nums"
                   >
-                    {v.index}
+                    {isUrdu ? toUrduNumerals(v.index) : v.index}
                   </button>
                 ))}
               </div>
@@ -804,63 +830,38 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
         </AnimatePresence>
       </header>
 
-      {/* Main Content Area - Full-Width Responsive Container */}
-      <main className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6 space-y-4">
-        {/* Introduction Section (only when separate verses exist) */}
+      {/* Main Content Area */}
+      <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+        {/* Virtues & Context (if present) */}
         {item.introduction && item.verses && item.verses.length > 0 && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-3">
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
-                Virtues &amp; Etiquette
+              <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
+                {t('virtues_etiquette', appLanguage)}
               </span>
               <button
                 onClick={() => setIsIntroExpanded(!isIntroExpanded)}
-                className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
               >
-                {isIntroExpanded ? 'Show Less' : 'Read More'}
+                {isIntroExpanded ? (isUrdu ? 'مختصر کریں' : 'Show Less') : (isUrdu ? 'مکمل پڑھیں' : 'Read More')}
               </button>
             </div>
-            <p className={`text-xs leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line ${
+            <p className={`text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line ${
               isIntroExpanded ? '' : 'line-clamp-2'
             }`}>
               {item.introduction}
             </p>
-            {item.audioUrl && (
-              <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={handleTogglePlay}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                    isThisItemPlaying
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
-                  }`}
-                >
-                  {isThisItemBuffering ? (
-                    <div className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                  ) : isThisItemPlaying ? (
-                    <Pause size={14} />
-                  ) : (
-                    <Play size={14} className="fill-current" />
-                  )}
-                  <span>{isThisItemPlaying ? 'Pause Recitation' : 'Play Recitation Audio'}</span>
-                </button>
-                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
-                  {isThisItemPlaying ? 'Recitation in Progress' : 'Audio Available'}
-                </span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Majestic Bismillah Invocation */}
-        <div className="relative text-center py-6 sm:py-8 px-4 sm:px-8 rounded-2xl sm:rounded-3xl border border-emerald-300/70 dark:border-emerald-800/60 bg-gradient-to-b from-emerald-50/80 via-white to-teal-50/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/20 shadow-xs transition-all duration-300 overflow-hidden">
+        {/* Serene Minimalist Bismillah Banner */}
+        <div className="text-center py-6 sm:py-8 px-4 rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
           <h2 
             dir="rtl"
             className="font-arabic text-slate-900 dark:text-slate-100 font-normal leading-[1.8] select-text"
             style={{ 
-              fontSize: `${Math.max(Math.round(mafatihFontSize * 1.1), 30)}px`,
-              fontFamily: arabicFont 
+              fontSize: `${Math.max(Math.round(mafatihFontSize * 1.05), 28)}px`,
+              fontFamily: getArabicFontFamily(arabicFont)
             }}
           >
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
@@ -868,54 +869,53 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
           <p 
             dir="rtl" 
-            className="font-arabic text-emerald-700/80 dark:text-emerald-400/80 mt-1"
+            className="font-arabic text-emerald-700 dark:text-emerald-400 mt-1"
             style={{ 
-              fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.46))}px`,
-              fontFamily: arabicFont 
+              fontSize: `${Math.max(15, Math.round(mafatihFontSize * 0.44))}px`,
+              fontFamily: getArabicFontFamily(arabicFont)
             }}
           >
             اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَآلِ مُحَمَّدٍ
           </p>
 
           {mafatihShowTranslation && (
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2.5 font-serif italic">
-              In the Name of Allah, the Entirely Merciful, the Especially Merciful
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 font-serif italic">
+              {isUrdu 
+                ? 'شروع اللہ کے نام سے جو بڑا مہربان نہایت رحم والا ہے'
+                : 'In the Name of Allah, the Entirely Merciful, the Especially Merciful'}
             </p>
           )}
         </div>
 
-        {/* PROSE VIEW FOR 0-VERSE ITEMS (Hajj guides, shrine histories, rituals) */}
+        {/* PROSE VIEW FOR 0-VERSE ITEMS (Hajj guides, shrine guidelines, rituals) */}
         {(!item.verses || item.verses.length === 0) ? (
-          <div className="p-5 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl shadow-xs space-y-5">
+          <div className="p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 rounded-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                <ScrollText size={17} />
-                <span>Text, Virtues &amp; Practical Guidelines</span>
-              </div>
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                {isUrdu ? 'متن، فضائل اور احکام' : 'Text, Virtues & Guidelines'}
+              </span>
               <button
                 onClick={() => {
                   hapticImpact(ImpactStyle.Light);
-                  navigator.clipboard?.writeText?.(`${item.title}\n\n${item.introduction}`);
+                  navigator.clipboard?.writeText?.(`${primaryTitle}\n\n${item.introduction}`);
                   setCopiedIndex(9999);
                   setTimeout(() => setCopiedIndex(null), 2000);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                title="Copy entire text"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
+                title={t('copy_all_text', appLanguage)}
               >
                 {copiedIndex === 9999 ? <Check size={14} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={14} />}
-                <span>{copiedIndex === 9999 ? 'Copied' : 'Copy Text'}</span>
+                <span>{copiedIndex === 9999 ? t('line_copied', appLanguage) : t('copy_all_text', appLanguage)}</span>
               </button>
             </div>
 
-            <div 
-              className="text-slate-800 dark:text-slate-200 leading-[2] sm:leading-[2.2] space-y-4 select-text whitespace-pre-line font-serif text-sm sm:text-base"
-            >
-              {item.introduction || 'This supplication content is available in the complete Mafatih Al Jinan volume.'}
+            <div className="text-slate-800 dark:text-slate-200 leading-[2] sm:leading-[2.2] select-text whitespace-pre-line text-sm sm:text-base">
+              {item.introduction || (isUrdu ? 'یہ متن مفاتیح الجنان کی مکمل جلد میں دستیاب ہے۔' : 'This supplication content is available in the complete Mafatih Al Jinan volume.')}
             </div>
           </div>
         ) : (
           /* Progressive Verses List */
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3">
             {item.verses.slice(0, visibleCount).map((verse) => {
               if (verse.index === 1 && hasFirstVerseBismillah && cleanArabicText(verse.arabic).length < 35 && !verse.translation?.trim()) {
                 return null;
@@ -930,6 +930,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   mafatihShowTranslation={mafatihShowTranslation}
                   isBookmarked={bookmarkedVerses.has(verse.index)}
                   isCopied={copiedIndex === verse.index}
+                  isUrdu={isUrdu}
                   onCopy={copyVerse}
                   onToggleBookmark={toggleBookmark}
                   registerRef={registerVerseRef}
@@ -937,14 +938,15 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
               );
             })}
 
-            {/* Load more button if long content still has chunks */}
             {visibleCount < item.verses.length && (
-              <div className="text-center pt-4 pb-6">
+              <div className="text-center pt-3 pb-6">
                 <button
                   onClick={() => setVisibleCount(item.verses.length)}
-                  className="px-6 py-2.5 rounded-full bg-slate-100 hover:bg-emerald-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-emerald-700 dark:text-emerald-400 transition-colors cursor-pointer shadow-2xs"
+                  className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:border-emerald-500/40 transition-colors cursor-pointer"
                 >
-                  Load All {item.verses.length} Verses (Showing {visibleCount})
+                  {isUrdu 
+                    ? `تمام ${toUrduNumerals(item.verses.length)} سطور دیکھیں (${toUrduNumerals(visibleCount)} ظاہر ہیں)`
+                    : `Load All ${item.verses.length} Verses (Showing ${visibleCount})`}
                 </button>
               </div>
             )}
@@ -958,6 +960,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
           key={`audio-${item.id}`}
           item={item}
           isDarkMode={isDarkMode}
+          isUrdu={isUrdu}
         />
       )}
     </div>
