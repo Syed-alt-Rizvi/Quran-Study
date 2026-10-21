@@ -255,8 +255,8 @@ export default function ImamScienceReaderModal({ article, onClose, onSelectCateg
                 <span className="hidden sm:inline font-sans">Back</span>
               </button>
 
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100/80 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
-                <BookOpen size={11} className="mr-1 opacity-75" />
+              <span className="inline-flex items-center text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                <BookOpen size={13} className="mr-1.5 opacity-75" />
                 {article.primaryCategory || 'Ahlebait Teachings'}
               </span>
 

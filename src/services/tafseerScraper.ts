@@ -2,6 +2,7 @@ import { getApiUrl } from '../utils/apiBase';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorHttp } from '@capacitor/core';
 import { fastStorage } from '../utils/fastStorage';
+import { isValidTafseerContent, notifyIntegrityRecovery } from '../utils/dataIntegrity';
 
 export interface TafseerContent {
   ur: string;

@@ -1,10 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, X, LocateFixed, ChevronRight, Repeat, Volume2, RotateCcw, RotateCw } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { 
+  Play, 
+  Pause, 
+  SkipBack, 
+  SkipForward, 
+  X, 
+  LocateFixed, 
+  ChevronRight, 
+  Repeat, 
+  Volume2, 
+  RotateCcw, 
+  RotateCw, 
+  Gauge 
+} from 'lucide-react';
 import { useAudioStore } from '../audioStore';
 import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { useSettingsStore } from '../store';
 import { hapticSelection, hapticImpact, ImpactStyle } from '../utils/haptics';
 import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
+import { t } from '../i18n';
+import { 
+  resolveAyahAudio, 
+  recordAudioOutcome, 
+  ayahPreloadManager, 
+  QURAN_RECITERS 
+} from '../utils/quranAudioEngine';
+import { audioFocusCoordinator } from '../utils/audioFocus';
+import { updateMediaSession as syncMediaSession, clearMediaSession } from '../utils/mediaSessionManager';
 
 interface AudioPlayerProps {
   onSelectSurah?: (surahId: number, targetAyah?: number) => void;
@@ -14,7 +36,15 @@ interface AudioPlayerProps {
   isOnHome?: boolean;
 }
 
-export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafatihItem, selectedMafatihItem, isOnHome }: AudioPlayerProps) {
+const SPEED_OPTIONS = [0.75, 1.0, 1.25, 1.5];
+
+export default function AudioPlayer({ 
+  onSelectSurah, 
+  onSelectJuz, 
+  onSelectMafatihItem, 
+  selectedMafatihItem, 
+  isOnHome 
+}: AudioPlayerProps) {
   const { 
     playlist, 
     currentIndex, 
@@ -24,10 +54,19 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     pause, 
     next, 
     prev, 
-    stop 
+    stop,
+    setIsBuffering: setStoreBuffering
   } = useAudioStore();
   
-  const { reciter, autoScrollAudio, toggleAutoScrollAudio, appLanguage } = useSettingsStore();
+  const { 
+    reciter, 
+    autoScrollAudio, 
+    toggleAutoScrollAudio, 
+    appLanguage,
+    globalAudioSpeed,
+    setGlobalAudioSpeed
+  } = useSettingsStore();
+
   const isUrdu = appLanguage === 'ur';
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -35,45 +74,24 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
   const [duration, setDuration] = useState(0);
   const [isLoopingAyah, setIsLoopingAyah] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
-
   const [fallbackAttempted, setFallbackAttempted] = useState(false);
 
   const currentAyah = playlist[currentIndex];
 
-  // Reset fallback attempt when track changes
+  // Resolve active audio source and mirror fallback via QuranAudioEngine
+  const audioSourceInfo = resolveAyahAudio(currentAyah, surahId, reciter, fallbackAttempted);
+  const audioSrc = audioSourceInfo.activeUrl;
+
+  // Reset fallback attempt when track index changes
   useEffect(() => {
     setFallbackAttempted(false);
   }, [currentIndex, playlist]);
 
-  const fallbackFolderMap: Record<string, string> = {
-    'ar.alafasy': 'Alafasy_128kbps',
-    'ar.abdulbasitmurattal': 'Abdul_Basit_Murattal_192kbps',
-    'ar.abdurrahmaansudais': 'Abdurrahmaan_As-Sudais_192kbps',
-    'ar.minshawi': 'Minshawy_Murattal_128kbps'
-  };
+  // Reciter display profile
+  const activeReciterProfile = QURAN_RECITERS[reciter] || QURAN_RECITERS['ar.alafasy'];
 
-  const getFallbackAudioUrl = () => {
-    if (!currentAyah) return '';
-    const folder = fallbackFolderMap[reciter] || 'Alafasy_128kbps';
-    const s = String(currentAyah.surahNumber || 1).padStart(3, '0');
-    const a = String(currentAyah.numberInSurah || 1).padStart(3, '0');
-    return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
-  };
-
-  const primaryAudioSrc = currentAyah?.audio
-    ? currentAyah.audio.replace(/\/\d+\/ar\.[^/]+/, `/${['ar.abdulbasitmurattal', 'ar.abdurrahmaansudais'].includes(reciter) ? '192' : '128'}/${reciter}`)
-    : '';
-
-  const audioSrc = fallbackAttempted ? getFallbackAudioUrl() : primaryAudioSrc;
-
-  const reciterNames: Record<string, string> = {
-    'ar.alafasy': 'Mishary Alafasy',
-    'ar.abdulbasitmurattal': 'Abdul Basit',
-    'ar.abdurrahmaansudais': 'Abdur-Rahman as-Sudais',
-    'ar.minshawi': 'Mohamed al-Minshawi'
-  };
-
-  const handleNavigate = (e?: React.MouseEvent) => {
+  // Handle navigate to active ayah in Mushaf view
+  const handleNavigate = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
     }
@@ -100,7 +118,8 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
 
     // If verse element is present in DOM, smoothly scroll and highlight
     setTimeout(() => {
-      const el = document.getElementById(`ayah-${targetAyahNumber}`) || document.getElementById(`ayah-${targetSurahNumber}-${targetAyahNumber}`);
+      const el = document.getElementById(`ayah-${targetAyahNumber}`) || 
+                 document.getElementById(`ayah-${targetSurahNumber}-${targetAyahNumber}`);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'ring-2', 'ring-emerald-500/50', 'transition-all', 'duration-700');
@@ -109,7 +128,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
         }, 2500);
       }
     }, 150);
-  };
+  }, [currentAyah, surahId, onSelectJuz, onSelectSurah]);
 
   const handleContainerClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('input')) {
@@ -118,7 +137,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     handleNavigate(e);
   };
 
-  // Synchronize audio playback & pause Mafatih audio if Quran audio starts
+  // Synchronize audio focus & pause when external subsystem requests focus
   useEffect(() => {
     const handlePauseQuran = () => {
       pause();
@@ -127,6 +146,16 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     return () => window.removeEventListener('pause-quran-audio', handlePauseQuran);
   }, [pause]);
 
+  // Apply playback speed to native audio element whenever speed setting changes
+  useEffect(() => {
+    if (audioRef.current && globalAudioSpeed) {
+      try {
+        audioRef.current.playbackRate = globalAudioSpeed;
+      } catch {}
+    }
+  }, [globalAudioSpeed, audioSrc]);
+
+  // Main Audio Element Lifecycle & Playback Management
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioSrc) return;
@@ -135,14 +164,33 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
 
     const attemptPlay = () => {
       if (!isMounted || !isPlaying) return;
-      window.dispatchEvent(new CustomEvent('pause-mafatih-audio'));
+      audioFocusCoordinator.requestAudioFocus('quran').catch(() => {});
+
+      // Apply playback speed before starting playback
+      if (globalAudioSpeed) {
+        try {
+          audio.playbackRate = globalAudioSpeed;
+        } catch {}
+      }
+
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(e => {
-          if (e.name !== 'AbortError') {
-            console.warn("Audio playback issue:", e);
-          }
-        });
+        playPromise
+          .then(() => {
+            if (isMounted) {
+              setIsBuffering(false);
+              setStoreBuffering(false);
+              recordAudioOutcome(fallbackAttempted ? 'mirror' : 'cdn', true);
+            }
+          })
+          .catch(e => {
+            if (e.name !== 'AbortError') {
+              console.warn("[QuranAudio] Playback interrupted or blocked:", e);
+              if (e.name === 'NotAllowedError') {
+                pause();
+              }
+            }
+          });
       }
     };
 
@@ -167,22 +215,47 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     return () => {
       isMounted = false;
     };
-  }, [isPlaying, audioSrc, currentIndex]);
+  }, [isPlaying, audioSrc, currentIndex, globalAudioSpeed, fallbackAttempted, pause, setStoreBuffering]);
 
-  // Audio time update listeners
+  // Audio Event Listeners (timeupdate, loadedmetadata, buffering, playbackRate)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
     const onLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration)) {
         setDuration(audio.duration);
       }
+      if (globalAudioSpeed) {
+        try {
+          audio.playbackRate = globalAudioSpeed;
+        } catch {}
+      }
     };
-    const onWaiting = () => setIsBuffering(true);
-    const onPlaying = () => setIsBuffering(false);
-    const onCanPlay = () => setIsBuffering(false);
+
+    const onWaiting = () => {
+      setIsBuffering(true);
+      setStoreBuffering(true);
+    };
+
+    const onPlaying = () => {
+      setIsBuffering(false);
+      setStoreBuffering(false);
+      if (globalAudioSpeed) {
+        try {
+          audio.playbackRate = globalAudioSpeed;
+        } catch {}
+      }
+    };
+
+    const onCanPlay = () => {
+      setIsBuffering(false);
+      setStoreBuffering(false);
+    };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
@@ -197,21 +270,22 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('canplay', onCanPlay);
     };
-  }, [audioSrc]);
+  }, [audioSrc, globalAudioSpeed, setStoreBuffering]);
 
-  // Proactively preload the next audio file for instantaneous gapless playback
+  // Proactively preload the next audio track via the single-instance manager (gapless)
   useEffect(() => {
     if (currentIndex < playlist.length - 1) {
       const nextAyah = playlist[currentIndex + 1];
-      if (nextAyah?.audio) {
-        const nextSrc = nextAyah.audio.replace(/\/\d+\/ar\.[^/]+/, `/${['ar.abdulbasitmurattal', 'ar.abdurrahmaansudais'].includes(reciter) ? '192' : '128'}/${reciter}`);
-        const preloader = new Audio();
-        preloader.preload = 'auto';
-        preloader.src = nextSrc;
+      if (nextAyah) {
+        const nextInfo = resolveAyahAudio(nextAyah, surahId, reciter, fallbackAttempted);
+        if (nextInfo.activeUrl) {
+          ayahPreloadManager.preloadNextAyah(nextInfo.activeUrl);
+        }
       }
     }
-  }, [currentIndex, playlist, reciter]);
+  }, [currentIndex, playlist, reciter, surahId, fallbackAttempted]);
 
+  // Scrub progress handler
   const handleScrub = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!audioRef.current || duration <= 0) return;
@@ -224,36 +298,110 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     hapticSelection();
   };
 
-  // Set up MediaSession API safely for lock screen / notification controls
+  // Synchronize MediaSession API for lockscreen and smartwatch controls
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && currentAyah) {
-      try {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: `Ayah ${currentAyah.numberInSurah}`,
-          artist: currentAyah.surahName || `Surah ${currentAyah.surahNumber || ''}`,
-          album: 'The Holy Qur\'an',
-        });
-
-        navigator.mediaSession.setActionHandler('play', () => play());
-        navigator.mediaSession.setActionHandler('pause', () => pause());
-        navigator.mediaSession.setActionHandler('previoustrack', currentIndex > 0 ? () => prev() : null);
-        navigator.mediaSession.setActionHandler('nexttrack', currentIndex < playlist.length - 1 ? () => next() : null);
-      } catch (e) {
-        // Ignore if MediaSession fails in WebView
-      }
+    if (currentAyah) {
+      const surahTitle = currentAyah.surahName || `Surah ${currentAyah.surahNumber || ''}`;
+      syncMediaSession({
+        title: `Ayah ${currentAyah.numberInSurah}`,
+        artist: `${surahTitle} • ${activeReciterProfile.name}`,
+        album: "The Holy Qur'an",
+        playbackState: isPlaying ? 'playing' : 'paused',
+        duration,
+        position: currentTime,
+        playbackRate: globalAudioSpeed || 1.0,
+        onPlay: () => play(),
+        onPause: () => pause(),
+        onStop: () => stop(),
+        onPrevious: currentIndex > 0 ? () => prev() : undefined,
+        onNext: currentIndex < playlist.length - 1 ? () => next() : undefined,
+        onSeek: (pos) => {
+          if (audioRef.current) {
+            audioRef.current.currentTime = pos;
+            setCurrentTime(pos);
+          }
+        },
+        onSkip: (secs) => {
+          if (audioRef.current) {
+            const target = Math.max(0, Math.min(duration, audioRef.current.currentTime + secs));
+            audioRef.current.currentTime = target;
+            setCurrentTime(target);
+          }
+        }
+      });
     }
 
     return () => {
-      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-        try {
-          navigator.mediaSession.setActionHandler('play', null);
-          navigator.mediaSession.setActionHandler('pause', null);
-          navigator.mediaSession.setActionHandler('previoustrack', null);
-          navigator.mediaSession.setActionHandler('nexttrack', null);
-        } catch {}
+      if (!currentAyah) {
+        clearMediaSession();
       }
     };
-  }, [currentAyah, currentIndex, playlist.length, play, pause, prev, next]);
+  }, [
+    currentAyah, 
+    currentIndex, 
+    playlist.length, 
+    isPlaying, 
+    duration, 
+    currentTime, 
+    globalAudioSpeed, 
+    activeReciterProfile.name, 
+    play, 
+    pause, 
+    stop, 
+    prev, 
+    next
+  ]);
+
+  // Keyboard navigation shortcuts (Space: Play/Pause, Left/Right: Prev/Next)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' || 
+        target.tagName === 'TEXTAREA' || 
+        target.isContentEditable || 
+        target.tagName === 'SELECT'
+      ) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        hapticImpact(ImpactStyle.Medium);
+        if (isPlaying) {
+          pause();
+        } else {
+          play();
+        }
+      } else if (e.code === 'ArrowRight') {
+        if (currentIndex < playlist.length - 1) {
+          e.preventDefault();
+          hapticImpact(ImpactStyle.Light);
+          next();
+        }
+      } else if (e.code === 'ArrowLeft') {
+        if (currentIndex > 0) {
+          e.preventDefault();
+          hapticImpact(ImpactStyle.Light);
+          prev();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, currentIndex, playlist.length, play, pause, next, prev]);
+
+  // Cycle playback speed directly from player
+  const handleCycleSpeed = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    hapticSelection();
+    const curSpeed = globalAudioSpeed || 1.0;
+    const curIdx = SPEED_OPTIONS.findIndex(s => Math.abs(s - curSpeed) < 0.05);
+    const nextIdx = (curIdx + 1) % SPEED_OPTIONS.length;
+    const newSpeed = SPEED_OPTIONS[nextIdx];
+    setGlobalAudioSpeed(newSpeed);
+  };
 
   // Mafatih audio store subscription
   const mafatihTrack = useMafatihAudioStore((s) => s.currentTrack);
@@ -432,10 +580,13 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
     );
   }
 
+  // Handle track finished (support looping verse for Hifz memorization)
   const handleEnded = () => {
     if (isLoopingAyah && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      try {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      } catch {}
     } else {
       next();
     }
@@ -479,7 +630,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
             </span>
             <ChevronRight size={13} className="text-emerald-500 opacity-60 group-hover/info:opacity-100 group-hover/info:translate-x-0.5 transition-all shrink-0" />
             <span className="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:inline truncate">
-              • {reciterNames[reciter] || 'Recitation'}
+              • {activeReciterProfile.name}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -505,7 +656,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               prev();
             }}
             disabled={currentIndex === 0}
-            className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors p-1"
+            className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors p-1 cursor-pointer"
             aria-label="Previous Ayah"
           >
             <SkipBack size={18} fill="currentColor" />
@@ -523,7 +674,7 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
                 play();
               }
             }}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform shrink-0 relative"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform shrink-0 relative cursor-pointer"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isBuffering ? (
@@ -544,15 +695,33 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               next();
             }}
             disabled={currentIndex === playlist.length - 1}
-            className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors p-1"
+            className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors p-1 cursor-pointer"
             aria-label="Next Ayah"
           >
             <SkipForward size={18} fill="currentColor" />
           </button>
         </div>
 
-        {/* Auxiliary Controls (Loop verse, Auto-scroll, Close) */}
+        {/* Auxiliary Controls (Speed, Loop verse, Auto-scroll, Close) */}
         <div className="flex items-center gap-1 sm:gap-1.5 ml-1 sm:ml-2 shrink-0">
+          {/* Universal Recitation Speed Pill */}
+          <button
+            type="button"
+            onClick={handleCycleSpeed}
+            title={`Recitation Speed: ${globalAudioSpeed || 1.0}x (Tap to cycle)`}
+            className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold transition-all border cursor-pointer ${
+              globalAudioSpeed && globalAudioSpeed !== 1.0
+                ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-400/60'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-emerald-500'
+            }`}
+            aria-label={`Playback speed: ${globalAudioSpeed || 1.0}x`}
+          >
+            <div className="flex items-center gap-0.5">
+              <Gauge size={11} className={globalAudioSpeed !== 1.0 ? 'text-amber-600' : 'text-slate-400'} />
+              <span>{globalAudioSpeed || 1.0}x</span>
+            </div>
+          </button>
+
           {/* Loop Ayah (Hifz memorization) */}
           <button
             type="button"
@@ -561,15 +730,15 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               hapticSelection();
               setIsLoopingAyah(!isLoopingAyah);
             }}
-            title={isLoopingAyah ? "Loop current Ayah: ON" : "Loop current Ayah: OFF"}
-            className={`p-1.5 rounded-full transition-all ${
+            title={isLoopingAyah ? "Loop current Ayah (Hifz Mode): ON" : "Loop current Ayah (Hifz Mode): OFF"}
+            className={`p-1.5 rounded-full transition-all cursor-pointer ${
               isLoopingAyah
                 ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/70 ring-1 ring-emerald-500/50'
                 : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
             aria-label="Toggle Repeat Ayah"
           >
-            <Repeat size={16} />
+            <Repeat size={15} />
           </button>
 
           {/* Auto-scroll toggle */}
@@ -582,14 +751,14 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
               toggleAutoScrollAudio();
             }}
             title={autoScrollAudio ? "Auto-scroll to active verse: ON" : "Auto-scroll to active verse: OFF"}
-            className={`p-1.5 rounded-full transition-all ${
+            className={`p-1.5 rounded-full transition-all cursor-pointer ${
               autoScrollAudio 
                 ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 ring-1 ring-emerald-500/50' 
                 : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             aria-label="Toggle Auto Scroll"
           >
-            <LocateFixed size={16} />
+            <LocateFixed size={15} />
           </button>
 
           {/* Close Player */}
@@ -599,12 +768,13 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
             onClick={(e) => {
               e.stopPropagation();
               hapticImpact(ImpactStyle.Light);
+              ayahPreloadManager.cleanup();
               stop();
             }}
-            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1"
+            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1 cursor-pointer"
             aria-label="Close Player"
           >
-            <X size={18} />
+            <X size={17} />
           </button>
         </div>
       </div>
@@ -613,12 +783,15 @@ export default function AudioPlayer({ onSelectSurah, onSelectJuz, onSelectMafati
         <audio 
           ref={audioRef} 
           src={audioSrc} 
+          preload="auto"
           onEnded={handleEnded} 
           onError={(e) => {
-            console.warn("Audio failed to load from source:", audioSrc, e);
+            console.warn("[QuranAudio] Primary audio load failure for:", audioSrc, e);
             if (!fallbackAttempted) {
+              recordAudioOutcome('cdn', false);
               setFallbackAttempted(true);
             } else {
+              recordAudioOutcome('mirror', false);
               pause();
             }
           }}

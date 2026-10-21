@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Share2, PlusSquare, Smartphone, Check, X, Sparkles, WifiOff, Volume2 } from 'lucide-react';
+import { Download, Share2, PlusSquare, Smartphone, Check, X, WifiOff, Volume2 } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
@@ -65,10 +65,10 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
 
         {/* Benefits List */}
         <div className="p-5 space-y-4">
-          {/* Clean PWA Benefits List */}
+          {/* PWA Benefits */}
           <div className="grid grid-cols-3 gap-2.5 text-center">
             <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-              <Sparkles size={18} className="mx-auto text-emerald-600 dark:text-emerald-400 mb-1" />
+              <Smartphone size={18} className="mx-auto text-emerald-600 dark:text-emerald-400 mb-1" />
               <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Native Feel</p>
               <p className="text-[9px] text-slate-500 dark:text-slate-400">Full-screen UI</p>
             </div>
@@ -98,8 +98,8 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
             /* Framed / Masked Domain Breakout Flow to enable native browser PWA installation */
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
               <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
-                <Sparkles size={16} />
-                <span>Install Standalone PWA</span>
+                <Download size={16} />
+                <span>Install Standalone App</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Mobile browsers require launching directly to install the native Progressive Web App with offline Quran and audio playback:

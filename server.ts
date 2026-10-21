@@ -140,7 +140,12 @@ async function startServer() {
       if (fs.existsSync(p)) {
         res.setHeader("Content-Type", "application/xml; charset=utf-8");
         res.setHeader("Cache-Control", "public, max-age=86400");
-        return res.sendFile(p);
+        let xml = fs.readFileSync(p, "utf8");
+        const host = req.get('host') || 'shiamarkaz.org';
+        const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const currentOrigin = `${protocol}://${host}`;
+        xml = xml.replace(/https:\/\/(quran-study\.ai\.studio|shiamarkaz\.org)/g, currentOrigin);
+        return res.send(xml);
       }
     }
     res.status(404).send("<!-- Sitemap not found -->");
@@ -148,19 +153,12 @@ async function startServer() {
 
   // Dedicated SEO Robots.txt endpoint
   app.get("/robots.txt", (req, res) => {
-    const candidatePaths = [
-      path.join(process.cwd(), "public", "robots.txt"),
-      path.join(process.cwd(), "dist", "robots.txt")
-    ];
-    for (const p of candidatePaths) {
-      if (fs.existsSync(p)) {
-        res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        res.setHeader("Cache-Control", "public, max-age=86400");
-        return res.sendFile(p);
-      }
-    }
+    const host = req.get('host') || 'shiamarkaz.org';
+    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const currentOrigin = `${protocol}://${host}`;
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.send("User-agent: *\nAllow: /\nSitemap: https://quran-study.ai.studio/sitemap.xml\n");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${currentOrigin}/sitemap.xml\n`);
   });
 
   // In-memory LRU/map caches for Google Maps & AlAdhan to minimize quota consumption
@@ -1359,9 +1357,23 @@ async function startServer() {
       res.setHeader('Surrogate-Control', 'no-store');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
-      res.removeHeader('ETag');
-      res.removeHeader('Last-Modified');
-      res.sendFile(path.join(distPath, 'index.html'));
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        let html = fs.readFileSync(indexPath, 'utf8');
+        const host = req.get('host') || 'shiamarkaz.org';
+        const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const currentOrigin = `${protocol}://${host}`;
+        const canonicalUrl = `${currentOrigin}${req.path === '/' ? '' : req.path}`;
+        
+        html = html.replace(/<link id="canonical-url"[^>]*>/i, `<link id="canonical-url" rel="canonical" href="${canonicalUrl}" />`);
+        html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${canonicalUrl}$2`);
+        if (!html.includes('property="og:url"')) {
+          html = html.replace('</head>', `  <meta property="og:url" content="${canonicalUrl}" />\n  </head>`);
+        }
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.send(html);
+      }
+      res.sendFile(indexPath);
     });
   }
 

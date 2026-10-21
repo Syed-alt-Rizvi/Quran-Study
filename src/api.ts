@@ -1,5 +1,6 @@
 import staticSurahs from './surahList.json';
 import { fastStorage } from './utils/fastStorage';
+import { isValidSurahDetail, isValidJuzDetail, notifyIntegrityRecovery } from './utils/dataIntegrity';
 
 async function fetchWithTimeout(url: string, timeoutMs = 12000, retries = 1): Promise<Response> {
   let lastError: any;
@@ -42,6 +43,7 @@ export interface SurahMeta {
 }
 
 export interface Ayah {
+  number?: number; // Global Quranic Ayah number (1 - 6236)
   numberInSurah: number;
   surahNumber?: number;
   surahName?: string;
@@ -165,16 +167,25 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
   const fetchPromise = (async () => {
     const cacheKey = `quran-surah-detail-${id}`;
     
-    // Check IndexedDB
+    // Check IndexedDB with data integrity validation
     try {
       const cached = await fastStorage.get<SurahDetail>(cacheKey);
-      if (cached && cached.ayahs && cached.ayahs.length > 0) {
+      if (cached && isValidSurahDetail(cached)) {
         cached.ayahs.forEach((a: any) => {
           if (!a.surahNumber && cached.number) a.surahNumber = cached.number;
           if (!a.surahName && cached.englishName) a.surahName = cached.englishName;
         });
         surahDetailCache.set(id, cached);
         return cached;
+      } else if (cached) {
+        await fastStorage.del(cacheKey);
+        notifyIntegrityRecovery({
+          subsystem: 'quran',
+          identifier: id,
+          reason: 'Corrupted or partial surah cache evicted',
+          recoveredFromBundle: false,
+          timestamp: Date.now()
+        });
       }
     } catch {}
 
@@ -183,9 +194,9 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
     try {
       response = await fetchWithTimeout(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`, 12000, 1);
     } catch (netErr) {
-      // Offline / network failure: check if fastStorage has any cached detail
+      // Offline / network failure: check if fastStorage has any valid cached detail
       const fallbackCached = await fastStorage.get<SurahDetail>(cacheKey);
-      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+      if (fallbackCached && isValidSurahDetail(fallbackCached)) {
         surahDetailCache.set(id, fallbackCached);
         return fallbackCached;
       }
@@ -194,7 +205,7 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
     
     if (!response.ok) {
       const fallbackCached = await fastStorage.get<SurahDetail>(cacheKey);
-      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+      if (fallbackCached && isValidSurahDetail(fallbackCached)) {
         surahDetailCache.set(id, fallbackCached);
         return fallbackCached;
       }
@@ -237,6 +248,10 @@ export const fetchSurahDetail = async (id: number): Promise<SurahDetail> => {
       numberOfAyahs: arabicData.numberOfAyahs,
       ayahs,
     };
+
+    if (!isValidSurahDetail(result)) {
+      throw new Error(`Data validation failed for Surah ${id}`);
+    }
     
     surahDetailCache.set(id, result);
     fastStorage.set(cacheKey, result);
@@ -263,15 +278,25 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
 
   const fetchPromise = (async () => {
     const cacheKey = `quran-juz-detail-${id}`;
+    // Check IndexedDB with data integrity validation
     try {
       const cached = await fastStorage.get<JuzDetail>(cacheKey);
-      if (cached && cached.ayahs && cached.ayahs.length > 0) {
+      if (cached && isValidJuzDetail(cached)) {
         cached.ayahs.forEach((a: any) => {
           if (!a.surahNumber && a.surah?.number) a.surahNumber = a.surah.number;
           if (!a.surahName && a.surah?.englishName) a.surahName = a.surah.englishName;
         });
         juzDetailCache.set(id, cached);
         return cached;
+      } else if (cached) {
+        await fastStorage.del(cacheKey);
+        notifyIntegrityRecovery({
+          subsystem: 'quran',
+          identifier: `juz_${id}`,
+          reason: 'Corrupted or partial juz cache evicted',
+          recoveredFromBundle: false,
+          timestamp: Date.now()
+        });
       }
     } catch {}
 
@@ -285,7 +310,7 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
       ]);
     } catch (netErr) {
       const fallbackCached = await fastStorage.get<JuzDetail>(cacheKey);
-      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+      if (fallbackCached && isValidJuzDetail(fallbackCached)) {
         juzDetailCache.set(id, fallbackCached);
         return fallbackCached;
       }
@@ -296,7 +321,7 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
     
     if (!arabicResponse.ok || !englishResponse.ok || !urduResponse.ok || !audioResponse.ok) {
       const fallbackCached = await fastStorage.get<JuzDetail>(cacheKey);
-      if (fallbackCached && fallbackCached.ayahs && fallbackCached.ayahs.length > 0) {
+      if (fallbackCached && isValidJuzDetail(fallbackCached)) {
         juzDetailCache.set(id, fallbackCached);
         return fallbackCached;
       }
@@ -341,7 +366,7 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
       ayahs.pop();
     } else if (id === 21) {
       try {
-        const singleAyahRes = await fetch(`https://api.alquran.cloud/v1/ayah/29:45/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`);
+        const singleAyahRes = await fetchWithTimeout(`https://api.alquran.cloud/v1/ayah/29:45/editions/quran-uthmani,en.asad,ur.jalandhry,ar.alafasy`, 10000, 1);
         const singleAyahJson = await safeJson(singleAyahRes);
         if (singleAyahJson.data) {
           const d = singleAyahJson.data;
@@ -365,6 +390,10 @@ export const fetchJuzDetail = async (id: number): Promise<JuzDetail> => {
       number: arabicData.number,
       ayahs,
     };
+
+    if (!isValidJuzDetail(result)) {
+      throw new Error(`Data validation failed for Juz ${id}`);
+    }
     
     juzDetailCache.set(id, result);
     fastStorage.set(cacheKey, result);

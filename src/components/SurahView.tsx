@@ -138,18 +138,9 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         ref={ayahRef}
         className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
           isActivePlaying || isLastRead
-            ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/70 dark:border-emerald-600/70 shadow-md ring-1 ring-emerald-400/30'
+            ? 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500/70 dark:border-emerald-600/70 shadow-md ring-1 ring-emerald-400/30'
             : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700'
         }`}
-        style={{
-          forcedColorAdjust: 'none',
-          backgroundColor: isActivePlaying || isLastRead
-            ? (isDarkMode ? '#0d281e' : '#f0fdf4')
-            : (isDarkMode ? '#0f172a' : '#ffffff'),
-          borderColor: isActivePlaying || isLastRead
-            ? (isDarkMode ? '#059669' : '#86efac')
-            : (isDarkMode ? '#1e293b' : '#e2e8f0'),
-        }}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
         onPointerLeave={handlePressEnd}
@@ -163,13 +154,13 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-3">
             <span 
-              className="w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-colors border"
-              style={{
-                backgroundColor: isActivePlaying ? '#10b981' : (isLastRead ? (isDarkMode ? '#065f46' : '#d1fae5') : (isDarkMode ? '#1e293b' : '#f1f5f9')),
-                color: isActivePlaying ? '#ffffff' : (isLastRead ? (isDarkMode ? '#6ee7b7' : '#065f46') : (isDarkMode ? '#cbd5e1' : '#334155')),
-                borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-                forcedColorAdjust: 'none',
-              }}
+              className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-colors border ${
+                isActivePlaying
+                  ? 'bg-emerald-500 text-white border-emerald-400'
+                  : isLastRead
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
             >
               {ayah.numberInSurah}
             </span>
@@ -196,13 +187,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
             {!isLastRead && (
               <button
                 onClick={handleMarkAsRead}
-                className="px-3 py-1 text-xs font-medium rounded-full transition-colors border"
-                style={{
-                  backgroundColor: isDarkMode ? '#064e3b' : '#ecfdf5',
-                  color: isDarkMode ? '#6ee7b7' : '#047857',
-                  borderColor: isDarkMode ? '#047857' : '#a7f3d0',
-                  forcedColorAdjust: 'none',
-                }}
+                className="px-3 py-1 text-xs font-medium rounded-full transition-colors border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer"
               >
                 Mark Read
               </button>
@@ -248,12 +233,11 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
         <p 
           dir="rtl"
           lang="ar"
-          className="ayah-arabic-text font-arabic text-right leading-[2.5] select-none mb-3 font-normal"
+          className="ayah-arabic-text font-arabic text-right leading-[2.5] select-none mb-3 font-normal text-slate-900 dark:text-slate-100"
           style={{ 
             fontSize: `${fontSize}px`, 
             fontFamily: getArabicFontFamily(arabicFont),
-            color: isDarkMode ? '#F8FAFC' : '#0F172A',
-            forcedColorAdjust: 'none',
+            unicodeBidi: 'isolate'
           }}
         >
           {ayah.text}
@@ -800,6 +784,13 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
             </a>
           </div>
         </div>
+
+        {/* Standardized Global Footer */}
+        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 Shia Markaz. All Rights Reserved.
+          </p>
+        </footer>
       </main>
       
       {discussionAyah && (

@@ -7,8 +7,7 @@ import {
   Volume2, 
   X, 
   ChevronRight,
-  BookOpen,
-  Sparkles
+  BookOpen
 } from 'lucide-react';
 import { MAFATIH_COLLECTION } from '../data/mafatihData';
 import { getFullIndex, MafatihSummary } from '../mafatihApi';
@@ -17,6 +16,7 @@ import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
+import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
 interface MafatihViewProps {
   onSelectItem?: (id: string) => void;
@@ -215,24 +215,21 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
+      const qNormal = normalizeSearchQuery(searchQuery);
       result = result.filter((item) => {
-        const title = (item.title || '').toLowerCase();
-        const urduTitle = getMafatihUrduTitle(item.id, item.title).toLowerCase();
-        const arTitle = getArabicTitle(item.id, item.title).toLowerCase();
-        const snippet = (item.snippet || '').toLowerCase();
-        const cat = (item.mainCategory || '').toLowerCase();
-        const urduCat = getMafatihUrduCategory(item.mainCategory).toLowerCase();
-        const chain = (item.categoryChain || []).join(' ').toLowerCase();
+        const urduTitle = getMafatihUrduTitle(item.id, item.title);
+        const arTitle = getArabicTitle(item.id, item.title);
+        const urduCat = getMafatihUrduCategory(item.mainCategory);
+        const chain = (item.categoryChain || []).join(' ');
 
         return (
-          title.includes(q) ||
-          urduTitle.includes(q) ||
-          arTitle.includes(q) ||
-          snippet.includes(q) ||
-          cat.includes(q) ||
-          urduCat.includes(q) ||
-          chain.includes(q)
+          matchesSearch(item.title, qNormal) ||
+          matchesSearch(urduTitle, qNormal) ||
+          matchesSearch(arTitle, qNormal) ||
+          matchesSearch(item.snippet, qNormal) ||
+          matchesSearch(item.mainCategory, qNormal) ||
+          matchesSearch(urduCat, qNormal) ||
+          matchesSearch(chain, qNormal)
         );
       });
     }

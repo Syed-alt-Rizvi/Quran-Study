@@ -13,7 +13,6 @@ export default function DuaScreen({
   onContinueExit: () => void;
   onCancel?: () => void;
 }) {
-  const isDarkMode = useSettingsStore(s => s.isDarkMode);
   const arabicFont = useSettingsStore(s => s.arabicFont);
 
   useEffect(() => {

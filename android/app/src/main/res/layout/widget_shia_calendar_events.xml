@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_calendar_events_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_rounded"
+    android:padding="12dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⭐ Upcoming Shia Occasions"
+            android:textColor="@color/widget_gold"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_events_header_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rabi' al-Thani"
+            android:textColor="@color/widget_emerald"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Event 1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/widget_card_rounded"
+        android:padding="6dp"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/widget_event_1_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TODAY"
+            android:textColor="@color/widget_gold"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/widget_event_1_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Wiladat of Imam Hasan al-Askari (a.s)"
+            android:textColor="@color/widget_text_white"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_event_1_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8 Rabi' II"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Event 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/widget_card_rounded"
+        android:padding="6dp"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/widget_event_2_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEXT"
+            android:textColor="@color/widget_emerald"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/widget_event_2_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Shahadat of Lady Fatimah al-Zahra (s.a)"
+            android:textColor="@color/widget_text_white"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_event_2_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="13 Jumada I"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Event 3 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/widget_card_rounded"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/widget_event_3_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SOON"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/widget_event_3_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Wiladat of Amir al-Mu'minin Ali (a.s)"
+            android:textColor="@color/widget_text_white"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_event_3_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="13 Rajab"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

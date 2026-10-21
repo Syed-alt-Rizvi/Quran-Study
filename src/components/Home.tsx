@@ -14,11 +14,14 @@ import MafatihView from "./MafatihView";
 import CalendarView from "./CalendarView";
 import AdhanMapScreen from "./AdhanMapScreen";
 import HomeAdhanWidget from "./HomeAdhanWidget";
+import HomeTafseerWidget from "./HomeTafseerWidget";
+import HomeQuranAudioWidget from "./HomeQuranAudioWidget";
 import { useSettingsStore, AppTab } from '../store';
 import { t } from '../i18n';
 import { PWAInstallButton } from './PWAInstallButton';
 import { getArabicFontFamily } from '../utils/arabicFonts';
 import { SURAH_URDU_MAP, JUZ_URDU_NAMES } from '../data/surahUrduNames';
+import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
 const JUZ_NAMES = [
   'Alif Laam Meem', 'Sayaqool', 'Tilkal Rusul', 'Lan Tana Loo', 'Wal Mohsanat',
@@ -69,8 +72,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   const [loading, setLoading] = useState(() => surahs.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const { readProgress, lastRead, defaultAppTab, userName, setUserName, habitStats, arabicFont, appLanguage } = useSettingsStore();
-  const [activeTab, setActiveTab] = useState<AppTab>(defaultAppTab || 'quran');
+  const { readProgress, lastRead, defaultAppTab, currentAppTab, setCurrentAppTab, userName, setUserName, habitStats, arabicFont, appLanguage } = useSettingsStore();
+  const activeTab = currentAppTab || defaultAppTab || 'quran';
+  const setActiveTab = (tab: AppTab) => {
+    setCurrentAppTab(tab);
+  };
   const [quranMode, setQuranMode] = useState<'surah' | 'juz'>('surah');
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(userName || '');
@@ -124,10 +130,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   }, []);
 
   useEffect(() => {
-    if (defaultAppTab) {
-      setActiveTab(defaultAppTab);
+    if (defaultAppTab && !currentAppTab) {
+      setCurrentAppTab(defaultAppTab);
     }
-  }, [defaultAppTab]);
+  }, [defaultAppTab, currentAppTab, setCurrentAppTab]);
 
   // Idle background prefetching for zero-latency instant opening
   useEffect(() => {
@@ -164,46 +170,52 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
     }
   }, [surahs.length]);
 
-  const q = searchQuery.trim().toLowerCase();
-  const filteredSurahs = useMemo(() => {
-    let list = surahs;
-    if (q) {
-      const cleanQ = q.replace(/[^a-z0-9]/g, '');
-      const trimmedQuery = searchQuery.trim();
-      list = surahs.filter(s => {
-        const urduInfo = SURAH_URDU_MAP[s.number];
-        const matchesUrdu = urduInfo && (
-          urduInfo.urduName.includes(trimmedQuery) ||
-          urduInfo.urduMeaning.includes(trimmedQuery)
-        );
-        return (
-          s.number.toString() === q ||
-          s.englishName.toLowerCase().includes(q) ||
-          (s.englishNameTranslation && s.englishNameTranslation.toLowerCase().includes(q)) ||
-          s.name.includes(trimmedQuery) ||
-          matchesUrdu ||
-          (cleanQ.length > 0 && s.englishName.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cleanQ))
-        );
-      });
-    }
+  const qNormal = useMemo(() => normalizeSearchQuery(searchQuery), [searchQuery]);
 
-    // Always standard canonical Mushaf order 1 to 114
-    return [...list].sort((a, b) => a.number - b.number);
-  }, [surahs, q, searchQuery]);
+  const filteredSurahs = useMemo(() => {
+    if (!qNormal.raw) return [...surahs].sort((a, b) => a.number - b.number);
+
+    return surahs.filter(s => {
+      // 1. Direct number match (supports ASCII "112", Eastern Arabic "١١٢", Urdu "۱۱۲")
+      if (qNormal.asciiDigits && s.number.toString() === qNormal.asciiDigits) {
+        return true;
+      }
+      // 2. English name & translation
+      if (matchesSearch(s.englishName, qNormal) || matchesSearch(s.englishNameTranslation, qNormal)) {
+        return true;
+      }
+      // 3. Arabic Quranic name (diacritics-insensitive: "البقرة" matches "سُورَةُ البَقَرَةِ")
+      if (matchesSearch(s.name, qNormal)) {
+        return true;
+      }
+      // 4. Urdu name & meaning
+      const urduInfo = SURAH_URDU_MAP[s.number];
+      if (urduInfo) {
+        if (matchesSearch(urduInfo.urduName, qNormal) || matchesSearch(urduInfo.urduMeaning, qNormal)) {
+          return true;
+        }
+      }
+      return false;
+    }).sort((a, b) => a.number - b.number);
+  }, [surahs, qNormal]);
   
   const filteredJuzs = useMemo(() => {
-    if (!q) return STATIC_JUZ_LIST;
-    const trimmedQuery = searchQuery.trim();
+    if (!qNormal.raw) return STATIC_JUZ_LIST;
     return STATIC_JUZ_LIST.filter(j => {
+      // Direct number match
+      if (qNormal.asciiDigits && j.number.toString() === qNormal.asciiDigits) {
+        return true;
+      }
+      if (matchesSearch(`juz ${j.number}`, qNormal) || matchesSearch(j.name, qNormal)) {
+        return true;
+      }
       const urduJuz = JUZ_URDU_NAMES[j.number];
-      return (
-        `juz ${j.number}`.includes(q) || 
-        j.number.toString().includes(q) ||
-        j.name.toLowerCase().includes(q) ||
-        (urduJuz && urduJuz.includes(trimmedQuery))
-      );
+      if (urduJuz && matchesSearch(urduJuz, qNormal)) {
+        return true;
+      }
+      return false;
     });
-  }, [q, searchQuery]);
+  }, [qNormal]);
 
   return (
     <div className="min-h-screen pb-32 text-slate-900 dark:text-slate-100">
@@ -261,7 +273,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
       </header>
 
       <main className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
-        {/* Thoughtful, Simplistic & Elegant Welcome Masthead - Proportional on all mobile ratios */}
+        {/* Welcome Masthead */}
         <section className="mb-3 pt-0.5 pb-2.5 border-b border-slate-200/70 dark:border-slate-800/70">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-3">
             <div className="min-w-0 flex-1">
@@ -314,13 +326,13 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                   title="Click to edit name"
                 >
                   <h2 className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold tracking-wide text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight">
-                    {userName && userName.trim().length > 0 ? userName.trim() : 'Noble Reader'}
+                    {userName && userName.trim().length > 0 ? userName.trim() : 'Welcome'}
                   </h2>
                   <Edit3 size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0" />
                 </div>
               )}
 
-              {/* Thoughtful Spiritual Reflection from Ahlulbayt (a.s) - Responsive and concise */}
+              {/* Hadith Reflection from Ahlulbayt (a.s) */}
               <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-serif italic max-w-xl leading-snug line-clamp-2">
                 &ldquo;{reflection.quote}&rdquo;
                 <span className="not-italic text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 ml-1.5 font-sans">
@@ -329,7 +341,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               </p>
             </div>
 
-            {/* Quiet, Unboxed Daily Recitation Status */}
+            {/* Daily Recitation Status */}
             {todayAyahs > 0 && !isEditingName && (
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 sm:text-right shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
@@ -343,14 +355,16 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
         </section>
 
         {/* Last Read Ayah Quick Resume */}
-        {lastRead && activeTab === 'quran' && (
+        {lastRead && activeTab === 'quran' && typeof lastRead.surahId === 'number' && lastRead.surahId >= 1 && lastRead.surahId <= 114 && (
           <div className="mb-4 p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between gap-4">
             <div className="space-y-0.5">
               <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Continue Reading
+                {appLanguage === 'ur' ? 'جاری رکھیں' : 'Continue Reading'}
               </p>
               <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
-                {lastRead.surahName || ('Surah ' + lastRead.surahId)} &bull; Ayah {lastRead.ayahNumber}
+                {appLanguage === 'ur' && SURAH_URDU_MAP[lastRead.surahId]
+                  ? `سورۃ ${SURAH_URDU_MAP[lastRead.surahId].urduName} • آیت ${lastRead.ayahNumber}`
+                  : `${lastRead.surahName || ('Surah ' + lastRead.surahId)} • Ayah ${lastRead.ayahNumber}`}
               </h3>
             </div>
             <button 
@@ -380,6 +394,12 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           <div>
             {/* Quick Shia Prayer & Adhan Countdown Widget */}
             <HomeAdhanWidget onOpenMapAndPrayers={() => { hapticImpact(ImpactStyle.Light); setActiveTab('adhan'); }} />
+
+            {/* Holy Quran Audio Player on Homescreen */}
+            <HomeQuranAudioWidget onSelectSurah={onSelectSurah} />
+
+            {/* Read Shia Tafseer on Homescreen */}
+            <HomeTafseerWidget onOpenSurahTafseer={onSelectSurah} />
 
             {/* Search Input for Quran */}
             <div className="relative mb-2.5">
@@ -566,13 +586,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           </div>
         )}
 
-        {/* Minimal Footer with Solemn Iltemas-e-Surah Fatiha */}
-        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center space-y-2">
-          <p className="text-xs font-serif text-slate-800 dark:text-slate-200">
-            التماسِ سورۂ فاتحہ برائے مغفرت: <span className="font-semibold">Sakina Banoo D/O Akhoon Mohd Kazim</span> &bull; <span className="font-semibold">Syed Abbas Rizvi S/O Syed Hassan Rizvi</span>
-          </p>
-          <p className="text-[11px] text-slate-400">
-            Shia Markaz &bull; Developer: Syed Murtaza Razavee
+        {/* Standardized Global Footer */}
+        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 Shia Markaz. All Rights Reserved.
           </p>
         </footer>
       </main>

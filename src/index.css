@@ -1,31 +1,49 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, :where(.dark *)));
+
 @layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  html.dark, html.dark body {
+    background-color: #020617;
+    color: #f8fafc;
+    color-scheme: dark;
+  }
+  html:not(.dark), html:not(.dark) body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    color-scheme: light;
+  }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
 .font-arabic {
-  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', 'Traditional Arabic', 'Arial', serif;
 }
 
 .font-urdu {
-  font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Amiri', serif;
+  font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Noto Naskh Arabic', 'Amiri', serif;
   line-height: 2.1;
 }
 
 .font-quran {
-  font-family: 'Amiri Quran', 'Scheherazade New', 'Amiri', serif;
+  font-family: 'Amiri Quran', 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', 'Traditional Arabic', serif;
   line-height: 2.2;
 }
 
 .font-amiri {
-  font-family: 'Amiri', serif;
+  font-family: 'Amiri', 'Amiri Quran', 'Scheherazade New', serif;
 }
 
 .ayah-arabic-text {
-  font-family: 'Amiri', 'Scheherazade New', serif;
+  font-family: 'Amiri Quran', 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', serif;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1, "calt" 1;
 }
 
 /* Custom smooth scrollbar */

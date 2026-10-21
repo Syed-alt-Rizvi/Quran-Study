@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Gauge, Check, Sparkles } from 'lucide-react';
+import { Gauge, Check } from 'lucide-react';
 import { useSettingsStore } from '../../store';
 import { hapticImpact, hapticSelection } from '../../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
@@ -151,8 +151,8 @@ export default function GlobalSpeedControl({
           style={{ willChange: 'transform, opacity' }}
         >
           <div className="flex items-center justify-between px-2 py-1 mb-1 border-b border-slate-100 dark:border-slate-800">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-              <Sparkles size={11} />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+              <Gauge size={12} />
               Audio Speed
             </span>
             <span className="text-[10px] font-mono font-semibold text-slate-400">

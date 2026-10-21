@@ -2,6 +2,7 @@
 // Plays authentic Shia Ithna Ashari Adhan at the exact announced times (Fajr, Dhuhr, Maghrib)
 
 import { ShiaPrayerTimings } from './shiaPrayerTimes';
+import { audioFocusCoordinator } from './audioFocus';
 
 export interface ShiaAdhanLine {
   arabic: string;
@@ -112,6 +113,11 @@ class ShiaAdhanPlayerService {
           }
         });
       }
+
+      // Listen for audio focus pause events
+      window.addEventListener('pause-adhan-audio', () => {
+        this.pauseAdhan();
+      });
 
       // Listen for Capacitor native scheduled alarm triggers
       import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
@@ -233,6 +239,7 @@ class ShiaAdhanPlayerService {
           this.currentRepeat = 0;
           this.releaseWakeLock();
           this.clearMediaSession();
+          audioFocusCoordinator.releaseAudioFocus('adhan');
           this.notify();
         }
       });
@@ -242,6 +249,7 @@ class ShiaAdhanPlayerService {
         this.isPlaying = false;
         this.releaseWakeLock();
         this.clearMediaSession();
+        audioFocusCoordinator.releaseAudioFocus('adhan');
         this.notify();
       });
     } catch (e) {
@@ -364,6 +372,7 @@ class ShiaAdhanPlayerService {
       // Lock screen / background playback preservation
       await this.acquireWakeLock();
       this.updateMediaSession(prayerName);
+      audioFocusCoordinator.requestAudioFocus('adhan').catch(() => {});
 
       // In PWA, if tab/screen is hidden, notify user via service worker
       if (typeof document !== 'undefined' && document.hidden && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
@@ -385,6 +394,7 @@ class ShiaAdhanPlayerService {
       this.pendingPrayer = prayerName;
       this.releaseWakeLock();
       this.clearMediaSession();
+      audioFocusCoordinator.releaseAudioFocus('adhan');
       this.notify();
       return false;
     }
@@ -399,6 +409,7 @@ class ShiaAdhanPlayerService {
       await this.audio.play();
       this.isPlaying = true;
       await this.acquireWakeLock();
+      audioFocusCoordinator.requestAudioFocus('adhan').catch(() => {});
       if (this.currentPrayerName) {
         this.updateMediaSession(this.currentPrayerName);
       }
@@ -416,6 +427,7 @@ class ShiaAdhanPlayerService {
     this.isPlaying = false;
     this.releaseWakeLock();
     this.clearMediaSession();
+    audioFocusCoordinator.releaseAudioFocus('adhan');
     this.notify();
   }
 
@@ -429,6 +441,7 @@ class ShiaAdhanPlayerService {
     this.currentRepeat = 0;
     this.releaseWakeLock();
     this.clearMediaSession();
+    audioFocusCoordinator.releaseAudioFocus('adhan');
     this.notify();
   }
 

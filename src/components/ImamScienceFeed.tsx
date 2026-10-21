@@ -5,6 +5,7 @@ import ImamScienceReaderModal, { ImamArticle } from './ImamScienceReaderModal';
 import { getApiUrl } from '../utils/apiBase';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
+import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
 interface ImamScienceFeedProps {
   onSelectSurah?: (surah: number, ayah?: number) => void;
@@ -111,10 +112,10 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
 
       // Search query filter
       if (searchQuery.trim().length > 0) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchesTitle = article.title.toLowerCase().includes(q);
-        const matchesExcerpt = article.excerpt?.toLowerCase().includes(q);
-        const matchesCategory = (article.categories || []).some(c => c.toLowerCase().includes(q));
+        const qNormal = normalizeSearchQuery(searchQuery);
+        const matchesTitle = matchesSearch(article.title, qNormal);
+        const matchesExcerpt = matchesSearch(article.excerpt, qNormal);
+        const matchesCategory = (article.categories || []).some(c => matchesSearch(c, qNormal));
         if (!matchesTitle && !matchesExcerpt && !matchesCategory) {
           return false;
         }
@@ -142,11 +143,9 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
     <div className="space-y-6">
       {/* Archive Header & Mission Statement */}
       <div className="border-b-[0.5px] border-slate-200 dark:border-slate-800 pb-5 mt-2">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300">
-            <Microscope size={11} className="mr-1" />
-            Dynamic Research Archive
-          </span>
+        <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold mb-1">
+          <Microscope size={14} />
+          <span>Research &amp; Literature</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-slate-50">
           Qur'an, Hadith & Scientific Wisdom

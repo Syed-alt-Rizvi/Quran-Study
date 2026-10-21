@@ -2,39 +2,107 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Shia Markaz - Holy Quran, Shia Tafseer &amp; Adhan</title>
-    <meta name="description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona &amp; Al-Kauthar), authentic Mafatih Al Jinan supplications, and prayer times with Shia Adhan." />
-    <meta name="keywords" content="Shia Quran, Shia Tafseer, Tafseer Namoona, Tafseer Al-Kauthar, Mafatih al-Jinan, Shia Adhan, Shia Prayer Times, Ja'fari, Ahlulbayt, Shia Islam, Quran Urdu Translation" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- Primary Page Title & Descriptive Meta (Optimal 50-60 characters title, 140-160 characters description) -->
+    <title>Shia Markaz – Holy Quran, Shia Tafseer &amp; Mafatih Al Jinan</title>
+    <meta name="description" content="Explore the Holy Quran with authentic Shia Tafseer (Namoona &amp; Al-Kauthar), Mafatih Al Jinan supplications, Shia prayer times, Adhan, and Ahlulbayt insights." />
+    <meta name="keywords" content="Shia Quran, Shia Tafseer, Tafseer Namoona, Tafseer Al-Kauthar, Mafatih al-Jinan, Shia Adhan, Shia Prayer Times, Ja'fari, Ahlulbayt, Shia Islam, Quran Urdu Translation, Dua Kumayl, Ziyarat Ashura, Dua Tawassul, Hadith al-Kisa" />
     <meta name="author" content="Syed Murtaza Razavee" />
+    <meta name="application-name" content="Shia Markaz" />
+    <meta name="apple-mobile-web-app-title" content="Shia Markaz" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="theme-color" content="#047857" />
-    <link rel="canonical" href="https://quran-study.ai.studio/" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="rating" content="general" />
+    <meta name="revisit-after" content="7 days" />
+
+    <!-- Crawlers & Search Engines Indexing Directives -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Immediate Dark Mode Execution Script (prevents theme flash on initial paint) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('quran-app-settings') || localStorage.getItem('shia-quran-settings') || localStorage.getItem('shia-markaz-settings');
+          var isDark = false;
+          if (saved) {
+            var parsed = JSON.parse(saved);
+            if (parsed && parsed.state && typeof parsed.state.isDarkMode === 'boolean') {
+              isDark = parsed.state.isDarkMode;
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              isDark = true;
+            }
+          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            isDark = true;
+          }
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+            var metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.setAttribute('content', '#020617');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+            var metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.setAttribute('content', '#047857');
+          }
+        } catch(e) {}
+      })();
+    </script>
+
+    <!-- Dynamic Canonical URL Setup -->
+    <link id="canonical-url" rel="canonical" href="/" />
+    <script>
+      (function() {
+        try {
+          var canon = document.getElementById('canonical-url');
+          if (canon && window.location && window.location.origin) {
+            canon.href = window.location.origin + window.location.pathname;
+          }
+        } catch(e) {}
+      })();
+    </script>
+
+    <!-- Language Alternate Tags -->
+    <link rel="alternate" hreflang="en" href="/" />
+    <link rel="alternate" hreflang="ur" href="/?lang=ur" />
+    <link rel="alternate" hreflang="x-default" href="/" />
 
     <!-- OpenGraph Social Cards -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://quran-study.ai.studio/" />
-    <meta property="og:title" content="Shia Markaz - Holy Quran, Shia Tafseer &amp; Adhan" />
-    <meta property="og:description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona &amp; Al-Kauthar), authentic Mafatih Al Jinan supplications, and prayer times with Shia Adhan." />
-    <meta property="og:image" content="/pwa-512x512.png" />
     <meta property="og:site_name" content="Shia Markaz" />
+    <meta property="og:title" content="Shia Markaz – Holy Quran, Shia Tafseer &amp; Mafatih Al Jinan" />
+    <meta property="og:description" content="Explore the Holy Quran with authentic Shia Tafseer (Namoona &amp; Al-Kauthar), Mafatih Al Jinan supplications, Shia prayer times, Adhan, and Ahlulbayt insights." />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Shia Markaz Logo &amp; Holy Quran Cover" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ur_PK" />
+    <meta property="og:locale:alternate" content="ar_SA" />
 
-    <!-- Twitter / X Cards -->
+    <!-- Twitter / X Social Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://quran-study.ai.studio/" />
-    <meta name="twitter:title" content="Shia Markaz - Holy Quran, Shia Tafseer &amp; Adhan" />
-    <meta name="twitter:description" content="Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona &amp; Al-Kauthar), authentic Mafatih Al Jinan supplications, and prayer times with Shia Adhan." />
+    <meta name="twitter:title" content="Shia Markaz – Holy Quran, Shia Tafseer &amp; Mafatih Al Jinan" />
+    <meta name="twitter:description" content="Explore the Holy Quran with authentic Shia Tafseer (Namoona &amp; Al-Kauthar), Mafatih Al Jinan supplications, Shia prayer times, Adhan, and Ahlulbayt insights." />
     <meta name="twitter:image" content="/pwa-512x512.png" />
+    <meta name="twitter:image:alt" content="Shia Markaz Logo &amp; Holy Quran Cover" />
 
     <!-- Favicons & Web App Manifest -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&amp;family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@300;400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@400;600;700&amp;family=Noto+Nastaliq+Urdu:wght@400;600;700&amp;family=Scheherazade+New:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <!-- Preconnect High-Performance Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&amp;family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@300;400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@400;600;700&amp;family=Noto+Nastaliq+Urdu:wght@400;600;700&amp;family=Scheherazade+New:wght@400;600;700&amp;display=swap" rel="stylesheet" />
 
     <!-- Schema.org JSON-LD Structured Data for Search Engines -->
     <script type="application/ld+json">
@@ -43,17 +111,24 @@
       "@graph": [
         {
           "@type": "WebSite",
-          "@id": "https://quran-study.ai.studio/#website",
-          "url": "https://quran-study.ai.studio/",
+          "@id": "https://shiamarkaz.org/#website",
+          "url": "https://shiamarkaz.org/",
           "name": "Shia Markaz",
-          "description": "Comprehensive Shia Markaz platform featuring the Holy Quran, Shia Tafseer (Namoona & Al-Kauthar), Mafatih Al Jinan, and Shia Adhan.",
-          "inLanguage": ["en", "ur", "ar"]
+          "alternateName": "شیعہ مرکز",
+          "description": "Comprehensive Shia Markaz platform featuring the Holy Quran, authentic Shia Tafseer (Namoona & Al-Kauthar), Mafatih Al Jinan, and Shia Adhan.",
+          "inLanguage": ["en", "ur", "ar"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://shiamarkaz.org/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
         },
         {
           "@type": "WebApplication",
-          "@id": "https://quran-study.ai.studio/#app",
+          "@id": "https://shiamarkaz.org/#app",
           "name": "Shia Markaz",
-          "applicationCategory": "EducationalApplication",
+          "alternateName": "شیعہ مرکز",
+          "applicationCategory": "LifestyleApplication",
           "operatingSystem": "All",
           "browserRequirements": "Requires JavaScript. Requires HTML5.",
           "offers": {
@@ -65,13 +140,136 @@
             "@type": "Person",
             "name": "Syed Murtaza Razavee"
           }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://shiamarkaz.org/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Shia Markaz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Shia Markaz is a comprehensive Islamic web and mobile platform featuring the complete Holy Quran with authentic Shia commentaries (Tafseer-e-Namoona by Ayatullah Makarim Shirazi and Tafseer Al-Kauthar by Allama Mohsin Ali Najafi), full Mafatih Al Jinan supplications and ziyaraat, Ja'fari prayer times with Shia Adhan, and a Shia Hijri calendar."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which Shia Tafseer works are available in Shia Markaz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Shia Markaz includes Tafseer Namoona by Ayatullah Naser Makarim Shirazi and Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi with verse-by-verse Urdu commentaries and English insights."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does Shia Markaz include Mafatih Al Jinan supplications and audio?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, Shia Markaz provides the complete Mafatih Al Jinan catalog including Dua Kumayl, Dua Tawassul, Dua al-Faraj, Dua al-Ahd, Ziyarat Ashura, Ziyarat Waritha, and Hadith al-Kisa with synchronous Arabic text, Urdu and English translations, and audio recitation."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How are Shia prayer times calculated in Shia Markaz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Prayer times are calculated according to the Ja'fari Ithna Ashari method with precise twilight angles (Fajr at 16 degrees, Isha at 14 degrees) and Maghrib at 4 degrees sunset elevation, accompanied by Shia Adhan recitations with the testimony of Amir al-Mu'minin Ali (a.s)."
+              }
+            }
+          ]
         }
       ]
     }
     </script>
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
-    <div id="root"></div>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Main Application Mounting Container with Semantic Fallback Content for Crawlers & SEO Audits -->
+    <div id="root">
+      <!-- Semantic Static HTML Pre-Rendered for Search Engine Indexation (React replaces this automatically upon hydration) -->
+      <header style="max-width: 900px; margin: 0 auto; padding: 24px 16px; border-bottom: 1px solid #e2e8f0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+          <div>
+            <h1 style="font-size: 24px; font-weight: bold; color: #065f46; margin: 0 0 6px 0;">
+              Shia Markaz – Holy Quran, Authentic Shia Tafseer &amp; Mafatih Al Jinan
+            </h1>
+            <p style="font-size: 14px; color: #475569; margin: 0;">
+              The premier digital sanctuary for Quranic reflection, Ahlulbayt (a.s) supplications, and Ja'fari Islamic teachings.
+            </p>
+          </div>
+        </div>
+        <nav aria-label="Main Navigation" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; font-weight: 600;">
+          <a href="/?tab=quran" style="color: #047857; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border-radius: 8px;">Holy Quran &amp; Tafseer</a>
+          <a href="/?tab=mafatih" style="color: #047857; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border-radius: 8px;">Mafatih Al Jinan</a>
+          <a href="/?tab=adhan" style="color: #047857; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border-radius: 8px;">Shia Adhan &amp; Prayer Times</a>
+          <a href="/?tab=calendar" style="color: #047857; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border-radius: 8px;">Shia Hijri Calendar</a>
+          <a href="/?tab=science" style="color: #047857; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border-radius: 8px;">Imams &amp; Science</a>
+          <a href="/privacy" style="color: #64748b; text-decoration: none; padding: 6px 12px;">Privacy Policy</a>
+          <a href="/terms" style="color: #64748b; text-decoration: none; padding: 6px 12px;">Terms</a>
+          <a href="/data-deletion" style="color: #64748b; text-decoration: none; padding: 6px 12px;">Data Deletion</a>
+        </nav>
+      </header>
+
+      <main style="max-width: 900px; margin: 0 auto; padding: 32px 16px;">
+        <article>
+          <section id="quran-overview" style="margin-bottom: 36px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+              Holy Quran with Verse-by-Verse Authentic Shia Tafseer
+            </h2>
+            <p style="font-size: 15px; line-height: 1.75; color: #334155; margin-bottom: 14px;">
+              Shia Markaz offers the complete text of the Holy Quran across all 114 Surahs and 30 Juz, enriched with high-contrast Arabic calligraphy and comprehensive commentaries from distinguished Shia scholars. Study each Ayah alongside <strong>Tafseer-e-Namoona</strong> by Grand Ayatullah Naser Makarim Shirazi and <strong>Tafseer Al-Kauthar</strong> by Allama Sheikh Mohsin Ali Najafi, with complete Urdu translations and English insights.
+            </p>
+            <ul style="font-size: 14px; line-height: 1.8; color: #475569; padding-left: 20px;">
+              <li>Complete 114 Surahs with authentic Arabic script (Amiri Quran, Scheherazade New, and Noto Naskh).</li>
+              <li>Dual Shia commentaries: Tafseer Namoona and Tafseer Al-Kauthar with thematic indexation.</li>
+              <li>High-fidelity Quran audio recitation with renowned international reciters (Mishary Alafasy, Abdul Basit, Al-Minshawi).</li>
+              <li>Daily Ayah reminders, bookmarking, and personalized reading progress tracking.</li>
+            </ul>
+          </section>
+
+          <section id="mafatih-overview" style="margin-bottom: 36px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+              Complete Mafatih Al Jinan Supplications, Duas &amp; Ziyaraat
+            </h2>
+            <p style="font-size: 15px; line-height: 1.75; color: #334155; margin-bottom: 14px;">
+              Immerse yourself in the immortal words of the Ahlulbayt (a.s) compiled by Sheikh Abbas Qummi in <strong>Mafatih Al Jinan</strong>. Access cherished supplications including <em>Dua Kumayl, Dua Tawassul, Dua al-Faraj, Dua al-Ahd, Dua al-Iftitah, Dua al-Mashlool, Dua al-Mujir</em>, and esteemed Ziyaraat including <em>Ziyarat Ashura, Ziyarat Waritha, Ziyarat Ale-Yasin</em>, alongside <em>Hadith al-Kisa</em>. Each recitation provides verse-by-verse Arabic typography, translations, and soothing streaming audio playback.
+            </p>
+          </section>
+
+          <section id="prayer-times-overview" style="margin-bottom: 36px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+              Ja'fari Shia Prayer Times, Shia Adhan &amp; Qibla Direction
+            </h2>
+            <p style="font-size: 15px; line-height: 1.75; color: #334155; margin-bottom: 14px;">
+              Calculate exact Ja'fari prayer times (Fajr, Sunrise, Dhuhr, Asr, Sunset, Maghrib, Isha, and Midnight) worldwide based on authentic Ithna Ashari astronomical criteria. Experience authentic Shia Adhan notifications incorporating the sacred third testimony (<em>Ashhadu anna Aliyyan Waliyyullah</em>) and track the sacred Qibla direction towards the Holy Ka'bah in Makkah.
+            </p>
+          </section>
+
+          <section id="calendar-overview" style="margin-bottom: 36px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+              Shia Islamic Hijri Calendar &amp; Sacred Events Chronicle
+            </h2>
+            <p style="font-size: 15px; line-height: 1.75; color: #334155; margin-bottom: 14px;">
+              Stay spiritually aligned throughout the Islamic lunar year with the comprehensive Shia calendar. Track all major Islamic occasions, including the Wiladat and Shahadat of the Holy Prophet Muhammad (s.a.w.w), Lady Fatimah az-Zahra (s.a), Imam Ali (a.s), and the Holy Imams of Ahlulbayt (a.s), alongside sacred Eids (Eid al-Ghadeer, Eid al-Fitr, Eid al-Adha, Eid al-Mubahala) and recommended fasting days.
+            </p>
+          </section>
+        </article>
+      </main>
+
+      <footer style="max-width: 900px; margin: 40px auto 0 auto; padding: 24px 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
+        <p style="margin: 0;">&copy; 2026 Shia Markaz. All Rights Reserved.</p>
+      </footer>
+    </div>
+
+    <!-- Fallback for Web Crawlers and Browsers with JavaScript Disabled -->
+    <noscript>
+      <div style="max-width: 800px; margin: 20px auto; padding: 20px; background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; color: #991b1b; font-family: sans-serif;">
+        <h3 style="margin-top: 0;">JavaScript Required for Full Interactive Experience</h3>
+        <p>Shia Markaz requires JavaScript to play audio recitations and enable live search. You can still access full text content by browsing our chapters below:</p>
+        <p><a href="/?tab=quran" style="color: #047857; font-weight: bold;">Browse Holy Quran &amp; Shia Tafseer</a> | <a href="/?tab=mafatih" style="color: #047857; font-weight: bold;">Browse Mafatih Al Jinan</a></p>
+      </div>
+    </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

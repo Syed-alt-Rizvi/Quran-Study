@@ -1,5 +1,7 @@
 import { getApiUrl } from './utils/apiBase';
 import { fastStorage } from './utils/fastStorage';
+import { isValidMafatihDetail, notifyIntegrityRecovery } from './utils/dataIntegrity';
+import { normalizeArabicForSearch, normalizeLatinForSearch } from './utils/arabicSearch';
 
 export interface MafatihSummary {
   id: string;
@@ -111,7 +113,10 @@ export async function getFullIndex(): Promise<MafatihSummary[]> {
   indexPromise = (async (): Promise<MafatihSummary[]> => {
     // 1. Try static JSON first (0ms, pre-bundled, offline ready)
     try {
-      const res = await fetch(getApiUrl('/mafatih_index.json'));
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(getApiUrl('/mafatih_index.json'), { signal: controller.signal });
+      clearTimeout(timer);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -121,9 +126,12 @@ export async function getFullIndex(): Promise<MafatihSummary[]> {
       }
     } catch {}
 
-    // 2. Try live API fallback
+    // 2. Try live API fallback with timeout
     try {
-      const res = await fetch(getApiUrl('/api/mafatih/items?limit=1500'));
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(getApiUrl('/api/mafatih/items?limit=1500'), { signal: controller.signal });
+      clearTimeout(timer);
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.items) && data.items.length > 0) {
@@ -178,21 +186,23 @@ export async function fetchMafatihCategories(): Promise<MafatihCategory[]> {
 
 export function normalizeSearchText(str: string): string {
   if (!str) return "";
-  return str
-    .toLowerCase()
-    .replace(/[’'`\-_]/g, "")
+  // If string contains Arabic characters, perform full diacritic and letter normalization
+  if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(str)) {
+    return normalizeArabicForSearch(str);
+  }
+
+  // Latin transliteration normalization with Islamic keyword mappings
+  const latin = normalizeLatinForSearch(str);
+  return latin
     .replace(/hadith|hadees|hadis|hadeeth/g, "hadis")
     .replace(/kisaa?|kisa/g, "kisa")
     .replace(/ziyara[th]|ziyarat/g, "ziyarat")
     .replace(/kumayl|kumail/g, "kumail")
-    .replace(/ay/g, "ai")
-    .replace(/ee/g, "i")
-    .replace(/oo/g, "u")
-    .replace(/ou/g, "u")
-    .replace(/th/g, "s")
-    .replace(/dh/g, "z")
-    .replace(/ah\b/g, "at")
-    .replace(/aa/g, "a");
+    .replace(/ahd|ahad/g, "ahad")
+    .replace(/jawshan|joshan/g, "jawshan")
+    .replace(/mujir|mujeer/g, "mujir")
+    .replace(/iftitah|iftitaah/g, "iftitah")
+    .replace(/mashlool|mashlul/g, "mashlool");
 }
 
 export async function fetchMafatihItems(params: {
@@ -372,12 +382,21 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
   // 1b. Check IndexedDB persistent storage (0ms offline-first - only accept if valid verses exist)
   try {
     const cachedItem = await fastStorage.get<MafatihDetail>(`mafatih_detail_${targetId.toLowerCase()}`);
-    if (cachedItem && cachedItem.verses && cachedItem.verses.length > 0) {
+    if (cachedItem && isValidMafatihDetail(cachedItem)) {
       itemCache.set(targetId, cachedItem);
       itemCache.set(cleanId, cachedItem);
       itemCache.set(targetId.toLowerCase(), cachedItem);
       if (cachedItem.code) itemCache.set(cachedItem.code, cachedItem);
       return cachedItem;
+    } else if (cachedItem) {
+      await fastStorage.del(`mafatih_detail_${targetId.toLowerCase()}`);
+      notifyIntegrityRecovery({
+        subsystem: 'mafatih',
+        identifier: targetId,
+        reason: 'Corrupted mafatih item cache evicted',
+        recoveredFromBundle: true,
+        timestamp: Date.now()
+      });
     }
   } catch {}
 
@@ -396,7 +415,7 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
         (i.code && i.code.toLowerCase() === cleanId.toLowerCase())
       ) || null;
 
-      // Attempt 1: Instant static bundled asset read (0-5ms in both Web & APK)
+      // Attempt 1: Instant static bundled asset read (0-5ms in both Web & APK) with timeout
       const targetLower = targetId.toLowerCase();
       const cleanLower = cleanId.toLowerCase();
       const metaCode = meta?.code?.toLowerCase() || '';
@@ -415,17 +434,22 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
 
       for (const url of Array.from(staticCandidateSet)) {
         try {
-          const res = await fetch(url, { signal: callerSignal });
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 6000);
+          const res = await fetch(url, { signal: callerSignal || controller.signal });
+          clearTimeout(timer);
           if (res.ok) {
             const raw = await res.json();
             if (raw && ((raw.verses && raw.verses.length > 0) || raw.introduction || raw.title)) {
               const detail = sanitizeMafatihDetail(raw, targetId, meta);
-              itemCache.set(targetId, detail);
-              itemCache.set(cleanId, detail);
-              itemCache.set(targetId.toLowerCase(), detail);
-              if (detail.code) itemCache.set(detail.code, detail);
-              fastStorage.set(`mafatih_detail_${targetId.toLowerCase()}`, detail).catch(() => {});
-              return detail;
+              if (isValidMafatihDetail(detail)) {
+                itemCache.set(targetId, detail);
+                itemCache.set(cleanId, detail);
+                itemCache.set(targetId.toLowerCase(), detail);
+                if (detail.code) itemCache.set(detail.code, detail);
+                fastStorage.set(`mafatih_detail_${targetId.toLowerCase()}`, detail).catch(() => {});
+                return detail;
+              }
             }
           }
         } catch {}

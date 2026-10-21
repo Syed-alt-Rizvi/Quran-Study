@@ -6,88 +6,88 @@
 
   <!-- Shia Markaz Homepage & Holy Quran Reader -->
   <url>
-    <loc>https://quran-study.ai.studio/</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Shia Quran & Verse-by-Verse Tafseer Namoona -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=quran&amp;tafseer=namoona</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=quran&amp;tafseer=namoona</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Shia Quran & Tafseer Al-Kauthar -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=quran&amp;tafseer=kauthar</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=quran&amp;tafseer=kauthar</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Mafatih Al Jinan Supplications & Ziyaraat -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=mafatih</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=mafatih</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Shia Prayer Times, Ja'fari Adhan & Qibla Compass -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=adhan</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=adhan</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Shia Hijri Islamic Calendar & Wiladat / Shahadat Events -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=calendar</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=calendar</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Ahlulbayt (a.s) & Scientific Insights (Imams & Science) -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=science</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=science</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Community Discussions & Quranic Reflections -->
   <url>
-    <loc>https://quran-study.ai.studio/?tab=discuss</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/?tab=discuss</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Privacy Policy (Google Play & Web Compliance) -->
   <url>
-    <loc>https://quran-study.ai.studio/privacy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/privacy</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <!-- Terms of Service & User Guidelines -->
   <url>
-    <loc>https://quran-study.ai.studio/terms</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/terms</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <!-- Data Deletion & Privacy Sovereignty -->
   <url>
-    <loc>https://quran-study.ai.studio/data-deletion</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://shiamarkaz.org/data-deletion</loc>
+    <lastmod>2026-10-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

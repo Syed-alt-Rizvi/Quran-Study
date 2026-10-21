@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Calendar as CalendarIcon, ChevronLeft, ChevronRight, Bell, BellRing, BellOff, 
-  Sparkles, Star, Moon, Info, BookOpen, KeyRound, Search, Check, X, 
+  Star, Moon, Info, BookOpen, KeyRound, Search, Check, X, 
   Sliders, ExternalLink, CalendarDays, ListFilter, Bookmark, Share2, HelpCircle
 } from 'lucide-react';
 import { useSettingsStore } from '../store';
@@ -17,6 +17,7 @@ import {
 } from '../utils/calendarNotifications';
 import { ShiaCalendarEvent, CalendarDay } from '../types/calendar';
 import { getMafatihUrduTitle } from '../utils/mafatihUrdu';
+import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
 interface CalendarViewProps {
   onSelectMafatihItem?: (itemId: string) => void;
@@ -242,7 +243,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
   // Filtered and sorted events for list view
   const filteredEvents = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const qNormal = normalizeSearchQuery(searchQuery);
     const list = SHIA_CALENDAR_EVENTS.filter(ev => {
       // Type filtering
       if (filterType === 'eid' && ev.type !== 'eid') return false;
@@ -251,13 +252,15 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
       if (filterType === 'fasting' && !ev.isFastingRecommended) return false;
 
       // Search query
-      if (q) {
-        const matchesName = ev.name.toLowerCase().includes(q);
-        const matchesArabic = ev.arabicName && ev.arabicName.includes(q);
-        const matchesDesc = ev.shortDescription && ev.shortDescription.toLowerCase().includes(q);
+      if (qNormal.raw) {
         const monthInfo = getHijriMonthInfo(ev.hijriMonth);
-        const matchesMonth = monthInfo.nameEn.toLowerCase().includes(q) || monthInfo.nameAr.includes(q);
-        return matchesName || matchesArabic || matchesDesc || matchesMonth;
+        return (
+          matchesSearch(ev.name, qNormal) ||
+          matchesSearch(ev.arabicName, qNormal) ||
+          matchesSearch(ev.shortDescription, qNormal) ||
+          matchesSearch(monthInfo.nameEn, qNormal) ||
+          matchesSearch(monthInfo.nameAr, qNormal)
+        );
       }
 
       return true;
@@ -340,7 +343,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
             >
               {calendarNotificationSettings.enabled ? (
                 <>
-                  <BellRing size={13} className="animate-pulse" />
+                  <BellRing size={13} />
                   <span>Alerts Active</span>
                 </>
               ) : (
@@ -361,22 +364,25 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
           </div>
         </div>
 
-        {/* Proactive "Today's Sacred Day" Highlight Banner */}
+        {/* Today's Sacred Day Highlight */}
         {todayData.events.length > 0 && (
           <div className="mt-4 pt-4 border-t border-emerald-700/50">
             <div className="flex items-start gap-3 bg-emerald-950/60 rounded-2xl p-3.5 border border-emerald-600/40">
               <div className="p-2 rounded-xl bg-amber-400 text-slate-950 shrink-0 mt-0.5">
-                <Sparkles size={16} />
+                <Star size={16} />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">
                     Observed Today
                   </span>
                   {todayData.events[0].type === 'eid' && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                      Eid Mubarak!
-                    </span>
+                    <>
+                      <span className="text-amber-400/60" aria-hidden="true">·</span>
+                      <span className="text-[11px] font-semibold text-emerald-300">
+                        Eid Mubarak!
+                      </span>
+                    </>
                   )}
                 </div>
                 <h3 className="font-bold text-white text-sm sm:text-base">
@@ -663,14 +669,14 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        <span className={`text-[11px] font-semibold uppercase tracking-wider ${
                           ev.type === 'eid'
-                            ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300/40'
+                            ? 'text-amber-600 dark:text-amber-400'
                             : ev.type === 'celebration'
-                            ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40'
+                            ? 'text-emerald-600 dark:text-emerald-400'
                             : ev.type === 'urs' || ev.type === 'commemoration'
-                            ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300/40'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                            ? 'text-purple-600 dark:text-purple-400'
+                            : 'text-slate-600 dark:text-slate-400'
                         }`}>
                           {ev.type === 'urs' ? 'Urs / Shahadat' : ev.type}
                         </span>
@@ -724,11 +730,11 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
         </section>
       )}
 
-      {/* UPCOMING EVENTS QUICK SECTION */}
+      {/* Upcoming Events */}
       <section className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-amber-500" />
+            <CalendarDays size={16} className="text-amber-500" />
             <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100">
               Upcoming Holy Days (Next 60 Days)
             </h3>
@@ -768,12 +774,12 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               </div>
 
               <div className="text-right shrink-0">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                <span className={`text-[11px] font-semibold capitalize ${
                   item.event.type === 'eid'
-                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                    ? 'text-amber-600 dark:text-amber-400'
                     : item.event.type === 'celebration'
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                    : 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300'
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-purple-600 dark:text-purple-400'
                 }`}>
                   {item.event.type === 'urs' ? 'Urs' : item.event.type}
                 </span>
@@ -782,6 +788,8 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
           ))}
         </div>
       </section>
+
+      {/* DAY INSPECTION SHEET / MODAL */}
 
       {/* DAY INSPECTION SHEET / MODAL */}
       {selectedDay && !selectedEvent && (
@@ -867,9 +875,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
               <div className="space-y-1 pr-8">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-950">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">
                     {selectedEvent.type === 'urs' ? 'Urs / Commemoration' : selectedEvent.type}
                   </span>
+                  <span className="text-amber-400/60" aria-hidden="true">·</span>
                   <span className="text-xs font-bold text-amber-200 font-arabic">
                     {selectedEvent.hijriDay} {getHijriMonthInfo(selectedEvent.hijriMonth).nameEn}
                   </span>
@@ -932,7 +941,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               {selectedEvent.recommendedAmaal && selectedEvent.recommendedAmaal.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                   <h4 className="font-bold text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                    <Sparkles size={14} />
+                    <BookOpen size={14} />
                     <span>Recommended Amaal &amp; Observances</span>
                   </h4>
                   <ul className="space-y-2">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, X, Sparkles } from 'lucide-react';
+import { RefreshCw, X } from 'lucide-react';
 import { getApiUrl } from '../../utils/apiBase';
 
 export default function UpdateToast() {
@@ -18,14 +18,8 @@ export default function UpdateToast() {
           getApiUrl(`/api/version?_t=${Date.now()}`),
         ];
 
-        // If running on a forwarded domain or external host, also check canonical backend directly
-        if (
-          typeof window !== 'undefined' &&
-          !window.location.hostname.includes('ai.studio') &&
-          !window.location.hostname.includes('localhost') &&
-          !window.location.hostname.includes('127.0.0.1')
-        ) {
-          urlsToTry.push(`https://quran-study.ai.studio/api/version?_t=${Date.now()}`);
+        if (typeof window !== 'undefined') {
+          urlsToTry.push(`/api/version?_t=${Date.now()}`);
         }
 
         for (const url of urlsToTry) {
@@ -118,10 +112,10 @@ export default function UpdateToast() {
   return (
     <div
       role="alert"
-      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-emerald-800/95 dark:bg-emerald-950/95 text-white px-4 py-2.5 rounded-full shadow-2xl border border-emerald-500/30 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-300 max-w-[90vw] text-xs sm:text-sm font-medium"
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-emerald-900/95 dark:bg-emerald-950/95 text-white px-4 py-2 rounded-full shadow-lg border border-emerald-500/30 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200 max-w-[90vw] text-xs sm:text-sm font-medium"
     >
-      <Sparkles className="w-4 h-4 text-amber-300 shrink-0 animate-pulse" />
-      <span>New version published!</span>
+      <RefreshCw className="w-4 h-4 text-emerald-300 shrink-0" />
+      <span>An update is available</span>
       <button
         onClick={handleUpdate}
         className="px-3.5 py-1 bg-white text-emerald-900 rounded-full font-bold hover:bg-emerald-50 transition active:scale-95 shadow-sm shrink-0 flex items-center gap-1.5 cursor-pointer"

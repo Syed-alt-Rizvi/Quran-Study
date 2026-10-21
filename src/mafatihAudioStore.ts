@@ -3,6 +3,8 @@ import { Capacitor } from '@capacitor/core';
 import { getApiUrl } from './utils/apiBase';
 import { useAudioStore } from './audioStore';
 import { getCanonicalMafatihId } from './mafatihApi';
+import { audioFocusCoordinator } from './utils/audioFocus';
+import { updateMediaSession as syncMediaSession, clearMediaSession } from './utils/mediaSessionManager';
 
 export interface MafatihAudioTrack {
   id: string;
@@ -114,30 +116,21 @@ function teardownAudioElement(audio: HTMLAudioElement | null) {
 }
 
 function updateMediaSession(track: MafatihAudioTrack, getStore: () => MafatihAudioState) {
-  if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: 'Mafatih al-Jinan • Sheikh Abbas Qummi',
-      album: track.category || 'Supplications & Ziyaraat',
-    });
-    navigator.mediaSession.playbackState = 'playing';
-    navigator.mediaSession.setActionHandler('play', () => {
-      getStore().resume();
-    });
-    navigator.mediaSession.setActionHandler('pause', () => {
-      getStore().pause();
-    });
-    navigator.mediaSession.setActionHandler('stop', () => {
-      getStore().stop();
-    });
-    navigator.mediaSession.setActionHandler('seekbackward', () => {
-      getStore().skip(-10);
-    });
-    navigator.mediaSession.setActionHandler('seekforward', () => {
-      getStore().skip(10);
-    });
-  } catch {}
+  const store = getStore();
+  syncMediaSession({
+    title: track.title,
+    artist: 'Mafatih al-Jinan • Sheikh Abbas Qummi',
+    album: track.category || 'Supplications & Ziyaraat',
+    playbackState: store.isPlaying ? 'playing' : 'paused',
+    duration: store.duration,
+    position: store.currentTime,
+    playbackRate: store.playbackSpeed,
+    onPlay: () => store.resume(),
+    onPause: () => store.pause(),
+    onStop: () => store.stop(),
+    onSkip: (secs) => store.skip(secs),
+    onSeek: (pos) => store.seek(pos),
+  });
 }
 
 export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
@@ -154,6 +147,13 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
 
     window.addEventListener('stop-mafatih-audio', () => {
       get().stop();
+    });
+
+    window.addEventListener('global-audio-speed-changed', (e: any) => {
+      const spd = e.detail?.speed;
+      if (spd && typeof spd === 'number') {
+        get().setSpeed(spd);
+      }
     });
   }
 
@@ -261,11 +261,8 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     playTrack: async (track: MafatihAudioTrack) => {
       if (!track.audioUrl) return;
 
-      // Pause Quran audio
-      useAudioStore.getState().pause();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('pause-quran-audio'));
-      }
+      // Request exclusive audio focus for Mafatih supplication
+      await audioFocusCoordinator.requestAudioFocus('mafatih');
 
       currentFallbackUsed = false;
       const targetSrc = resolveStreamUrl(track.audioUrl, false);
@@ -338,6 +335,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
 
     pause: () => {
+      audioFocusCoordinator.releaseAudioFocus('mafatih');
       if (globalAudio) {
         try {
           globalAudio.pause();
@@ -350,11 +348,8 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
       const state = get();
       if (!state.currentTrack) return;
 
-      // Pause Quran audio
-      useAudioStore.getState().pause();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('pause-quran-audio'));
-      }
+      // Request exclusive audio focus
+      await audioFocusCoordinator.requestAudioFocus('mafatih');
 
       if (globalAudio && globalAudio.src) {
         set({ isPlaying: true, isBuffering: false });
@@ -433,20 +428,13 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
 
     stop: () => {
+      audioFocusCoordinator.releaseAudioFocus('mafatih');
       if (globalAudio) {
         teardownAudioElement(globalAudio);
         globalAudio = null;
       }
       currentFallbackUsed = false;
-
-      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-        try {
-          navigator.mediaSession.playbackState = 'none';
-          if (navigator.mediaSession.metadata) {
-            navigator.mediaSession.metadata = null;
-          }
-        } catch {}
-      }
+      clearMediaSession();
 
       set({
         currentTrack: null,

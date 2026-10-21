@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_calendar_compact_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_rounded"
+    android:padding="12dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/widget_compact_gregorian"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monday, 16 October"
+        android:textColor="@color/widget_text_muted"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/widget_compact_hijri_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="14"
+        android:textColor="@color/widget_gold"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:id="@+id/widget_compact_hijri_month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rabi' al-Thani 1448 AH"
+        android:textColor="@color/widget_emerald"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/widget_compact_occasion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wiladat of Imam Hasan al-Askari (a.s)"
+        android:textColor="@color/widget_text_white"
+        android:textSize="11sp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end" />
+</LinearLayout>

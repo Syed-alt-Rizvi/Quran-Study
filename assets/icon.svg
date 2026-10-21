@@ -1,63 +1,123 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Rich Islamic Green Gradient Canvas -->
-    <radialGradient id="greenCanvas" cx="50%" cy="46%" r="68%" fx="50%" fy="40%">
+    <!-- Rich Islamic Emerald Radial Gradient -->
+    <radialGradient id="emeraldCanvas" cx="50%" cy="46%" r="68%" fx="50%" fy="40%">
       <stop offset="0%" stop-color="#059669" />
-      <stop offset="60%" stop-color="#047857" />
-      <stop offset="100%" stop-color="#064e3b" />
+      <stop offset="45%" stop-color="#047857" />
+      <stop offset="85%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#022c22" />
     </radialGradient>
-    
-    <!-- Stylized Drop Shadow for Legibility and Depth -->
-    <filter id="vectorGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#022c22" flood-opacity="0.45" />
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#022c22" flood-opacity="0.3" />
-    </filter>
 
-    <linearGradient id="goldWhite" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="100%" stop-color="#F0FDF4" />
+    <!-- Persian Gold Luster Gradient -->
+    <linearGradient id="persianGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="30%" stop-color="#F59E0B" />
+      <stop offset="70%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#B45309" />
     </linearGradient>
+
+    <!-- Luminous Ivory Gold for Typography -->
+    <linearGradient id="ivoryLuster" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FEF3C7" />
+    </linearGradient>
+
+    <!-- Stylized Drop Shadow Filter -->
+    <filter id="medallionGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#011b15" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#F59E0B" flood-opacity="0.35" />
+    </filter>
   </defs>
 
-  <!-- Green Canvas Base -->
-  <rect width="1024" height="1024" fill="url(#greenCanvas)" />
+  <!-- Base Emerald Canvas -->
+  <rect width="1024" height="1024" fill="url(#emeraldCanvas)" />
 
-  <!-- Subtle Elegant Geometric Border Accent (Inside Adaptive Icon Safe Zone) -->
-  <rect x="96" y="96" width="832" height="832" rx="48" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-opacity="0.22" />
-  <rect x="112" y="112" width="800" height="800" rx="36" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.14" />
+  <!-- Outer Persian Border Frame -->
+  <rect x="96" y="96" width="832" height="832" rx="56" fill="none" stroke="url(#persianGold)" stroke-width="3" stroke-opacity="0.4" />
+  <rect x="116" y="116" width="792" height="792" rx="44" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.2" />
 
-  <!-- Stylized Words: Shia Markaz in Vector Typography -->
-  <g filter="url(#vectorGlow)" text-anchor="middle">
-    <!-- SHIA -->
+  <!-- Corner Arabesque Florets -->
+  <g fill="url(#persianGold)" fill-opacity="0.5">
+    <circle cx="116" cy="116" r="6" />
+    <circle cx="908" cy="116" r="6" />
+    <circle cx="116" cy="908" r="6" />
+    <circle cx="908" cy="908" r="6" />
+  </g>
+
+  <!-- Central Persian Shamseh (شمسہ) Medallion -->
+  <g filter="url(#medallionGlow)" transform="translate(512, 460)">
+    <!-- 16-Point Radiant Interlocking Star -->
+    <polygon points="
+      0,-260 76,-184 184,-184 184,-76 260,0 184,76 184,184 76,184 
+      0,260 -76,184 -184,184 -184,76 -260,0 -184,-76 -184,-184 -76,-184"
+      fill="#047857" stroke="url(#persianGold)" stroke-width="4.5" />
+
+    <polygon points="
+      0,-242 70,-172 172,-172 172,-70 242,0 172,70 172,172 70,172 
+      0,242 -70,172 -172,172 -172,70 -242,0 -172,-70 -172,-172 -70,-172"
+      transform="rotate(22.5)"
+      fill="#064e3b" stroke="url(#persianGold)" stroke-width="2.5" stroke-opacity="0.85" />
+
+    <!-- Inner Sacred Circle -->
+    <circle cx="0" cy="0" r="190" fill="#022c22" stroke="url(#persianGold)" stroke-width="4" />
+    <circle cx="0" cy="0" r="176" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-dasharray="6 4" stroke-opacity="0.35" />
+
+    <!-- Persian Calligraphy: شِیعَہ (Top) and مَرْکَز (Bottom) -->
+    <text x="0" y="-12" 
+      fill="url(#ivoryLuster)" 
+      font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', 'Traditional Arabic', serif" 
+      font-size="94" 
+      font-weight="bold" 
+      text-anchor="middle"
+      letter-spacing="2">شِیعَہ</text>
+
+    <!-- Arabesque Center Rosette Divider -->
+    <g transform="translate(0, 18)">
+      <path d="M -90 0 C -60 -8, -25 8, 0 0 C 25 8, 60 -8, 90 0" fill="none" stroke="url(#persianGold)" stroke-width="2.5" stroke-linecap="round" />
+      <polygon points="0,-7 7,0 0,7 -7,0" fill="url(#persianGold)" />
+      <circle cx="-35" cy="0" r="2.5" fill="url(#persianGold)" />
+      <circle cx="35" cy="0" r="2.5" fill="url(#persianGold)" />
+    </g>
+
+    <text x="0" y="96" 
+      fill="url(#ivoryLuster)" 
+      font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', 'Traditional Arabic', serif" 
+      font-size="82" 
+      font-weight="bold" 
+      text-anchor="middle"
+      letter-spacing="3">مَرْکَز</text>
+  </g>
+
+  <!-- Typography Below Medallion: SHIA MARKAZ -->
+  <g text-anchor="middle" filter="url(#medallionGlow)">
+    <!-- Roman Typography: SHIA MARKAZ -->
     <text 
       x="512" 
-      y="435" 
-      fill="url(#goldWhite)" 
-      font-family="'Cinzel Decorative', 'Cinzel', 'Playfair Display', 'Trajan Pro', 'Liberation Serif', 'FreeSerif', 'Georgia', serif" 
-      font-size="155" 
+      y="795" 
+      fill="url(#ivoryLuster)" 
+      font-family="'Cinzel Decorative', 'Cinzel', 'Playfair Display', 'Trajan Pro', serif" 
+      font-size="62" 
       font-weight="800" 
-      letter-spacing="14">SHIA</text>
+      letter-spacing="12">SHIA MARKAZ</text>
 
-    <!-- Stylized Vector Ornamental Divider -->
+    <!-- Persian Ornamental Underline Flourish -->
     <path 
-      d="M 340 488 C 400 484, 460 492, 492 488 L 512 474 L 532 488 C 564 492, 624 484, 684 488" 
+      d="M 330 825 C 420 818, 604 818, 694 825" 
       fill="none" 
-      stroke="#FFFFFF" 
-      stroke-width="3" 
+      stroke="url(#persianGold)" 
+      stroke-width="2" 
       stroke-linecap="round" 
-      stroke-opacity="0.85" />
-    
-    <!-- Central Calligraphic Diamond Accent -->
-    <polygon points="512,476 520,488 512,500 504,488" fill="#FFFFFF" fill-opacity="0.9" />
+      stroke-opacity="0.9" />
+    <polygon points="512,820 518,825 512,830 506,825" fill="url(#persianGold)" />
 
-    <!-- MARKAZ -->
+    <!-- Dedication subtitle -->
     <text 
       x="512" 
-      y="620" 
-      fill="url(#goldWhite)" 
-      font-family="'Cinzel Decorative', 'Cinzel', 'Playfair Display', 'Trajan Pro', 'Liberation Serif', 'FreeSerif', 'Georgia', serif" 
-      font-size="125" 
-      font-weight="700" 
-      letter-spacing="18">MARKAZ</text>
+      y="860" 
+      fill="#A7F3D0" 
+      font-family="'Inter', sans-serif" 
+      font-size="20" 
+      font-weight="600" 
+      letter-spacing="4">HOLY QURAN • TAFSEER • MAFATIH</text>
   </g>
 </svg>

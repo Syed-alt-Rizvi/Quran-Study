@@ -101,6 +101,73 @@
                 android:resource="@xml/widget_daily_ayah_info" />
         </receiver>
 
+        <!-- Shia Islamic Calendar Widget -->
+        <receiver
+            android:name=".ShiaCalendarWidgetProvider"
+            android:label="Shia Islamic Calendar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_shia_calendar_info" />
+        </receiver>
+
+        <!-- Shia Islamic Calendar Compact Widget -->
+        <receiver
+            android:name=".ShiaCalendarCompactWidgetProvider"
+            android:label="Shia Calendar (Date &amp; Day)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_shia_calendar_compact_info" />
+        </receiver>
+
+        <!-- Shia Upcoming Occasions Calendar Widget -->
+        <receiver
+            android:name=".ShiaCalendarEventsWidgetProvider"
+            android:label="Shia Upcoming Occasions"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_shia_calendar_events_info" />
+        </receiver>
+
+        <!-- Shia Quran Tafseer Widget -->
+        <receiver
+            android:name=".TafseerWidgetProvider"
+            android:label="Shia Quran Tafseer"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_tafseer_info" />
+        </receiver>
+
+        <!-- Holy Quran Audio Player Widget -->
+        <receiver
+            android:name=".QuranAudioWidgetProvider"
+            android:label="Holy Quran Audio"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.tafseerenamoona.app.ACTION_PREV_SURAH" />
+                <action android:name="com.tafseerenamoona.app.ACTION_NEXT_SURAH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quran_audio_info" />
+        </receiver>
+
     </application>
 
 </manifest>

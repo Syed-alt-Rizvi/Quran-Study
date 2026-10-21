@@ -5,7 +5,6 @@ import AudioPlayer from './components/AudioPlayer';
 import UpdateToast from './components/common/UpdateToast';
 import { AnimatePresence } from 'motion/react';
 import { popModal } from './utils/modalBackHandler';
-import { trackAppLaunchAndTelemetry } from './utils/telemetry';
 import { checkUrlForTransfer, importUserData } from './utils/dataTransfer';
 import { checkAndDispatchCalendarNotifications } from './utils/calendarNotifications';
 import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
@@ -72,8 +71,16 @@ export default function App() {
     if (typeof document !== 'undefined') {
       if (isDarkMode) {
         document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
       } else {
         document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+      }
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', isDarkMode ? '#020617' : '#047857');
       }
     }
   }, [isDarkMode]);
@@ -203,6 +210,7 @@ export default function App() {
 
   const handleSelectMafatihItem = (itemId: string) => {
     setIsSidebarOpen(false);
+    useSettingsStore.getState().setCurrentAppTab('mafatih');
     setSelectedMafatihItem(itemId);
     setSelectedSurah(null);
     setSelectedJuz(null);
@@ -247,12 +255,22 @@ export default function App() {
     }
 
     if (selectedSurahRef.current !== null || selectedJuzRef.current !== null || selectedMafatihItemRef.current !== null) {
+      const wasMafatih = selectedMafatihItemRef.current !== null;
       setSelectedSurah(null);
       setSelectedJuz(null);
       setSelectedMafatihItem(null);
       setTargetAyah(null);
       setTargetSurah(null);
+      if (wasMafatih) {
+        useSettingsStore.getState().setCurrentAppTab('mafatih');
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      return true;
+    }
+
+    const currentTab = useSettingsStore.getState().currentAppTab;
+    if (currentTab && currentTab !== 'quran') {
+      useSettingsStore.getState().setCurrentAppTab('quran');
       return true;
     }
 
@@ -273,12 +291,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const telemetryTimer = setTimeout(() => {
-      trackAppLaunchAndTelemetry().catch(() => {});
-    }, 1500);
-
     let isMounted = true;
-    const cleanupFns: Array<() => void> = [() => clearTimeout(telemetryTimer)];
+    const cleanupFns: Array<() => void> = [];
 
     try {
       CapacitorApp.addListener('backButton', () => {
@@ -382,6 +396,7 @@ export default function App() {
                 if (window.location.hash) {
                   history.replaceState(null, '', window.location.pathname + window.location.search);
                 }
+                useSettingsStore.getState().setCurrentAppTab('mafatih');
                 setSelectedMafatihItem(null);
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
               }} 

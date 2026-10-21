@@ -1,4 +1,4 @@
-// Ultra-fast asynchronous IndexedDB storage layer with in-memory L1 cache and fallback
+// Ultra-fast asynchronous IndexedDB storage layer with in-memory L1 cache, quota protection, and resilient fallback
 
 const DB_NAME = 'shia_markaz_fast_cache';
 const DB_VERSION = 1;
@@ -49,9 +49,31 @@ function getDb(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
+/**
+ * Prune non-essential cache keys if IndexedDB hits a quota ceiling
+ */
+async function pruneNonEssentialKeys(db: IDBDatabase): Promise<void> {
+  try {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const keysReq = store.getAllKeys();
+    keysReq.onsuccess = () => {
+      const keys = keysReq.result || [];
+      // Evict transient prefetch or raw html proxy entries first
+      const evictable = keys.filter(k => 
+        typeof k === 'string' && (k.startsWith('tafseer_proxy_') || k.startsWith('prefetch_') || k.includes('_html_'))
+      );
+      evictable.slice(0, 50).forEach(k => {
+        store.delete(k);
+        memoryL1.delete(k as string);
+      });
+    };
+  } catch {}
+}
+
 export const fastStorage = {
   async get<T = any>(key: string): Promise<T | null> {
-    // Check Tier 1: In-memory L1 Cache (0ms)
+    // Check Tier 1: In-memory L1 Cache (0ms instant)
     if (memoryL1.has(key)) {
       return memoryL1.get(key) as T;
     }
@@ -91,6 +113,8 @@ export const fastStorage = {
   },
 
   async set(key: string, value: any): Promise<void> {
+    if (value === undefined || value === null) return;
+
     // Store in Tier 1 L1
     memoryL1.set(key, value);
 
@@ -102,13 +126,19 @@ export const fastStorage = {
         const store = tx.objectStore(STORE_NAME);
         const req = store.put(value, key);
         req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
+        req.onerror = async (err) => {
+          // If quota exceeded, attempt intelligent eviction of volatile keys
+          if (req.error?.name === 'QuotaExceededError') {
+            await pruneNonEssentialKeys(db);
+          }
+          reject(req.error || err);
+        };
       });
     } catch {
-      // Fallback: localStorage (with size check)
+      // Fallback: localStorage (with strict size ceiling to prevent synchronous quota crash)
       try {
         const str = JSON.stringify(value);
-        if (str.length < 500000) { // Only small items in localStorage fallback to avoid quota error
+        if (str.length < 300000) {
           localStorage.setItem(key, str);
         }
       } catch {}
@@ -124,5 +154,9 @@ export const fastStorage = {
     } catch {
       try { localStorage.removeItem(key); } catch {}
     }
+  },
+
+  has(key: string): boolean {
+    return memoryL1.has(key);
   }
 };

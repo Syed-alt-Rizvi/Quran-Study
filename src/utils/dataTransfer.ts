@@ -65,7 +65,7 @@ export function importUserData(data: Partial<UserDataPayload>): { success: boole
   if (Array.isArray(data.bookmarks)) {
     const existingKeys = new Set((current.bookmarks || []).map(b => `${b.surahId}_${b.ayahNumber}`));
     for (const b of data.bookmarks) {
-      if (b && typeof b.surahId === 'number' && typeof b.ayahNumber === 'number') {
+      if (b && typeof b.surahId === 'number' && typeof b.ayahNumber === 'number' && b.surahId >= 1 && b.surahId <= 114 && b.ayahNumber >= 1) {
         const key = `${b.surahId}_${b.ayahNumber}`;
         if (!existingKeys.has(key)) {
           current.addBookmark(b);
@@ -80,9 +80,9 @@ export function importUserData(data: Partial<UserDataPayload>): { success: boole
   if (Array.isArray(data.mafatihBookmarks)) {
     const existingMafatih = new Set(current.mafatihBookmarks || []);
     for (const mId of data.mafatihBookmarks) {
-      if (typeof mId === 'string' && !existingMafatih.has(mId)) {
-        current.addMafatihBookmark(mId);
-        existingMafatih.add(mId);
+      if (typeof mId === 'string' && mId.trim() && !existingMafatih.has(mId.trim())) {
+        current.addMafatihBookmark(mId.trim());
+        existingMafatih.add(mId.trim());
         count++;
       }
     }
@@ -105,7 +105,7 @@ export function importUserData(data: Partial<UserDataPayload>): { success: boole
       for (const [sId, aNum] of Object.entries(data.readProgress!)) {
         const s = Number(sId);
         const a = Number(aNum);
-        if (!isNaN(s) && !isNaN(a)) {
+        if (!isNaN(s) && !isNaN(a) && s >= 1 && s <= 114 && a >= 1) {
           merged[s] = Math.max(merged[s] || 0, a);
         }
       }
@@ -113,18 +113,20 @@ export function importUserData(data: Partial<UserDataPayload>): { success: boole
     });
   }
 
-  // 5. Restore last read if present
-  if (data.lastRead && data.lastRead.surahId) {
+  // 5. Restore last read if valid
+  if (data.lastRead && typeof data.lastRead.surahId === 'number' && data.lastRead.surahId >= 1 && data.lastRead.surahId <= 114 && typeof data.lastRead.ayahNumber === 'number' && data.lastRead.ayahNumber >= 1) {
     current.setLastRead(data.lastRead);
   }
 
-  // 6. Restore user preferences
-  if (data.reciter) current.setReciter(data.reciter);
-  if (data.arabicFont) current.setArabicFont(data.arabicFont);
-  if (data.englishFont) current.setEnglishFont(data.englishFont);
-  if (typeof data.fontSize === 'number') current.setFontSize(data.fontSize);
-  if (data.tafseerProvider) current.setTafseerProvider(data.tafseerProvider);
-  if (data.userName) current.setUserName(data.userName);
+  // 6. Restore user preferences with safe clamps
+  if (data.reciter && typeof data.reciter === 'string') current.setReciter(data.reciter);
+  if (data.arabicFont && typeof data.arabicFont === 'string') current.setArabicFont(data.arabicFont);
+  if (data.englishFont && typeof data.englishFont === 'string') current.setEnglishFont(data.englishFont);
+  if (typeof data.fontSize === 'number' && data.fontSize >= 20 && data.fontSize <= 56) current.setFontSize(data.fontSize);
+  if (data.tafseerProvider && (data.tafseerProvider === 'namoona' || data.tafseerProvider === 'kauthar')) {
+    current.setTafseerProvider(data.tafseerProvider);
+  }
+  if (data.userName && typeof data.userName === 'string') current.setUserName(data.userName);
 
   return { success: true, importedCount: count };
 }

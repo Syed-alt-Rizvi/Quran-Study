@@ -33,6 +33,18 @@ public class MainActivity extends BridgeActivity {
                     getBridge().getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('open-app-tab', { detail: 'mafatih' }))", null);
                 }, 600);
             }
+        } else if ("OPEN_TAB_CALENDAR".equals(action)) {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().postDelayed(() -> {
+                    getBridge().getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('open-app-tab', { detail: 'calendar' }))", null);
+                }, 600);
+            }
+        } else if ("OPEN_TAB_TAFSEER".equals(action)) {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().postDelayed(() -> {
+                    getBridge().getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('open-app-tab', { detail: 'quran' }))", null);
+                }, 600);
+            }
         }
     }
 }

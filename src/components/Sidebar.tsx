@@ -16,6 +16,9 @@ import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import { PWAInstallButton } from './PWAInstallButton';
+import { getApiUrl } from '../utils/apiBase';
+import { SURAH_URDU_MAP } from '../data/surahUrduNames';
+import staticSurahs from '../surahList.json';
 
 import { registerModal } from '../utils/modalBackHandler';
 
@@ -31,7 +34,7 @@ type TabCategory = 'display' | 'quran' | 'mafatih' | 'audio' | 'library' | 'abou
 
 export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafatihItem, onExitApp }: SidebarProps) {
   const { 
-    isDarkMode, toggleDarkMode, 
+    isDarkMode, toggleDarkMode, setDarkMode,
     fontSize, setFontSize, 
     arabicFont, setArabicFont,
     englishFont, setEnglishFont,
@@ -81,8 +84,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     try {
       const bundled = typeof __APP_BUILD_ID__ !== 'undefined' ? String(__APP_BUILD_ID__) : '1.2.0';
       const urls = [
-        `/api/version?_t=${Date.now()}`,
-        `https://quran-study.ai.studio/api/version?_t=${Date.now()}`
+        getApiUrl(`/api/version?_t=${Date.now()}`),
+        `/api/version?_t=${Date.now()}`
       ];
       let serverVer: string | null = null;
       for (const u of urls) {
@@ -231,10 +234,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
   const notesList = Object.entries(tafseerNotes || {}).filter(([_, note]) => note && note.trim().length > 0);
 
   const sortedBookmarks = useMemo(() => {
-    return [...bookmarks].sort((a, b) => {
-      if (a.surahId !== b.surahId) return a.surahId - b.surahId;
-      return a.ayahNumber - b.ayahNumber;
-    });
+    return [...bookmarks]
+      .filter((b) => b && typeof b.surahId === 'number' && b.surahId >= 1 && b.surahId <= 114 && typeof b.ayahNumber === 'number' && b.ayahNumber >= 1)
+      .sort((a, b) => {
+        if (a.surahId !== b.surahId) return a.surahId - b.surahId;
+        return a.ayahNumber - b.ayahNumber;
+      });
   }, [bookmarks]);
 
   const isUrdu = appLanguage === 'ur';
@@ -362,20 +367,20 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     title="Click to change your name"
                   >
                     <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-                      {userName ? `Salam, ${userName}` : 'Salam, Noble Reader'}
+                      {userName ? `Salam, ${userName}` : 'Salam alaykum'}
                     </span>
                     <FileEdit size={12} className="text-slate-400 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex-shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex-shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>Offline Ready</span>
               </div>
             </div>
 
-            {/* Modern Segmented Navigation Bar */}
+            {/* Navigation Tabs */}
             <div className="grid grid-cols-6 gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/90 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -533,14 +538,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="theme-light-btn"
                       onClick={() => {
-                        if (isDarkMode) {
-                          hapticSelection();
-                          toggleDarkMode();
-                        }
+                        hapticSelection();
+                        setDarkMode(false);
                       }}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs ${
+                      className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs cursor-pointer ${
                         !isDarkMode
-                          ? 'bg-amber-500/10 border-amber-500/80 text-amber-900 dark:text-amber-200 shadow-xs'
+                          ? 'bg-amber-500/10 border-amber-500/80 text-amber-900 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/30'
                           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                       }`}
                     >
@@ -552,14 +555,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="theme-dark-btn"
                       onClick={() => {
-                        if (!isDarkMode) {
-                          hapticSelection();
-                          toggleDarkMode();
-                        }
+                        hapticSelection();
+                        setDarkMode(true);
                       }}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs ${
+                      className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs cursor-pointer ${
                         isDarkMode
-                          ? 'bg-emerald-500/10 border-emerald-500/80 text-emerald-300 shadow-xs'
+                          ? 'bg-emerald-500/10 border-emerald-500/80 text-emerald-300 shadow-xs ring-1 ring-emerald-500/30'
                           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                       }`}
                     >
@@ -1202,14 +1203,25 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                             }}
                             className="flex items-center gap-2.5 text-left flex-1 mr-2"
                           >
-                            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/40">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/40 shrink-0">
                               {b.surahId}
                             </div>
-                            <div>
-                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                Surah {b.surahId}, Ayah {b.ayahNumber}
-                              </span>
-                              <span className="text-[10px] text-slate-400 block">Tap to jump to verse</span>
+                            <div className="min-w-0 flex-1">
+                              {(() => {
+                                const surahMeta = (staticSurahs as any[])?.find((s) => s.number === b.surahId);
+                                const urduInfo = SURAH_URDU_MAP[b.surahId];
+                                const name = isUrdu && urduInfo ? `سورۃ ${urduInfo.urduName}` : (surahMeta?.englishName || `Surah ${b.surahId}`);
+                                return (
+                                  <>
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors block truncate">
+                                      {name} • {isUrdu ? `آیت ${b.ayahNumber}` : `Ayah ${b.ayahNumber}`}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 block truncate">
+                                      {isUrdu ? 'آیت پر جانے کیلئے ٹیپ کریں' : 'Tap to jump to verse'}
+                                    </span>
+                                  </>
+                                );
+                              })()}
                             </div>
                           </button>
 
@@ -1424,87 +1436,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   </div>
                 </div>
 
-                {/* Sacred Dedication: ILTEMAS-E-SURAH FATIHA */}
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-emerald-500/10 to-amber-500/5 dark:from-amber-950/40 dark:via-emerald-950/30 dark:to-amber-950/20 border border-amber-300/70 dark:border-amber-700/60 shadow-xs space-y-3">
-                  <div className="text-center space-y-1">
-                    <p className="text-sm font-bold text-amber-900 dark:text-amber-200 font-arabic">
-                      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                    </p>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 font-serif">
-                      التماسِ سورۂ فاتحہ (Iltemas-e-Surah Fatiha)
-                    </h4>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                      Please recite Surah Al-Fatiha for the Isal-e-Sawab and Maghfirat of:
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 bg-white/95 dark:bg-slate-900/95 p-3 rounded-xl border border-amber-200/80 dark:border-amber-900/60 shadow-xs">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-xs">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
-                      <span>Sakina Banoo D/O Akhoon Mohd Kazim</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-xs">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
-                      <span>Syed Abbas Rizvi S/O Syed Hassan Rizvi</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[10px] text-center text-slate-500 dark:text-slate-400 italic leading-relaxed">
-                    May Allah (SWT) grant them forgiveness, elevate their spiritual stations, and illuminate their graves in the company of the Holy Prophet Muhammad (s.a.w.w) and the 14 Infallible Ahlulbayt (a.s).
-                  </p>
-                </div>
-
                 {/* Download Web App (Android / iOS) */}
                 <PWAInstallButton variant="full" />
-
-                {/* Developer Profile Card */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-xs flex-shrink-0">
-                      SR
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs">Syed Murtaza Razavee</h4>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                          Developer
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                        Syedmurtazarazavee@gmail.com
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <a
-                      id="contact-developer-mail-link"
-                      href="mailto:Syedmurtazarazavee@gmail.com?subject=Shia%20Markaz%20Feedback"
-                      className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
-                    >
-                      <Mail size={14} />
-                      <span>Contact</span>
-                    </a>
-
-                    <button
-                      id="copy-developer-email-btn"
-                      onClick={handleCopyEmail}
-                      className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      {copiedEmail ? (
-                        <>
-                          <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-emerald-600 dark:text-emerald-400">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={14} />
-                          <span>Copy Email</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
 
                 {/* Legal, Privacy & Compliance */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
@@ -1612,6 +1545,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       <span>Exit App (Dua e Khatm e Quraan)</span>
                     </button>
                   )}
+                </div>
+
+                {/* Standardized Global Footer */}
+                <div className="pt-4 pb-2 text-center border-t border-slate-200/60 dark:border-slate-800/60">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    &copy; 2026 Shia Markaz. All Rights Reserved.
+                  </p>
                 </div>
               </div>
             )}
