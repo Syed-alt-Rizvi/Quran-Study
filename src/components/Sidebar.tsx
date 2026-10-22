@@ -8,7 +8,8 @@ import {
   Code, Mail, Copy, Info, Shield, FileText,
   ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
   Smartphone, Vibrate, ExternalLink,
-  Microscope, MessageCircle, LogOut, RefreshCw, Calendar
+  Microscope, MessageCircle, LogOut, RefreshCw, Calendar,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useSettingsStore, AppTab } from '../store';
 import { t } from '../i18n';
@@ -76,6 +77,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
   });
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
+  const [isFatihaExpanded, setIsFatihaExpanded] = useState(true);
 
   const handleManualCheckUpdate = async () => {
     setIsCheckingUpdate(true);
@@ -1359,6 +1361,67 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {/* TAB 5: ABOUT, SUPPORT & DEDICATION */}
             {activeTab === 'about' && (
               <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Dedicated Collapsible Tab: Iltemas e Surah Fatiha */}
+                <div className="rounded-2xl border border-emerald-200/90 dark:border-emerald-800/60 bg-gradient-to-br from-emerald-50/70 via-white to-amber-50/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 p-4 shadow-xs space-y-3 transition-all">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      hapticSelection();
+                      setIsFatihaExpanded(prev => !prev);
+                    }}
+                    className="w-full flex items-center justify-between gap-3 text-left cursor-pointer group"
+                    aria-expanded={isFatihaExpanded}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-600/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shadow-xs shrink-0">
+                        <BookOpen size={17} />
+                      </div>
+                      <div className="truncate">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <span>Iltemas e Surah Fatiha</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          Memorial dedication & supplication
+                        </p>
+                      </div>
+                    </div>
+                    <div className="w-7 h-7 rounded-lg bg-emerald-100/60 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 transition-transform">
+                      {isFatihaExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isFatihaExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="overflow-hidden pt-2 border-t border-emerald-100 dark:border-emerald-900/50 space-y-3"
+                      >
+                        <div className="p-3.5 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-emerald-200/60 dark:border-emerald-800/40 space-y-2.5 text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                          <p className="font-bold text-emerald-800 dark:text-emerald-300">
+                            Iltemas e Surah Fatiha:
+                          </p>
+                          <ul className="space-y-1.5 pl-1">
+                            <li className="flex items-start gap-2">
+                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
+                              <span className="font-medium">Madar e Aziz Sakina Banoo D/O Akhoon Mohd Kazim</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
+                              <span className="font-medium">Dada Jaan Syed Abbas Rizvi S/O Syed Hassan Rizvi</span>
+                            </li>
+                          </ul>
+                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 italic">
+                            Iltemas e Dua- Syed Murtaza Rizvi(Developer)
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 {/* Voluntary Support via UPI */}
                 <div className="rounded-2xl border border-rose-200/80 dark:border-rose-900/40 bg-gradient-to-br from-rose-50/40 via-white to-amber-50/30 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/20 p-4 space-y-3.5 shadow-xs">
                   <div className="flex items-center gap-3">

@@ -95,15 +95,15 @@
       text-anchor="middle"
       letter-spacing="2">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</text>
 
-    <!-- Center Calligraphy: "شيعة مركز" / "مرکزِ تشیع" -->
-    <!-- Large Artistic Central Arabic/Persian Calligraphy -->
+    <!-- Center Calligraphy: "شيعة مركز" -->
+    <!-- Large Artistic Central Arabic Calligraphy -->
     <g filter="url(#goldGlow)" text-anchor="middle">
       <text x="0" y="-10" 
         fill="url(#ivoryWhite)" 
-        font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', serif" 
+        font-family="'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif" 
         font-size="160" 
         font-weight="bold" 
-        letter-spacing="4">شِیعَہ</text>
+        letter-spacing="2">شِيعَة</text>
 
       <!-- Calligraphic Center Rosette Divider -->
       <g transform="translate(0, 40)">
@@ -115,10 +115,10 @@
 
       <text x="0" y="165" 
         fill="url(#ivoryWhite)" 
-        font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', serif" 
+        font-family="'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif" 
         font-size="140" 
         font-weight="bold" 
-        letter-spacing="6">مَرْکَز</text>
+        letter-spacing="4">مَرْكَز</text>
     </g>
 
     <!-- Bottom Medallion Finial Accent -->

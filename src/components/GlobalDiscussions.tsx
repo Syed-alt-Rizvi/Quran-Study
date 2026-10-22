@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, MessageCircle, BookOpen, LogIn, Flag, UserX, ShieldCheck, Check, CheckCircle2 } from 'lucide-react';
+import { Send, User, MessageCircle, BookOpen, LogIn, Flag, UserX, ShieldCheck, Check, CheckCircle2, Reply, ChevronDown, ChevronUp, CornerDownRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../utils/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, deleteDoc, doc, updateDoc, limit } from 'firebase/firestore';
@@ -18,6 +18,7 @@ import { ImpactStyle } from '@capacitor/haptics';
 import { registerModal } from '../utils/modalBackHandler';
 import SignInModal from './SignInModal';
 import ReportModal from './ReportModal';
+import ThreadReplyModal, { DiscussionRow } from './ThreadReplyModal';
 import { getApiUrl } from '../utils/apiBase';
 
 interface Discussion {
@@ -158,6 +159,44 @@ export default function GlobalDiscussions() {
     discussionId: '',
     authorName: '',
   });
+
+  // Dedicated Thread Reply Modal State
+  const [threadModal, setThreadModal] = useState<{
+    isOpen: boolean;
+    parentRow: DBRow | null;
+    initialTargetAuthor?: string;
+  }>({
+    isOpen: false,
+    parentRow: null,
+    initialTargetAuthor: undefined,
+  });
+
+  // Collapsible feed replies tracking (seed threads start expanded for discoverability)
+  const [expandedThreads, setExpandedThreads] = useState<Set<string>>(
+    () => new Set(['comm_seed_1', 'comm_seed_3'])
+  );
+
+  const toggleThreadExpanded = (threadId: string) => {
+    hapticSelection();
+    setExpandedThreads(prev => {
+      const next = new Set(prev);
+      if (next.has(threadId)) {
+        next.delete(threadId);
+      } else {
+        next.add(threadId);
+      }
+      return next;
+    });
+  };
+
+  const openThreadModal = (parentRow: DBRow, initialAuthor?: string) => {
+    hapticSelection();
+    setThreadModal({
+      isOpen: true,
+      parentRow,
+      initialTargetAuthor: initialAuthor || parentRow.discussion.author,
+    });
+  };
 
   useEffect(() => {
     if (blockConfirm) {
@@ -340,6 +379,70 @@ export default function GlobalDiscussions() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const handleSubmitThreadReply = async (
+    replyContent: string,
+    replyToId: string,
+    replyAuthor?: string
+  ): Promise<boolean> => {
+    if (!replyContent.trim()) return false;
+
+    const activeAuthor = replyAuthor || currentUser?.displayName || 'Anonymous';
+    const activeUserId = currentUser?.userId || `user_${Date.now()}`;
+    const localId = `disc_reply_${Date.now()}`;
+
+    // Optimistic instant UI update
+    const newRow: DBRow = {
+      discussion: {
+        id: localId,
+        content: replyContent.trim(),
+        author: activeAuthor,
+        email: null,
+        userId: activeUserId,
+        createdAt: new Date().toISOString(),
+        replyToId,
+        isModerated: false,
+        isOfficialAnswer: false,
+      },
+      ayahRef: null,
+    };
+
+    setDiscussions(prev => [newRow, ...prev]);
+
+    // Ensure thread is expanded so user sees their reply in feed
+    setExpandedThreads(prev => new Set(prev).add(replyToId));
+
+    // Persist to Firestore
+    try {
+      await addDoc(collection(db, 'discussions'), {
+        content: replyContent.trim(),
+        author: activeAuthor,
+        userId: activeUserId,
+        createdAt: serverTimestamp(),
+        replyToId,
+        isModerated: false,
+      });
+    } catch (err) {
+      console.warn('[GlobalDiscussions] Firestore reply save notice:', err);
+    }
+
+    // Persist to server API
+    try {
+      await fetch(getApiUrl('/api/discussions'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: replyContent.trim(),
+          author: activeAuthor,
+          replyToId,
+        }),
+      });
+    } catch (err) {
+      console.warn('[GlobalDiscussions] API reply save notice:', err);
+    }
+
+    return true;
   };
 
   // Filter out blocked users and reported content (Google Play UGC compliance)
@@ -548,71 +651,158 @@ export default function GlobalDiscussions() {
                   {row.discussion.content}
                 </p>
                 
-                {currentUser && (
-                  <button 
-                    onClick={() => {
-                      setReplyTo(row.discussion.id);
-                      setContent(`@${row.discussion.author} `);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      setTimeout(() => textareaRef.current?.focus(), 100);
-                    }}
-                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-                  >
-                    Reply
-                  </button>
-                )}
-
-                {/* Nested Replies */}
-                {threadReplies.length > 0 && (
-                  <div className="mt-6 pl-4 md:pl-6 border-l-2 border-slate-100 dark:border-slate-800 space-y-4">
-                    {threadReplies.map((replyRow, replyIdx) => (
-                      <div key={`reply-${row.discussion.id}-${replyRow.discussion.id || replyIdx}-${replyIdx}`} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400">
-                              <User size={14} />
-                            </div>
-                            <div>
-                              <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{replyRow.discussion.author}</span>
-                              <span className="text-xs text-slate-500 ml-2">{new Date(replyRow.discussion.createdAt).toLocaleString()}</span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              onClick={() => setReportModal({
-                                isOpen: true,
-                                discussionId: replyRow.discussion.id,
-                                authorName: replyRow.discussion.author,
-                              })}
-                              className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
-                              title="Report reply"
-                            >
-                              <Flag size={12} />
-                            </button>
-                            {replyRow.discussion.userId && currentUser?.userId !== replyRow.discussion.userId && (
-                              <button
-                                onClick={() => handleBlockAuthor(replyRow.discussion.userId, replyRow.discussion.author)}
-                                className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
-                                title="Block user"
-                              >
-                                <UserX size={12} />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
-                          {replyRow.discussion.content}
-                        </p>
-                      </div>
-                    ))}
+                {/* Discussion Action Bar: Reply button visible to all users + Collapsible replies count */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                  <div className="flex items-center gap-2">
+                    <button 
+                      type="button"
+                      onClick={() => openThreadModal(row, row.discussion.author)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors cursor-pointer active:scale-95 shadow-2xs"
+                      title={`Reply to ${row.discussion.author}`}
+                    >
+                      <Reply size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Reply</span>
+                    </button>
                   </div>
-                )}
+
+                  {threadReplies.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleThreadExpanded(row.discussion.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <MessageCircle size={13} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>
+                        {threadReplies.length} {threadReplies.length === 1 ? 'reply' : 'replies'}
+                      </span>
+                      {expandedThreads.has(row.discussion.id) ? (
+                        <ChevronUp size={14} className="text-slate-400" />
+                      ) : (
+                        <ChevronDown size={14} className="text-slate-400" />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* Nested Replies with Smooth Collapse / Expand */}
+                <AnimatePresence>
+                  {threadReplies.length > 0 && expandedThreads.has(row.discussion.id) && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      className="mt-4 pl-3 sm:pl-5 border-l-2 border-emerald-500/20 dark:border-emerald-500/30 space-y-3 overflow-hidden"
+                    >
+                      {threadReplies.map((replyRow, replyIdx) => (
+                        <div 
+                          key={`reply-${row.discussion.id}-${replyRow.discussion.id || replyIdx}-${replyIdx}`} 
+                          className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3.5 border border-slate-200/50 dark:border-slate-800"
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-xs shrink-0">
+                                {replyRow.discussion.author?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                              <div className="truncate">
+                                <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate block">
+                                  {replyRow.discussion.author}
+                                </span>
+                                <span className="text-[10px] text-slate-400">
+                                  {new Date(replyRow.discussion.createdAt).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              {/* Reply directly to this nested comment */}
+                              <button
+                                type="button"
+                                onClick={() => openThreadModal(row, replyRow.discussion.author)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                                title={`Reply to ${replyRow.discussion.author}`}
+                              >
+                                <CornerDownRight size={11} />
+                                <span>Reply</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setReportModal({
+                                  isOpen: true,
+                                  discussionId: replyRow.discussion.id,
+                                  authorName: replyRow.discussion.author,
+                                })}
+                                className="p-1 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                                title="Report reply"
+                              >
+                                <Flag size={12} />
+                              </button>
+                              {replyRow.discussion.userId && currentUser?.userId !== replyRow.discussion.userId && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleBlockAuthor(replyRow.discussion.userId, replyRow.discussion.author)}
+                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                                  title="Block user"
+                                >
+                                  <UserX size={12} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="text-slate-700 dark:text-slate-300 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed mt-1">
+                            {replyRow.discussion.content}
+                          </p>
+                        </div>
+                      ))}
+
+                      {/* Quick button at bottom of thread in feed to add reply */}
+                      <button
+                        type="button"
+                        onClick={() => openThreadModal(row, row.discussion.author)}
+                        className="w-full py-2 px-3 text-center text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 border border-dashed border-emerald-200 dark:border-emerald-800/50 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Reply size={13} />
+                        <span>Add reply to this thread...</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })
         )}
       </div>
+
+      {/* Focused Thread Reply Modal Sheet */}
+      {threadModal.isOpen && threadModal.parentRow && (
+        <ThreadReplyModal
+          isOpen={threadModal.isOpen}
+          onClose={() => setThreadModal({ isOpen: false, parentRow: null })}
+          parentRow={threadModal.parentRow}
+          replies={visibleDiscussions.filter(
+            d => d.discussion.replyToId === threadModal.parentRow?.discussion.id
+          )}
+          currentUser={currentUser}
+          onSaveProfile={(profile) => {
+            setCurrentUser(profile);
+            setAuthor(profile.displayName);
+          }}
+          onSubmitReply={handleSubmitThreadReply}
+          onReport={(discussionId, authorName) => {
+            setReportModal({
+              isOpen: true,
+              discussionId,
+              authorName,
+            });
+          }}
+          onBlock={(blockedUserId, authorName) => {
+            handleBlockAuthor(blockedUserId, authorName);
+          }}
+          initialReplyTarget={threadModal.initialTargetAuthor}
+        />
+      )}
 
       {/* Safety & UGC Modals */}
       <SignInModal

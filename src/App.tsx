@@ -11,6 +11,7 @@ import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
 import { Loader2 } from 'lucide-react';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 // Code-split heavy views with resilient retry and chunk refresh logic
 const WelcomeScreen = lazyWithRetry(() => import('./components/WelcomeScreen'), 'WelcomeScreen');
@@ -84,6 +85,21 @@ export default function App() {
       }
     }
   }, [isDarkMode]);
+
+  // Android & Capacitor platform detection for status bar insets
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const isAndroid = Capacitor.getPlatform() === 'android' || /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        document.documentElement.classList.add('capacitor-android');
+        document.body.classList.add('capacitor-android');
+      }
+      if (Capacitor.isNativePlatform()) {
+        document.documentElement.classList.add('capacitor-native');
+        document.body.classList.add('capacitor-native');
+      }
+    }
+  }, []);
 
   // Sync when zustand persist rehydrates
   useEffect(() => {

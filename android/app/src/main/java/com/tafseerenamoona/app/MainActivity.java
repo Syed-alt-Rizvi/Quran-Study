@@ -2,6 +2,9 @@ package com.tafseerenamoona.app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -10,6 +13,23 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(AdhanNativePlugin.class);
         super.onCreate(savedInstanceState);
         handleWidgetIntent(getIntent());
+
+        try {
+            ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
+                Insets sbInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+                float density = getResources().getDisplayMetrics().density;
+                int statusBarDp = Math.round(sbInsets.top / (density > 0 ? density : 1.0f));
+                if (statusBarDp > 0 && getBridge() != null && getBridge().getWebView() != null) {
+                    getBridge().getWebView().post(() -> {
+                        String js = "document.documentElement.style.setProperty('--android-status-bar', '" + statusBarDp + "px');" +
+                                    "document.documentElement.classList.add('capacitor-android');" +
+                                    "document.body.classList.add('capacitor-android');";
+                        getBridge().getWebView().evaluateJavascript(js, null);
+                    });
+                }
+                return insets;
+            });
+        } catch (Exception ignored) {}
     }
 
     @Override

@@ -23,6 +23,22 @@ async function prepare() {
   const splashPng = path.join(__dirname, 'assets', 'splash.png');
   const iconSvg = path.join(__dirname, 'assets', 'icon.svg');
   const splashSvg = path.join(__dirname, 'assets', 'splash.svg');
+  const amiriTtf = path.join(__dirname, 'assets', 'fonts', 'Amiri-Bold.ttf');
+
+  // Ensure fontconfig has access to Amiri font
+  try {
+    const os = require('os');
+    const userFontDir = path.join(os.homedir(), '.fonts');
+    if (!fs.existsSync(userFontDir)) fs.mkdirSync(userFontDir, { recursive: true });
+    const targetFont = path.join(userFontDir, 'Amiri-Bold.ttf');
+    if (fs.existsSync(amiriTtf) && !fs.existsSync(targetFont)) {
+      fs.copyFileSync(amiriTtf, targetFont);
+      const cp = require('child_process');
+      cp.spawnSync('fc-cache', ['-f', userFontDir]);
+    }
+  } catch (fontErr) {
+    console.warn('Font setup notice:', fontErr.message);
+  }
 
   console.log('Regenerating PNG assets from SVG with sharp...');
   let sharp;

@@ -61,3 +61,63 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.5);
 }
+
+/* ============================================================
+   Safe Area Insets & Android System Status Bar Handling
+   ============================================================ */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --android-status-bar: 0px;
+}
+
+/* Default fallback for Android environments (Capacitor or PWA) */
+html.capacitor-android,
+body.capacitor-android {
+  --android-status-bar: 28px;
+}
+
+/* Sticky & Fixed App Headers: guaranteed clearance under Android & iOS status bars */
+.app-header-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 0px), 12px);
+  padding-left: max(env(safe-area-inset-left, 0px), 0.75rem);
+  padding-right: max(env(safe-area-inset-right, 0px), 0.75rem);
+}
+
+html.capacitor-android .app-header-safe,
+body.capacitor-android .app-header-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 34px), 34px);
+}
+
+/* Modal and Drawer header safe area */
+.modal-header-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 0px), 14px);
+  padding-left: max(env(safe-area-inset-left, 0px), 1.25rem);
+  padding-right: max(env(safe-area-inset-right, 0px), 1.25rem);
+}
+
+html.capacitor-android .modal-header-safe,
+body.capacitor-android .modal-header-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 34px), 34px);
+}
+
+/* Safe Area Padding Utilities */
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 0px), 16px);
+}
+
+html.capacitor-android .pt-safe,
+body.capacitor-android .pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--android-status-bar, 34px), 34px);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+
+html.capacitor-android .pb-safe,
+body.capacitor-android .pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px);
+}

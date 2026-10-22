@@ -24,7 +24,7 @@
 
     <!-- Stylized Drop Shadow Filter -->
     <filter id="medallionGlow" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#011b15" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#011b15" flood-opacity="0.65" />
       <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#F59E0B" flood-opacity="0.35" />
     </filter>
   </defs>
@@ -33,91 +33,80 @@
   <rect width="1024" height="1024" fill="url(#emeraldCanvas)" />
 
   <!-- Outer Persian Border Frame -->
-  <rect x="96" y="96" width="832" height="832" rx="56" fill="none" stroke="url(#persianGold)" stroke-width="3" stroke-opacity="0.4" />
-  <rect x="116" y="116" width="792" height="792" rx="44" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.2" />
+  <rect x="72" y="72" width="880" height="880" rx="48" fill="none" stroke="url(#persianGold)" stroke-width="3" stroke-opacity="0.4" />
+  <rect x="92" y="92" width="840" height="840" rx="38" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.2" />
 
   <!-- Corner Arabesque Florets -->
   <g fill="url(#persianGold)" fill-opacity="0.5">
-    <circle cx="116" cy="116" r="6" />
-    <circle cx="908" cy="116" r="6" />
-    <circle cx="116" cy="908" r="6" />
-    <circle cx="908" cy="908" r="6" />
+    <circle cx="92" cy="92" r="6" />
+    <circle cx="932" cy="92" r="6" />
+    <circle cx="92" cy="932" r="6" />
+    <circle cx="932" cy="932" r="6" />
   </g>
 
-  <!-- Central Persian Shamseh (شمسہ) Medallion -->
-  <g filter="url(#medallionGlow)" transform="translate(512, 460)">
+  <!-- Central Persian Shamseh (شمسہ) Medallion - Positioned inside Android safe circle -->
+  <g filter="url(#medallionGlow)" transform="translate(512, 435)">
     <!-- 16-Point Radiant Interlocking Star -->
     <polygon points="
-      0,-260 76,-184 184,-184 184,-76 260,0 184,76 184,184 76,184 
-      0,260 -76,184 -184,184 -184,76 -260,0 -184,-76 -184,-184 -76,-184"
+      0,-225 66,-160 160,-160 160,-66 225,0 160,66 160,160 66,160 
+      0,225 -66,160 -160,160 -160,66 -225,0 -160,-66 -160,-160 -66,-160"
       fill="#047857" stroke="url(#persianGold)" stroke-width="4.5" />
 
     <polygon points="
-      0,-242 70,-172 172,-172 172,-70 242,0 172,70 172,172 70,172 
-      0,242 -70,172 -172,172 -172,70 -242,0 -172,-70 -172,-172 -70,-172"
+      0,-210 61,-150 150,-150 150,-61 210,0 150,61 150,150 61,150 
+      0,210 -61,150 -150,150 -150,61 -210,0 -150,-61 -150,-150 -61,-150"
       transform="rotate(22.5)"
       fill="#064e3b" stroke="url(#persianGold)" stroke-width="2.5" stroke-opacity="0.85" />
 
     <!-- Inner Sacred Circle -->
-    <circle cx="0" cy="0" r="190" fill="#022c22" stroke="url(#persianGold)" stroke-width="4" />
-    <circle cx="0" cy="0" r="176" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-dasharray="6 4" stroke-opacity="0.35" />
+    <circle cx="0" cy="0" r="165" fill="#022c22" stroke="url(#persianGold)" stroke-width="3.5" />
+    <circle cx="0" cy="0" r="152" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-dasharray="6 4" stroke-opacity="0.35" />
 
-    <!-- Persian Calligraphy: شِیعَہ (Top) and مَرْکَز (Bottom) -->
+    <!-- Authentic Arabic Calligraphy: شِيعَة (Top) and مَرْكَز (Bottom) -->
     <text x="0" y="-12" 
       fill="url(#ivoryLuster)" 
-      font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', 'Traditional Arabic', serif" 
-      font-size="94" 
+      font-family="'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Amiri Quran', serif" 
+      font-size="86" 
       font-weight="bold" 
       text-anchor="middle"
-      letter-spacing="2">شِیعَہ</text>
+      letter-spacing="1">شِيعَة</text>
 
     <!-- Arabesque Center Rosette Divider -->
-    <g transform="translate(0, 18)">
-      <path d="M -90 0 C -60 -8, -25 8, 0 0 C 25 8, 60 -8, 90 0" fill="none" stroke="url(#persianGold)" stroke-width="2.5" stroke-linecap="round" />
-      <polygon points="0,-7 7,0 0,7 -7,0" fill="url(#persianGold)" />
-      <circle cx="-35" cy="0" r="2.5" fill="url(#persianGold)" />
-      <circle cx="35" cy="0" r="2.5" fill="url(#persianGold)" />
+    <g transform="translate(0, 16)">
+      <path d="M -75 0 C -50 -7, -20 7, 0 0 C 20 7, 50 -7, 75 0" fill="none" stroke="url(#persianGold)" stroke-width="2.5" stroke-linecap="round" />
+      <polygon points="0,-6 6,0 0,6 -6,0" fill="url(#persianGold)" />
+      <circle cx="-30" cy="0" r="2.5" fill="url(#persianGold)" />
+      <circle cx="30" cy="0" r="2.5" fill="url(#persianGold)" />
     </g>
 
-    <text x="0" y="96" 
+    <text x="0" y="86" 
       fill="url(#ivoryLuster)" 
-      font-family="'Noto Nastaliq Urdu', 'Scheherazade New', 'Amiri', 'Traditional Arabic', serif" 
-      font-size="82" 
+      font-family="'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Amiri Quran', serif" 
+      font-size="74" 
       font-weight="bold" 
       text-anchor="middle"
-      letter-spacing="3">مَرْکَز</text>
+      letter-spacing="2">مَرْكَز</text>
   </g>
 
-  <!-- Typography Below Medallion: SHIA MARKAZ -->
+  <!-- Typography Below Medallion: SHIA MARKAZ (Compact to prevent circular cropping on Android) -->
   <g text-anchor="middle" filter="url(#medallionGlow)">
-    <!-- Roman Typography: SHIA MARKAZ -->
     <text 
       x="512" 
-      y="795" 
+      y="716" 
       fill="url(#ivoryLuster)" 
-      font-family="'Cinzel Decorative', 'Cinzel', 'Playfair Display', 'Trajan Pro', serif" 
-      font-size="62" 
+      font-family="'Cinzel Decorative', 'Cinzel', 'Playfair Display', 'Trajan Pro', 'Georgia', serif" 
+      font-size="46" 
       font-weight="800" 
-      letter-spacing="12">SHIA MARKAZ</text>
+      letter-spacing="6">SHIA MARKAZ</text>
 
     <!-- Persian Ornamental Underline Flourish -->
     <path 
-      d="M 330 825 C 420 818, 604 818, 694 825" 
+      d="M 372 738 C 442 732, 582 732, 652 738" 
       fill="none" 
       stroke="url(#persianGold)" 
       stroke-width="2" 
       stroke-linecap="round" 
       stroke-opacity="0.9" />
-    <polygon points="512,820 518,825 512,830 506,825" fill="url(#persianGold)" />
-
-    <!-- Dedication subtitle -->
-    <text 
-      x="512" 
-      y="860" 
-      fill="#A7F3D0" 
-      font-family="'Inter', sans-serif" 
-      font-size="20" 
-      font-weight="600" 
-      letter-spacing="4">HOLY QURAN • TAFSEER • MAFATIH</text>
+    <polygon points="512,734 517,738 512,742 507,738" fill="url(#persianGold)" />
   </g>
 </svg>
