@@ -1,0 +1,45 @@
+{
+  "id": "27_short",
+  "code": "27_short",
+  "title": "27th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "27th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram27.m4a",
+  "introduction": "27th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ ارْزُقْنِيْ فِيْهِ فَضْلَ لَيْلَةِ الْقَدْرِ،",
+      "translation": "O Allah, on this day, (please) provide me with the merits of the Destiny Night,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَصَيِّرْ اُمُوْرِيْ فِيْهِ مِنَ الْعُسْرِ اِلَى الْيُسْرِ،",
+      "translation": "convert my affairs from difficulty into easiness,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاقْبَلْ مَعَاذِيْرِيْ،",
+      "translation": "accept my apologies,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَحُطَّ عَنِّيْ الذَّنْبَ وَالْوِزْرَ،",
+      "translation": "and let off my sins and burdens."
+    },
+    {
+      "index": 5,
+      "arabic": "يَا رَؤُوْفًا بِعِبَادِهِ الصَّالِحِيْنَ۔",
+      "translation": "O He Who is kind to His righteous servants!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=27_short&lang=en"
+}

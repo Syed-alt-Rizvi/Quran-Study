@@ -1,0 +1,40 @@
+{
+  "id": "20_short",
+  "code": "20_short",
+  "title": "20th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "20th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram20.m4a",
+  "introduction": "20th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ افْتَحْ لِيْ فِيْهِ اَبْوَابَ الْجِنَانِ،",
+      "translation": "O Allah, on this day, (please) open for me the gates of the gardens of Paradise,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَغْلِقْ عَنِّيْ فِيْهِ اَبْوَابَ النِّيْرَانِ،",
+      "translation": "shut in my face the gates of Hellfire,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَوَفِّقْنِيْ فِيْهِ لِتِلَاوَةِ الْقُرْاٰنِ،",
+      "translation": "and lead me to recite the Qur'an."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا مُنْزِلَ السَّكِيْنَةِ فِى قُلُوْبِ الْمُؤْمِنِيْنَ۔",
+      "translation": "0 He Who sends down tranquility on the hearts of the believers!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=20_short&lang=en"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "21_short",
+  "code": "21_short",
+  "title": "21st Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "21st Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram21.m4a",
+  "introduction": "21st Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْ لِىْ فِيْهِ اِلٰى مَرْضَاتِكَ دَلِيْلًا،",
+      "translation": "O Allah, on this day, (please) make for me a course that takes me to Your pleasure,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَلَا تَجْعَلْ لِلشَّيْطَانِ فِيْهِ عَلَيَّ سَبِيْلًا،",
+      "translation": "do not make for Satan a course to me,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاجْعَلِ الْجَنَّةَ لِىْ مَنْزِلًا وَمَـقِـيْـلًا،",
+      "translation": "and make Paradise my home and dwelling."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا قَاضِـيَ حَوَآئِجِ الطَّالِبِيْنَ۔",
+      "translation": "O He Who settles the needs of the beseechers!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=21_short&lang=en"
+}

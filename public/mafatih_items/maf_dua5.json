@@ -1,0 +1,132 @@
+{
+  "id": "maf_dua5",
+  "code": "maf_dua5",
+  "title": "Taqibaat e Namaz e Isha",
+  "mainCategory": "Taqibaat e Namaz",
+  "mainCategoryCode": "maf_taqee",
+  "categoryChain": [
+    "Taqibaat e Namaz",
+    "Taqibaat e Namaz e Isha"
+  ],
+  "audioUrl": null,
+  "introduction": "TAQIBAAT E NAMAZ E ISHA\n\nAs quoted from Misbah al-Mutahajjid\n\nSubsequent to the Evening Prayer, you are recommended to say the following supplicatory prayer, as is quoted from Misbah al-Mutahajjid:\n\nIt is worth mentioning that the abovementioned supplication is one of the supplications restricted to seeking sustenance.\n\nTHE WUTAYRAH PRAYER\n\nUpon accomplishment of the Evening Prayer, it is recommended to recite Surah al-Qadr (No. 97) seven times and offer the Wutayrah supererogatory (mustahab / nafilah) prayer, which consists of two units and should be offered in the position of sitting by reciting one hundred verses of the Holy Qur’an in both the units. Hence, it is recommended to recite Surah al-Waqiah (No. 56) in the first unit and Surah al-Tawheed in the second.",
+  "versesCount": 23,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اِنَّهُ لَيْسَ لِيْ عِلْمٌ بِمَوْضِعِ رِزْقِيْ",
+      "translation": "O Allah! verily, I lack acquaintance with the place of my sustenance;"
+    },
+    {
+      "index": 2,
+      "arabic": "وَ اِنَّمَا اَطْلُبُهُ بِخَطَرَاتٍ تَخْطُرُ عَلٰى قَلْبِيْ",
+      "translation": "rather, I am seeking it owing to ideas that come upon my mind."
+    },
+    {
+      "index": 3,
+      "arabic": "فَاَجُوْلُ فِي طَلَبِهِ الْبُلْدَانَ",
+      "translation": "I consequently wander in countries searching for it."
+    },
+    {
+      "index": 4,
+      "arabic": "فَاَنَا فِيْمَا اَنَا طَالِبٌ كَالْحَيْرَانِ",
+      "translation": "By doing such, I am as confused as the confounded,"
+    },
+    {
+      "index": 5,
+      "arabic": "لَاۤ اَدْرِيْ اَ فِي سَهْلٍ هُوَ اَمْ فِيْ جَبَلٍ",
+      "translation": "since I do not know whether my sustenance lies in a plain, on a mountain,"
+    },
+    {
+      "index": 6,
+      "arabic": "اَمْ فِي اَرْضٍ اَمْ فِي سَمَاۤءٍ",
+      "translation": "on the ground, in the air,"
+    },
+    {
+      "index": 7,
+      "arabic": "اَمْ فِي بَرٍّ اَمْ فِي بَحْرٍ",
+      "translation": "on lands, in seas,"
+    },
+    {
+      "index": 8,
+      "arabic": "وَ عَلٰى يَدَيْ مَنْ",
+      "translation": "at whose hands,"
+    },
+    {
+      "index": 9,
+      "arabic": "وَ مِنْ قِبَلِ مَنْ",
+      "translation": "or who the source of it is."
+    },
+    {
+      "index": 10,
+      "arabic": "وَ قَدْ عَلِمْتُ اَنَّ عِلْمَهُ عِنْدَكَ",
+      "translation": "I have full knowledge that You know all these,"
+    },
+    {
+      "index": 11,
+      "arabic": "وَ اَسْبَابَهُ بِيَدِكَ",
+      "translation": "the causes of them are in Your Hands,"
+    },
+    {
+      "index": 12,
+      "arabic": "وَ اَنْتَ الَّذِيْ تَقْسِمُهُ بِلُطْفِكَ",
+      "translation": "and it is You Who distribute it out of Your compassion"
+    },
+    {
+      "index": 13,
+      "arabic": "وَ تُسَبِّبُهُ بِرَحْمَتِكَ",
+      "translation": "and cause it out of Your mercy."
+    },
+    {
+      "index": 14,
+      "arabic": "اَللّٰهُمَّ فَصَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِهِ",
+      "translation": "O Allah, please send blessings to Muhammad and his Household"
+    },
+    {
+      "index": 15,
+      "arabic": "وَ اجْعَلْ يَا رَبِّ رِزْقَكَ لِيْ وَاسِعًا",
+      "translation": "and make, O Lord, Your sustenance that is provided (by You) to me expansive,"
+    },
+    {
+      "index": 16,
+      "arabic": "وَ مَطْلَبَهُ سَهْلًا",
+      "translation": "my seeking for it easy for me,"
+    },
+    {
+      "index": 17,
+      "arabic": "وَ مَأْخَذَهُ قَرِيْبًا",
+      "translation": "and its source close to me."
+    },
+    {
+      "index": 18,
+      "arabic": "وَ لَا تُعَنِّنِي بِطَلَبِ مَا لَمْ تُقَدِّرْ لِي فِيْهِ رِزْقًا",
+      "translation": "Please, do not fatigue me by seeking that which You have not decided for me to take,"
+    },
+    {
+      "index": 19,
+      "arabic": "فَاِنَّكَ غَنِيٌّ عَنْ عَذَابِيْ [عَنَاۤئِي‏]",
+      "translation": "because You are certainly in no need for tormenting me"
+    },
+    {
+      "index": 20,
+      "arabic": "وَ اَنَا فَقِيْرٌ اِلٰى رَحْمَتِكَ",
+      "translation": "while I am in full need for Your mercy."
+    },
+    {
+      "index": 21,
+      "arabic": "فَصَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِهِ",
+      "translation": "(Please) Send blessings upon Muhammad and his Household"
+    },
+    {
+      "index": 22,
+      "arabic": "وَ جُدْ عَلٰى عَبْدِكَ بِفَضْلِكَ",
+      "translation": "and confer liberally upon me, Your slave, out of Your graciousness."
+    },
+    {
+      "index": 23,
+      "arabic": "اِنَّكَ ذُوْ فَضْلٍ عَظِيْمٍ۔",
+      "translation": "You are surely the Lord of great favor."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua5&lang=en"
+}

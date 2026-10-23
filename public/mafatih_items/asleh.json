@@ -1,0 +1,28 @@
+{
+  "id": "asleh",
+  "code": "asleh",
+  "title": "Dua Allahumma Asleh",
+  "mainCategory": "Duas & Supplications",
+  "mainCategoryCode": "maf_dua",
+  "categoryChain": [
+    "Duas & Supplications",
+    "Duas",
+    "Dua Allahumma Asleh"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/mohsin_farahmad/alahomaasleh_farahmand.m4a",
+  "introduction": "DUA ALLAHUMMA ASLEH",
+  "versesCount": 2,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 2,
+      "arabic": "اَللّٰهُمَّ أَصْلِحْ عَبْدَكَ وَ خَلِیْفَتَكَ بِمَا أَصْلَحْتَ بِهِ اَنْبِیَآءَكَ وَ رُسُلَكَ، وَ حُفَّهُ بِمَلَآئِكَتِكَ، وَاَیِّدْهُ بِرُوْحِ الْقُدْسِ مِنْ عِنْدِكَ وَ اسْلُكْهُ مِنْ بَیْنِ یَدَیْهِ وَ مِنْ خَلْفِهِ رَصَدًا یَحْفَظُوْنَهُ مِنْ كُلِّ سُوْءٍ، وَ اَبْدِلْهُ مِنْ بَعْدِ خَوْفِهِ اَمْنًا یَعْبُدُكَ لَا یُشْرِكُ بِكَ شَیْئًا، وَ لَا تَجْعَلْ لِاَحَدٍ مِنْ خَلْقِكَ عَلٰی وَلِیِّكَ سُلْطَانًا وَاْذَنْ لَهُ فِی جِهَادِ عَدُوِّكَ وَ عَدُوِّهِ، وَ اجْعَلْنِیْ مِنْ اَنْصَارِهِ اِنَّكَ عَلٰی كُلِّ شَیْ‏ءٍ قَدِیْرٍ۔",
+      "translation": ""
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=asleh&lang=en"
+}

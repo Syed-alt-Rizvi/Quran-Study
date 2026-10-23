@@ -187,14 +187,6 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
             )}
           </div>
           <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-            {!isLastRead && (
-              <button
-                onClick={handleMarkAsRead}
-                className="px-3 py-1 text-xs font-medium rounded-full transition-colors border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer"
-              >
-                Mark Read
-              </button>
-            )}
             <button 
               onClick={toggleBookmark}
               className="p-2 text-slate-400 hover:text-emerald-500 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
@@ -617,23 +609,14 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
             >
               <ArrowLeft size={22} />
             </button>
-            <div className="hidden sm:block text-left">
-              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">
+            <div className="min-w-0 text-left">
+              <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-tight truncate">
                 {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
               </h1>
-              <p className="text-[11px] text-slate-500 font-arabic leading-tight">
+              <p className="text-[10px] sm:text-[11px] text-slate-500 font-arabic leading-tight truncate">
                 {appLanguage === 'ur' && JUZ_URDU_NAMES[juz.number] ? JUZ_URDU_NAMES[juz.number] : `الجزء ${juz.number}`} • {juz.ayahs.length} {appLanguage === 'ur' ? 'آیات' : 'Ayahs'}
               </p>
             </div>
-          </div>
-
-          <div className="text-center sm:hidden min-w-0">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
-              {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
-            </h1>
-            <p className="text-[10px] text-slate-500 font-arabic truncate">
-              {appLanguage === 'ur' && JUZ_URDU_NAMES[juz.number] ? JUZ_URDU_NAMES[juz.number] : `الجزء ${juz.number}`}
-            </p>
           </div>
 
           <div className="flex items-center gap-2">

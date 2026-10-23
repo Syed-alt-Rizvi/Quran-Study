@@ -1,0 +1,40 @@
+{
+  "id": "28_short",
+  "code": "28_short",
+  "title": "28th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "28th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram28.m4a",
+  "introduction": "28th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ وَفِّرْ حَظِّيْ فِيْهِ مِنَ النَّوَافِلِ،",
+      "translation": "O Allah, on this day, decide for me a share of the supererogatory acts,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَكْرِمْنِيْ فِيْهِ بِاِحْضَارِ الْمَسَاۤئِلِ،",
+      "translation": "honor me by making me care for the matters,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَقَرِّبْ فِيْهِ وَسِيْلَتِىْ اِلَيْكَ مِنْ بَيْنِ الْوَسَآئِلِ،",
+      "translation": "and make near my means to You from among the other means."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا مَنْ لَا يَشْغَلُهُ اِلْحَاحُ الْمُلِحِّيْنَ۔",
+      "translation": "O He Whom is not preoccupied by the earnest entreaty of the insisters!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=28_short&lang=en"
+}

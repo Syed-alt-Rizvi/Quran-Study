@@ -1,0 +1,35 @@
+{
+  "id": "15_short",
+  "code": "15_short",
+  "title": "15th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "15th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram15.m4a",
+  "introduction": "15th Day",
+  "versesCount": 3,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ ارْزُقْنِيْ فِيْهِ طَاعَةَ الْخَاشِعِيْنَ،",
+      "translation": "O Allah, on this day, (please) provide me with the obedience of those who are fearful of You"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاشْرَحْ فِيْهِ صَدْرِيْ بِاِنابَةِ الْمُخْبِتِيْنَ،",
+      "translation": "and expand on this day my chest by granting me the turning of the submissive ones,"
+    },
+    {
+      "index": 3,
+      "arabic": "بِاَمَانِكَ يَا اَمَانَ الْخَاۤئِفِيْنَ۔",
+      "translation": "in the name of Your security, O Grantor of security to the fearful ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=15_short&lang=en"
+}

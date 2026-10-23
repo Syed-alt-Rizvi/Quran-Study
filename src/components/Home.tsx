@@ -272,7 +272,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+      <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 overflow-x-hidden min-w-0">
         {/* Welcome Masthead */}
         <section className="mb-3 pt-0.5 pb-2.5 border-b border-slate-200/70 dark:border-slate-800/70">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-3">

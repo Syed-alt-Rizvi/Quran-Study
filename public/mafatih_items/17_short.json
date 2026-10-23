@@ -1,0 +1,45 @@
+{
+  "id": "17_short",
+  "code": "17_short",
+  "title": "17th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "17th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram17.m4a",
+  "introduction": "17th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اهْدِنِيْ فِيْهِ لِصَالِحِ الْاَعْمَالِ،",
+      "translation": "O Allah, on this day, (please) guide me to the virtuous deeds,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاقْضِ لِيْ فِيْهِ الْحَوَاۤئِجَ وَالْاٰمَالَ،",
+      "translation": "and settle on this day all my needs and hopes."
+    },
+    {
+      "index": 3,
+      "arabic": "يَا مَنْ لَا يَحْتَاجُ اِلَى التَّفْسِيْرِ وَالسُّؤَالِ،",
+      "translation": "O He Who does not require explanation or wonderment!"
+    },
+    {
+      "index": 4,
+      "arabic": "يَا عالِمًا بِمَا فِيْ صُدُوْرِ الْعَالَمِيْنَ،",
+      "translation": "O He Who knows what is hidden in the chest of the peoples,"
+    },
+    {
+      "index": 5,
+      "arabic": "صَلِّ عَلٰى مُحَمَّدٍ وَاٰلِهِ الطَّاهِرِيْنَ۔",
+      "translation": "(please) send blessings to Muhammad and his Household the immaculate."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=17_short&lang=en"
+}

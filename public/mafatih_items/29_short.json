@@ -1,0 +1,40 @@
+{
+  "id": "29_short",
+  "code": "29_short",
+  "title": "29th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "29th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram29.m4a",
+  "introduction": "29th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ غَشِّنِيْ فِيْهِ بِالرَّحْمَةِ،",
+      "translation": "O Allah, on this day, (please) spread out mercy over me,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَارْزُقْنِيْ فِيْهِ التَّوْفِيْقَ وَالْعِصْمَةَ،",
+      "translation": "provide me with success and protection (against sinning),"
+    },
+    {
+      "index": 3,
+      "arabic": "وَطَهِّرْ قَلْبِيْ مِنْ غَيَاهِبِ التُّهْمَةِ،",
+      "translation": "and cleanse my heart from the murk of doubt."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا رَحِيْمًا بِعِبَادِهِ الْمُؤْمِنِيْنَ۔",
+      "translation": "O He Who is merciful to His faithful servants!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=29_short&lang=en"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "12_short",
+  "code": "12_short",
+  "title": "12th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "12th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram12.m4a",
+  "introduction": "12th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ زَيِّنِّي فِيْهِ بِالسِّتْرِ وَالْعَفَافِ،",
+      "translation": "O Allah, on this day, (please) adorn me with covering and chastity,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاسْتُرْنِيْ فِيْهِ بِلِبَاسِ الْقُنُوْعِ وَالْكَفَافِ،",
+      "translation": "cover me on it with the dress of satisfaction and contentment,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاحْمِلْنِيْ فِيْهِ عَلَى الْعَدْلِ وَالْاِنْصَافِ،",
+      "translation": "encourage me on this day to be just and impartial,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَاٰمِنِّي فِيْهِ مِنْ كُلِّ مَا اَخَافُ،",
+      "translation": "secure me against whatever I fear,"
+    },
+    {
+      "index": 5,
+      "arabic": "بِعِصْمَتِكَ يَا عِصْمَةَ الْخَآئِفِيْنَ۔",
+      "translation": "in the name of Your protection, O Shelter of the fearful ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=12_short&lang=en"
+}

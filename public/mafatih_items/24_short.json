@@ -1,0 +1,40 @@
+{
+  "id": "24_short",
+  "code": "24_short",
+  "title": "24th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "24th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram24.m4a",
+  "introduction": "24th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ فِيْهِ مَا يُرْضِيْكَ،",
+      "translation": "O Allah, on this day, I beseech You for that which pleases You,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَعُوْذُبِكَ مِمَّا يُؤْذِيْكَ،",
+      "translation": "I seek Your protection against that which hurts You,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاَسْاَلُكَ التَّوْفِيْقَ فِيْهِ لِاَنْ اُطِيْعَكَ وَلَا اَعْصِيْكَ،",
+      "translation": "and I beseech You to lead me to obey You and avoid disobeying You."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا جَوَادَ السَّآئِلِيْنَ۔",
+      "translation": "O He Who treats the beseechers magnanimously!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=24_short&lang=en"
+}

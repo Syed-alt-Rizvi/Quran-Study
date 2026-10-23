@@ -1,0 +1,936 @@
+{
+  "id": "juzz21",
+  "code": "juzz21",
+  "title": "Juzz : 21",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "📚 Categories",
+    "The Holy Quran",
+    "Juzz Wise",
+    "Juzz : 21"
+  ],
+  "audioUrl": "https://aswaatulqurraa.com/files/Paras/Saad%20Al-Ghamdi/21.mp3",
+  "introduction": "SURAH AR-RUM (THE ROMANS)\n\nSURAH LUQMAN\n\nSURAH AS-SAJDAH (THE ADORATION)\n\nSURAH AL-AHZAB (THE ALLIES)",
+  "versesCount": 183,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اُتْلُ مَاۤ اُوْحِىَ اِلَيْكَ مِنَ الْكِتٰبِ وَاَقِمِ الصَّلٰوةَ ‌ؕ اِنَّ الصَّلٰوةَ تَنْهٰى عَنِ الْفَحْشَآءِ وَالْمُنْكَرِ‌ؕ وَلَذِكْرُ اللّٰهِ اَكْبَرُ‌ؕ وَاللّٰهُ يَعْلَمُ مَا تَصْنَعُوْنَ‏(45)",
+      "translation": "(45) Recite that which has been revealed to you of the Book and keep up prayer; surely prayer keeps (one) away from indecency and evil, and certainly the remembrance of Allah is the greatest, and Allah knows what you do."
+    },
+    {
+      "index": 2,
+      "arabic": "وَلَا تُجَادِلُوْٓا اَهْلَ الْكِتٰبِ اِلَّا بِالَّتِىْ هِىَ اَحْسَنُۖ اِلَّا الَّذِيْنَ ظَلَمُوْا مِنْهُمْ‌ وَقُوْلُوْٓا اٰمَنَّا بِالَّذِىْۤ اُنْزِلَ اِلَيْنَا وَاُنْزِلَ اِلَيْكُمْ وَاِلٰهُنَا وَاِلٰهُكُمْ وَاحِدٌ وَّنَحْنُ لَهٗ مُسْلِمُوْنَ‏(46)",
+      "translation": "(46) And do not dispute with the followers of the Book except by what is best, except those of them who act unjustly, and say: We believe in that which has been revealed to us and revealed to you, and our Allah and your Allah is One, and to Him do we submit."
+    },
+    {
+      "index": 3,
+      "arabic": "وَكَذٰلِكَ اَنْزَلْنَاۤ اِلَيْكَ الْكِتٰبَ‌ؕ فَالَّذِيْنَ اٰتَيْنٰهُمُ الْكِتٰبَ يُؤْمِنُوْنَ بِهٖ‌ۚ وَمِنْ هٰٓؤُلَاۤءِ مَنْ يُّؤْمِنُ بِهٖ ‌ؕ وَ مَا يَجْحَدُ بِاٰيٰتِنَاۤ اِلَّا الْكٰفِرُوْنَ‏(47)",
+      "translation": "(47) And thus have We revealed the Book to you. So those whom We have given the Book believe in it, and of these there are those who believe in it, and none deny Our communications except the unbelievers."
+    },
+    {
+      "index": 4,
+      "arabic": "وَمَا كُنْتَ تَتْلُوْا مِنْ قَبْلِهٖ مِنْ كِتٰبٍ وَّلَا تَخُطُّهٗ بِيَمِيْنِكَ‌ اِذًا لَّارْتَابَ الْمُبْطِلُوْنَ‏(48)",
+      "translation": "(48) And you did not recite before it any book, nor did you transcribe one with your right hand, for then could those who say untrue things have doubted."
+    },
+    {
+      "index": 5,
+      "arabic": "بَلْ هُوَ اٰيٰتٌۢ بَيِّنٰتٌ فِىْ صُدُوْرِ الَّذِيْنَ اُوْتُوا الْعِلْمَ‌ؕ وَمَا يَجْحَدُ بِاٰيٰتِنَاۤ اِلَّا الظّٰلِمُوْنَ‏(49)",
+      "translation": "(49) Nay! these are clear communications in the breasts of those who are granted knowledge; and none deny Our communications except the unjust."
+    },
+    {
+      "index": 6,
+      "arabic": "وَقَالُوْا لَوْلَاۤ اُنْزِلَ عَلَيْهِ اٰيٰتٌ مِّنْ رَّبِّهٖ‌ؕ قُلْ اِنَّمَا الْاٰيٰتُ عِنْدَ اللّٰهِ ؕ وَاِنَّمَاۤ اَنَاۡ نَذِيْرٌ مُّبِيْنٌ‏(50)",
+      "translation": "(50) And they say: Why are not signs sent down upon him from his Lord? Say: The signs are only with Allah, and I am only a plain warner."
+    },
+    {
+      "index": 7,
+      "arabic": "اَوَلَمْ يَكْفِهِمْ اَنَّاۤ اَنْزَلْنَا عَلَيْكَ الْكِتٰبَ يُتْلٰى عَلَيْهِمْ‌ؕ اِنَّ فِىْ ذٰلِكَ لَرَحْمَةً وَّذِكْرٰى لِقَوْمٍ يُّؤْمِنُوْنَ‏(51)",
+      "translation": "(51) Is it not enough for them that We have revealed to you the Book which is recited to them? Most surely there is mercy in this and a reminder for a people who believe."
+    },
+    {
+      "index": 8,
+      "arabic": "قُلْ كَفٰى بِاللّٰهِ بَيْنِىْ وَبَيْنَكُمْ شَهِيْدًا ‌ۚ يَعْلَمُ مَا فِى السَّمٰوٰتِ وَالْاَرْضِ‌ ؕ وَالَّذِيْنَ اٰمَنُوْا بِالْبَاطِلِ وَكَفَرُوْا بِاللّٰهِ ۙ اُولٰٓئِكَ هُمُ الْخٰسِرُوْنَ‏(52)",
+      "translation": "(52) Say: Allah is sufficient as a witness between me and you; He knows what is in the heavens and the earth. And (as for) those who believe in the falsehood and disbelieve in Allah, these it is that are the losers."
+    },
+    {
+      "index": 9,
+      "arabic": "وَيَسْتَعْجِلُوْنَكَ بِالْعَذَابِ‌ؕ وَلَوْلَاۤ اَجَلٌ مُّسَمًّى لَّجَآءَهُمُ الْعَذَابُؕ وَلَيَاْتِيَنَّهُمْ بَغْتَةً وَّهُمْ لَا يَشْعُرُوْنَ‏(53)",
+      "translation": "(53) And they ask you to hasten on the chastisement; and had not a term been appointed, the chastisement would certainly have come to them; and most certainly it will come to them all of a sudden while they will not perceive."
+    },
+    {
+      "index": 10,
+      "arabic": "يَسْتَعْجِلُوْنَكَ بِالْعَذَابِؕ وَ اِنَّ جَهَنَّمَ لَمُحِيْطَةٌۢ بِالْكٰفِرِيْنَۙ‏(54)",
+      "translation": "(54) They ask you to hasten on the chastisement, and most surely hell encompasses the unbelievers;"
+    },
+    {
+      "index": 11,
+      "arabic": "يَوْمَ يَغْشٰٮهُمُ الْعَذَابُ مِنْ فَوْقِهِمْ وَمِنْ تَحْتِ اَرْجُلِهِمْ وَيَقُوْلُ ذُوْقُوْا مَا كُنْتُمْ تَعْمَلُوْنَ‏(55)",
+      "translation": "(55) On the day when the chastisement shall cover them from above them, and from beneath their feet; and He shall say: Taste what you did."
+    },
+    {
+      "index": 12,
+      "arabic": "يٰعِبَادِىَ الَّذِيْنَ اٰمَنُوْۤا اِنَّ اَرْضِىْ وَاسِعَةٌ فَاِيَّاىَ فَاعْبُدُوْنِ‏(56)",
+      "translation": "(56) O My servants who believe! surely My earth is vast, therefore Me alone should you serve."
+    },
+    {
+      "index": 13,
+      "arabic": "كُلُّ نَفْسٍ ذَآئِقَةُ الْمَوْتِ ثُمَّ اِلَيْنَا تُرْجَعُوْنَ‏(57)",
+      "translation": "(57) Every soul must taste of death, then to Us you shall be brought back."
+    },
+    {
+      "index": 14,
+      "arabic": "وَالَّذِيْنَ اٰمَنُوا وَعَمِلُوْا الصّٰلِحٰتِ لَنُبَوِّئَنَّهُمْ مِّنَ الْجَنَّةِ غُرَفًا تَجْرِىْ مِنْ تَحْتِهَا الْاَنْهٰرُ خٰلِدِيْنَ فِيْهَا ‌ؕ نِعْمَ اَجْرُ الْعٰمِلِيْنَ‌ۖ‏(58)",
+      "translation": "(58) And (as for) those who believe and do good, We will certainly give them abode in the high places in gardens beneath which rivers flow, abiding therein; how good the reward of the workers:"
+    },
+    {
+      "index": 15,
+      "arabic": "الَّذِيْنَ صَبَرُوْا وَعَلٰى رَبِّهِمْ يَتَوَكَّلُوْنَ‏(59)",
+      "translation": "(59) Those who are patient, and on their Lord do they rely."
+    },
+    {
+      "index": 16,
+      "arabic": "وَكَاَيِّنْ مِّنْ دَآبَّةٍ لَّا تَحْمِلُ رِزْقَهَاۖ اللّٰهُ يَرْزُقُهَا وَاِيَّاكُمْ‌‌ۖ وَهُوَ السَّمِيْعُ الْعَلِيْمُ‏(60)",
+      "translation": "(60) And how many a living creature that does not carry its sustenance: Allah sustains it and yourselves; and He is the Hearing, the Knowing."
+    },
+    {
+      "index": 17,
+      "arabic": "وَلَئِنْ سَاَلْتَهُمْ مَّنْ خَلَقَ السَّمٰوٰتِ وَالْاَرْضَ وَسَخَّرَ الشَّمْسَ وَالْقَمَرَ لَيَقُوْلُنَّ اللّٰهُ‌ۚ فَاَنّٰى يُؤْفَكُوْنَ‏(61)",
+      "translation": "(61) And if you ask them, Who created the heavens and the earth and made the sun and the moon subservient, they will certainly say, Allah. Whence are they then turned away?"
+    },
+    {
+      "index": 18,
+      "arabic": "اَللّٰهُ يَبْسُطُ الرِّزْقَ لِمَنْ يَّشَآءُ مِنْ عِبَادِهٖ وَيَقْدِرُ لَهٗ ؕ اِنَّ اللّٰهَ بِكُلِّ شَىْءٍ عَلِيْمٌ‏(62)",
+      "translation": "(62) Allah makes abundant the means of subsistence for whom He pleases of His servants, and straitens them for whom (He pleases) surely Allah is Cognizant of all things."
+    },
+    {
+      "index": 19,
+      "arabic": "وَلَئِنْ سَاَلْتَهُمْ مَّنْ نَّزَّلَ مِنَ السَّمَآءِ مَآءً فَاَحْيَا بِهِ الْاَرْضَ مِنْۢ بَعْدِ مَوْتِهَا لَيَقُوْلُنَّ اللّٰهُ‌ؕ قُلِ الْحَمْدُ لِلّٰهِ‌ؕ بَلْ اَكْثَرُهُمْ لَا يَعْقِلُوْنَ‏(63)",
+      "translation": "(63) And if you ask them Who is it that sends down water from the clouds, then gives life to the earth with it after its death, they will certainly say, Allah. Say: All praise is due to Allah. Nay, most of them do not understand."
+    },
+    {
+      "index": 20,
+      "arabic": "وَمَا هٰذِهِ الْحَيٰوةُ الدُّنْيَاۤ اِلَّا لَهْوٌ وَّلَعِبٌ‌ؕ وَاِنَّ الدَّارَ الْاٰخِرَةَ لَهِىَ الْحَيَوَانُ‌ۘ لَوْ كَانُوْا يَعْلَمُوْنَ‏(64)",
+      "translation": "(64) And this life of the world is nothing but a sport and a play; and as for the next abode, that most surely is the life-- did they but know!"
+    },
+    {
+      "index": 21,
+      "arabic": "فَاِذَا رَكِبُوْا فِى الْفُلْكِ دَعَوُا اللّٰهَ مُخْلِصِيْنَ لَهُ الدِّيْنَ ۚ فَلَمَّا نَجّٰٮهُمْ اِلَى الْبَرِّ اِذَا هُمْ يُشْرِكُوْنَۙ‏(65)",
+      "translation": "(65) So when they ride in the ships they call upon Allah, being sincerely obedient to Him, but when He brings them safe to the land, lo! they associate others (with Him);"
+    },
+    {
+      "index": 22,
+      "arabic": "لِيَكْفُرُوْا بِمَاۤ اٰتَيْنٰهُمْۙۚ وَلِيَتَمَتَّعُوْا‌فَسَوْفَ يَعْلَمُوْنَ‏(66)",
+      "translation": "(66) Thus they become ungrateful for what We have given them, so that they may enjoy; but they shall soon know."
+    },
+    {
+      "index": 23,
+      "arabic": "اَوَلَمْ يَرَوْا اَنَّا جَعَلْنَا حَرَمًا اٰمِنًا وَّيُتَخَطَّفُ النَّاسُ مِنْ حَوْلِهِمْ‌ ؕ اَفَبِالْبَاطِلِ يُؤْمِنُوْنَ وَبِنِعْمَةِ اللّٰهِ يَكْفُرُوْنَ‏(67)",
+      "translation": "(67) Do they not see that We have made a sacred territory secure, while men are carried off by force from around them? Will they still believe in the falsehood and disbelieve in the favour of Allah?"
+    },
+    {
+      "index": 24,
+      "arabic": "وَمَنْ اَظْلَمُ مِمَّنِ افْتَرٰى عَلَى اللّٰهِ كَذِبًا اَوْ كَذَّبَ بِالْحَقِّ لَمَّا جَآءَهٗ‌ؕ اَلَيْسَ فِىْ جَهَنَّمَ مَثْوًى لِّلْكٰفِرِيْنَ‏(68)",
+      "translation": "(68) And who is more unjust than one who forges a lie against Allah, or gives the lie to the truth when it has come to him? Will not in hell be the abode of the unbelievers?"
+    },
+    {
+      "index": 25,
+      "arabic": "وَالَّذِيْنَ جَاهَدُوْا فِيْنَا لَنَهْدِيَنَّهُمْ سُبُلَنَا ‌ؕ وَاِنَّ اللّٰهَ لَمَعَ الْمُحْسِنِيْنَ‏(69)",
+      "translation": "(69) And (as for) those who strive hard for Us, We will most certainly guide them in Our ways; and Allah is most surely with the doers of good."
+    },
+    {
+      "index": 26,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 27,
+      "arabic": "الٓمّٓ ۚ‏(1)",
+      "translation": "(1) Alif Lam Mim."
+    },
+    {
+      "index": 28,
+      "arabic": "غُلِبَتِ الرُّوْمُۙ‏(2)",
+      "translation": "(2) The Romans are vanquished,"
+    },
+    {
+      "index": 29,
+      "arabic": "فِىْۤ اَدْنَى الْاَرْضِ وَهُمْ مِّنْۢ بَعْدِ غَلَبِهِمْ سَيَغْلِبُوْنَۙ‏(3)",
+      "translation": "(3) In a near land, and they, after being vanquished, shall overcome,"
+    },
+    {
+      "index": 30,
+      "arabic": "فِىْ بِضْعِ سِنِيْنَ ؕ لِلّٰهِ الْاَمْرُ مِنْ قَبْلُ وَمِنْۢ بَعْدُ ؕ وَيَوْمَئِذٍ يَّفْرَحُ الْمُؤْمِنُوْنَ ۙ‏(4)",
+      "translation": "(4) Within a few years. Allah's is the command before and after; and on that day the believers shall rejoice,"
+    },
+    {
+      "index": 31,
+      "arabic": "بِنَصْرِ اللّٰهِ‌ؕ يَنْصُرُ مَنْ يَّشَآءُ ؕ وَهُوَ الْعَزِيْزُ الرَّحِيْمُۙ‏(5)",
+      "translation": "(5) With the help of Allah; He helps whom He pleases; and He is the Mighty, the Merciful;"
+    },
+    {
+      "index": 32,
+      "arabic": "وَعْدَ اللّٰهِ‌ؕ لَا يُخْلِفُ اللّٰهُ وَعْدَهٗ وَلٰكِنَّ اَكْثَرَ النَّاسِ لَا يَعْلَمُوْنَ‏(6)",
+      "translation": "(6) (This is) Allah's promise! Allah will not fail His promise, but most people do not know."
+    },
+    {
+      "index": 33,
+      "arabic": "يَعْلَمُوْنَ ظَاهِرًا مِّنَ الْحَيٰوةِ الدُّنْيَا‌ۖۚ وَهُمْ عَنِ الْاٰخِرَةِ هُمْ غٰفِلُوْنَ‏(7)",
+      "translation": "(7) They know the outward of this world's life, but of the hereafter they are absolutely heedless."
+    },
+    {
+      "index": 34,
+      "arabic": "اَوَلَمْ يَتَفَكَّرُوْا فِىْۤ اَنْفُسِهِمْ مَا خَلَقَ اللّٰهُ السَّمٰوٰتِ وَالْاَرْضَ وَمَا بَيْنَهُمَاۤ اِلَّا بِالْحَقِّ وَاَجَلٍ مُّسَمًّى‌ؕ وَ اِنَّ كَثِيْرًا مِّنَ النَّاسِ بِلِقَآئِ رَبِّهِمْ لَكٰفِرُوْنَ‏(8)",
+      "translation": "(8) Do they not reflect within themselves: Allah did not create the heavens and the earth and what is between them two but with truth, and (for) an appointed term? And most surely most of the people are deniers of the meeting of their Lord."
+    },
+    {
+      "index": 35,
+      "arabic": "اَوَلَمْ يَسِيْرُوْا فِى الْاَرْضِ فَيَنْظُرُوْا كَيْفَ كَانَ عَاقِبَةُ الَّذِيْنَ مِنْ قَبْلِهِمْ‌ؕ كَانُوْۤا اَشَدَّ مِنْهُمْ قُوَّةً وَّاَثَارُوا الْاَرْضَ وَعَمَرُوْهَاۤ اَكْثَرَ مِمَّا عَمَرُوْهَا وَجَآءَتْهُمْ رُسُلُهُمْ بِالْبَيِّنٰتِ‌ ؕ فَمَا كَانَ اللّٰهُ لِيَظْلِمَهُمْ وَلٰكِنْ كَانُوْۤا اَنْفُسَهُمْ يَظْلِمُوْنَ ؕ‏(9)",
+      "translation": "(9) Have they not travelled in the earth and seen how was the end of those before them? They were stronger than these in prowess, and dug up the earth, and built on it in greater abundance than these have built on it, and there came to them their apostles with clear arguments; so it was not beseeming for Allah that He should deal with them unjustly, but they dealt unjustly with their own souls."
+    },
+    {
+      "index": 36,
+      "arabic": "ثُمَّ كَانَ عَاقِبَةَ الَّذِيْنَ اَسَآءُوا السُّوْٓآٰى اَنْ كَذَّبُوْا بِاٰيٰتِ اللّٰهِ وَكَانُوْا بِهَا يَسْتَهْزِءُوْنَ‏(10)",
+      "translation": "(10) Then evil was the end of those who did evil, because they |"
+    },
+    {
+      "index": 37,
+      "arabic": "اَللّٰهُ يَبْدَؤُا الْخَلْقَ ثُمَّ يُعِيْدُهٗ ثُمَّ اِلَيْهِ تُرْجَعُوْنَ‏(11)",
+      "translation": "(11) Allah originates the creation, then reproduces it, then to Him you shall be brought back."
+    },
+    {
+      "index": 38,
+      "arabic": "وَيَوْمَ تَقُوْمُ السَّاعَةُ يُبْلِسُ الْمُجْرِمُوْنَ‏(12)",
+      "translation": "(12) And at the time when the hour shall come the guilty shall be in despair."
+    },
+    {
+      "index": 39,
+      "arabic": "وَلَمْ يَكُنْ لَّهُمْ مِّنْ شُرَكَآئِهِمْ شُفَعٰٓؤُا وَكَانُوْا بِشُرَكَآئِهِمْ كٰفِرِيْنَ‏(13)",
+      "translation": "(13) And they shall not have any intercessors from among their gods they have joined with Allah, and they shall be deniers of their associate-gods."
+    },
+    {
+      "index": 40,
+      "arabic": "وَيَوْمَ تَقُوْمُ السَّاعَةُ يَوْمَئِذٍ يَّتَفَرَّقُوْنَ‏(14)",
+      "translation": "(14) And at the time when the hour shall come, at that time they shall become separated one from the other."
+    },
+    {
+      "index": 41,
+      "arabic": "فَاَمَّا الَّذِيْنَ اٰمَنُوْا وَعَمِلُوا الصّٰلِحٰتِ فَهُمْ فِىْ رَوْضَةٍ يُّحْبَرُوْنَ‏(15)",
+      "translation": "(15) Then as to those who believed and did good, they shall be made happy in a garden."
+    },
+    {
+      "index": 42,
+      "arabic": "وَاَمَّا الَّذِيْنَ كَفَرُوْا وَكَذَّبُوْا بِاٰيٰتِنَا وَلِقَآئِ الْاٰخِرَةِ فَاُولٰٓئِكَ فِى الْعَذَابِ مُحْضَرُوْنَ‏(16)",
+      "translation": "(16) And as to those who disbelieved and rejected Our communications and the meeting of the hereafter, these shall be brought over to the chastisement."
+    },
+    {
+      "index": 43,
+      "arabic": "فَسُبْحٰنَ اللّٰهِ حِيْنَ تُمْسُوْنَ وَحِيْنَ تُصْبِحُوْنَ‏(17)",
+      "translation": "(17) Therefore glory be to Allah when you enter upon the time of the evening and when you enter upon the time of the morning."
+    },
+    {
+      "index": 44,
+      "arabic": "وَلَهُ الْحَمْدُ فِىْ السَّمٰوٰتِ وَالْاَرْضِ وَعَشِيًّا وَّحِيْنَ تُظْهِرُوْنَ‏(18)",
+      "translation": "(18) And to Him belongs praise in the heavens and the earth, and at nightfall and when you are at midday."
+    },
+    {
+      "index": 45,
+      "arabic": "يُخْرِجُ الْحَىَّ مِنَ الْمَيِّتِ وَيُخْرِجُ الْمَيِّتَ مِنَ الْحَىِّ وَيُحْىِ الْاَرْضَ بَعْدَ مَوْتِهَا‌ؕ وَكَذٰلِكَ تُخْرَجُوْنَ‏(19)",
+      "translation": "(19) He brings forth the living from the dead and brings forth the dead from the living, and gives life to the earth after its death, and thus shall you be brought forth."
+    },
+    {
+      "index": 46,
+      "arabic": "وَمِنْ اٰيٰتِهٖۤ اَنْ خَلَقَكُمْ مِّنْ تُرَابٍ ثُمَّ اِذَاۤ اَنْتُمْ بَشَرٌ تَنْتَشِرُوْنَ‏(20)",
+      "translation": "(20) And one of His signs is that He created you from dust, then lo! you are mortals (who) scatter."
+    },
+    {
+      "index": 47,
+      "arabic": "وَمِنْ اٰيٰتِهٖۤ اَنْ خَلَقَ لَكُمْ مِّنْ اَنْفُسِكُمْ اَزْوَاجًا لِّتَسْكُنُوْۤا اِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَّوَدَّةً وَّرَحْمَةً  ؕ اِنَّ فِىْ ذٰ لِكَ لَاٰيٰتٍ لِّقَوْمٍ يَّتَفَكَّرُوْنَ‏(21)",
+      "translation": "(21) And one of His signs is that He created mates for you from yourselves that you may find rest in them, and He put between you love and compassion; most surely there are signs in this for a people who reflect."
+    },
+    {
+      "index": 48,
+      "arabic": "وَمِنْ اٰيٰتِهٖ خَلْقُ السَّمٰوٰتِ وَالْاَرْضِ وَاخْتِلَافُ اَلْسِنَتِكُمْ وَاَلْوَانِكُمْ‌ؕ اِنَّ فِىْ ذٰلِكَ لَاٰيٰتٍ لِّلْعٰلِمِيْنَ‏(22)",
+      "translation": "(22) And one of His signs is the creation of the heavens and the earth and the diversity of your tongues and colors; most surely there are signs in this for the learned."
+    },
+    {
+      "index": 49,
+      "arabic": "وَمِنْ اٰيٰتِهٖ مَنَامُكُمْ بِالَّيْلِ وَالنَّهَارِ وَابْتِغَآؤُكُمْ مِّنْ فَضْلِهٖ‌ؕ اِنَّ فِىْ ذٰلِكَ لَاٰيٰتٍ لِّقَوْمٍ يَّسْمَعُوْنَ‏(23)",
+      "translation": "(23) And one of His signs is your sleeping and your seeking of His grace by night and (by) day; most surely there are signs in this for a people who would hear."
+    },
+    {
+      "index": 50,
+      "arabic": "وَمِنْ اٰيٰتِهٖ يُرِيْكُمُ الْبَرْقَ خَوْفًا وَّطَمَعًا وَّيُنَزِّلُ مِنَ السَّمَآءِ مَآءً فَيُحْىٖ بِهِ الْاَرْضَ بَعْدَ مَوْتِهَا ‌ؕ اِنَّ فِىْ ذٰلِكَ لَاٰيٰتٍ لِّقَوْمٍ يَّعْقِلُوْنَ‏(24)",
+      "translation": "(24) And one of His signs is that He shows you the lightning for fear and for hope, and sends down water from the clouds then gives life therewith to the earth after its death; most surely there are signs in this for a people who understand"
+    },
+    {
+      "index": 51,
+      "arabic": "وَمِنْ اٰيٰتِهٖۤ اَنْ تَقُوْمَ السَّمَآءُ وَالْاَرْضُ بِاَمْرِهٖ‌ ؕ ثُمَّ اِذَا دَعَاكُمْ دَعْوَةً  ‌ۖ مِّنَ الْاَرْضِ ‌ۖ اِذَاۤ اَنْتُمْ تَخْرُجُوْنَ‏(25)",
+      "translation": "(25) And one of His signs is that the heaven and the earth subsist by His command, then when He calls you with a (single) call from out of the earth, lo! you come forth."
+    },
+    {
+      "index": 52,
+      "arabic": "وَلَهٗ مَنْ فِى السَّمٰوٰتِ وَالْاَرْضِ‌ؕ كُلٌّ لَّهٗ قٰنِتُوْنَ‏(26)",
+      "translation": "(26) And His is whosoever is in the heavens and the earth; all are obedient to Him."
+    },
+    {
+      "index": 53,
+      "arabic": "وَهُوَ الَّذِىْ يَبْدَؤُا الْخَلْقَ ثُمَّ يُعِيْدُهٗ وَهُوَ اَهْوَنُ عَلَيْهِ‌ؕ وَلَهُ الْمَثَلُ الْاَعْلٰى فِى السَّمٰوٰتِ وَالْاَرْضِ‌ۚ وَهُوَ الْعَزِيْزُ الْحَكِيْمُ‏(27)",
+      "translation": "(27) And He it is Who originates the creation, then reproduces it, and it is easy to Him; and His are the most exalted attributes in the heavens and the earth, and He is the Mighty, the Wise."
+    },
+    {
+      "index": 54,
+      "arabic": "ضَرَبَ لَكُمْ مَّثَلًا مِّنْ اَنْفُسِكُمْ‌ؕ هَلْ لَّكُمْ مِّنْ مَّا مَلَكَتْ اَيْمَانُكُمْ مِّنْ شُرَكَآءَ فِىْ مَا رَزَقْنٰكُمْ فَاَنْتُمْ فِيْهِ سَوَآءٌ تَخَافُوْنَهُمْ كَخِيْفَتِكُمْ اَنْفُسَكُمْ‌ؕ كَذٰلِكَ نُفَصِّلُ الْاٰيٰتِ لِقَوْمٍ يَّعْقِلُوْنَ‏(28)",
+      "translation": "(28) He sets forth to you a parable relating to yourselves: Have you among those whom your right hands possess partners in what We have given you for sustenance, so that with respect to it you are alike; you fear them as you fear each other? Thus do We make the communications distinct for a people who understand."
+    },
+    {
+      "index": 55,
+      "arabic": "بَلِ اتَّبَعَ الَّذِيْنَ ظَلَمُوْۤا اَهْوَآءَهُمْ بِغَيْرِ عِلْمٍ‌ۚ فَمَنْ يَّهْدِىْ مَنْ اَضَلَّ اللّٰهُ‌ؕ وَمَا لَهُمْ مِّنْ نّٰصِرِيْنَ‏(29)",
+      "translation": "(29) Nay! those who are unjust follow their low desires without any knowledge; so who can guide him whom Allah makes err? And they shall have no helpers."
+    },
+    {
+      "index": 56,
+      "arabic": "فَاَقِمْ وَجْهَكَ لِلدِّيْنِ حَنِيْفًا ‌ؕ فِطْرَتَ اللّٰهِ الَّتِىْ فَطَرَ النَّاسَ عَلَيْهَا ‌ؕ لَا تَبْدِيْلَ لِخَلْقِ اللّٰهِ‌ ؕ ذٰ لِكَ الدِّيْنُ الْقَيِّمُ ۙ  وَلٰكِنَّ اَكْثَرَ النَّاسِ لَا يَعْلَمُوْنَ ۙ ‏(30)",
+      "translation": "(30) Then set your face upright for religion in the right state-- the nature made by Allah in which He has made men; there is no altering of Allah's creation; that is the right religion, but most people do not know--"
+    },
+    {
+      "index": 57,
+      "arabic": "مُنِيْبِيْنَ اِلَيْهِ وَاتَّقُوْهُ وَاَقِيْمُوا الصَّلٰوةَ وَلَا تَكُوْنُوْا مِنَ الْمُشْرِكِيْنَۙ‏(31)",
+      "translation": "(31) Turning to Him, and be careful of (your duty to) Him and keep up prayer and be not of the polytheists"
+    },
+    {
+      "index": 58,
+      "arabic": "مِنَ الَّذِيْنَ فَرَّقُوْا دِيْنَهُمْ وَكَانُوْا شِيَعًا ‌ؕ كُلُّ حِزْبٍۢ بِمَا لَدَيْهِمْ فَرِحُوْنَ‏(32)",
+      "translation": "(32) Of those who divided their religion and became seas every sect rejoicing in what they had with them"
+    },
+    {
+      "index": 59,
+      "arabic": "وَاِذَا مَسَّ النَّاسَ ضُرٌّ دَعَوْا رَبَّهُمْ مُّنِيْبِيْنَ اِلَيْهِ ثُمَّ اِذَاۤ اَذَاقَهُمْ مِّنْهُ رَحْمَةً اِذَا فَرِيْقٌ مِّنْهُمْ بِرَبِّهِمْ يُشْرِكُوْنَۙ‏(33)",
+      "translation": "(33) And when harm afflicts men, they call upon their Lord, turning to Him, then when He makes them taste of mercy from Him, lo! some of them begin to associate (others) with their Lord,"
+    },
+    {
+      "index": 60,
+      "arabic": "لِيَكْفُرُوْا بِمَاۤ اٰتَيْنٰهُمْ‌ؕ فَتَمَتَّعُوْا فَسَوْفَ تَعْلَمُوْنَ‏(34)",
+      "translation": "(34) So as to be ungrateful for what We have given them; but enjoy yourselves (for a while), for you shall soon come to know."
+    },
+    {
+      "index": 61,
+      "arabic": "اَمْ اَنْزَلْنَا عَلَيْهِمْ سُلْطٰنًا فَهُوَ يَتَكَلَّمُ بِمَا كَانُوْا بِهٖ يُشْرِكُوْنَ‏(35)",
+      "translation": "(35) Or, have We sent down upon them an authority so that it speaks of that which they associate with Him?"
+    },
+    {
+      "index": 62,
+      "arabic": "وَاِذَاۤ اَذَقْنَا النَّاسَ رَحْمَةً فَرِحُوْا بِهَاؕ‌ وَاِنْ تُصِبْهُمْ سَيِّئَةٌ ۢ بِمَا قَدَّمَتْ اَيْدِيْهِمْ اِذَا هُمْ يَقْنَطُوْنَ‏(36)",
+      "translation": "(36) And when We make people taste of mercy they rejoice in it, and if an evil befall them for what their hands have already wrought, lo! they are in despair."
+    },
+    {
+      "index": 63,
+      "arabic": "اَوَلَمْ يَرَوْا اَنَّ اللّٰهَ يَبْسُطُ الرِّزْقَ لِمَنْ يَّشَآءُ وَيَقْدِرُ‌ؕ اِنَّ فِىْ ذٰلِكَ لَاٰيٰتٍ لِّقَوْمٍ يُّؤْمِنُوْنَ‏(37)",
+      "translation": "(37) Do they not see that Allah makes ample provision for whom He pleases, or straitens? Most surely there are signs in this for a people who believe."
+    },
+    {
+      "index": 64,
+      "arabic": "فَاٰتِ ذَا الْقُرْبٰى حَقَّهٗ وَ الْمِسْكِيْنَ وَابْنَ السَّبِيْلِ‌ؕ ذٰلِكَ خَيْرٌ لِّلَّذِيْنَ يُرِيْدُوْنَ وَجْهَ اللّٰهِ‌ وَاُولٰٓئِكَ هُمُ الْمُفْلِحُوْنَ‏(38)",
+      "translation": "(38) Then give to the near of kin his due, and to the needy and the wayfarer; this is best for those who desire Allah's pleasure, and these it is who are successful."
+    },
+    {
+      "index": 65,
+      "arabic": "وَمَاۤ اٰتَيْتُمْ مِّنْ رِّبًا لِّيَرْبُوَاۡ فِىْۤ اَمْوَالِ النَّاسِ فَلَا يَرْبُوْا عِنْدَ اللّٰهِ‌ۚ وَمَاۤ اٰتَيْتُمْ مِّنْ زَكٰوةٍ تُرِيْدُوْنَ وَجْهَ اللّٰهِ فَاُولٰٓئِكَ هُمُ الْمُضْعِفُوْنَ‏(39)",
+      "translation": "(39) And whatever you lay out as usury, so that it may increase in the property of men, it shall not increase with Allah; and whatever you give in charity, desiring Allah's pleasure-- it is these (persons) that shall get manifold."
+    },
+    {
+      "index": 66,
+      "arabic": "اَللّٰهُ الَّذِىْ خَلَقَكُمْ ثُمَّ رَزَقَكُمْ ثُمَّ يُمِيْتُكُمْ ثُمَّ يُحْيِيْكُمْ‌ ؕ هَلْ مِنْ شُرَكَآئِكُمْ مَّنْ يَّفْعَلُ مِنْ ذٰ لِكُمْ مِّنْ شَىْءٍ‌ؕ سُبْحٰنَهٗ وَتَعٰلٰى عَمَّا يُشْرِكُوْنَ‏(40)",
+      "translation": "(40) Allah is He Who created you, then gave you sustenance, then He causes you to die, then brings you to life. Is there any of your associate-gods who does aught of it? Glory be to Him, and exalted be He above what they associate (with Him)."
+    },
+    {
+      "index": 67,
+      "arabic": "ظَهَرَ الْفَسَادُ فِى الْبَرِّ وَالْبَحْرِ بِمَا كَسَبَتْ اَيْدِى النَّاسِ لِيُذِيْقَهُمْ بَعْضَ الَّذِىْ عَمِلُوْا لَعَلَّهُمْ يَرْجِعُوْنَ‏(41)",
+      "translation": "(41) Corruption has appeared in the land and the sea on account of what the hands of men have wrought, that He may make them taste a part of that which they have done, so that they may return."
+    },
+    {
+      "index": 68,
+      "arabic": "قُلْ سِيْرُوْا فِى الْاَرْضِ فَانْظُرُوْا كَيْفَ كَانَ عَاقِبَةُ الَّذِيْنَ مِنْ قَبْلُ‌ؕ كَانَ اَكْثَرُهُمْ مُّشْرِكِيْنَ‏(42)",
+      "translation": "(42) Say: Travel in the land, then see how was the end of those before; most of them were polytheists."
+    },
+    {
+      "index": 69,
+      "arabic": "فَاَقِمْ وَجْهَكَ لِلدِّيْنِ الْقَيِّمِ مِنْ قَبْلِ اَنْ يَّاْتِىَ يَوْمٌ لَّا مَرَدَّ لَهٗ مِنَ اللّٰهِ‌ يَوْمَئِذٍ يَّصَّدَّعُوْنَ‏(43)",
+      "translation": "(43) Then turn thy face straight to the right religion before there come from Allah the day which cannot be averted; on that day they shall become separated."
+    },
+    {
+      "index": 70,
+      "arabic": "مَنْ كَفَرَ فَعَلَيْهِ كُفْرُهٗ‌ۚ وَمَنْ عَمِلَ صَالِحاً فَلِاَنْفُسِهِمْ يَمْهَدُوْنَۙ ‏(44)",
+      "translation": "(44) Whoever disbelieves, he shall be responsible for his disbelief, and whoever does good, they prepare (good) for their own souls,"
+    },
+    {
+      "index": 71,
+      "arabic": "لِيَجْزِىَ الَّذِيْنَ اٰمَنُوا وَعَمِلُوْا الصّٰلِحٰتِ مِنْ فَضْلِهٖ‌ؕ اِنَّهٗ لَا يُحِبُّ الْكٰفِرِيْنَ‏(45)",
+      "translation": "(45) That He may reward those who believe and do good out of His grace; surely He does not love the unbelievers."
+    },
+    {
+      "index": 72,
+      "arabic": "وَمِنْ اٰيٰتِهٖۤ اَنْ يُّرْسِلَ الرِّيَاحَ مُبَشِّرٰتٍ وَّلِيُذِيْقَكُمْ مِّنْ رَّحْمَتِهٖ وَلِتَجْرِىَ الْفُلْكُ بِاَمْرِهٖ وَلِتَبْتَغُوْا مِنْ فَضْلِهٖ وَلَعَلَّكُمْ تَشْكُرُوْنَ‏(46)",
+      "translation": "(46) And one of His signs is that He sends forth the winds bearing good news, and that He may make your taste of His mercy, and that the ships may run by His command, and that you may seek of His grace, and that you may be grateful."
+    },
+    {
+      "index": 73,
+      "arabic": "وَ لَقَدْ اَرْسَلْنَا مِنْ قَبْلِكَ رُسُلًا اِلٰى قَوْمِهِمْ فَجَآءُوْهُمْ بِالْبَيِّنٰتِ فَانْتَقَمْنَا مِنَ الَّذِيْنَ اَجْرَمُوْا ‌ؕ وَكَانَ حَقًّا عَلَيْنَا نَصْرُ الْمُؤْمِنِيْنَ‏(47)",
+      "translation": "(47) And certainly We sent before you apostles to their people, so they came to them with clear arguments, then We gave the punishment to those who were guilty; and helping the believers is ever incumbent on Us."
+    },
+    {
+      "index": 74,
+      "arabic": "اَللّٰهُ الَّذِىْ يُرْسِلُ الرِّيٰحَ فَتُثِيْرُ سَحَابًا فَيَبْسُطُهٗ فِى السَّمَآءِ كَيْفَ يَشَآءُ وَيَجْعَلُهٗ كِسَفًا فَتَرَى الْوَدْقَ يَخْرُجُ مِنْ خِلٰلِهٖ‌ۚ فَاِذَاۤ اَصَابَ بِهٖ مَنْ يَّشَآءُ مِنْ عِبَادِهٖۤ اِذَا هُمْ يَسْتَبْشِرُوْنَۚ‏(48)",
+      "translation": "(48) Allah is he Who sends forth the winds so they raise a cloud, then He spreads it forth in the sky as He pleases, and He breaks it up so that you see the rain coming forth from inside it; then when He causes it to fall upon whom He pleases of His servants, lo! they are joyful"
+    },
+    {
+      "index": 75,
+      "arabic": "وَاِنْ كَانُوْا مِنْ قَبْلِ اَنْ يُّنَزَّلَ عَلَيْهِمْ مِّنْ قَبْلِهٖ لَمُبْلِسِيْنَ‏(49)",
+      "translation": "(49) Though they were before this, before it was sent down upon them, confounded in sure despair."
+    },
+    {
+      "index": 76,
+      "arabic": "فَانْظُرْ اِلٰٓى اٰثٰرِ رَحْمَتِ اللّٰهِ كَيْفَ يُحْىِ الْاَرْضَ بَعْدَ مَوْتِهَا ‌ؕ اِنَّ ذٰ لِكَ لَمُحْىِ الْمَوْتٰى ‌ۚ وَهُوَ عَلٰى كُلِّ شَىْءٍ قَدِيْرٌ‏(50)",
+      "translation": "(50) Look then at the signs of Allah's mercy, how He gives life to the earth after its death, most surely He will raise the dead to life; and He has power over all things."
+    },
+    {
+      "index": 77,
+      "arabic": "وَلَئِنْ اَرْسَلْنَا رِيْحًا فَرَاَوْهُ مُصْفَرًّا لَّظَلُّوْا مِنْۢ بَعْدِهٖ يَكْفُرُوْنَ‏(51)",
+      "translation": "(51) And if We send a wind and they see it to be yellow, they would after that certainly continue to disbelieve"
+    },
+    {
+      "index": 78,
+      "arabic": "فَاِنَّكَ لَا تُسْمِعُ الْمَوْتٰى وَلَا تُسْمِعُ الصُّمَّ الدُّعَآءَ اِذَا وَلَّوْا مُدْبِرِيْنَ‏(52)",
+      "translation": "(52) For surely you cannot, make the dead to hear and you cannot make the deaf to hear the call, when they turn back and"
+    },
+    {
+      "index": 79,
+      "arabic": "وَمَاۤ اَنْتَ بِهٰدِ الْعُمْىِ عَنْ ضَلٰلَتِهِمْ‌ؕ اِنْ تُسْمِعُ اِلَّا مَنْ يُّؤْمِنُ بِاٰيٰتِنَا فَهُمْ مُّسْلِمُوْنَ‏(53)",
+      "translation": "(53) Nor can you lead away the blind out of their error. You cannot make to hear any but those who believe in Our communications so they shall submit."
+    },
+    {
+      "index": 80,
+      "arabic": "اَللّٰهُ الَّذِىْ خَلَقَكُمْ مِّنْ ضَعْفٍ ثُمَّ جَعَلَ مِنْۢ بَعْدِ ضَعْفٍ قُوَّةً ثُمَّ جَعَلَ مِنْۢ بَعْدِ قُوَّةٍ ضَعْفًا وَّشَيْبَةً  ‌ؕ يَخْلُقُ مَا يَشَآءُ ‌ۚ وَهُوَ الْعَلِيْمُ الْقَدِيْرُ‏(54)",
+      "translation": "(54) Allah is He Who created you from a state of weakness then He gave strength after weakness, then ordained weakness and hoary hair after strength; He creates what He pleases, and He is the Knowing, the Powerful."
+    },
+    {
+      "index": 81,
+      "arabic": "وَيَوْمَ تَقُوْمُ السَّاعَةُ يُقْسِمُ الْمُجْرِمُوْنَ ۙ مَا لَبِثُوْا غَيْرَ سَاعَةٍ ‌ؕ كَذٰلِكَ كَانُوْا يُؤْفَكُوْنَ‏(55)",
+      "translation": "(55) And at the time when the hour shall come, the guilty shall swear (that) they did not tarry but an hour; thus are they ever turned away."
+    },
+    {
+      "index": 82,
+      "arabic": "وَقَالَ الَّذِيْنَ اُوْتُوا الْعِلْمَ وَ الْاِيْمَانَ لَقَدْ لَبِثْتُمْ فِىْ كِتٰبِ اللّٰهِ اِلٰى يَوْمِ الْبَعْثِ فَهٰذَا يَوْمُ الْبَعْثِ وَلٰكِنَّكُمْ كُنْتُمْ لَا تَعْلَمُوْنَ‏(56)",
+      "translation": "(56) And those who are given knowledge and faith will say: Certainly you tarried according to the ordinance of Allah till the day of resurrection, so this is the day of resurrection, but you did not know."
+    },
+    {
+      "index": 83,
+      "arabic": "فَيَوْمَئِذٍ لَّا يَنْفَعُ الَّذِيْنَ ظَلَمُوْا مَعْذِرَتُهُمْ وَلَا هُمْ يُسْتَعْتَبُوْنَ‏(57)",
+      "translation": "(57) But on that day their excuse shall not profit those who were unjust, nor shall they be regarded with goodwill."
+    },
+    {
+      "index": 84,
+      "arabic": "وَلَقَدْ ضَرَبْنَا لِلنَّاسِ فِىْ هٰذَا الْقُرْاٰنِ مِنْ كُلِّ مَثَلٍ‌ؕ وَلَئِنْ جِئْتَهُمْ بِاٰيَةٍ لَّيَقُوْلَنَّ الَّذِيْنَ كَفَرُوْۤا اِنْ اَنْتُمْ اِلَّا مُبْطِلُوْنَ‏(58)",
+      "translation": "(58) And certainly We have set forth for men every kind of example in this Quran; and if you should bring them a communication, those who disbelieve would certainly say: You are naught but false claimants."
+    },
+    {
+      "index": 85,
+      "arabic": "كَذٰلِكَ يَطْبَعُ اللّٰهُ عَلٰى قُلُوْبِ الَّذِيْنَ لَا يَعْلَمُوْنَ‏(59)",
+      "translation": "(59) Thus does Allah set a seal on the hearts of those who do not know."
+    },
+    {
+      "index": 86,
+      "arabic": "فَاصْبِرْ اِنَّ وَعْدَ اللّٰهِ حَقٌّ‌ وَّلَا يَسْتَخِفَّنَّكَ الَّذِيْنَ لَا يُوْقِنُوْنَ‏(60)",
+      "translation": "(60) Therefore be patient; surely the promise of Allah is true and let not those who have no certainty hold you in light estimation."
+    },
+    {
+      "index": 87,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 88,
+      "arabic": "الٓمّٓ ‌ۚ‏(1)",
+      "translation": "(1) Alif Lam Mim."
+    },
+    {
+      "index": 89,
+      "arabic": "تِلْكَ اٰيٰتُ الْكِتٰبِ الْحَكِيْمِۙ‏(2)",
+      "translation": "(2) These are verses of the Book of Wisdom"
+    },
+    {
+      "index": 90,
+      "arabic": "هُدًى وَّرَحْمَةً لِّلْمُحْسِنِيْنَۙ‏(3)",
+      "translation": "(3) A guidance and a mercy for the doers of goodness,"
+    },
+    {
+      "index": 91,
+      "arabic": "الَّذِيْنَ يُقِيْمُوْنَ الصَّلٰوةَ وَيُؤْتُوْنَ الزَّكٰوةَ وَهُمْ بِالْاٰخِرَةِ هُمْ يُوْقِنُوْنَؕ‏(4)",
+      "translation": "(4) Those who keep up prayer and pay the poor-rate and they are certain of the hereafter."
+    },
+    {
+      "index": 92,
+      "arabic": "اُولٰٓئِكَ عَلٰى هُدًى مِّنْ رَّبِّهِمْ‌ وَاُولٰٓئِكَ هُمُ الْمُفْلِحُوْنَ‏(5)",
+      "translation": "(5) These are on a guidance from their Lord, and these are they who are successful:"
+    },
+    {
+      "index": 93,
+      "arabic": "وَمِنَ النَّاسِ مَنْ يَّشْتَرِىْ لَهْوَ الْحَدِيْثِ لِيُضِلَّ عَنْ سَبِيْلِ اللّٰهِ بِغَيْرِ عِلْمٍ‌ۖ وَّيَتَّخِذَهَا هُزُوًا ‌ؕ اُولٰٓئِكَ لَهُمْ عَذَابٌ مُّهِيْنٌ‏(6)",
+      "translation": "(6) And of men is he who takes instead frivolous discourse to lead astray from Allah's path without knowledge, and to take it for a mockery; these shall have an abasing chastisement."
+    },
+    {
+      "index": 94,
+      "arabic": "وَاِذَا تُتْلٰى عَلَيْهِ اٰيٰتُنَا وَلّٰى مُسْتَكْبِرًا كَاَنْ لَّمْ يَسْمَعْهَا كَاَنَّ فِىْۤ اُذُنَيْهِ وَقْرًا‌ۚ فَبَشِّرْهُ بِعَذَابٍ اَلِيْمٍ‏(7)",
+      "translation": "(7) And when Our communications are recited to him, he turns back proudly, as if he had not heard them, as though in his ears were a heaviness, therefore announce to him a painful chastisement."
+    },
+    {
+      "index": 95,
+      "arabic": "اِنَّ الَّذِيْنَ اٰمَنُوا وَعَمِلُوْا الصّٰلِحٰتِ لَهُمْ جَنّٰتُ النَّعِيْمِۙ‏(8)",
+      "translation": "(8) (As for) those who believe and do good, they shall surely have gardens of bliss,"
+    },
+    {
+      "index": 96,
+      "arabic": "خٰلِدِيْنَ فِيْهَا ؕ وَعْدَ اللّٰهِ حَقًّا‌ؕ وَهُوَ الْعَزِيْزُ الْحَكِيْمُ‏(9)",
+      "translation": "(9) Abiding in them; the promise of Allah; (a) true (promise), and He is the Mighty, the Wise."
+    },
+    {
+      "index": 97,
+      "arabic": "خَلَقَ السَّمٰوٰتِ بِغَيْرِ عَمَدٍ تَرَوْنَهَا‌ وَاَ لْقٰى فِى الْاَرْضِ رَوَاسِىَ اَنْ تَمِيْدَ بِكُمْ وَبَثَّ فِيْهَا مِنْ كُلِّ دَآ بَّةٍ‌ ؕ وَاَنْزَلْنَا مِنَ السَّمَآءِ مَآءً فَاَنْۢبَتْنَا فِيْهَا مِنْ كُلِّ زَوْجٍ كَرِيْمٍ‏(10)",
+      "translation": "(10) He created the heavens without pillars as you see them, and put mountains upon the earth lest it might convulse with you, and He spread in it animals of every kind; and We sent down water from the cloud, then caused to grow therein (vegetation) of every noble kind."
+    },
+    {
+      "index": 98,
+      "arabic": "هٰذَا خَلْقُ اللّٰهِ فَاَرُوْنِىْ مَاذَا خَلَقَ الَّذِيْنَ مِنْ دُوْنِهٖ‌ؕ بَلِ الظّٰلِمُوْنَ فِىْ ضَلٰلٍ مُّبِيْنٍ‏(11)",
+      "translation": "(11) This is Allah's creation, but show Me what those besides Him have created. Nay, the unjust are in manifest error"
+    },
+    {
+      "index": 99,
+      "arabic": "وَلَقَدْ اٰتَيْنَا لُقْمٰنَ الْحِكْمَةَ اَنِ اشْكُرْ لِلّٰهِ‌ؕ وَمَنْ يَّشْكُرْ فَاِنَّمَا يَشْكُرُ لِنَفْسِهٖ‌ۚ وَمَنْ كَفَرَ فَاِنَّ اللّٰهَ غَنِىٌّ حَمِيْدٌ‏(12)",
+      "translation": "(12) And certainly We gave wisdom to Luqman, saying: Be grateful to Allah. And whoever is grateful, he is only grateful for his own soul; and whoever is ungrateful, then surely Allah is Self-sufficient, Praised."
+    },
+    {
+      "index": 100,
+      "arabic": "وَاِذْ قَالَ لُقْمٰنُ لِا بْنِهٖ وَهُوَ يَعِظُهٗ يٰبُنَىَّ لَا تُشْرِكْ بِاللّٰهِ ؔؕ اِنَّ الشِّرْكَ لَظُلْمٌ عَظِيْمٌ‏(13)",
+      "translation": "(13) And when Luqman said to his son while he admonished him: O my son! do not associate aught with Allah; most surely polytheism is a grievous iniquity--"
+    },
+    {
+      "index": 101,
+      "arabic": "وَوَصَّيْنَا الْاِنْسٰنَ بِوَالِدَيْهِ‌ۚ حَمَلَتْهُ اُمُّهٗ وَهْنًا عَلٰى وَهْنٍ وَّفِصٰلُهٗ فِىْ عَامَيْنِ اَنِ اشْكُرْ لِىْ وَلِوَالِدَيْكَؕ اِلَىَّ الْمَصِيْرُ‏(14)",
+      "translation": "(14) And We have enjoined man in respect of his parents-- his mother bears him with faintings upon faintings and his weaning takes two years-- saying: Be grateful to Me and to both your parents; to Me is the eventual coming."
+    },
+    {
+      "index": 102,
+      "arabic": "وَاِنْ جَاهَدٰكَ عَلٰٓى اَنْ تُشْرِكَ بِىْ مَا لَيْسَ لَكَ بِهٖ عِلْمٌ ۙ فَلَا تُطِعْهُمَا‌ وَصَاحِبْهُمَا فِى الدُّنْيَا مَعْرُوْفًا‌ وَّاتَّبِعْ سَبِيْلَ مَنْ اَنَابَ اِلَىَّ ‌ۚ ثُمَّ اِلَىَّ مَرْجِعُكُمْ فَاُنَبِّئُكُمْ بِمَا كُنْتُمْ تَعْمَلُوْنَ‏(15)",
+      "translation": "(15) And if they contend with you that you should associate with Me what you have no knowledge of, do not obey them, and keep company with them in this world kindly, and follow the way of him who turns to Me, then to Me is your return, then will I inform you of what you did--"
+    },
+    {
+      "index": 103,
+      "arabic": "يٰبُنَىَّ اِنَّهَاۤ اِنْ تَكُ مِثْقَالَ حَبَّةٍ مِّنْ خَرْدَلٍ فَتَكُنْ فِىْ صَخْرَةٍ اَوْ فِى السَّمٰوٰتِ اَوْ فِى الْاَرْضِ يَاْتِ بِهَا اللّٰهُ ‌ؕ اِنَّ اللّٰهَ لَطِيْفٌ خَبِيْرٌ‏(16)",
+      "translation": "(16) O my son! surely if it is the very weight of the grain of a mustard-seed, even though it is in (the heart of) rock, or (high above) in the heaven or (deep down) in the earth, Allah will bring it (to light); surely Allah is Knower of subtleties, Aware;"
+    },
+    {
+      "index": 104,
+      "arabic": "يٰبُنَىَّ اَقِمِ الصَّلٰوةَ وَاْمُرْ بِالْمَعْرُوْفِ وَانْهَ عَنِ الْمُنْكَرِ وَاصْبِرْ عَلٰى مَاۤ اَصَابَكَ‌ؕ اِنَّ ذٰلِكَ مِنْ عَزْمِ الْاُمُوْرِ‌ۚ ‏(17)",
+      "translation": "(17) O my son! keep up prayer and enjoin the good and forbid the evil, and bear patiently that which befalls you; surely these acts require courage;"
+    },
+    {
+      "index": 105,
+      "arabic": "وَلَا تُصَعِّرْ خَدَّكَ لِلنَّاسِ وَلَا تَمْشِ فِى الْاَرْضِ مَرَحًا ‌ؕ اِنَّ اللّٰهَ لَا يُحِبُّ كُلَّ مُخْتَالٍ فَخُوْرٍۚ‏(18)",
+      "translation": "(18) And do not turn your face away from people in contempt, nor go about in the land exulting overmuch; surely Allah does not love any self-conceited boaster;"
+    },
+    {
+      "index": 106,
+      "arabic": "وَاقْصِدْ فِىْ مَشْيِكَ وَاغْضُضْ مِنْ صَوْتِكَ‌ؕ اِنَّ اَنْكَرَ الْاَصْوَاتِ لَصَوْتُ الْحَمِيْرِ‏(19)",
+      "translation": "(19) And pursue the right course in your going about and lower your voice; surely the most hateful of voices is braying of the asses."
+    },
+    {
+      "index": 107,
+      "arabic": "اَلَمْ تَرَوْا اَنَّ اللّٰهَ سَخَّرَ لَكُمْ مَّا فِى السَّمٰوٰتِ وَمَا فِى الْاَرْضِ وَاَسْبَغَ عَلَيْكُمْ نِعَمَهٗ ظَاهِرَةً وَّبَاطِنَةً ‌ؕ وَمِنَ النَّاسِ مَنْ يُّجَادِلُ فِى اللّٰهِ بِغَيْرِ عِلْمٍ وَّلَا هُدًى وَّلَا كِتٰبٍ مُّنِيْرٍ‏(20)",
+      "translation": "(20) Do you not see that Allah has made what is in the heavens and what is in the earth subservient to you, and made complete to you His favors outwardly and inwardly? And among men is he who disputes in respect of Allah though having no knowledge nor guidance, nor a book giving light."
+    },
+    {
+      "index": 108,
+      "arabic": "وَ اِذَا قِيْلَ لَهُمُ اتَّبِعُوْا مَآ اَنْزَلَ اللّٰهُ قَالُوْا بَلْ نَتَّبِعُ مَا وَجَدْنَا عَلَيْهِ اٰبَآءَنَا ؕ اَوَلَوْ كَانَ الشَّيْطٰنُ يَدْعُوْهُمْ اِلٰى عَذَابِ السَّعِيْرِ‏(21)",
+      "translation": "(21) And when it is said to them: Follow what Allah has revealed, they say: Nay, we follow that on which we found our fathers. What! though the Shaitan calls them to the chastisement of the burning fire!"
+    },
+    {
+      "index": 109,
+      "arabic": "وَمَنْ يُّسْلِمْ وَجْهَهٗۤ اِلَى اللّٰهِ وَهُوَ مُحْسِنٌ فَقَدِ اسْتَمْسَكَ بِالْعُرْوَةِ الْوُثْقٰى‌ؕ وَاِلَى اللّٰهِ عَاقِبَةُ الْاُمُوْرِ‏(22)",
+      "translation": "(22) And whoever submits himself wholly to Allah and he is the doer of good (to others), he indeed has taken hold of the firmest thing upon which one can lay hold; and Allah's is the end of affairs."
+    },
+    {
+      "index": 110,
+      "arabic": "وَمَنْ كَفَرَ فَلَا يَحْزُنْكَ كُفْرُهٗ ؕ اِلَيْنَا مَرْجِعُهُمْ فَنُنَبِّئُهُمْ بِمَا عَمِلُوْا ‌ؕ اِنَّ اللّٰهَ عَلِيْمٌۢ بِذَاتِ الصُّدُوْرِ‏(23)",
+      "translation": "(23) And whoever disbelieves, let not his disbelief grieve you; to Us is their return, then will We inform them of what they did surely Allah is the Knower of what is in the breasts."
+    },
+    {
+      "index": 111,
+      "arabic": "نُمَتِّعُهُمْ قَلِيْلًا ثُمَّ نَضْطَرُّهُمْ اِلٰى عَذَابٍ غَلِيْظٍ‏(24)",
+      "translation": "(24) We give them to enjoy a little, then will We drive them to a severe chastisement."
+    },
+    {
+      "index": 112,
+      "arabic": "وَلَئِنْ سَاَلْتَهُمْ مَّنْ خَلَقَ السَّمٰوٰتِ وَالْاَرْضَ لَيَقُوْلُنَّ اللّٰهُ‌ ؕ قُلِ الْحَمْدُ لِلّٰهِ‌ ؕ بَلْ اَكْثَرُهُمْ لَا يَعْلَمُوْنَ‏(25)",
+      "translation": "(25) And if you ask them who created the heavens and the earth, they will certainly say: Allah. Say: (All) praise is due to Allah; nay! most of them do not know."
+    },
+    {
+      "index": 113,
+      "arabic": "لِلّٰهِ مَا فِى السَّمٰوٰتِ وَالْاَرْضِ‌ؕ اِنَّ اللّٰهَ هُوَ الْغَنِىُّ الْحَمِيْدُ‏(26)",
+      "translation": "(26) What is in the heavens and the earth is Allah's; surely Allah is the Self-sufficient, the Praised."
+    },
+    {
+      "index": 114,
+      "arabic": "وَلَوْ اَنَّ مَا فِى الْاَرْضِ مِنْ شَجَرَةٍ اَقْلَامٌ وَّالْبَحْرُ يَمُدُّهٗ مِنْۢ بَعْدِهٖ سَبْعَةُ اَبْحُرٍ مَّا نَفِدَتْ كَلِمٰتُ اللّٰهِ‌ؕ اِنَّ اللّٰهَ عَزِيْزٌ حَكِيْمٌ‏(27)",
+      "translation": "(27) And were every tree that is in the earth (made into) pens and the sea (to supply it with ink), with seven more seas to increase it, the words of Allah would not come to an end; surely Allah is Mighty, Wise."
+    },
+    {
+      "index": 115,
+      "arabic": "مَا خَلْقُكُمْ وَلَا بَعْثُكُمْ اِلَّا كَنَفْسٍ وَّاحِدَةٍ‌ ؕ اِنَّ اللّٰهَ سَمِيْعٌۢ بَصِيْرٌ‏(28)",
+      "translation": "(28) Neither your creation nor your raising is anything but as a single soul; surely Allah is Hearing, Seeing."
+    },
+    {
+      "index": 116,
+      "arabic": "اَلَمْ تَرَ اَنَّ اللّٰهَ يُوْلِجُ الَّيْلَ فِى النَّهَارِ وَيُوْلِجُ النَّهَارَ فِى الَّيْلِ وَسَخَّرَ الشَّمْسَ وَالْقَمَرَ كُلٌّ يَّجْرِىْۤ اِلٰٓى اَجَلٍ مُّسَمًّى وَّاَنَّ اللّٰهَ بِمَا تَعْمَلُوْنَ خَبِيْرٌ‏(29)",
+      "translation": "(29) Do you not see that Allah makes the night to enter into the day, and He makes the day to enter into the night, and He has made the sun and the moon subservient (to you); each pursues its course till an appointed time; and that Allah is Aware of what you do?"
+    },
+    {
+      "index": 117,
+      "arabic": "ذٰ لِكَ بِاَنَّ اللّٰهَ هُوَ الْحَقُّ وَاَنَّ مَا يَدْعُوْنَ مِنْ دُوْنِهِ الْبَاطِلُ ۙ وَاَنَّ اللّٰهَ هُوَ الْعَلِىُّ الْكَبِيْرُ‏(30)",
+      "translation": "(30) This is because Allah is the Truth, and that which they call upon besides Him is the falsehood, and that Allah is the High, the Great."
+    },
+    {
+      "index": 118,
+      "arabic": "اَلَمْ تَرَ اَنَّ الْفُلْكَ تَجْرِىْ فِى الْبَحْرِ بِنِعْمَتِ اللّٰهِ لِيُرِيَكُمْ مِّنْ اٰيٰتِهٖؕ اِنَّ فِىْ ذٰ لِكَ لَاٰيٰتٍ لِّكُلِّ صَبَّارٍ شَكُوْرٍ‏(31)",
+      "translation": "(31) Do you not see that the ships run on in the sea by Allah's favor that He may show you of His signs? Most surely there are signs in this for every patient endurer, grateful one."
+    },
+    {
+      "index": 119,
+      "arabic": "وَاِذَا غَشِيَهُمْ مَّوْجٌ كَالظُّلَلِ دَعَوُا اللّٰهَ مُخْلِصِيْنَ لَهُ الدِّيْنَ ۙ فَلَمَّا نَجّٰٮهُمْ اِلَى الْبَرِّ فَمِنْهُمْ مُّقْتَصِدٌ ‌ؕ وَمَا يَجْحَدُ بِاٰيٰتِنَاۤ اِلَّا كُلُّ خَتَّارٍ كَفُوْرٍ‏(32)",
+      "translation": "(32) And when a wave like mountains covers them they call upon Allah, being sincere to Him in obedience, but when He brings them safe to the land, some of them follow the middle course; and none denies Our signs but every perfidious, ungrateful one."
+    },
+    {
+      "index": 120,
+      "arabic": "يٰۤاَيُّهَا النَّاسُ اتَّقُوْا رَبَّكُمْ وَاخْشَوْا يَوْمًا لَّا يَجْزِىْ وَالِدٌ عَنْ وَّلَدِهٖ وَلَا مَوْلُوْدٌ هُوَ جَازٍ عَنْ وَّالِدِهٖ شَيْئًا‌ ؕ اِنَّ وَعْدَ اللّٰهِ حَقٌّ‌ فَلَا تَغُرَّنَّكُمُ الْحَيٰوةُ الدُّنْيَا وَلَا يَغُرَّنَّكُمْ بِاللّٰهِ الْغَرُوْرُ‏(33)",
+      "translation": "(33) O people! guard against (the punishment of) your Lord and dread the day when a father shall not make any satisfaction for his son, nor shall the child be the maker of any satisfaction for his father; surely the promise of Allah is true, therefore let not this world's life deceive you, nor let the archdeceiver deceive you in respect of Allah."
+    },
+    {
+      "index": 121,
+      "arabic": "اِنَّ اللّٰهَ عِنْدَهٗ عِلْمُ السَّاعَةِ‌ ۚ وَيُنَزِّلُ الْغَيْثَ‌ ۚ وَيَعْلَمُ مَا فِى الْاَرْحَامِ‌ ؕ وَمَا تَدْرِىْ نَفْسٌ مَّاذَا تَكْسِبُ غَدًا‌ ؕ وَّمَا تَدْرِىْ نَفْسٌۢ بِاَىِّ اَرْضٍ تَمُوْتُ ‌ؕ اِنَّ اللّٰهَ عَلِيْمٌ خَبِيْرٌ ‏(34)",
+      "translation": "(34) Surely Allah is He with Whom is the knowledge of the hour, and He sends down the rain and He knows what is in the wombs; and no one knows what he shall earn on the morrow; and no one knows in what land he shall die; surely Allah is Knowing, Aware."
+    },
+    {
+      "index": 122,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 123,
+      "arabic": "الٓمّٓ‏(1)",
+      "translation": "(1) Alif Lam Mim."
+    },
+    {
+      "index": 124,
+      "arabic": "ۚ تَنْزِيْلُ الْكِتٰبِ لَا رَيْبَ فِيْهِ مِنْ رَّبِّ الْعٰلَمِيْنَؕ‏(2)",
+      "translation": "(2) The revelation of the Book, there is no doubt in it, is from the Lord of the worlds."
+    },
+    {
+      "index": 125,
+      "arabic": "اَمْ يَقُوْلُوْنَ افْتَرٰٮهُ‌ۚ بَلْ هُوَ الْحَقُّ مِنْ رَّبِّكَ لِتُنْذِرَ قَوْمًا مَّاۤ اَتٰٮهُمْ مِّنْ نَّذِيْرٍ مِّنْ قَبْلِكَ لَعَلَّهُمْ يَهْتَدُوْنَ‏(3)",
+      "translation": "(3) Or do they say: He has forged it? Nay! it is the truth from your Lord that you may warn a people to whom no warner has come before you, that they may follow the right direction."
+    },
+    {
+      "index": 126,
+      "arabic": "اَللّٰهُ الَّذِىْ خَلَقَ السَّمٰوٰتِ وَالْاَرْضَ وَمَا بَيْنَهُمَا فِىْ سِتَّةِ اَيَّامٍ ثُمَّ اسْتَوٰى عَلَى الْعَرْشِ‌ؕ مَا لَكُمْ مِّنْ دُوْنِهٖ مِنْ وَّلِىٍّ وَّلَا شَفِيْعٍ‌ؕ اَفَلَا تَتَذَكَّرُوْنَ‏(4)",
+      "translation": "(4) Allah is He Who created the heavens and the earth and what is between them in six periods, and He mounted the throne (of authority); you have not besides Him any guardian or any intercessor, will you not then mind?"
+    },
+    {
+      "index": 127,
+      "arabic": "يُدَبِّرُ الْاَمْرَ مِنَ السَّمَآءِ اِلَى الْاَرْضِ ثُمَّ يَعْرُجُ اِلَيْهِ فِىْ يَوْمٍ كَانَ مِقْدَارُهٗۤ اَلْفَ سَنَةٍ مِّمَّا تَعُدُّوْنَ‏(5)",
+      "translation": "(5) He regulates the affair from the heaven to the earth; then shall it ascend to Him in a day the measure of which is a thousand years of what you count."
+    },
+    {
+      "index": 128,
+      "arabic": "ذٰلِكَ عٰلِمُ الْغَيْبِ وَالشَّهَادَةِ الْعَزِيْزُ الرَّحِيْمُۙ‏(6)",
+      "translation": "(6) This is the Knower of the unseen and the seen, the Mighty the Merciful,"
+    },
+    {
+      "index": 129,
+      "arabic": "الَّذِىْۤ اَحْسَنَ كُلَّ شَىْءٍ خَلَقَهٗ‌ وَبَدَاَ خَلْقَ الْاِنْسَانِ مِنْ طِيْنٍ‌ۚ‏(7)",
+      "translation": "(7) Who made good everything that He has created, and He began the creation of man from dust."
+    },
+    {
+      "index": 130,
+      "arabic": "ثُمَّ جَعَلَ نَسْلَهٗ مِنْ سُلٰلَةٍ مِّنْ مَّآءٍ مَّهِيْنٍ‌ۚ‏(8)",
+      "translation": "(8) Then He made his progeny of an extract, of water held in light estimation."
+    },
+    {
+      "index": 131,
+      "arabic": "ثُمَّ سَوّٰٮهُ وَنَفَخَ فِيْهِ مِنْ رُّوْحِهٖ‌ وَجَعَلَ لَكُمُ السَّمْعَ وَالْاَبْصَارَ وَالْاَفْئِدَةَ ‌ ؕ قَلِيْلًا مَّا تَشْكُرُوْنَ‏(9)",
+      "translation": "(9) Then He made him complete and breathed into him of His spirit, and made for you the ears and the eyes and the hearts; little is it that you give thanks."
+    },
+    {
+      "index": 132,
+      "arabic": "وَقَالُوْٓا ءَاِذَا ضَلَلْنَا فِى الْاَرْضِ ءَاِنَّا لَفِىْ خَلْقٍ جَدِيْدٍ ؕ ‌بَلْ هُمْ بِلِقَآءِ رَبِّهِمْ كٰفِرُوْنَ‏(10)",
+      "translation": "(10) And they say: What! when we have become lost in the earth, shall we then certainly be in a new creation? Nay! they are disbelievers in the meeting of their Lord."
+    },
+    {
+      "index": 133,
+      "arabic": "قُلْ يَتَوَفّٰٮكُمْ مَّلَكُ الْمَوْتِ الَّذِىْ وُكِّلَ بِكُمْ ثُمَّ اِلٰى رَبِّكُمْ تُرْجَعُوْنَ‏(11)",
+      "translation": "(11) Say: The angel of death who is given charge of you shall cause you to die, then to your Lord you shall be brought back."
+    },
+    {
+      "index": 134,
+      "arabic": "وَلَوْ تَرٰٓى اِذِ الْمُجْرِمُوْنَ نَاكِسُوْا رُءُوْسِهِمْ عِنْدَ رَبِّهِمْ رَبَّنَاۤ اَبْصَرْنَا وَسَمِعْنَا فَارْجِعْنَا نَعْمَلْ صَالِحًا اِنَّا مُوْقِنُوْنَ‏(12)",
+      "translation": "(12) And could you but see when the guilty shall hang down their heads before their Lord: Our Lord! we have seen and we have heard, therefore send us back, we will do good; surely (now) we are certain."
+    },
+    {
+      "index": 135,
+      "arabic": "وَ لَوْ شِئْنَا لَاٰتَيْنَا كُلَّ نَفْسٍ هُدٰٮهَا وَلٰكِنْ حَقَّ الْقَوْلُ مِنِّىْ لَاَمْلَئَنَّ جَهَنَّمَ مِنَ الْجِنَّةِ وَالنَّاسِ اَجْمَعِيْنَ‏(13)",
+      "translation": "(13) And if We had pleased We would certainly have given to every soul its guidance, but the word (which had gone forth) from Me was just: I will certainly fill hell with the jinn and men together."
+    },
+    {
+      "index": 136,
+      "arabic": "فَذُوْقُوْا بِمَا نَسِيْتُمْ لِقَآءَ يَوْمِكُمْ هٰذَا‌ ۚ اِنَّا نَسِيْنٰكُمْ‌ وَذُوْقُوْا عَذَابَ الْخُلْدِ بِمَا كُنْتُمْ تَعْمَلُوْنَ‏(14)",
+      "translation": "(14) So taste, because you neglected the meeting of this day of yours; surely We forsake you; and taste the abiding chastisement for what you did."
+    },
+    {
+      "index": 137,
+      "arabic": "اِنَّمَا يُؤْمِنُ بِاٰيٰتِنَا الَّذِيْنَ اِذَا ذُكِّرُوْا بِهَا خَرُّوْا سُجَّدًا وَّسَبَّحُوْا بِحَمْدِ رَبِّهِمْ وَهُمْ لَا يَسْتَكْبِرُوْنَ۩‏(15)",
+      "translation": "(15) Only they believe in Our communications who, when they are reminded of them, fall down in prostration and celebrate the praise of their Lord, and they are not proud."
+    },
+    {
+      "index": 138,
+      "arabic": "تَتَجَافٰى جُنُوْبُهُمْ عَنِ الْمَضَاجِعِ يَدْعُوْنَ رَبَّهُمْ خَوْفًا وَّطَمَعًا وَّمِمَّا رَزَقْنٰهُمْ يُنْفِقُوْنَ‏(16)",
+      "translation": "(16) Their sides draw away from (their) beds, they call upon their Lord in fear and in hope, and they spend (benevolently) out of what We have given them."
+    },
+    {
+      "index": 139,
+      "arabic": "فَلَا تَعْلَمُ نَفْسٌ مَّاۤ اُخْفِىَ لَهُمْ مِّنْ قُرَّةِ اَعْيُنٍ‌ۚ جَزَآءًۢ بِمَا كَانُوْا يَعْمَلُوْنَ‏(17)",
+      "translation": "(17) So no soul knows what is hidden for them of that which will refresh the eyes; a reward for what they did."
+    },
+    {
+      "index": 140,
+      "arabic": "اَفَمَنْ كَانَ مُؤْمِنًا كَمَنْ كَانَ فَاسِقًا‌ ؕ لَا يَسْتَوٗنَؔ‏(18)",
+      "translation": "(18) Is he then who is a believer like him who is a transgressor? They are not equal."
+    },
+    {
+      "index": 141,
+      "arabic": "اَمَّا الَّذِيْنَ اٰمَنُوْا وَعَمِلُوا الصّٰلِحٰتِ فَلَهُمْ جَنّٰتُ الْمَاْوٰى نُزُلًاۢ بِمَا كَانُوْا يَعْمَلُوْنَ‏(19)",
+      "translation": "(19) As for those who believe and do good, the gardens are their abiding-place; an entertainment for what they did."
+    },
+    {
+      "index": 142,
+      "arabic": "وَاَمَّا الَّذِيْنَ فَسَقُوْا فَمَاْوٰٮهُمُ النَّارُ‌ؕ كُلَّمَاۤ اَرَادُوْۤا اَنْ يَّخْرُجُوْا مِنْهَاۤ اُعِيْدُوْا فِيْهَا وَ قِيْلَ لَهُمْ ذُوْقُوْا عَذَابَ النَّارِ الَّذِىْ كُنْتُمْ بِهٖ تُكَذِّبُوْنَ‏(20)",
+      "translation": "(20) And as for those who transgress, their abode is the fire; whenever they desire to go forth from it they shall be brought back into it, and it will be said to them: Taste the chastisement of the fire which you called a lie."
+    },
+    {
+      "index": 143,
+      "arabic": "وَلَنُذِيْقَنَّهُمْ مِّنَ الْعَذَابِ الْاَدْنٰى دُوْنَ الْعَذَابِ الْاَكْبَرِ لَعَلَّهُمْ يَرْجِعُوْنَ‏(21)",
+      "translation": "(21) And most certainly We will make them taste of the nearer chastisement before the greater chastisement that haply they may turn."
+    },
+    {
+      "index": 144,
+      "arabic": "وَمَنْ اَظْلَمُ مِمَّنْ ذُكِّرَ بِاٰيٰتِ رَبِّهٖ ثُمَّ اَعْرَضَ عَنْهَا‌ؕ اِنَّا مِنَ الْمُجْرِمِيْنَ مُنْتَقِمُوْنَ‏(22)",
+      "translation": "(22) And who is more unjust than he who is reminded of the communications of his Lord, then he turns away from them? Surely We will give punishment to the guilty."
+    },
+    {
+      "index": 145,
+      "arabic": "وَلَقَدْ اٰتَيْنَا مُوْسَى الْكِتٰبَ فَلَا تَكُنْ فِىْ مِرْيَةٍ مِّنْ لِّقَآئِهٖ‌ وَجَعَلْنٰهُ هُدًى لِّبَنِىْۤ اِسْرَآءِيْلَۚ‏(23)",
+      "translation": "(23) And certainly We gave the Book to Musa, so be not in doubt concerning the receiving of it, and We made it a guide for the children of Israel."
+    },
+    {
+      "index": 146,
+      "arabic": "وَ جَعَلْنَا مِنْهُمْ اَئِمَّةً يَّهْدُوْنَ بِاَمْرِنَا لَمَّا صَبَرُوْا‌ ؕ وَ كَانُوْا بِاٰيٰتِنَا يُوْقِنُوْنَ‏(24)",
+      "translation": "(24) And We made of them Imams to guide by Our command when they were patient, and they were certain of Our communications."
+    },
+    {
+      "index": 147,
+      "arabic": "اِنَّ رَبَّكَ هُوَ يَفْصِلُ بَيْنَهُمْ يَوْمَ الْقِيٰمَةِ فِيْمَا كَانُوْا فِيْهِ يَخْتَلِفُوْنَ‏(25)",
+      "translation": "(25) Surely your Lord will judge between them on the day of resurrection concerning that wherein they differ."
+    },
+    {
+      "index": 148,
+      "arabic": "اَوَلَمْ يَهْدِ لَهُمْ كَمْ اَهْلَكْنَا مِنْ قَبْلِهِمْ مِّنَ الْقُرُوْنِ يَمْشُوْنَ فِىْ مَسٰكِنِهِمْ‌ ؕ اِنَّ فِىْ ذٰ لِكَ لَاٰيٰتٍ ؕ اَفَلَا يَسْمَعُوْنَ‏(26)",
+      "translation": "(26) Does it not point out to them the right way, how many of the generations, in whose abodes they go about, did We destroy before them? Most surely there are signs in this; will they not then hear?"
+    },
+    {
+      "index": 149,
+      "arabic": "اَوَلَمْ يَرَوْا اَنَّا نَسُوْقُ الْمَآءَ اِلَى الْاَرْضِ الْجُرُزِ فَنُخْرِجُ بِهٖ زَرْعًا تَاْكُلُ مِنْهُ اَنْعَامُهُمْ وَاَنْفُسُهُمْ‌ؕ اَفَلَا يُبْصِرُوْنَ‏(27)",
+      "translation": "(27) Do they not see that We drive the water to a land having no herbage, then We bring forth thereby seed-produce of which their cattle and they themselves eat; will they not then see?"
+    },
+    {
+      "index": 150,
+      "arabic": "وَيَقُوْلُوْنَ مَتٰى هٰذَا الْفَتْحُ اِنْ كُنْتُمْ صٰدِقِيْنَ‏(28)",
+      "translation": "(28) And they say: When will this Judgement take place, If you are truthful?"
+    },
+    {
+      "index": 151,
+      "arabic": "قُلْ يَوْمَ الْفَتْحِ لَا يَنْفَعُ الَّذِيْنَ كَفَرُوْۤا اِيْمَانُهُمْ وَلَا هُمْ يُنْظَرُوْنَ‏(29)",
+      "translation": "(29) Say: On the day of Judgement the faith of those who (now) disbelieve will not profit them, nor will they be respited."
+    },
+    {
+      "index": 152,
+      "arabic": "فَاَعْرِضْ عَنْهُمْ وَانْتَظِرْ اِنَّهُمْ مُّنْتَظِرُوْنَ‏(30)",
+      "translation": "(30) Therefore turn away from them and wait, surely they too are waiting."
+    },
+    {
+      "index": 153,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 154,
+      "arabic": "يٰۤاَيُّهَا النَّبِىُّ اتَّقِ اللّٰهَ وَلَا تُطِعِ الْكٰفِرِيْنَ وَالْمُنٰفِقِيْنَ‌ ؕ اِنَّ اللّٰهَ كَانَ عَلِيْمًا حَكِيْمًا ۙ‏(1)",
+      "translation": "(1) O Prophet! be careful of (your duty to) Allah and do not comply with (the wishes of) the unbelievers and the hypocrites; surely Allah is Knowing, Wise;"
+    },
+    {
+      "index": 155,
+      "arabic": "وَّاتَّبِعْ مَا يُوْحٰٓى اِلَيْكَ مِنْ رَّبِّكَ‌ ؕ اِنَّ اللّٰهَ كَانَ بِمَا تَعْمَلُوْنَ خَبِيْرًا ۙ‏(2)",
+      "translation": "(2) And follow what is revealed to you from your Lord; surely Allah is Aware of what you do;"
+    },
+    {
+      "index": 156,
+      "arabic": "وَّتَوَكَّلْ عَلَى اللّٰهِ‌ ؕ وَكَفٰى بِاللّٰهِ وَكِيْلًا‏(3)",
+      "translation": "(3) And rely on Allah; and Allah is sufficient for a Protector."
+    },
+    {
+      "index": 157,
+      "arabic": "مَا جَعَلَ اللّٰهُ لِرَجُلٍ مِّنْ قَلْبَيْنِ فِىْ جَوْفِهٖ ۚ وَمَا جَعَلَ اَزْوَاجَكُمُ الّٰٓئِْ تُظٰهِرُوْنَ مِنْهُنَّ اُمَّهٰتِكُمْ ‌ۚ وَمَا جَعَلَ اَدْعِيَآءَكُمْ اَبْنَآءَكُمْ‌ ؕ ذٰ لِكُمْ قَوْلُكُمْ بِاَ فْوَاهِكُمْ‌ ؕ وَاللّٰهُ يَقُوْلُ الْحَقَّ وَهُوَ يَهْدِى السَّبِيْلَ‏(4)",
+      "translation": "(4) Allah has not made for any man two hearts within him; nor has He made your wives whose backs you liken to the backs of your mothers as your mothers, nor has He made those whom you assert to be your sons your real sons; these are the words of your mouths; and Allah speaks the truth and He guides to the way."
+    },
+    {
+      "index": 158,
+      "arabic": "اُدْعُوْهُمْ لِاٰبَآئِهِمْ هُوَ اَقْسَطُ عِنْدَ اللّٰهِ‌ ۚ فَاِنْ لَّمْ تَعْلَمُوْۤا اٰبَآءَهُمْ فَاِخْوَانُكُمْ فِى الدِّيْنِ وَمَوَالِيْكُمْ‌ؕ وَ لَيْسَ عَلَيْكُمْ جُنَاحٌ فِيْمَاۤ اَخْطَاْ تُمْ بِهٖۙ وَلٰكِنْ مَّا تَعَمَّدَتْ قُلُوْبُكُمْ‌ ؕ وَكَانَ اللّٰهُ غَفُوْرًا رَّحِيْمًا‏(5)",
+      "translation": "(5) Assert their relationship to their fathers; this is more equitable with Allah; but if you do not know their fathers, then they are your brethren in faith and your friends; and there is no blame on you concerning that in which you made a mistake, but (concerning) that which your hearts do purposely (blame may rest on you), and Allah is Forgiving, Merciful."
+    },
+    {
+      "index": 159,
+      "arabic": "اَلنَّبِىُّ اَوْلٰى بِالْمُؤْمِنِيْنَ مِنْ اَنْفُسِهِمْ‌ وَاَزْوَاجُهٗۤ اُمَّهٰتُهُمْ‌ ؕ وَاُولُوا الْاَرْحَامِ بَعْضُهُمْ اَوْلٰى بِبَعْضٍ فِىْ كِتٰبِ اللّٰهِ مِنَ الْمُؤْمِنِيْنَ وَالْمُهٰجِرِيْنَ اِلَّاۤ اَنْ تَفْعَلُوْۤا اِلٰٓى اَوْلِيٰٓئِكُمْ مَّعْرُوْفًا‌ ؕ كَانَ ذٰ لِكَ فِى الْكِتٰبِ مَسْطُوْرًا‏(6)",
+      "translation": "(6) The Prophet has a greater claim on the faithful than they have on themselves, and his wives are (as) their mothers; and the possessors of relationship have the better claim in the ordinance of Allah to inheritance, one with respect to another, than (other) believers, and (than) those who have fled (their homes), except that you do some good to your friends; this is written in the Book."
+    },
+    {
+      "index": 160,
+      "arabic": "وَاِذْ اَخَذْنَا مِنَ النَّبِيّٖنَ مِيْثَاقَهُمْ وَمِنْكَ وَمِنْ نُّوْحٍ وَّاِبْرٰهِيْمَ وَمُوْسٰى وَعِيْسَى ابْنِ مَرْيَمَ وَاَخَذْنَا مِنْهُمْ مِّيْثاقًا غَلِيْظًا ۙ‏(7)",
+      "translation": "(7) And when We made a covenant with the prophets and with you, and with Nuh and Ibrahim and Musa and Isa, son of Marium, and We made with them a strong covenant"
+    },
+    {
+      "index": 161,
+      "arabic": "لِّيَسْئَلَ الصّٰدِقِيْنَ عَنْ صِدْقِهِمْ‌ۚ وَاَعَدَّ لِلْكٰفِرِيْنَ عَذَابًا اَ لِيْمًا‏(8)",
+      "translation": "(8) That He may question the truthful of their truth, and He has prepared for the unbelievers a painful punishment."
+    },
+    {
+      "index": 162,
+      "arabic": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوا اذْكُرُوْا نِعْمَةَ اللّٰهِ عَلَيْكُمْ اِذْ جَآءَتْكُمْ جُنُوْدٌ فَاَرْسَلْنَا عَلَيْهِمْ رِيْحًا وَّجُنُوْدًا لَّمْ تَرَوْهَا‌ ؕ وَكَانَ اللّٰهُ بِمَا تَعْمَلُوْنَ بَصِيْرًا ۚ‏(9)",
+      "translation": "(9) O you who believe! call to mind the favor of Allah to you when there came down upon you hosts, so We sent against them a strong wind and hosts, that you saw not, and Allah is Seeing what you do."
+    },
+    {
+      "index": 163,
+      "arabic": "اِذْ جَآءُوْكُمْ مِّنْ فَوْقِكُمْ وَمِنْ اَسْفَلَ مِنْكُمْ وَاِذْ زَاغَتِ الْاَبْصَارُ وَبَلَغَتِ الْقُلُوْبُ الْحَنَاجِرَ وَتَظُنُّوْنَ بِاللّٰهِ الظُّنُوْنَا ؕ‏(10)",
+      "translation": "(10) When they came upon you from above you and from below you, and when the eyes turned dull, and the hearts rose up to the throats, and you began to think diverse thoughts of Allah."
+    },
+    {
+      "index": 164,
+      "arabic": "هُنَالِكَ ابْتُلِىَ الْمُؤْمِنُوْنَ وَزُلْزِلُوْا زِلْزَالًا شَدِيْدًا‏(11)",
+      "translation": "(11) There the believers were tried and they were shaken with severe shaking."
+    },
+    {
+      "index": 165,
+      "arabic": "وَاِذْ يَقُوْلُ الْمُنٰفِقُوْنَ وَالَّذِيْنَ فِىْ قُلُوْبِهِمْ مَّرَضٌ مَّا وَعَدَنَا اللّٰهُ وَرَسُوْلُهٗۤ اِلَّا غُرُوْرًا‏(12)",
+      "translation": "(12) And when the hypocrites and those in whose hearts was a disease began to say: Allah and His Apostle did not promise us (victory) but only to deceive."
+    },
+    {
+      "index": 166,
+      "arabic": "وَاِذْ قَالَتْ طَّآئِفَةٌ مِّنْهُمْ يٰۤاَهْلَ يَثْرِبَ لَا مُقَامَ لَكُمْ فَارْجِعُوْا‌ ۚ وَيَسْتَاْذِنُ فَرِيْقٌ مِّنْهُمُ النَّبِىَّ يَقُوْلُوْنَ اِنَّ بُيُوْتَنَا عَوْرَة‌ٌ  ‌ۛؕ وَمَا هِىَ بِعَوْرَةٍ  ۛۚ اِنْ يُّرِيْدُوْنَ اِلَّا فِرَارًا‏(13)",
+      "translation": "(13) And when a party of them said: O people of Yasrib! there is no place to stand for you (here), therefore go back; and a party of them asked permission of the prophet, saying. Surely our houses are exposed; and they were not exposed; they only desired to fly away."
+    },
+    {
+      "index": 167,
+      "arabic": "وَلَوْ دُخِلَتْ عَلَيْهِمْ مِّنْ اَقْطَارِهَا ثُمَّ سُئِلُوا الْفِتْنَةَ لَاٰتَوْهَا وَمَا تَلَبَّثُوْا بِهَاۤ اِلَّا يَسِيْرًا‏(14)",
+      "translation": "(14) And if an entry were made upon them from the outlying parts of it, then they were asked to wage war, they would certainly have done it, and they would not have stayed in it but a little while."
+    },
+    {
+      "index": 168,
+      "arabic": "وَلَقَدْ كَانُوْا عَاهَدُوا اللّٰهَ مِنْ قَبْلُ لَا يُوَلُّوْنَ الْاَدْبَارَ‌ ؕ وَكَانَ عَهْدُ اللّٰهِ مَسْئُوْلًا‏(15)",
+      "translation": "(15) And certainly they had made a covenant with Allah before, that) they would not turn (their) backs; and Allah's covenant shall be inquired of."
+    },
+    {
+      "index": 169,
+      "arabic": "قُلْ لَّنْ يَّنْفَعَكُمُ الْفِرَارُ اِنْ فَرَرْتُمْ مِّنَ الْمَوْتِ اَوِ الْقَتْلِ وَاِذًا لَّا تُمَتَّعُوْنَ اِلَّا قَلِيْلًا‏(16)",
+      "translation": "(16) Say: Flight shall not do you any good if you fly from death or slaughter, and in that case you will not be allowed to enjoy yourselves but a little."
+    },
+    {
+      "index": 170,
+      "arabic": "قُلْ مَنْ ذَا الَّذِىْ يَعْصِمُكُمْ مِّنَ اللّٰهِ اِنْ اَرَادَ بِكُمْ سُوْٓءًا اَوْ اَرَادَ بِكُمْ رَحْمَةً ‌ؕ وَلَا يَجِدُوْنَ لَهُمْ مِّنْ دُوْنِ اللّٰهِ وَلِيًّا وَّلَا نَصِيْرًا‏(17)",
+      "translation": "(17) Say: Who is it that can withhold you from Allah if He intends to do you evil, rather He intends to show you mercy? And they will not find for themselves besides Allah any guardian or a helper."
+    },
+    {
+      "index": 171,
+      "arabic": "قَدْ يَعْلَمُ اللّٰهُ الْمُعَوِّقِيْنَ مِنْكُمْ وَالْقَآئِلِيْنَ لِاِخْوَانِهِمْ هَلُمَّ اِلَيْنَا‌ ۚ وَلَا يَاْتُوْنَ الْبَاْسَ اِلَّا قَلِيْلًا ۙ‏(18)",
+      "translation": "(18) Allah knows indeed those among you who hinder others and those who say to their brethren: Come to us; and they come not to the fight but a little,"
+    },
+    {
+      "index": 172,
+      "arabic": "اَشِحَّةً عَلَيْكُمْ ‌‌ۖۚ فَاِذَا جَآءَ الْخَوْفُ رَاَيْتَهُمْ يَنْظُرُوْنَ اِلَيْكَ تَدُوْرُ اَعْيُنُهُمْ كَالَّذِىْ يُغْشٰى عَلَيْهِ مِنَ الْمَوْتِ‌ ۚ فَاِذَا ذَهَبَ الْخَوْفُ سَلَقُوْكُمْ بِاَ لْسِنَةٍ حِدَادٍ اَشِحَّةً عَلَى الْخَيْرِ‌ ؕ اُولٰٓئِكَ لَمْ يُؤْمِنُوْا فَاَحْبَطَ اللّٰهُ اَعْمَالَهُمْ‌ ؕ وَكَانَ ذٰ لِكَ عَلَى اللّٰهِ يَسِيْرًا‏(19)",
+      "translation": "(19) Being niggardly with respect to you; but when fear comes, you will see them looking to you, their eyes rolling like one swooning because of death; but when the fear is gone they smite you with sharp tongues, being niggardly of the good things. These have not believed, therefore Allah has made their doing naught; and this is easy to Allah."
+    },
+    {
+      "index": 173,
+      "arabic": "يَحْسَبُوْنَ الْاَحْزَابَ لَمْ يَذْهَبُوْا‌ ۚ وَاِنْ يَّاْتِ الْاَحْزَابُ يَوَدُّوْا لَوْ اَنَّهُمْ بَادُوْنَ فِى الْاَعْرَابِ يَسْاَ لُوْنَ عَنْ اَنْۢبَآئِكُمْ‌ ؕ وَلَوْ كَانُوْا فِيْكُمْ مَّا قٰتَلُوْۤا اِلَّا قَلِيْلًا‏(20)",
+      "translation": "(20) They think the allies are not gone, and if the allies should come (again) they would fain be in the deserts with the desert Arabs asking for news about you, and if they were among you they would not fight save a little."
+    },
+    {
+      "index": 174,
+      "arabic": "لَقَدْ كَانَ لَكُمْ فِىْ رَسُوْلِ اللّٰهِ اُسْوَةٌ حَسَنَةٌ لِّمَنْ كَانَ يَرْجُوا اللّٰهَ وَالْيَوْمَ الْاٰخِرَ وَذَكَرَ اللّٰهَ كَثِيْرًا ؕ‏(21)",
+      "translation": "(21) Certainly you have in the Apostle of Allah an excellent exemplar for him who hopes in Allah and the latter day and remembers Allah much."
+    },
+    {
+      "index": 175,
+      "arabic": "وَلَمَّا رَاَ الْمُؤْمِنُوْنَ الْاَحْزَابَ ۙ قَالُوْا هٰذَا مَا وَعَدَنَا اللّٰهُ وَرَسُوْلُهٗ وَ صَدَقَ اللّٰهُ وَرَسُوْلُهٗ وَمَا زَادَهُمْ اِلَّاۤ اِيْمَانًا وَّتَسْلِيْمًا ؕ‏(22)",
+      "translation": "(22) And when the believers saw the allies, they said: This is what Allah and His Apostle promised us, and Allah and His Apostle spoke the truth; and it only increased them in faith and submission."
+    },
+    {
+      "index": 176,
+      "arabic": "مِنَ الْمُؤْمِنِيْنَ رِجَالٌ صَدَقُوْا مَا عَاهَدُوا اللّٰهَ عَلَيْهِ‌ۚ فَمِنْهُمْ مَّنْ قَضٰى نَحْبَهٗ وَمِنْهُمْ مَّنْ يَّنْتَظِرُ‌ ۖ  وَمَا بَدَّلُوْا تَبْدِيْلًا ۙ‏(23)",
+      "translation": "(23) Of the believers are men who are true to the covenant which they made with Allah: so of them is he who accomplished his vow, and of them is he who yet waits, and they have not changed in the least"
+    },
+    {
+      "index": 177,
+      "arabic": "لِّيَجْزِىَ اللّٰهُ الصّٰدِقِيْنَ بِصِدْقِهِمْ وَيُعَذِّبَ الْمُنٰفِقِيْنَ اِنْ شَآءَ اَوْ يَتُوْبَ عَلَيْهِمْ‌ ؕ اِنَّ اللّٰهَ كَانَ غَفُوْرًا رَّحِيْمًا ۚ‏(24)",
+      "translation": "(24) That Allah may reward the truthful for their truth, and punish the hypocrites if He please or turn to them (mercifully); surely Allah is Forgiving, Merciful."
+    },
+    {
+      "index": 178,
+      "arabic": "وَرَدَّ اللّٰهُ الَّذِيْنَ كَفَرُوْا بِغَيْظِهِمْ لَمْ يَنَالُوْا خَيْرًا‌ ؕ وَكَفَى اللّٰهُ الْمُؤْمِنِيْنَ الْقِتَالَ‌ ؕ وَكَانَ اللّٰهُ قَوِيًّا عَزِيْزًا ۚ‏(25)",
+      "translation": "(25) And Allah turned back the unbelievers in their rage; they did not obtain any advantage, and Allah sufficed the believers in fighting; and Allah is Strong, Mighty."
+    },
+    {
+      "index": 179,
+      "arabic": "وَاَنْزَلَ الَّذِيْنَ ظَاهَرُوْهُمْ مِّنْ اَهْلِ الْكِتٰبِ مِنْ صَيَاصِيْهِمْ وَقَذَفَ فِىْ قُلُوْبِهِمُ الرُّعْبَ فَرِيْقًا تَقْتُلُوْنَ وَتَاْسِرُوْنَ فَرِيْقًا ۚ‏(26)",
+      "translation": "(26) And He drove down those of the followers of the Book who backed them from their fortresses and He cast awe into their hearts; some you killed and you took captive another part."
+    },
+    {
+      "index": 180,
+      "arabic": "وَاَوْرَثَكُمْ اَرْضَهُمْ وَدِيَارَهُمْ وَ اَمْوَالَهُمْ وَاَرْضًا لَّمْ تَطَئُوْهَا‌ ؕ وَكَانَ اللّٰهُ عَلٰى كُلِّ شَىْءٍ قَدِيْرًا‏(27)",
+      "translation": "(27) And He made you heirs to their land and their dwellings and their property, and (to) a land which you have not yet trodden, and Allah has power over all things."
+    },
+    {
+      "index": 181,
+      "arabic": "يٰۤاَيُّهَا النَّبِىُّ قُلْ لِّاَزْوَاجِكَ اِنْ كُنْتُنَّ تُرِدْنَ الْحَيٰوةَ الدُّنْيَا وَزِيْنَتَهَا فَتَعَالَيْنَ اُمَتِّعْكُنَّ وَاُسَرِّحْكُنَّ سَرَاحًا جَمِيْلًا‏(28)",
+      "translation": "(28) O Prophet! say to your wives: If you desire this world's life and its adornment, then come, I will give you a provision and allow you to depart a goodly departing"
+    },
+    {
+      "index": 182,
+      "arabic": "وَاِنْ كُنْتُنَّ تُرِدْنَ اللّٰهَ وَرَسُوْلَهٗ وَالدَّارَ الْاٰخِرَةَ فَاِنَّ اللّٰهَ اَعَدَّ لِلْمُحْسِنٰتِ مِنْكُنَّ اَجْرًا عَظِيْمًا‏(29)",
+      "translation": "(29) And if you desire Allah and His Apostle and the latter abode, then surely Allah has prepared for the doers of good among you a mighty reward."
+    },
+    {
+      "index": 183,
+      "arabic": "يٰنِسَآءَ النَّبِىِّ مَنْ يَّاْتِ مِنْكُنَّ بِفَاحِشَةٍ مُّبَيِّنَةٍ يُّضٰعَفْ لَهَا الْعَذَابُ ضِعْفَيْنِ ‌ؕ وَكَانَ ذٰ لِكَ عَلَى اللّٰهِ يَسِيْرًا‏(30)",
+      "translation": "(30) O wives of the prophet! whoever of you commits an open indecency, the punishment shall be increased to her doubly; and this is easy to Allah."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=juzz21&lang=en"
+}

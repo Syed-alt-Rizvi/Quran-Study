@@ -1,0 +1,53 @@
+{
+  "id": "maf_baqe223",
+  "code": "maf_baqe223",
+  "title": "Namaz at Seeing a non Muslims",
+  "mainCategory": "Namaz & Special Prayers",
+  "mainCategoryCode": "maf_namaz",
+  "categoryChain": [
+    "Namaz & Special Prayers",
+    "Namaz",
+    "Namaz at Seeing a non Muslims"
+  ],
+  "audioUrl": null,
+  "introduction": "NAMAZ AT SEEING A NON-MUSLIMS\n\nTwenty-eighth: The Holy Prophet (s) is reported to have said: Whoever, upon seeing a Jew, a Christian, or a Magus says this prayer, Almighty Allah will not include him with the nonbelievers in Hellfire:",
+  "versesCount": 7,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَلْحَمْدُ لِلّٰهِ الَّذِىْ",
+      "translation": "All praise be to Allah"
+    },
+    {
+      "index": 2,
+      "arabic": "فَضَّلَنِىْ عَلَيْكَ بِالْاِسْلَامِ دِيْنًا",
+      "translation": "Who has preferred me against You through making Islam to be my religion,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَ بِالْقُرْاٰنِ كِتَابًا",
+      "translation": "the Qur'an to be my Book,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَ بِمُحَمَّدٍ نَبِيًّا",
+      "translation": "Muhammad to be my Prophet,"
+    },
+    {
+      "index": 5,
+      "arabic": "وَ بِعَلِىٍّ‏ اِمَامًا",
+      "translation": "'Ali to be my Imam,"
+    },
+    {
+      "index": 6,
+      "arabic": "وَ بِالْمُؤْمِنِيْنَ اِخْوَانًا",
+      "translation": "the believers to be my brothers,"
+    },
+    {
+      "index": 7,
+      "arabic": "وَ بِالْكَعْبَةِ قِبْلَةً۔",
+      "translation": "and the Ka'bah to be my kiblah."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe223&lang=en"
+}

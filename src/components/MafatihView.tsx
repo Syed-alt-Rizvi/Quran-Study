@@ -95,6 +95,44 @@ function getArabicTitle(id: string, englishTitle: string): string {
   return englishTitle;
 }
 
+function getCategoryColor(category: string): { border: string; badge: string } {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('ziyarat')) {
+    return {
+      border: 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-emerald-600 dark:rtl:border-r-emerald-500',
+      badge: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/80',
+    };
+  }
+  if (cat.includes('dua') || cat.includes('supplication')) {
+    return {
+      border: 'border-l-4 border-l-teal-600 dark:border-l-teal-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-teal-600 dark:rtl:border-r-teal-500',
+      badge: 'bg-teal-50 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/80 dark:border-teal-800/80',
+    };
+  }
+  if (cat.includes('munajat') || cat.includes('whispered')) {
+    return {
+      border: 'border-l-4 border-l-indigo-600 dark:border-l-indigo-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-indigo-600 dark:rtl:border-r-indigo-500',
+      badge: 'bg-indigo-50 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/80 dark:border-indigo-800/80',
+    };
+  }
+  if (cat.includes('aamaal') || cat.includes('amal')) {
+    return {
+      border: 'border-l-4 border-l-amber-600 dark:border-l-amber-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-amber-600 dark:rtl:border-r-amber-500',
+      badge: 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/80',
+    };
+  }
+  if (cat.includes('namaz') || cat.includes('taqib') || cat.includes('prayer')) {
+    return {
+      border: 'border-l-4 border-l-cyan-600 dark:border-l-cyan-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-cyan-600 dark:rtl:border-r-cyan-500',
+      badge: 'bg-cyan-50 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300 border-cyan-200/80 dark:border-cyan-800/80',
+    };
+  }
+  return {
+    border: 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 rtl:border-l-0 rtl:border-r-4 rtl:border-r-emerald-600 dark:rtl:border-r-emerald-500',
+    badge: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80',
+  };
+}
+
 const FEATURED_ITEMS = [
   { id: 'maf_dua40', titleEn: 'Dua Kumayl', titleUr: 'دعائے کمیل', titleAr: 'دعاء كميل', cat: 'Duas' },
   { id: 'maf_ziy86', titleEn: 'Ziyarat Ashura', titleUr: 'زیارتِ عاشورہ', titleAr: 'زيارة عاشوراء', cat: 'Ziyaraat' },
@@ -247,9 +285,40 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
   };
 
   return (
-    <div className="space-y-5" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <div className="space-y-4 sm:space-y-5 w-full max-w-full overflow-x-hidden min-w-0" dir={isUrdu ? 'rtl' : 'ltr'}>
+      {/* Illuminated Sanctuary Header Banner with Sacred Identity */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900 via-teal-950 to-slate-900 p-4 sm:p-5 text-white shadow-sm border border-emerald-800/50 min-w-0 w-full max-w-full">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-semibold uppercase tracking-wider">
+                {isUrdu ? 'کتابِ دعا و زیارت' : 'Sacred Supplications'}
+              </span>
+              <span className="text-xs text-emerald-300 font-arabic font-medium">مَفَاتِيحُ الْجِنَانِ</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2 truncate">
+              <span>{isUrdu ? 'مفاتیح الجنان' : 'Mafatih Al Jinan'}</span>
+              <span className="text-xs font-normal text-emerald-200/80 hidden sm:inline">
+                — {isUrdu ? 'محدث شیخ عباس قمی (رح)' : 'Sheikh Abbas Qummi (r.a)'}
+              </span>
+            </h2>
+            <p className="text-[11px] sm:text-xs text-emerald-100/80 mt-1 max-w-xl leading-relaxed break-words">
+              {isUrdu 
+                ? 'اہلبیتؑ کی مستند دعائیں، زیارات اور اعمال کا مکمل انسائیکلوپیڈیا با اعراب و آڈیو' 
+                : 'Complete 1,307 authentic Ahlulbayt (a.s) supplications, ziyaraat, and taqibaat with full text and synchronous recitations.'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-emerald-200 shrink-0 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs self-start sm:self-auto">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="tabular-nums font-semibold">
+              {isUrdu ? `${toUrduNumerals(items.length || 1307)} دعائیں` : `${items.length || 1307} Supplications`}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Sleek Minimalist Quick Recitations Bar */}
-      <div className="space-y-2">
+      <div className="space-y-2 w-full max-w-full overflow-hidden min-w-0">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
             {isUrdu ? 'برگزیدہ دعائیں و زیارات' : 'Core Recitations'}
@@ -426,63 +495,70 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full max-w-full min-w-0">
           {filteredItems.slice(0, visibleLimit).map((item) => {
             const isItemPlaying = isPlaying && (currentTrack?.id === item.id || (!!item.audioUrl && currentTrack?.audioUrl === item.audioUrl));
             const primaryTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : item.title;
             const arTitle = getArabicTitle(item.id, item.title);
             const categoryLabel = isUrdu ? getMafatihUrduCategory(item.mainCategory) : (item.mainCategory || 'Supplication');
             const versesCountFormatted = isUrdu ? `${toUrduNumerals(item.versesCount)} ${t('verses', appLanguage)}` : `${item.versesCount} verses`;
+            const catStyle = getCategoryColor(item.mainCategory || '');
 
             return (
               <div
                 key={`maf-${item.id}`}
                 onClick={() => handleSelectItem(item.id)}
-                className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 dark:hover:border-emerald-600/40 transition-colors group cursor-pointer flex flex-col justify-between space-y-3"
+                className={`w-full max-w-full min-w-0 p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-2xs hover:shadow-xs transition-all duration-200 group cursor-pointer flex flex-col justify-between space-y-3.5 overflow-hidden ${catStyle.border}`}
               >
-                <div>
-                  {/* Clean unboxed metadata header */}
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="truncate max-w-[200px]">{categoryLabel}</span>
-                    {item.versesCount > 0 && (
-                      <>
-                        <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
-                        <span className="tabular-nums">{versesCountFormatted}</span>
-                      </>
-                    )}
-                    {(item.hasAudio || item.audioUrl) && (
-                      <>
-                        <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
-                        <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                          <Volume2 size={12} className={isItemPlaying ? 'animate-pulse' : ''} />
-                          <span>{t('audio', appLanguage)}</span>
-                        </span>
-                      </>
-                    )}
+                <div className="min-w-0 w-full">
+                  {/* Category badge & metadata header */}
+                  <div className="flex items-center justify-between gap-2 text-xs mb-2 min-w-0 w-full">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border truncate max-w-[170px] sm:max-w-[210px] ${catStyle.badge}`}>
+                      {categoryLabel}
+                    </span>
+
+                    <div className="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 text-[11px] shrink-0">
+                      {item.versesCount > 0 && (
+                        <span className="tabular-nums font-mono">{versesCountFormatted}</span>
+                      )}
+                      {(item.hasAudio || item.audioUrl) && (
+                        <>
+                          <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
+                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <Volume2 size={12} className={isItemPlaying ? 'animate-pulse' : ''} />
+                            <span>{t('audio', appLanguage)}</span>
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Title and Arabic Calligraphy */}
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
-                      {primaryTitle}
-                    </h3>
+                  {/* Thoughtful Title and Arabic Calligraphy with distinct identity */}
+                  <div className="flex items-start justify-between gap-2.5 w-full min-w-0">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-snug break-words">
+                        {primaryTitle}
+                      </h3>
+                    </div>
                     {arTitle && (
-                      <span dir="rtl" className="font-arabic text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-medium shrink-0 text-right">
-                        {arTitle}
-                      </span>
+                      <div className="shrink-0 max-w-[42%] text-right">
+                        <span dir="rtl" className="inline-block font-arabic text-emerald-800 dark:text-emerald-300 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 px-2 py-0.5 rounded-lg text-xs sm:text-sm font-medium break-words leading-relaxed">
+                          {arTitle}
+                        </span>
+                      </div>
                     )}
                   </div>
 
-                  {/* Snippet / Description */}
+                  {/* Snippet / Description (Protected against horizontal overflow) */}
                   {item.snippet && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed break-words min-w-0 max-w-full">
                       {item.snippet}
                     </p>
                   )}
                 </div>
 
                 {/* Bottom Action Strip */}
-                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/60">
+                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/60 w-full min-w-0">
                   <div>
                     {(item.hasAudio || item.audioUrl) && (
                       <button
@@ -491,9 +567,9 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                           e.stopPropagation();
                           toggleAudio(item.audioUrl, item.id, item.title, item.mainCategory);
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                           isItemPlaying
-                            ? 'bg-emerald-600 text-white'
+                            ? 'bg-emerald-600 text-white shadow-xs'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-600 hover:text-white'
                         }`}
                         title={isItemPlaying ? (isUrdu ? 'روکیں' : 'Pause Audio') : (isUrdu ? 'آڈیو سنیں' : 'Play Audio')}
@@ -516,7 +592,7 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                       e.stopPropagation();
                       handleSelectItem(item.id);
                     }}
-                    className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors cursor-pointer"
                   >
                     <span>{t('read_full', appLanguage)}</span>
                     <ChevronRight size={14} className={isUrdu ? 'rotate-180' : ''} />

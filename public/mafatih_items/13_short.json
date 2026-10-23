@@ -1,0 +1,40 @@
+{
+  "id": "13_short",
+  "code": "13_short",
+  "title": "13th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "13th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram13.m4a",
+  "introduction": "13th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ طَهِّرْنِيْ فِيْهِ مِنَ الدَّنَسِ وَالْاَقْذَارِ،",
+      "translation": "O Allah, on this day, (please) purify me against filth and dirt,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَصَبِّرْنِيْ فِيْهِ عَلٰى كَآئِنَاتِ الْاَقْدَارِ،",
+      "translation": "grant me on this day steadfastness against vicissitudes of time,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَوَفِّقْنِيْ فِيْهِ لِلتُّقٰى وَصُحْبَةِ الْاَبْرَارِ،",
+      "translation": "lead me on this day to piety and companionship of the upright ones,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِعَوْنِكَ يَا قُرَّةَ عَيْنِ الْمَسَاكِيْنَ۔",
+      "translation": "in the name of Your assistance, O delight of the poor!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=13_short&lang=en"
+}

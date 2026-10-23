@@ -1,0 +1,28 @@
+{
+  "id": "ghareeq",
+  "code": "ghareeq",
+  "title": "Dua e Ghareeq",
+  "mainCategory": "Duas & Supplications",
+  "mainCategoryCode": "maf_dua",
+  "categoryChain": [
+    "Duas & Supplications",
+    "Duas",
+    "Dua e Ghareeq"
+  ],
+  "audioUrl": null,
+  "introduction": "DUA E GHAREEQ",
+  "versesCount": 2,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "بِسْمِ اللهِ الرَّحمٰن الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 2,
+      "arabic": "يَا اَللهُ يَا رَحْمٰنُ يَا رَحِيْمُ يَا مُقَلِّبَ الْقُلُوْبِ ثَبِّتْ قَلْبِىْ عَلٰى دِيْنِكَ۔",
+      "translation": ""
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=ghareeq&lang=en"
+}

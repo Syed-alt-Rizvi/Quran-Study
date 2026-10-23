@@ -1,0 +1,43 @@
+{
+  "id": "maf_baqe76",
+  "code": "maf_baqe76",
+  "title": "Namaz e Maghferat e Waledain",
+  "mainCategory": "Namaz & Special Prayers",
+  "mainCategoryCode": "maf_namaz",
+  "categoryChain": [
+    "Namaz & Special Prayers",
+    "Namaz",
+    "Namaz e Maghferat e Waledain"
+  ],
+  "audioUrl": null,
+  "introduction": "NAMAZ E MAGHFERAT E WALEDAIN\n\nThe prayer for the parents is of two units. In the first unit, Surah al-Faatehah is recited once and the following supplicatory prayer is repeated ten times:\n\nIn the second unit, Surah al-Faatehah is recited once and the following supplicatory prayer is repeated ten times:\n\nWhen the prayer is accomplished (by uttering the Taslim statement), the following supplicatory prayer is repeated ten times:",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "رَبَّنَا اغْفِرْلِىْ وَ لِوَالِدَىَّ وَ لِلْمُؤْمِنِيْنَ يَوْمَ يَقُوْمُ الْحِسَابُ۔",
+      "translation": "O my Lord! (please) Forgive me and my parents and believers on the day when the account is cast."
+    },
+    {
+      "index": 2,
+      "arabic": "رَبِّ اغْفِرْلِىْ وَ لِوَالِدَىَّ",
+      "translation": "O my Lord! (Please) forgive me and my parents"
+    },
+    {
+      "index": 3,
+      "arabic": "وَ لِمَنْ دَخَلَ بَيْتِىَ مُؤْمِنًا",
+      "translation": "and him who enters my house believing,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَّ لِلْمُؤْمِنِيْنَ وَ الْمُؤْمِنَاتِ۔",
+      "translation": "and the believing men and the believing women"
+    },
+    {
+      "index": 5,
+      "arabic": "رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِىْ صَغِيْرًا۔",
+      "translation": "O my Lord! Have compassion on them, as they brought me up (when I was) little."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe76&lang=en"
+}

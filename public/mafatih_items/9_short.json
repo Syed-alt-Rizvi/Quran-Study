@@ -1,0 +1,40 @@
+{
+  "id": "9_short",
+  "code": "9_short",
+  "title": "9th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "9th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram9.m4a",
+  "introduction": "9th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْ لِيْ فِيْهِ نَصِيْبًا مِنْ رَحْمَتِكَ الْوَاسِعَةِ،",
+      "translation": "O Allah, on this day, (please) decide for me a share from Your expansive mercy,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاهْدِنِيْ فِيْهِ لِبَرَاهِيْنِكَ السَّاطِعَةِ،",
+      "translation": "guide me on this day to Your luminous proofs,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَخُذْ بِنَاصِيَتِيْ اِلٰى مَرْضَاتِكَ الْجَامِعَةِ،",
+      "translation": "and take me from the forelock to Your all-inclusive satisfaction,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِمَحَبَّتِكَ يَا اَمَلَ الْمُشْتَاقِيْنَ۔",
+      "translation": "in the name of Your lovingness, O hope of the eager ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=9_short&lang=en"
+}

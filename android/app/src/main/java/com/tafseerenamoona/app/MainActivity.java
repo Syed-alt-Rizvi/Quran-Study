@@ -15,6 +15,9 @@ public class MainActivity extends BridgeActivity {
         handleWidgetIntent(getIntent());
 
         try {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
+            }
             ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
                 Insets sbInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars());
                 float density = getResources().getDisplayMetrics().density;
@@ -29,6 +32,27 @@ public class MainActivity extends BridgeActivity {
                 }
                 return insets;
             });
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Keep WebView media active in background so Quran and Mafatih audio continues uninterrupted
+        try {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().onResume();
+            }
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().onResume();
+            }
         } catch (Exception ignored) {}
     }
 

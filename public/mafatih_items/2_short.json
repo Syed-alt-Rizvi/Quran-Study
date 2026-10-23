@@ -1,0 +1,40 @@
+{
+  "id": "2_short",
+  "code": "2_short",
+  "title": "2nd Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "2nd Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram2.m4a",
+  "introduction": "2nd Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ قَرِّبْنِي فِيْهِ اِلٰى مَرْضَاتِكَ،",
+      "translation": "O Allah, on this day, (please) take me near Your pleasure,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَجَنِّبْنِيْ فِيْهِ مِنْ سَخَطِكَ وَنَقِمَاتِكَ،",
+      "translation": "keep me away on it from Your wrath and punishments,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَوَفِّقْنِيْ فِيْهِ لِقِرَاۤءَةِ اٰيَاتِكَ",
+      "translation": "and make me succeed in reciting Your verses,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِرَحْمَتِكَ يَا اَرْحَمَ الرَّاحِمِيْنَ۔",
+      "translation": "in the name of Your mercy, O most Merciful of all those who show mercy!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=2_short&lang=en"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "10_short",
+  "code": "10_short",
+  "title": "10th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "10th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram10.m4a",
+  "introduction": "10th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْنِيْ فِيْهِ مِنَ الْمُتَوَكِّلِيْنَ عَلَيْكَ،",
+      "translation": "O Allah, on this day, (please) include me with those who rely upon You,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاجْعَلْنِيْ فِيْهِ مِنَ الْفَآئِزِيْنَ لَدَيْكَ،",
+      "translation": "include me on this day with those who win with You,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاجْعَلْنِيْ فِيْهِ مِنَ الْمُقَرَّبِيْنَ اِلَيْكَ،",
+      "translation": "and include me on this day with those drawn near to You,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِاِحْسَانِكَ يَا غَايَةَ الطَّالِبِيْنَ۔",
+      "translation": "in the name of Your beneficence, O ultimate goal of the seekers!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=10_short&lang=en"
+}

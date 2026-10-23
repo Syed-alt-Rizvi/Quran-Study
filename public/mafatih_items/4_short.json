@@ -1,0 +1,45 @@
+{
+  "id": "4_short",
+  "code": "4_short",
+  "title": "4th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "4th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram4.m4a",
+  "introduction": "4th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ قَوِّنِيْ فِيْهِ عَلٰى اِقَامَةِ اَمْرِكَ،",
+      "translation": "O Allah, on this day, (please) grant me power so that I will carry out Your orders"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَذِقْنِيْ فِيْهِ حَلَاوَةَ ذِكْرِكَ،",
+      "translation": "make me taste the nice flavor of the reference to You,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاَوْزِعْنِيْ فِيْهِ لِاَدَاۤءِ شُكْرِكَ بِكَرَمِكَ،",
+      "translation": "arouse me to be thankful for You,through Your magnanimity,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَاحْفَظْنِيْ فِيْهِ بِحِفْظِكَ وَسَتْرِكَ،",
+      "translation": "and surround me with Your guarding and covering,"
+    },
+    {
+      "index": 5,
+      "arabic": "يَا اَبْصَرَ النَّاظِرِيْنَ۔",
+      "translation": "O best Seer of all those who can see!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=4_short&lang=en"
+}

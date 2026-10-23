@@ -1,0 +1,45 @@
+{
+  "id": "1_short",
+  "code": "1_short",
+  "title": "1st Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "1st Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram1.m4a",
+  "introduction": "SHORT DUAS FOR THE DAYS OF RAMADHAN\n\nIt has been narrated on the authority of Ibn ‘Abbas that the Holy Prophet (s.a.w.a.) referred to the great merits and rewards of observing fast on each day of Ramadan. He also mentioned supplicatory prayers that are dedicated to each of these days with the merits and rewards of saying them. Let us hereby mention these supplicatory prayers only:\n\n1st Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْ صِيَامِيْ فِيْهِ صِيَامَ الصَّآئِمِيْنَ،",
+      "translation": "O Allah, on this day, (please) decide my fasting to be as same as the fasting of the true fasters,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَقِيَامِيْ فِيْهِ قِيَامَ الْقَآئِمِيْنَ،",
+      "translation": "decide my acts of worship to be as same as the worship of the worshippers,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَنَبِّهْنِيْ فِيْهِ عَنْ نَوْمَةِ الْغَافِلِيْنَ،",
+      "translation": "awaken me from the slumber of the inadvertent ones,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَهَبْ لِىْ جُرْمِيْ فِيْهِ يَا اِلـٰهَ الْعَالَمِيْنَ،",
+      "translation": "excuse my offense on this day, O God of the worlds,"
+    },
+    {
+      "index": 5,
+      "arabic": "وَاعْفُ عَنِّي يَا عَافِيًا عَنِ الْمُجْرِمِيْنَ۔",
+      "translation": "and pardon me, O He Who pardons the offenders!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=1_short&lang=en"
+}

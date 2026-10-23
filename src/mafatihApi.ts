@@ -365,6 +365,92 @@ function sanitizeMafatihDetail(raw: any, fallbackId: string, metaFallback?: Mafa
   };
 }
 
+export function parseClientMafatihHtml(html: string, id: string, metaFallback?: MafatihSummary | null): MafatihDetail | null {
+  try {
+    if (typeof window === 'undefined' || typeof DOMParser === 'undefined') return null;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const titleEl = doc.querySelector('h2.section-title') || doc.querySelector('title');
+    const title = titleEl ? (titleEl.textContent || '').replace('- Divine Pearls', '').trim() : (metaFallback?.title || id);
+
+    let audioUrl = doc.querySelector('#audioPlayer')?.getAttribute('src') ||
+      doc.querySelector('#audioPlayer source')?.getAttribute('src') ||
+      doc.querySelector('audio source')?.getAttribute('src') ||
+      doc.querySelector('audio')?.getAttribute('src') ||
+      doc.querySelector('a[href*=".mp3"]')?.getAttribute('href') ||
+      doc.querySelector('a[href*=".m4a"]')?.getAttribute('href') ||
+      metaFallback?.audioUrl ||
+      null;
+
+    if (audioUrl && !audioUrl.startsWith('http')) {
+      audioUrl = `https://www.ya-mahdi.net/${audioUrl.replace(/^\/+/, '')}`;
+    }
+
+    const duaCard = doc.querySelector('.dua-card');
+    const verses: MafatihVerse[] = [];
+    const contentLines: string[] = [];
+    let pendingArabic = '';
+
+    if (duaCard) {
+      Array.from(duaCard.children).forEach((el) => {
+        const cls = el.className || '';
+        const text = (el.textContent || '').trim();
+        if (!text) return;
+
+        if (cls.includes('content-line')) {
+          contentLines.push(text);
+        } else if (cls.includes('arabic-line')) {
+          if (pendingArabic) {
+            verses.push({
+              index: verses.length + 1,
+              arabic: pendingArabic,
+              translation: ''
+            });
+          }
+          pendingArabic = text;
+        } else if (cls.includes('translation-line')) {
+          verses.push({
+            index: verses.length + 1,
+            arabic: pendingArabic,
+            translation: text
+          });
+          pendingArabic = '';
+        }
+      });
+
+      if (pendingArabic) {
+        verses.push({
+          index: verses.length + 1,
+          arabic: pendingArabic,
+          translation: ''
+        });
+      }
+    } else {
+      Array.from(doc.querySelectorAll('p, div.line')).forEach((el) => {
+        const text = (el.textContent || '').trim();
+        if (text) contentLines.push(text);
+      });
+    }
+
+    return {
+      id,
+      code: metaFallback?.code || id,
+      title,
+      mainCategory: metaFallback?.mainCategory || 'General Recitations',
+      mainCategoryCode: metaFallback?.mainCategoryCode || 'general',
+      categoryChain: metaFallback?.categoryChain || [title],
+      audioUrl,
+      introduction: contentLines.join('\n\n'),
+      versesCount: verses.length,
+      verses,
+      sourceUrl: `https://www.ya-mahdi.net/view.php?cat=${encodeURIComponent(id)}&lang=en`
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): Promise<MafatihDetail | null> {
   const cleanId = (id || '').trim();
   if (!cleanId) return null;
@@ -373,13 +459,13 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
 
   const targetId = MAFATIH_ALIASES[cleanId.toLowerCase()] || cleanId;
 
-  // 1. Check in-memory L1 cache (0ms instant - only accept if valid verses exist)
+  // 1. Check in-memory L1 cache (0ms instant - accept if valid verses or rich prose intro exist)
   const l1 = itemCache.get(targetId) || itemCache.get(cleanId) || itemCache.get(targetId.toLowerCase());
-  if (l1 && l1.verses && l1.verses.length > 0) {
+  if (l1 && ((l1.verses && l1.verses.length > 0) || (l1.introduction && l1.introduction.length > 25))) {
     return l1;
   }
 
-  // 1b. Check IndexedDB persistent storage (0ms offline-first - only accept if valid verses exist)
+  // 1b. Check IndexedDB persistent storage (0ms offline-first - accept if valid verses or intro exist)
   try {
     const cachedItem = await fastStorage.get<MafatihDetail>(`mafatih_detail_${targetId.toLowerCase()}`);
     if (cachedItem && isValidMafatihDetail(cachedItem)) {
@@ -467,6 +553,28 @@ export async function fetchMafatihItem(id: string, callerSignal?: AbortSignal): 
           const raw = await res.json();
           if (raw && ((raw.verses && raw.verses.length > 0) || raw.introduction || raw.title)) {
             const detail = sanitizeMafatihDetail(raw, targetId, meta);
+            itemCache.set(targetId, detail);
+            itemCache.set(cleanId, detail);
+            itemCache.set(targetId.toLowerCase(), detail);
+            if (detail.code) itemCache.set(detail.code, detail);
+            fastStorage.set(`mafatih_detail_${targetId.toLowerCase()}`, detail).catch(() => {});
+            return detail;
+          }
+        }
+      } catch {}
+
+      // Attempt 2b: Direct live external fetch with client-side DOM parsing (runs on mobile via CapacitorHttp or Web CORS)
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 9000);
+        const yaMahdiUrl = `https://www.ya-mahdi.net/view.php?cat=${encodeURIComponent(targetId)}&lang=en`;
+        const res = await fetch(yaMahdiUrl, { signal: callerSignal || controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const html = await res.text();
+          const parsed = parseClientMafatihHtml(html, targetId, meta);
+          if (parsed && ((parsed.verses && parsed.verses.length > 0) || (parsed.introduction && parsed.introduction.length > 30))) {
+            const detail = sanitizeMafatihDetail(parsed, targetId, meta);
             itemCache.set(targetId, detail);
             itemCache.set(cleanId, detail);
             itemCache.set(targetId.toLowerCase(), detail);

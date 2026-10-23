@@ -1,0 +1,45 @@
+{
+  "id": "22_short",
+  "code": "22_short",
+  "title": "22nd Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "22nd Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram22.m4a",
+  "introduction": "22nd Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ افْتَحْ لِىْ فِيْهِ اَبْوَابَ فَضْلِكَ،",
+      "translation": "O Allah, on this day, (please) open before me the doors to Your graces,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَنْزِلْ عَلَيَّ فِيْهِ بَرَكَاتِكَ،",
+      "translation": "pour down on me Your blessings,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَوَفِّقْنِيْ فِيْهِ لِمُوْجِبَاتِ مَرْضَاتِكَ،",
+      "translation": "lead me to things that bring about Your pleasure,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَاَسْكِنِّيْ فِيْهِ بُحْبُوْحَاتِ جَنَّاتِكَ،",
+      "translation": "and allow me to reside in the spacious places of the gardens of Your Paradise."
+    },
+    {
+      "index": 5,
+      "arabic": "يَا مُجِيْبَ دَعْوَةِ الْمُضْطَرِّيْنَ۔",
+      "translation": "O He Who responds to the prayer of the distressed ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=22_short&lang=en"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "18_short",
+  "code": "18_short",
+  "title": "18th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "18th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram18.m4a",
+  "introduction": "18th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ نَبِّهْنِيْ فِيْهِ لِبَرَكَاتِ اَسْحَارِهِ،",
+      "translation": "O Allah, on this day, (please) attract my attention to the blessings at the last hours of night,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَنَوِّرْ فِيْهِ قَلْبِيْ بِضِيَاۤءِ اَنْوَارِهِ،",
+      "translation": "enlighten my heart with the glow of its light,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَخُذْ بِكُلِّ اَعْضَآئِي اِلَى اتِّبَاعِ اٰثارِهِ،",
+      "translation": "and lead all my organs to the following of its traces,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِنُورِكَ يَا مُنَوِّرَ قُلُوْبِ الْعَارِفِيْنَ۔",
+      "translation": "in the name of Your light, O Grantor of light to the hearts of the connoisseurs!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=18_short&lang=en"
+}

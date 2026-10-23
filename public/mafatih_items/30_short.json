@@ -1,0 +1,45 @@
+{
+  "id": "30_short",
+  "code": "30_short",
+  "title": "30th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "30th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram30.m4a",
+  "introduction": "30th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْ صِيَامِىْ فِيْهِ بِالشُّكْرِ وَالْقَبُوْلِ",
+      "translation": "O Allah, on this day, (please) decide my fasting to be praiseworthy and approved"
+    },
+    {
+      "index": 2,
+      "arabic": "عَلٰى مَا تَرْضَاهُ وَيَرْضَاهُ الرَّسُوْلُ،",
+      "translation": "according to what is pleased by You and Your Messenger,"
+    },
+    {
+      "index": 3,
+      "arabic": "مُحْكَمَةً فُرُوْعُهُ بِالْاُصُوْلِ،",
+      "translation": "and decide its parts to be corresponding with its fundamentals,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِحَقِّ سَيِّدِنَا مُحَمَّدٍ وَاٰلِهِ الطَّاهِرِيْنَ،",
+      "translation": "in the name of our master, Muhammad, and his Household the immaculate."
+    },
+    {
+      "index": 5,
+      "arabic": "وَالْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِیْنَ۔",
+      "translation": "All praise be to Allah the Lord of the worlds."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=30_short&lang=en"
+}

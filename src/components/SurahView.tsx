@@ -184,14 +184,6 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
             )}
           </div>
           <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-            {!isLastRead && (
-              <button
-                onClick={handleMarkAsRead}
-                className="px-3 py-1 text-xs font-medium rounded-full transition-colors border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer"
-              >
-                Mark Read
-              </button>
-            )}
             <button
               onClick={() => {
                 const text = `Qur'an ${surah.number}:${ayah.numberInSurah}`;
@@ -636,23 +628,14 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
             >
               <ArrowLeft size={22} />
             </button>
-            <div className="hidden sm:block text-left">
-              <h1 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-tight">
+            <div className="min-w-0 text-left">
+              <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-tight truncate">
                 {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
                   ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
                   : surah.englishName}
               </h1>
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight">{surah.name}</p>
+              <p className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight truncate">{surah.name}</p>
             </div>
-          </div>
-
-          <div className="text-center sm:hidden min-w-0">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
-              {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
-                ? SURAH_URDU_MAP[surah.number].urduName
-                : surah.englishName}
-            </h1>
-            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-arabic truncate">{surah.name}</p>
           </div>
 
           <div className="flex items-center gap-2">

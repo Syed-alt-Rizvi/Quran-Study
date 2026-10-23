@@ -1,0 +1,40 @@
+{
+  "id": "25_short",
+  "code": "25_short",
+  "title": "25th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "25th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram25.m4a",
+  "introduction": "25th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْنِيْ فِيْهِ مُحِبًّا لِاَوْلِيَآئِكَ،",
+      "translation": "O Allah, on this day, (please) make me bear love for Your intimate servants,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَمُعَادِيًا لِاَعْدَآئِكَ،",
+      "translation": "bear enmity towards Your enemies,"
+    },
+    {
+      "index": 3,
+      "arabic": "مُسْتَنًّا بِسُنَّةِ خَاتَمِ اَنْبِيَآئِكَ،",
+      "translation": "and follow the instructions of the seal of Your Prophets."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا عَاصِمَ قُلُوْبِ النَّبِيِّيْنَ۔",
+      "translation": "O Protector of the Prophet’s hearts!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=25_short&lang=en"
+}

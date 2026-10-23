@@ -1,0 +1,40 @@
+{
+  "id": "6_short",
+  "code": "6_short",
+  "title": "6th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "6th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram6.m4a",
+  "introduction": "6th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ لَا تَخْذُلْنِيْ فِيْهِ لِتَعَرُّضِ مَعْصِيَتِكَ،",
+      "translation": "O Allah, on this day, (please) do not disappoint me by allowing me expose myself to acts of disobedience to You,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَلَاتَضْرِبْنِيْ بِسِيَاطِ نَقِمَتِكَ،",
+      "translation": "do not beat me with the whips of Your punishment,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَزَحْزِحْنِيْ فِيْهِ مِنْ مُوْجِبَاتِ سَخَطِكَ،",
+      "translation": "and take me out on this day from the acts that bring about Your ire,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِمَنِّكَ وَاَيَادِيْكَ يَا مُنْتَهٰى رَغْبَةِ الرَّاغِبِيْنَ۔",
+      "translation": "in the name of Your favoring and bounties, O ultimate goal of the desires of the desirers!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=6_short&lang=en"
+}

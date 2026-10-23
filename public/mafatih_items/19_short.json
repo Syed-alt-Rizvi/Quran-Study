@@ -1,0 +1,40 @@
+{
+  "id": "19_short",
+  "code": "19_short",
+  "title": "19th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "19th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram19.m4a",
+  "introduction": "19th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ وَفِّرْ فِيْهِ حَظِّيْ مِنْ بَرَكَاتِهِ،",
+      "translation": "O Allah, on this day, (please) save me a share of its blessings,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَسَهِّلْ سَبِيْلِيْ اِلٰى خَيْرَاتِهِ،",
+      "translation": "make easy my way to the obtainment of its goodness,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَلَا تَحْرِمْنِيْ قَبُوْلَ حَسَنَاتِهِ،",
+      "translation": "and do not deprive me of Your approval of the good deeds (that I do on this day)."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا هَادِيًا اِلَى الْحَقِّ الْمُبِيْنِ۔",
+      "translation": "O He Who guides to the evident truth!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=19_short&lang=en"
+}

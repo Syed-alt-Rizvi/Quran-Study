@@ -1,0 +1,28 @@
+{
+  "id": "maf_baqe91",
+  "code": "maf_baqe91",
+  "title": "Namaz for Settling Needs",
+  "mainCategory": "Namaz & Special Prayers",
+  "mainCategoryCode": "maf_namaz",
+  "categoryChain": [
+    "Namaz & Special Prayers",
+    "Namaz",
+    "Namaz for Settling Needs"
+  ],
+  "audioUrl": null,
+  "introduction": "NAMAZ FOR SETTLING NEEDS\n\nThe following is quoted from the book of Makarim al-Akhlaq:\n\nAt midnight, you may bathe yourself and offer a two-unit prayer. In both units, you should recite Surah al-Faatehah once and repeat Surah al-Tawheed five hundred times. After repeating this Surah in the second unit, you may recite the last verses of Surah al-Hashr:\n\nYou may then recite the first six verses of Surah al-Hadid. While standing up, you may then repeat the following holy verse one thousand times:\n\nYou may then accomplish your prayer and praise Almighty Allah.\n\nIf your need is not settled, you may repeat this prayer. If it is still not settled, you may repeat it once more and your need will be settled, Allah willing.",
+  "versesCount": 2,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "لَوْ اَنْزَلْنَا هٰذَا الْقُرْاۤنُ۔۔۔",
+      "translation": "Had We sent down this Qur'an on a mountain..."
+    },
+    {
+      "index": 2,
+      "arabic": "اِيَّاكَ نَعْبُدُ وَ اِيَّاكَ نَسْتَعِيْنُ۔",
+      "translation": "You do we serve and You do we beseech for help."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe91&lang=en"
+}

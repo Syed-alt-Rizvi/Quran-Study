@@ -1,0 +1,40 @@
+{
+  "id": "14_short",
+  "code": "14_short",
+  "title": "14th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "14th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram14.m4a",
+  "introduction": "14th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ لَا تُؤَاخِذْنِيْ فِيْهِ بِالْعَثَرَاتِ،",
+      "translation": "O Allah, on this day, (please) do not blame me for my slips,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاَقِلْنِيْ فِيْهِ مِنَ الْخَطَايَا وَالْهَفَوَاتِ،",
+      "translation": "excuse me on this day for my wrong deeds and flaws,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَلَا تَجْعَلْنِيْ فِيْهِ غَرَضًا لِلْبَلَايَا وَالْاٰفَاتِ،",
+      "translation": "and do not expose me on this day to misfortunes and calamities,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِعِزَّتِكَ يَا عِزَّ الْمُسْلِمِيْنَ۔",
+      "translation": "in the name of Your might, O Might of the Muslims!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=14_short&lang=en"
+}

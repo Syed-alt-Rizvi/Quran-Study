@@ -1,0 +1,40 @@
+{
+  "id": "5_short",
+  "code": "5_short",
+  "title": "5th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "5th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram5.m4a",
+  "introduction": "5th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْنِيْ فِيْهِ مِنَ الْمُسْتَغْفِرِيْنَ،",
+      "translation": "O Allah, on this day, (please) include me with the seekers of Your forgiveness,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاجْعَلْنِيْ فِيْهِ مِنْ عِبَادِكَ الصَّالِحِيْنَ الْقَانِتِيْنَ،",
+      "translation": "include me on it with Your righteous, submissive servants,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاجْعَلْنِيْ فِيْهِ مِنْ اَوْلِيَآئِكَ الْمُقَرَّبِيْنَ،",
+      "translation": "and include me on it with Your favorite, intimate servants,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِرَاْفَتِكَ يَا اَرْحَمَ الرَّاحِمِيْنَ۔",
+      "translation": "in the name of Your kindness, O most Merciful of all those who show mercy!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=5_short&lang=en"
+}

@@ -161,11 +161,13 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     audio.onplay = () => {
       if (globalAudio !== audio || !get().currentTrack) return;
       set({ isPlaying: true, isBuffering: false });
+      updateMediaSession(track, get);
     };
 
     audio.onpause = () => {
       if (globalAudio !== audio || !get().currentTrack) return;
       set({ isPlaying: false });
+      updateMediaSession(track, get);
     };
 
     audio.onwaiting = () => {
@@ -176,6 +178,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     audio.onplaying = () => {
       if (globalAudio !== audio || !get().currentTrack) return;
       set({ isPlaying: true, isBuffering: false });
+      updateMediaSession(track, get);
     };
 
     audio.oncanplay = () => {
@@ -193,6 +196,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
       if (audio.duration && !isNaN(audio.duration)) {
         set({ duration: audio.duration });
       }
+      updateMediaSession(track, get);
     };
 
     audio.onended = () => {
@@ -342,6 +346,8 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
         } catch {}
       }
       set({ isPlaying: false, isBuffering: false });
+      const cur = get().currentTrack;
+      if (cur) updateMediaSession(cur, get);
     },
 
     resume: async () => {
@@ -353,6 +359,7 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
 
       if (globalAudio && globalAudio.src) {
         set({ isPlaying: true, isBuffering: false });
+        updateMediaSession(state.currentTrack, get);
         try {
           await globalAudio.play();
         } catch {

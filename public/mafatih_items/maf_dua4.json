@@ -1,0 +1,172 @@
+{
+  "id": "maf_dua4",
+  "code": "maf_dua4",
+  "title": "Taqibaat e Namaz e Maghrib",
+  "mainCategory": "Taqibaat e Namaz",
+  "mainCategoryCode": "maf_taqee",
+  "categoryChain": [
+    "Taqibaat e Namaz",
+    "Taqibaat e Namaz e Maghrib"
+  ],
+  "audioUrl": null,
+  "introduction": "TAQIBAAT E NAMAZ E MAGHRIB\n\nAs quoted from Misbah al-Mutahajjid\n\nAfter accomplishment of Tasbih al-Zahra’, it is recommended to say the following invocation of blessings:\n\nThen, repeat the following litany seven times:\n\nThen, repeat the following doxology (zikr) (zikr) three times:\n\nThen, say the following supplicatory prayer:\n\nYou may then offer the Sunset supererogatory (mustahab / nafilah) prayer, which consists of four units of prayer, each two separated by a Taslim statement. You should not utter any word between the two parts of the prayer.\n\nAccording to the Shaykh, it has been narrated that Surah al-Kafirun (No. 109) should be recited in the first unit and Surah al-Tawheed in the second. In the third and fourth units, it is optional to recite any other Surah desired.\n\nIt has been also narrated that Imam Ali al-Naqi (al-Hadi) (a.s.) used to recite, in the third unit (Rak’ah) of this prayer, Surah al-Faatehah and the first six verses (Ayahs) of Surah al-Hadid, and in the fourth unit, Surah al-Faatehah and the last four verses of Surah al-Hashr.\n\nIt is also recommended to repeat the following supplicatory prayer seven times in the last prostration (sajdah) of all supererogatory (mustahab / nafilah) prayers each night, especially at Friday nights (i.e. the night before Friday):\n\nWhen you accomplish the supererogatory (mustahab / nafilah) prayer, you may utter any supplication you like.\n\nYou may then repeat the following litany ten times:\n\nYou may then add the following:",
+  "versesCount": 31,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اِنَّ اللهَ وَ مَلَاۤئِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيِّ",
+      "translation": "“Surely, Allah and His angels bless the Prophet."
+    },
+    {
+      "index": 2,
+      "arabic": "يَاۤ اَيُّهَا الَّذِيْنَ ءَامَنُوْا صَلُّوْا عَلَيْهِ وَ سَلِّمُوْا تَسْلِيْمًا",
+      "translation": "O you who believe! Call for Divine blessings on him and salute him with a becoming salutation.”"
+    },
+    {
+      "index": 3,
+      "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ النَّبِيِّ",
+      "translation": "O Allah, send blessings to Muhammad the Prophet,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَ عَلٰى ذُرِّيَّتِهِ",
+      "translation": "upon his offspring,"
+    },
+    {
+      "index": 5,
+      "arabic": "وَ عَلَى اَهْلِ بَيْتِهِ۔",
+      "translation": "and upon his Household."
+    },
+    {
+      "index": 6,
+      "arabic": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": "In the Name of Allah; the All-beneficent, the All-merciful."
+    },
+    {
+      "index": 7,
+      "arabic": "وَ لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ۔",
+      "translation": "There is neither might nor power save with Allah, the All-high, the All-great."
+    },
+    {
+      "index": 8,
+      "arabic": "اَلْحَمْدُ لِلّٰهِ الَّذِيْ يَفْعَلُ مَا يَشَاۤءُ",
+      "translation": "All praise be to Allah Who does whatever He desires,"
+    },
+    {
+      "index": 9,
+      "arabic": "وَ لَا يَفْعَلُ مَا يَشَاۤءُ غَيْرُهُ",
+      "translation": "and none else can ever do whatever one desires save Him."
+    },
+    {
+      "index": 10,
+      "arabic": "سُبْحَانَكَ لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "All glory be to You. There is no god save You."
+    },
+    {
+      "index": 11,
+      "arabic": "اغْفِرْ لِي ذُنُوْبِيْ كُلَّهَا جَمِيْعًا",
+      "translation": "Forgive my sins all in all,"
+    },
+    {
+      "index": 12,
+      "arabic": "فَاِنَّهُ لَا يَغْفِرُ الذُّنُوْبَ كُلَّهَا جَمِيْعًا اِلَّا اَنْتَ:",
+      "translation": "for none can forgive all sins save You."
+    },
+    {
+      "index": 13,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ بِوَجْهِكَ الْكَرِيْمِ",
+      "translation": "O Allah, I surely beseech You in the name of Your Honorable Face,"
+    },
+    {
+      "index": 14,
+      "arabic": "وَ اسْمِكَ الْعَظِيْمِ",
+      "translation": "Your Tremendous Name,"
+    },
+    {
+      "index": 15,
+      "arabic": "وَ مُلْكِكَ الْقَدِيْمِ",
+      "translation": "and Your Timeless Kingdom,"
+    },
+    {
+      "index": 16,
+      "arabic": "اَنْ تُصَلِّيَ عَلٰى مُحَمَّدٍ وَ اٰلِهِ",
+      "translation": "to send blessings to Muhammad and his Household"
+    },
+    {
+      "index": 17,
+      "arabic": "وَ اَنْ تَغْفِرَ لِيْ ذَنْبِيَ الْعَظِيْمَ",
+      "translation": "and to forgive my enormous sin;"
+    },
+    {
+      "index": 18,
+      "arabic": "اِنَّهُ لَا يَغْفِرُ الْعَظِيْمَ اِلَّا الْعَظِيْمُ،",
+      "translation": "for none can forgive the enormous save the All-tremendous (Lord)."
+    },
+    {
+      "index": 19,
+      "arabic": "مَا شَاۤءَ اللهُ",
+      "translation": "Only that which Allah wills shall come to pass!"
+    },
+    {
+      "index": 20,
+      "arabic": "لَا قُوَّةَ اِلَّا بِاللّٰهِ",
+      "translation": "There is no strength save with Allah."
+    },
+    {
+      "index": 21,
+      "arabic": "اَسْتَغْفِرُ اللهَ",
+      "translation": "I pray the forgivenes of Allah."
+    },
+    {
+      "index": 22,
+      "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ مُوْجِبَاتِ رَحْمَتِكَ",
+      "translation": "O Allah! I beseech You for the motives of Your mercy,"
+    },
+    {
+      "index": 23,
+      "arabic": "وَ عَزَاۤئِمَ مَغْفِرَتِكَ",
+      "translation": "the determining causes of Your forgiveness,"
+    },
+    {
+      "index": 24,
+      "arabic": "وَ النَّجَاةَ مِنَ النَّارِ",
+      "translation": "deliverance from Hellfire"
+    },
+    {
+      "index": 25,
+      "arabic": "وَ مِنْ كُلِّ بَلِيَّةٍ",
+      "translation": "and all misfortunes,"
+    },
+    {
+      "index": 26,
+      "arabic": "وَ الْفَوْزَ بِالْجَنَّةِ",
+      "translation": "winning Paradise,"
+    },
+    {
+      "index": 27,
+      "arabic": "وَ الرِّضْوَانَ [الرِّضْوَانِ‏] فِي دَارِ السَّلَامِ",
+      "translation": "Divine Contentment in the Abode of Peace,"
+    },
+    {
+      "index": 28,
+      "arabic": "وَ جِوَارَ [جِوَارِ] نَبِيِّكَ مُحَمَّدٍ عَلَيْهِ وَ اٰلِهِ السَّلَامُ",
+      "translation": "and the vicinity of Your Prophet Muhammad peace be upon him and his Household."
+    },
+    {
+      "index": 29,
+      "arabic": "اَللّٰهُمَّ مَا بِنَا مِنْ نِعْمَةٍ فَمِنْكَ",
+      "translation": "O Allah, You are certainly the source of each and every favor that covers us."
+    },
+    {
+      "index": 30,
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "There is no god save You."
+    },
+    {
+      "index": 31,
+      "arabic": "اَسْتَغْفِرُكَ وَ اَتُوْبُ اِلَيْكَ",
+      "translation": "I pray Your forgiveness and I repent before You."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua4&lang=en"
+}

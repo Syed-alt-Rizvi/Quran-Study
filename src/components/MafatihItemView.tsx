@@ -630,12 +630,12 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
   return (
     <div 
-      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200`}
+      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200 w-full max-w-full overflow-x-hidden min-w-0`}
       dir={isUrdu ? 'rtl' : 'ltr'}
     >
       {/* Top Header Bar */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 app-header-safe pb-3 shadow-2xs gpu-layer">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-4">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={onBack}
@@ -646,9 +646,9 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
               <ArrowLeft size={18} className={isUrdu ? 'rotate-180' : ''} />
             </button>
             <div className="truncate">
-              <h1 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
+              <h2 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
                 {primaryTitle}
-              </h1>
+              </h2>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                 {categoryLabel}
               </p>
@@ -831,10 +831,35 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
       </header>
 
       {/* Main Content Area */}
-      <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+      <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 min-w-0 overflow-x-hidden">
+        {/* Illuminated Recitation Header with Authentic Identity */}
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-900 via-teal-950 to-slate-900 p-5 sm:p-6 text-white shadow-sm border border-emerald-800/50 min-w-0 w-full">
+          <div className="relative z-10 space-y-2.5 min-w-0">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                {categoryLabel}
+              </span>
+              <span className="text-xs font-mono text-emerald-200/90 bg-white/10 px-2.5 py-1 rounded-lg">
+                {isUrdu ? `${toUrduNumerals(item.verses?.length || 0)} سطریں` : `${item.verses?.length || 0} Lines`}
+              </span>
+            </div>
+
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white leading-snug break-words">
+                {primaryTitle}
+              </h1>
+              <p className="text-xs text-emerald-200/80 mt-1">
+                {isUrdu 
+                  ? 'مفاتیح الجنان • تالیف: ثقۃ الاسلام محدث شیخ عباس قمی (رح)' 
+                  : 'Mafatih al-Jinan • Compiled by Sheikh Abbas Qummi (r.a)'}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Virtues & Context (if present) */}
         {item.introduction && item.verses && item.verses.length > 0 && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 space-y-2.5">
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 space-y-2.5 min-w-0 overflow-hidden">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
                 {t('virtues_etiquette', appLanguage)}
@@ -846,7 +871,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                 {isIntroExpanded ? (isUrdu ? 'مختصر کریں' : 'Show Less') : (isUrdu ? 'مکمل پڑھیں' : 'Read More')}
               </button>
             </div>
-            <p className={`text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line ${
+            <p className={`text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line break-words min-w-0 max-w-full ${
               isIntroExpanded ? '' : 'line-clamp-2'
             }`}>
               {item.introduction}
@@ -909,8 +934,32 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
               </button>
             </div>
 
-            <div className="text-slate-800 dark:text-slate-200 leading-[2] sm:leading-[2.2] select-text whitespace-pre-line text-sm sm:text-base">
-              {item.introduction || (isUrdu ? 'یہ متن مفاتیح الجنان کی مکمل جلد میں دستیاب ہے۔' : 'This supplication content is available in the complete Mafatih Al Jinan volume.')}
+            <div className="space-y-4 select-text text-sm sm:text-base">
+              {item.introduction ? (
+                item.introduction.split('\n\n').filter((p) => p.trim().length > 0).map((para, idx) => {
+                  const isArabic = /[\u0600-\u06FF]/.test(para) && !/[a-zA-Z]/.test(para);
+                  return (
+                    <p
+                      key={idx}
+                      dir={isArabic ? 'rtl' : isUrdu ? 'rtl' : 'ltr'}
+                      className={`leading-[2] sm:leading-[2.2] text-slate-800 dark:text-slate-200 ${
+                        isArabic ? 'font-arabic text-right text-base sm:text-lg font-medium text-emerald-950 dark:text-emerald-100 py-1' : ''
+                      }`}
+                      style={
+                        isArabic
+                          ? { fontFamily: getArabicFontFamily(arabicFont), fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.75))}px` }
+                          : undefined
+                      }
+                    >
+                      {para}
+                    </p>
+                  );
+                })
+              ) : (
+                <p className="text-slate-500 italic">
+                  {isUrdu ? 'یہ متن مفاتیح الجنان کی مکمل جلد میں دستیاب ہے۔' : 'This supplication content is available in the complete Mafatih Al Jinan volume.'}
+                </p>
+              )}
             </div>
           </div>
         ) : (

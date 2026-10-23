@@ -1,0 +1,40 @@
+{
+  "id": "23_short",
+  "code": "23_short",
+  "title": "23rd Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "23rd Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram23.m4a",
+  "introduction": "23rd Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اغْسِلْنِيْ فِيْهِ مِنَ الذُّنُوْبِ،",
+      "translation": "O Allah, on this day, (please) cleanse me from sinning,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَطَهِّرْنِيْ فِيْهِ مِنَ الْعُيُوْبِ،",
+      "translation": "purify me from defects,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَامْتَحِنْ قَلْبِيْ فِيْهِ بِتَقْوَى الْقُلُوْبِ،",
+      "translation": "and try my heart with the cordial piety."
+    },
+    {
+      "index": 4,
+      "arabic": "يَا مُقِيْلَ عَثَرَاتِ الْمُذْنِبِيْنَ۔",
+      "translation": "O He Who overlooks the slips of the guilty ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=23_short&lang=en"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "8_short",
+  "code": "8_short",
+  "title": "8th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "8th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram8.m4a",
+  "introduction": "8th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ ارْزُقْنِيْ فِيْهِ رَحْمَةَ الْاَيْتَامِ،",
+      "translation": "O Allah, on this day, (please) grant me having mercy upon the orphans,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَاِطْعَامَ الطَّعَامِ،",
+      "translation": "serving food,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاِفْشَاۤءَ السَّلَامِ،",
+      "translation": "greeting the people,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَصُحْبَةَ الْكِرَامِ،",
+      "translation": "and accompanying the noble ones,"
+    },
+    {
+      "index": 5,
+      "arabic": "بِطَوْلِكَ يَا مَلْجَاَ الْاٰمِلِيْنَ۔",
+      "translation": "in the name of Your favoring, O Shelter of the hopeful ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=8_short&lang=en"
+}

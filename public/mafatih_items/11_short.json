@@ -1,0 +1,40 @@
+{
+  "id": "11_short",
+  "code": "11_short",
+  "title": "11th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "11th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram11.m4a",
+  "introduction": "11th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ حَبِّبْ اِلَيَّ فِيْهِ الْاِحْسَانَ،",
+      "translation": "O Allah, on this day, (please) make lovable good-doing for me,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَكَرِّهْ اِلَيَّ فِيْهِ الْفُسُوْقَ وَالْعِصْيَانَ،",
+      "translation": "make abhorrent for me wickedness and disobedience on this day,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَحَرِّمْ عَلَيَّ فِيْهِ السَّخَطَ وَالنِّيْرَانَ",
+      "translation": "and prevent me on this day from exposing myself to wrath and the Fire,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِعَوْنِكَ يَا غِيَاثَ الْمُسْتَغِيْثِيْنَ۔",
+      "translation": "in the name of Your help, O Aide of the seekers of aid!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=11_short&lang=en"
+}

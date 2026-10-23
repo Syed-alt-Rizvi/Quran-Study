@@ -1,0 +1,40 @@
+{
+  "id": "7_short",
+  "code": "7_short",
+  "title": "7th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "7th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram7.m4a",
+  "introduction": "7th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اَعِنِّي فِيْهِ عَلٰى صِيَامِهِ وَقِيَامِهِ،",
+      "translation": "O Allah, on this day, (please) help me observe fasting and do acts of worship,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَجَنِّبْنِي فِيْهِ مِنْ هَفَوَاتِهِ وَاٰثَامِهِ،",
+      "translation": "keep me away on this day from slips and sins,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَارْزُقْنِيْ فِيْهِ ذِكْرَكَ بِدَوَامِهِ،",
+      "translation": "and grant me remembrance of You throughout it,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِتَوْفِيْقِكَ يَا هَادِيَ الْمُضِلِّيْنَ۔",
+      "translation": "in the name of Your guiding to success, O Guide of the misled ones!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=7_short&lang=en"
+}

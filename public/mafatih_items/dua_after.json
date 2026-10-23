@@ -1,0 +1,27 @@
+{
+  "id": "dua_after",
+  "code": "dua_after",
+  "title": "Dua After Namaz",
+  "mainCategory": "Taqibaat e Namaz",
+  "mainCategoryCode": "maf_taqee",
+  "categoryChain": [
+    "Taqibaat e Namaz",
+    "Dua After Namaz"
+  ],
+  "audioUrl": null,
+  "introduction": "DUA AFTER NAMAZ FOR SEEKING SUSTENANCE",
+  "versesCount": 2,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": ""
+    },
+    {
+      "index": 2,
+      "arabic": "اَللّٰھُمَّ یَا سَبَبَ مَنْ لَا سَبَبَ لَہٗ یَا سَبَبَ كُلِّ ذِیْ سَبَبٍ یَا مُسَبِّبَ الْاَسْبَابِ بِغَیْرِ سَبَبٍ صَلِّ عَلیٰ مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ وَّ اَغْنِنِیْ بِحَلَالِكَ عَنْ حَرَامِكَ وَ بِطَاعَتِكَ عَنْ مَعْصِیَتِكَ وَ بِفَضْلِكَ عَمَّنْ سِوَاكَ یَا حَیُّ یَا قَیُّوْمُ یَا قَوِیُّ یَا غَنِیُّ یَا مَلِیُّ یَا وَفِیُّ بِرَحْمَتِكَ یَا اَرْحَمَ الرَّاحِمِیْنَ۔",
+      "translation": ""
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=dua_after&lang=en"
+}

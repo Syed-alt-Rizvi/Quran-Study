@@ -1,0 +1,48 @@
+{
+  "id": "maf_baqe90",
+  "code": "maf_baqe90",
+  "title": "Another Namaz for more Sustenance",
+  "mainCategory": "Namaz & Special Prayers",
+  "mainCategoryCode": "maf_namaz",
+  "categoryChain": [
+    "Namaz & Special Prayers",
+    "Namaz",
+    "Another Namaz for more Sustenance"
+  ],
+  "audioUrl": null,
+  "introduction": "ANOTHER PRAYER FOR MORE SUSTENANCE\n\nBefore you go to your shop (or place of work), you may go to the mosque to offer two or four units of prayer after which you may say the following supplication:\n\nANOTHER PRAYER FOR MORE SUSTENANCE\n\nYou may offer a two unit prayer; in the first unit, you may recite Surah al-Faatehah once and repeat Surah al-Kawthar (No. 108) three times. In the second unit, you may recite Surah al-Faatehah once and repeat Surah al-Falaq and Surah al-Nas each three times.",
+  "versesCount": 6,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "غَدَوْتُ بِحَوْلِ اللهِ وَ قُوَّتِهِ",
+      "translation": "I begin this day by Allah’s might and power."
+    },
+    {
+      "index": 2,
+      "arabic": "وَ غَدَوْتُ بِلَا حَوْلٍ مِّنِّىْ وَلَا قُوَّةٍ",
+      "translation": "I begin it by no might or power of mine;"
+    },
+    {
+      "index": 3,
+      "arabic": "وَلٰكِنْ بِحَوْلِكَ وَ قُوَّتِكَ يَا رَبِّ",
+      "translation": "rather, by Your might and power, O my Lord."
+    },
+    {
+      "index": 4,
+      "arabic": "اَللّٰهُمَّ اِنّى عَبْدُكَ",
+      "translation": "O Allah, I am verily your servant."
+    },
+    {
+      "index": 5,
+      "arabic": "اَلْتَمِسُ مِنْ فَضْلِكَ كَمَا اَمَرْتَنِىْ",
+      "translation": "I am seeking Your favor, as You have ordered me to do."
+    },
+    {
+      "index": 6,
+      "arabic": "فَيَسِّرْ لِىْ ذٰلِكَ وَ اَنَا خَافِضٌ فِىْ عَافِيَتِكَ",
+      "translation": "So, (please) make it easy for me while I am enjoying wellbeing that You confer upon me."
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe90&lang=en"
+}

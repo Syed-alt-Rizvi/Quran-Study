@@ -1,0 +1,45 @@
+{
+  "id": "26_short",
+  "code": "26_short",
+  "title": "26th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "26th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram26.m4a",
+  "introduction": "26th Day",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ اجْعَلْ سَعْيِيْ فِيْهِ مَشْكُوْرًا،",
+      "translation": "O Allah, on this day, (please) decide my efforts to be praiseworthy,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَذَنْبِيْ فِيْهِ مَغْفُوْرًا،",
+      "translation": "my sins to be forgiven,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَعَمَلِيْ فِيْهِ مَقْبُوْلًا،",
+      "translation": "my deeds to be accepted,"
+    },
+    {
+      "index": 4,
+      "arabic": "وَعَيْبِيْ فِيْهِ مَسْتُوْرًا،",
+      "translation": "and my defects to be concealed."
+    },
+    {
+      "index": 5,
+      "arabic": "يَا اَسْمَعَ السَّامِعِيْنَ۔",
+      "translation": "O most Hearing of all those who can hear!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=26_short&lang=en"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "3_short",
+  "code": "3_short",
+  "title": "3rd Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "3rd Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram3.m4a",
+  "introduction": "3rd Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ ارْزُقْنِيْ فِيْهِ الذِّهْنَ وَالتَّنْبِيْهِ،",
+      "translation": "O Allah, on this day, (please) confer upon me with sound mentality and acumen,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَبَاعِدْنِيْ فِيْهِ مِنَ السَّفَاهَةِ وَالتَّمْوِيْهِ،",
+      "translation": "take me away from foolishness and deception,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاجْعَلْ لِىْ نَصِيْبًا مِنْ كُلِّ خَيْرِ تُنْزِلُ فِيْهِ،",
+      "translation": "and decide for me a share from each goodness that You descend on this day,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِجُوْدِكَ يَا اَجْوَدَ الْاَجْوَدِيْنَ۔",
+      "translation": "in the name of Your magnanimity, O most Magnanimous of all those who are magnanimous!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=3_short&lang=en"
+}

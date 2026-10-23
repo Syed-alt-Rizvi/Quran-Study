@@ -22,9 +22,18 @@ export interface MediaSessionConfig {
   onSkip?: (seconds: number) => void;
 }
 
+const toAbsoluteUrl = (path: string): string => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (typeof window !== 'undefined' && window.location) {
+    return window.location.origin + (path.startsWith('/') ? path : '/' + path);
+  }
+  return path;
+};
+
 const DEFAULT_ARTWORK = [
-  { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-  { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+  { src: toAbsoluteUrl('/pwa-192x192.png'), sizes: '192x192', type: 'image/png' },
+  { src: toAbsoluteUrl('/pwa-512x512.png'), sizes: '512x512', type: 'image/png' }
 ];
 
 export function updateMediaSession(config: MediaSessionConfig) {
@@ -33,17 +42,19 @@ export function updateMediaSession(config: MediaSessionConfig) {
   }
 
   try {
+    const artworkList = config.artworkUrl
+      ? [
+          { src: toAbsoluteUrl(config.artworkUrl), sizes: '512x512', type: 'image/png' },
+          ...DEFAULT_ARTWORK
+        ]
+      : DEFAULT_ARTWORK;
+
     // 1. Metadata with high-res artwork
     navigator.mediaSession.metadata = new MediaMetadata({
       title: config.title,
       artist: config.artist,
       album: config.album,
-      artwork: config.artworkUrl
-        ? [
-            { src: config.artworkUrl, sizes: '512x512', type: 'image/png' },
-            ...DEFAULT_ARTWORK
-          ]
-        : DEFAULT_ARTWORK
+      artwork: artworkList
     });
 
     // 2. Playback State

@@ -1,0 +1,23 @@
+{
+  "id": "Iran8",
+  "code": "Iran8",
+  "title": "Ziyarat of Imam Zadah Tahir",
+  "mainCategory": "Journey to Paradise",
+  "mainCategoryCode": "maf_journey",
+  "categoryChain": [
+    "Journey to Paradise",
+    "Iran",
+    "Ziyarat of Imam Zadah Tahir"
+  ],
+  "audioUrl": null,
+  "introduction": "ZIYARAT OF IMAM ZADAH TAHIR\n\nThe ziyarat is as follows:",
+  "versesCount": 1,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَلسَّلَامُ عَلَیْكَ اَیُّهَا السَّیِّدُ الطَّاهِرُ اَلسَّلَامُ عَلَیْكَ اَیُّهَا التَّقِیُّ الرَّضِیُّ اَلسَّلَامُ عَلَیْكَ اَیُّهَا الْعَابِدُ الصَّالِحُ اَلسَّلَامُ عَلَیْكَ اَیُّهَا الزَّاهِدُ الْفَاتِحُ اَلسَّلَامُ عَلَیْكَ یَا صَلِ الْآئِمَّۃِ الْمَعْصُوْمِیْنَ الْهَادِیْنَ الْمَهْدِیِیِّیْنَ اَلسَّلَامُ عَلَیْكَ یَا خَلَفَ الْاَوْصِیَآئِ الْمَرْضِیِّیْنَ۔",
+      "translation": ""
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=Iran8&lang=en"
+}

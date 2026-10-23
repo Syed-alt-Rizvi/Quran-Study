@@ -1,0 +1,40 @@
+{
+  "id": "16_short",
+  "code": "16_short",
+  "title": "16th Day",
+  "mainCategory": "Aamaal & Monthly Rituals",
+  "mainCategoryCode": "maf_aamal",
+  "categoryChain": [
+    "Aamaal & Monthly Rituals",
+    "Aamaal",
+    "Ramadhan",
+    "Everyday short duas in the month of Ramadhan",
+    "16th Day"
+  ],
+  "audioUrl": "https://www.ya-mahdi.net/apps_audio/ramadhan_daily/ram16.m4a",
+  "introduction": "16th Day",
+  "versesCount": 4,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "اَللّٰهُمَّ وَفِّقْنِيْ فِيْهِ لِمُوَافَقَةِ الْاَبْرَارِ،",
+      "translation": "O Allah, on this day, (please) lead me so that I will correspond with the upright ones,"
+    },
+    {
+      "index": 2,
+      "arabic": "وَجَنِّبْنِيْ فِيْهِ مُرَافَقَةَ الْاَشْرَارِ،",
+      "translation": "keep me away on this day from the company of the evils,"
+    },
+    {
+      "index": 3,
+      "arabic": "وَاٰوِنِيْ فِيْهِ بِرَحْمَتِكَ اِلٰى دَارِ الْقَرَارِ،",
+      "translation": "and lodge me on this day, on account of Your mercy, to the Abode of Perpetual Settlement,"
+    },
+    {
+      "index": 4,
+      "arabic": "بِاِلٰهِيَّتِكَ يَا اِلـٰهَ الْعَالَمِيْنَ۔",
+      "translation": "in the name of Your godhead, O God of the worlds!"
+    }
+  ],
+  "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=16_short&lang=en"
+}

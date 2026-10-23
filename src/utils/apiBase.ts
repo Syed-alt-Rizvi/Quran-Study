@@ -38,6 +38,12 @@ export const getApiUrl = (path: string): string => {
     } catch {}
   }
 
-  // 4. Default to relative clean path (works in web, PWA, and local webview)
+  // 4. On native Android/iOS APK, fallback to production Cloud Run backend for dynamic API requests
+  if (Capacitor.isNativePlatform()) {
+    const cloudBackend = 'https://ais-pre-jx76sn2jydycu7xlncbv7z-1063163461455.asia-southeast1.run.app';
+    return `${cloudBackend}${cleanPath}`;
+  }
+
+  // 5. Default to relative clean path (works in web, PWA, and local webview)
   return cleanPath;
 };
