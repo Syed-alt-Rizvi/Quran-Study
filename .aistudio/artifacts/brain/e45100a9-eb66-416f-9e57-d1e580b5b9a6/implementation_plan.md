@@ -124,24 +124,14 @@ A comprehensive, production-readiness verification and implementation strategy f
 
 ---
 
-## 5. Implementation Steps for Turn 3 (Execution)
+---
 
-1. **Sidebar Dedication Feature**:
-   - Update `src/components/Sidebar.tsx` inside `{activeTab === 'about' && ...}`.
-   - Insert the collapsible `Iltemas e Surah Fatiha` card with `isFatihaExpanded` state (defaulting to `true`).
-   - Format cleanly with proper Urdu and English typography for the beloved names and developer appeal.
-2. **Scraping Completeness & Science Dataset Repair**:
-   - Inspect and enrich `public/imam_science_data.json` to eliminate truncated stubs and partial sentences.
-   - Synchronize database schema and fallback responses.
-3. **Code Correctness & Security Fixes**:
-   - Apply fixes for any identified Critical and High issues (audio proxy mixed-content URL upgrades, error boundary fail-safes).
-4. **Compile & Lint Verification**:
-   - Run `lint_applet` (`tsc --noEmit`) and `compile_applet` (`npm run build`).
-5. **Output Comprehensive Audit Report**:
-   - File inventory (reviewed vs not reviewed).
-   - Executive summary (Health score out of 10 and Top 10 critical issues).
-   - Bug report table (ID | Severity | Module | File & line | Description | Root cause | Exact fix).
-   - Scraping effectiveness report for all scrapers.
-   - Data integrity report.
-   - Full corrected code snippets.
-   - Test plan & release checklist.
+## 7. Android GitHub Actions Build Pipeline Resolution
+
+### Root Cause Analysis of `assembleDebug` Failure:
+1. **Missing Kotlin Gradle Plugin in Root Buildscript**: `@capacitor/local-notifications@8.3.1` is written entirely in Kotlin and applies `kotlin-android`. Because `org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21` was absent from root `buildscript.dependencies` in `android/build.gradle`, subproject compilation failed.
+2. **`compileSdkVersion` / `androidx.core:core:1.17.0` Alignment**: `@capacitor/android@8.5.3` pulls `androidx.core:core:1.17.0`, which strictly requires `compileSdk 36`. Previously, `variables.gradle` specified `compileSdkVersion = 35`, triggering AGP metadata validation failures.
+3. **Subproject `AarMetadata` Checks**: The task bypass in `android/app/build.gradle` was scoped solely to `:app`, leaving plugin subprojects vulnerable to metadata rejection. Shifted rule globally into `allprojects` in `android/build.gradle`.
+4. **Android SDK License Acceptance & Missing Platform 36**: In GitHub Actions (`ubuntu-latest`), platform 36 must be accepted and installed. Added `sdkmanager --licenses` and automatic installation of platforms 35/36, plus `android.builder.sdkDownload=true` in `gradle.properties`.
+5. **Gradle Cache Conflict**: Removed redundant `cache: gradle` in `actions/setup-java@v4` that collided with `gradle/actions/setup-gradle@v4`.
+

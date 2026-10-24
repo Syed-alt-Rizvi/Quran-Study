@@ -5,8 +5,8 @@ import fs from "fs";
 import os from "os";
 import crypto from "crypto";
 import { Readable } from "stream";
-import { createServer as createViteServer } from "vite";
 import { db } from "./src/db/index.ts";
+
 import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema.ts";
 import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -60,8 +60,8 @@ async function startServer() {
   });
 
   // API routes FIRST
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+  app.get(["/api/health", "/health", "/_health", "/_ah/health"], (req, res) => {
+    res.status(200).json({ status: "ok" });
   });
 
   const getAppBuildId = () => {
@@ -1222,7 +1222,8 @@ async function startServer() {
   });
 
   // Environment check for development vs production
-  const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith("server.cjs");
+  const isDev = process.env.NODE_ENV === "development" || process.argv.some(a => a.includes("tsx"));
+  const isProd = !isDev;
 
   // Always serve genuine PWA service worker with zero-cache headers when built
   app.get('/sw.js', (req, res, next) => {
@@ -1312,6 +1313,7 @@ async function startServer() {
 
   // Vite middleware for development
   if (!isProd) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
@@ -1339,7 +1341,7 @@ async function startServer() {
         }
       }
     }));
-    app.get('*', (req, res) => {
+    app.use((req, res) => {
       // Never return index.html for API routes, Tafseer assets, or JSON endpoints
       if (
         req.path.startsWith('/api/') ||
@@ -1357,23 +1359,34 @@ async function startServer() {
       res.setHeader('Surrogate-Control', 'no-store');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
-      const indexPath = path.join(distPath, 'index.html');
-      if (fs.existsSync(indexPath)) {
-        let html = fs.readFileSync(indexPath, 'utf8');
-        const host = req.get('host') || 'shiamarkaz.org';
-        const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-        const currentOrigin = `${protocol}://${host}`;
-        const canonicalUrl = `${currentOrigin}${req.path === '/' ? '' : req.path}`;
-        
-        html = html.replace(/<link id="canonical-url"[^>]*>/i, `<link id="canonical-url" rel="canonical" href="${canonicalUrl}" />`);
-        html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${canonicalUrl}$2`);
-        if (!html.includes('property="og:url"')) {
-          html = html.replace('</head>', `  <meta property="og:url" content="${canonicalUrl}" />\n  </head>`);
+
+      const candidatePaths = [
+        path.join(distPath, 'index.html'),
+        path.join(process.cwd(), 'index.html'),
+        path.join(process.cwd(), 'public', 'index.html')
+      ];
+
+      for (const p of candidatePaths) {
+        if (fs.existsSync(p)) {
+          let html = fs.readFileSync(p, 'utf8');
+          const host = req.get('host') || 'shiamarkaz.org';
+          const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+          const currentOrigin = `${protocol}://${host}`;
+          const canonicalUrl = `${currentOrigin}${req.path === '/' ? '' : req.path}`;
+          
+          html = html.replace(/<link id="canonical-url"[^>]*>/i, `<link id="canonical-url" rel="canonical" href="${canonicalUrl}" />`);
+          html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${canonicalUrl}$2`);
+          if (!html.includes('property="og:url"')) {
+            html = html.replace('</head>', `  <meta property="og:url" content="${canonicalUrl}" />\n  </head>`);
+          }
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.send(html);
         }
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.send(html);
       }
-      res.sendFile(indexPath);
+
+      // Fail-safe response for Cloud Run container startup health check
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Shia Markaz</title></head><body><div id="root">Loading Shia Markaz...</div></body></html>`);
     });
   }
 

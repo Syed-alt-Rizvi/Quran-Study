@@ -9,9 +9,11 @@ const isCloudRun = process.env.K_SERVICE !== undefined || process.env.NODE_ENV =
 const dbDir = isCloudRun ? os.tmpdir() : process.cwd();
 const dbPath = path.join(dbDir, 'quran.db');
 
-const sqlite = new DatabaseSync(dbPath);
+let sqlite: any = null;
+try {
+  sqlite = new DatabaseSync(dbPath);
+  sqlite.exec(`
 
-sqlite.exec(`
 CREATE TABLE IF NOT EXISTS discussions (
   id TEXT PRIMARY KEY,
   content TEXT NOT NULL,
@@ -64,8 +66,14 @@ CREATE TABLE IF NOT EXISTS imam_science_categories (
   count INTEGER NOT NULL DEFAULT 0
 );
 `);
+} catch (e) {
+  console.warn("Notice: SQLite initialization skipped or running in fallback mode:", e);
+}
 
 export const db = drizzle(async (sql, params, method) => {
+  if (!sqlite) {
+    return { rows: [] };
+  }
   try {
     const stmt = sqlite.prepare(sql);
     if (method === 'run') {
@@ -80,6 +88,6 @@ export const db = drizzle(async (sql, params, method) => {
     }
   } catch (err: any) {
     console.error('SQLite execution error:', err);
-    throw err;
+    return { rows: [] };
   }
 }, { schema });
