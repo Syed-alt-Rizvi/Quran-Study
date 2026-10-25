@@ -14,7 +14,7 @@ import { getFullIndex, MafatihSummary } from '../mafatihApi';
 import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
-import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
+import { getMafatihUrduTitle, getMafatihUrduCategory, getMafatihUrduSnippet, toUrduNumerals } from '../utils/mafatihUrdu';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
@@ -71,28 +71,44 @@ const ARABIC_TITLE_MAP: Record<string, string> = {
   maf_ziy144: 'زيارة سيدة نساء العالمين فاطمة',
   maf_ziy145: 'زيارة خاتم الأنبياء محمد',
   maf_ziy83: 'زيارة أمير المؤمنين علي',
-  maf_ziy138: 'زيارة شمس الشموس علي بن موسى الرضا',
+  sah_whis1: 'مناجاة التائبين',
+  sah_whis2: 'مناجاة الشاكين',
+  sah_whis3: 'مناجاة الخائفين',
+  sah_whis4: 'مناجاة الراجين',
+  sah_whis5: 'مناجاة الراغبين',
+  sah_whis6: 'مناجاة الشاكرين',
+  sah_whis7: 'مناجاة المطيعين لله',
+  sah_whis8: 'مناجاة المريدين',
+  sah_whis9: 'مناجاة المحبين',
+  sah_whis10: 'مناجاة المتوسلين',
+  sah_whis11: 'مناجاة المفتقرين',
+  sah_whis12: 'مناجاة العارفين',
+  sah_whis13: 'مناجاة الذاكرين',
+  sah_whis14: 'مناجاة المعتصمين',
+  sah_whis15: 'مناجاة الزاهدين',
+  maf_dua1: 'التعقيبات العامة للصلوات',
+  maf_dua2: 'تعقيب صلاة الفجر',
+  maf_dua3: 'تعقيب صلاة الظهر',
+  maf_dua3a: 'تعقيب صلاة العصر',
+  maf_dua4: 'تعقيب صلاة المغرب',
+  maf_dua5: 'تعقيب صلاة العشاء',
+  dua_after: 'التعقيب والدعاء بعد الصلاة',
+  maf_aamal88: 'أعمال ليلة القدر المباركة',
+  maf_aamal91: 'أعمال يوم الجمعة',
+  maf_baqe47: 'فضل وبركات صلاة الليل',
+  maf_baqe48: 'كيفية صلاة الليل',
+  maf_baqe48a: 'مختصر صلاة الليل',
+  nam_ayat: 'صلاة الآيات',
+  maf_dua4a: 'صلاة الغفيلة',
+  maf_dua26: 'صلاة جعفر الطيار',
 };
 
-function getArabicTitle(id: string, englishTitle: string): string {
+function getArabicTitle(id: string, _englishTitle: string): string | null {
   if (ARABIC_TITLE_MAP[id]) return ARABIC_TITLE_MAP[id];
-  const lower = englishTitle.toLowerCase();
-  if (lower.startsWith('ziyarat')) {
-    return 'زيارة ' + englishTitle.replace(/^ziyarat\s+(e\s+|of\s+)?/i, '');
-  }
-  if (lower.startsWith('dua')) {
-    return 'دعاء ' + englishTitle.replace(/^dua\s+(e\s+|of\s+)?/i, '');
-  }
-  if (lower.startsWith('munajaat') || lower.startsWith('whispered')) {
-    return 'مناجاة ' + englishTitle.replace(/^(munajaat|whispered\s+prayer)\s+(of\s+|the\s+)?/i, '');
-  }
-  if (lower.startsWith('aamaal')) {
-    return 'أعمال ' + englishTitle.replace(/^aamaal\s+(of\s+|for\s+)?/i, '');
-  }
-  if (lower.startsWith('namaz') || lower.startsWith('taqibaat')) {
-    return 'تعقيب ' + englishTitle.replace(/^(namaz|taqibaat)\s+(e\s+|of\s+)?/i, '');
-  }
-  return englishTitle;
+  const cleanId = (id || '').replace(/^(maf_|dua-|ziyarat-)/, '');
+  if (ARABIC_TITLE_MAP[cleanId]) return ARABIC_TITLE_MAP[cleanId];
+  // Guard against leaking raw English into the Arabic calligraphy badge
+  return null;
 }
 
 function getCategoryColor(category: string): { border: string; badge: string } {
@@ -549,10 +565,10 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                     )}
                   </div>
 
-                  {/* Snippet / Description (Protected against horizontal overflow) */}
-                  {item.snippet && (
+                  {/* Snippet / Description (Protected against horizontal overflow & English leaks) */}
+                  {(isUrdu || item.snippet) && (
                     <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed break-words min-w-0 max-w-full">
-                      {item.snippet}
+                      {isUrdu ? getMafatihUrduSnippet(item) : item.snippet}
                     </p>
                   )}
                 </div>

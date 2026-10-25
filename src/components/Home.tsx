@@ -237,17 +237,6 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-right shrink-0">
-            <button
-              id="header-lang-quick-toggle"
-              onClick={() => {
-                hapticImpact(ImpactStyle.Light);
-                useSettingsStore.getState().setAppLanguage(appLanguage === 'ur' ? 'en' : 'ur');
-              }}
-              className="py-1 px-2.5 rounded-xl text-xs font-bold border border-emerald-300/80 dark:border-emerald-800/80 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
-              title={appLanguage === 'ur' ? 'Switch to English' : 'اردو میں تبدیل کریں'}
-            >
-              <span className="text-[11px] font-semibold">{appLanguage === 'ur' ? 'English' : 'اردو'}</span>
-            </button>
             <PWAInstallButton variant="compact" />
             <button
               onClick={() => {

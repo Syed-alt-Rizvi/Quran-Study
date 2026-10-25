@@ -128,10 +128,19 @@ A comprehensive, production-readiness verification and implementation strategy f
 
 ## 7. Android GitHub Actions Build Pipeline Resolution
 
-### Root Cause Analysis of `assembleDebug` Failure:
-1. **Missing Kotlin Gradle Plugin in Root Buildscript**: `@capacitor/local-notifications@8.3.1` is written entirely in Kotlin and applies `kotlin-android`. Because `org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21` was absent from root `buildscript.dependencies` in `android/build.gradle`, subproject compilation failed.
-2. **`compileSdkVersion` / `androidx.core:core:1.17.0` Alignment**: `@capacitor/android@8.5.3` pulls `androidx.core:core:1.17.0`, which strictly requires `compileSdk 36`. Previously, `variables.gradle` specified `compileSdkVersion = 35`, triggering AGP metadata validation failures.
-3. **Subproject `AarMetadata` Checks**: The task bypass in `android/app/build.gradle` was scoped solely to `:app`, leaving plugin subprojects vulnerable to metadata rejection. Shifted rule globally into `allprojects` in `android/build.gradle`.
-4. **Android SDK License Acceptance & Missing Platform 36**: In GitHub Actions (`ubuntu-latest`), platform 36 must be accepted and installed. Added `sdkmanager --licenses` and automatic installation of platforms 35/36, plus `android.builder.sdkDownload=true` in `gradle.properties`.
-5. **Gradle Cache Conflict**: Removed redundant `cache: gradle` in `actions/setup-java@v4` that collided with `gradle/actions/setup-gradle@v4`.
+### Root Cause Analysis of `assembleDebug` Task 95 Failure:
+1. **Missing Debug Keystore & Java 21 Keystore Validation (`validateSigningDebug`)**:
+   - In headless CI under Java 21, AGP's task `:app:validateSigningDebug` (task 95 of 95 actionable tasks) failed because `~/.android/debug.keystore` was absent and automatic generation under Java 21 stricter cryptographic provider defaults threw an exception, causing Gradle to exit with code 1 right after task execution.
+   - **Fix**: Added an explicit CI pre-step `Ensure Android Debug Keystore` using standard `keytool` with `-validity 10000`, copying it directly to `android/app/debug.keystore`, and configured `signingConfigs.debug` and `signingConfigs.release` to reference `debug.keystore` by default.
+2. **Missing `build-tools;36.0.0` for `compileSdk 36`**:
+   - `variables.gradle` specifies `compileSdkVersion = 36`, but `ci.yml` was only installing `build-tools;35.0.0`. AGP 8.13 expects `build-tools;36.0.0` when targeting SDK 36.
+   - **Fix**: Added `platform-tools`, `platforms;android-36`, and `build-tools;36.0.0` to the CI `sdkmanager` installation.
+3. **Deprecations Modernization (Node 20 & `setup-java@v4`)**:
+   - GitHub Actions announced the sunset of Node 20 and deprecated `actions/setup-java@v4`. Furthermore, `gradle/actions/setup-gradle@v4` was triggering Node 20 runtime deprecation warnings.
+   - **Fix**: Migrated to official `actions/setup-java@v5` with native `cache: "gradle"`, eliminating third-party action deprecation warnings and streamlining the workflow to run directly with the verified Gradle wrapper `gradlew`.
+4. **Gradle JVM Memory & UTF-8 Encoding**:
+   - In CI with 67 MB of public assets and 538 Mafatih JSON items, DEX merging and asset packaging can OOM or fail on default locale encodings.
+   - **Fix**: Bumped JVM memory to `-Xmx3072m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8` in both `ci.yml` and `android/gradle.properties`.
+5. **Asset Crunching and Lint Safeguards**:
+   - Disabled AAPT PNG cruncher (`cruncherEnabled = false`) and refined `ignoreAssetsPattern` to exclude server artifacts without choking on hundreds of web JSON assets. Added `checkDependencies = false` and `disable 'MissingTranslation', 'ExtraTranslation'` to `android/app/build.gradle`.
 

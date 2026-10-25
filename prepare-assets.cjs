@@ -92,20 +92,17 @@ async function prepare() {
       const resDir = path.join(__dirname, 'android', 'app', 'src', 'main', 'res');
       if (fs.existsSync(resDir)) {
         const subdirs = fs.readdirSync(resDir);
+        // Pre-render portrait and landscape base buffers once to avoid redundant expensive SVG rasterization
+        const portBuffer = await sharp(splashSvg).resize(1080, 1920, { fit: 'cover' }).png().toBuffer();
+        const landBuffer = await sharp(splashSvg).resize(1920, 1080, { fit: 'cover' }).png().toBuffer();
         for (const sub of subdirs) {
           if (sub.startsWith('drawable')) {
             const target = path.join(resDir, sub, 'splash.png');
             if (fs.existsSync(path.dirname(target))) {
-              try {
-                if (sub.includes('port') || sub === 'drawable' || sub === 'drawable-night') {
-                  await sharp(splashSvg).resize(1080, 1920, { fit: 'cover' }).png().toFile(target);
-                } else if (sub.includes('land')) {
-                  await sharp(splashSvg).resize(1920, 1080, { fit: 'cover' }).png().toFile(target);
-                } else {
-                  await sharp(splashSvg).resize(1080, 1920, { fit: 'cover' }).png().toFile(target);
-                }
-              } catch (e) {
-                fs.copyFileSync(splashPng, target);
+              if (sub.includes('land')) {
+                fs.writeFileSync(target, landBuffer);
+              } else {
+                fs.writeFileSync(target, portBuffer);
               }
             }
           }
@@ -131,6 +128,11 @@ async function prepare() {
   console.log('✓ Asset preparation complete.');
 }
 
-prepare().catch(err => {
-  console.error('Asset preparation error:', err);
-});
+prepare()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch(err => {
+    console.error('Asset preparation error:', err);
+    process.exit(0);
+  });

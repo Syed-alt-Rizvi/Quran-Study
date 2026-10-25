@@ -551,7 +551,8 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const copyVerse = useCallback((verse: MafatihVerse) => {
     hapticImpact(ImpactStyle.Light);
     const itemTitle = isUrdu ? getMafatihUrduTitle(item?.id || '', item?.title || '') : (item?.title || '');
-    const text = `${verse.arabic}\n\n${verse.translation}\n\n[${itemTitle} - Line ${verse.index}]`;
+    const lineLabel = isUrdu ? `سطر ${toUrduNumerals(verse.index)}` : `Line ${verse.index}`;
+    const text = `${verse.arabic}\n\n${verse.translation}\n\n[${itemTitle} - ${lineLabel}]`;
     navigator.clipboard?.writeText?.(text);
     setCopiedIndex(verse.index);
     setTimeout(() => setCopiedIndex(null), 2000);

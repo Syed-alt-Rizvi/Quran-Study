@@ -83,37 +83,37 @@ jobs:
           echo "✓ Android web assets and raw adhan audio synchronized successfully."
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: "21"
           distribution: "temurin"
+          cache: "gradle"
 
       - name: Configure Android SDK & Licenses
         run: |
           echo "sdk.dir=$ANDROID_HOME" > android/local.properties
           # Auto-accept all Android SDK licenses so Gradle never fails on missing license acceptance
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
-          # Ensure platforms 36 and 35 are installed for Capacitor 8 and AndroidX 1.17
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "platforms;android-35" "build-tools;35.0.0" || true
+          # Ensure platforms 36 and 35 as well as build-tools 36.0.0 and 35.0.0 are installed
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "platforms;android-35" "build-tools;36.0.0" "build-tools;35.0.0" || true
           echo "✓ Android SDK and platform licenses configured."
 
-      - name: Set up Gradle 8.14.3
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.14.3"
-          validate-wrappers: false
-
-      - name: Validate Gradle Wrapper & Jar Integrity
+      - name: Validate Gradle Wrapper & Permissions
         run: |
           sed -i 's/\r$//' android/gradlew || true
           chmod +x android/gradlew
-          # Regenerate or ensure wrapper jar if missing on disk
-          if [ ! -s "android/gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "Notice: gradle-wrapper.jar missing or empty. Generating wrapper via Gradle..."
-            (cd android && gradle wrapper --gradle-version 8.14.3 --distribution-type bin)
-          fi
           test -s "android/gradle/wrapper/gradle-wrapper.jar" || { echo "::error::gradle-wrapper.jar could not be verified!"; exit 1; }
           echo "✓ Gradle wrapper verified successfully ($(ls -lh android/gradle/wrapper/gradle-wrapper.jar))"
+
+      - name: Ensure Android Debug Keystore
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            echo "Generating standardized debug keystore..."
+            keytool -genkey -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          cp -f "$HOME/.android/debug.keystore" android/app/debug.keystore
+          echo "✓ Android debug keystore prepared successfully."
 
       - name: Configure Custom Keystore if Secret Configured
         env:
@@ -139,14 +139,14 @@ jobs:
         working-directory: ./android
         run: |
           echo "Building debug APK for direct phone installation..."
-          ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m"
+          ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8"
 
       - name: Build Google Play Store Bundle (bundleRelease)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
           echo "Building release bundle for Google Play Store..."
-          ./gradlew bundleRelease --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m"
+          ./gradlew bundleRelease --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8"
 
       - name: Collect and Verify Distribution Artifacts
         run: |

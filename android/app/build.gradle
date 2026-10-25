@@ -11,27 +11,44 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:server.cjs'
+            cruncherEnabled = false
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:!.*:!CVS:!thumbs.db:!picasa.ini:!*~:!server.cjs:!*.map'
         }
     }
     signingConfigs {
+        debug {
+            if (file('debug.keystore').exists()) {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
         release {
             if (System.getenv("KEYSTORE_PATH") && file(System.getenv("KEYSTORE_PATH")).exists()) {
                 storeFile file(System.getenv("KEYSTORE_PATH"))
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
                 keyPassword System.getenv("KEY_PASSWORD")
+            } else if (file('debug.keystore').exists()) {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
             }
         }
     }
     buildTypes {
+        debug {
+            if (file('debug.keystore').exists()) {
+                signingConfig signingConfigs.debug
+            }
+        }
         release {
             minifyEnabled false
             if (System.getenv("KEYSTORE_PATH") && file(System.getenv("KEYSTORE_PATH")).exists()) {
                 signingConfig signingConfigs.release
-            } else {
+            } else if (file('debug.keystore').exists()) {
                 signingConfig signingConfigs.debug
             }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -41,9 +58,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
+    packaging {
+        resources {
+            excludes += [
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/license.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/notice.txt',
+                'META-INF/ASL2.0',
+                'META-INF/*.kotlin_module'
+            ]
+        }
+    }
     lint {
         abortOnError false
         checkReleaseBuilds false
+        checkDependencies false
+        disable 'MissingTranslation', 'ExtraTranslation'
     }
 }
 
