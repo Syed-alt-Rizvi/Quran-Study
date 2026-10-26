@@ -35,9 +35,9 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
 
   const surahName = useMemo(() => {
     if (!item) return '';
-    const urduName = SURAH_URDU_MAP[item.surahNumber];
-    if (isUrdu && urduName) {
-      return `سورۃ ${urduName} • آیت ${item.ayahNumber}`;
+    const urduMeta = SURAH_URDU_MAP[item.surahNumber];
+    if (isUrdu && urduMeta?.urduName) {
+      return `سورۃ ${urduMeta.urduName} • آیت ${item.ayahNumber}`;
     }
     return `Surah ${item.surahNumber} • Ayah ${item.ayahNumber}`;
   }, [item, isUrdu]);

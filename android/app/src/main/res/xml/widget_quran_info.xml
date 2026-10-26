@@ -4,9 +4,10 @@
     android:minHeight="110dp"
     android:targetCellWidth="4"
     android:targetCellHeight="2"
-    android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/widget_shia_prayer"
+    android:updatePeriodMillis="3600000"
+    android:initialLayout="@layout/widget_quran"
+    android:previewLayout="@layout/widget_quran"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:description="@string/app_name">
+    android:description="@string/widget_desc_quran">
 </appwidget-provider>

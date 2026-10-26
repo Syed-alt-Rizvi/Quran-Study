@@ -98,7 +98,8 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
   };
 
   const currentAyah = playlist[currentIndex];
-  const urduSurahName = SURAH_URDU_MAP[selectedSurahId];
+  const urduSurahMeta = SURAH_URDU_MAP[selectedSurahId];
+  const urduSurahName = urduSurahMeta?.urduName;
 
   // If collapsed (default), render a sleek narrow bar matching the Adhan bar
   if (!isExpanded) {
@@ -129,8 +130,12 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             </span>
             <span className="text-[11px] text-emerald-300 font-normal">
               {isCurrentSurahPlaying && currentAyah 
-                ? `(Ayah ${currentAyah.numberInSurah}/${currentSurahMeta.numberOfAyahs})`
-                : `(${currentSurahMeta.numberOfAyahs} Ayahs)`}
+                ? (isUrdu 
+                    ? `(آیت ${currentAyah.numberInSurah}/${currentSurahMeta.numberOfAyahs})`
+                    : `(Ayah ${currentAyah.numberInSurah}/${currentSurahMeta.numberOfAyahs})`)
+                : (isUrdu 
+                    ? `(${currentSurahMeta.numberOfAyahs} آیات)`
+                    : `(${currentSurahMeta.numberOfAyahs} Ayahs)`)}
             </span>
           </div>
         </div>

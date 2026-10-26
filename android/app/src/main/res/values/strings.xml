@@ -4,4 +4,12 @@
     <string name="title_activity_main">Shia Markaz</string>
     <string name="package_name">com.tafseerenamoona.app</string>
     <string name="custom_url_scheme">com.tafseerenamoona.app</string>
+
+    <!-- Consolidated 3 Home Screen Widgets -->
+    <string name="widget_name_calendar">Shia Calendar &amp; Prayer Times</string>
+    <string name="widget_desc_calendar">Displays authentic Shia Hijri date, next prayer time, daily Dhikr, and Islamic occasions.</string>
+    <string name="widget_name_mafatih">Mafatih al-Jinan &amp; Daily Duas</string>
+    <string name="widget_desc_mafatih">Daily recommended Shia supplication, Ziyarat of the day, and spiritual excerpts.</string>
+    <string name="widget_name_quran">Holy Quran &amp; Shia Tafseer</string>
+    <string name="widget_desc_quran">Daily Quranic Ayah with Urdu translation and authentic Shia Tafseer reflection.</string>
 </resources>

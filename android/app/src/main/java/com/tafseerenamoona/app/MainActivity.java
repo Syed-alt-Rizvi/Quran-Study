@@ -36,7 +36,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         // Keep WebView media active in background so Quran and Mafatih audio continues uninterrupted
         try {
@@ -47,7 +47,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         try {
             if (getBridge() != null && getBridge().getWebView() != null) {

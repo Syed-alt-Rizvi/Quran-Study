@@ -168,10 +168,10 @@ public class AdhanStorage {
     public static void updateWidgets(Context context, String fajr, String dhuhr, String maghrib) {
         try {
             AppWidgetManager manager = AppWidgetManager.getInstance(context);
-            ComponentName widget = new ComponentName(context, ShiaPrayerWidgetProvider.class);
+            ComponentName widget = new ComponentName(context, ShiaCalendarWidgetProvider.class);
             int[] appWidgetIds = manager.getAppWidgetIds(widget);
             if (appWidgetIds != null && appWidgetIds.length > 0) {
-                Intent updateIntent = new Intent(context, ShiaPrayerWidgetProvider.class);
+                Intent updateIntent = new Intent(context, ShiaCalendarWidgetProvider.class);
                 updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
                 updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
                 context.sendBroadcast(updateIntent);

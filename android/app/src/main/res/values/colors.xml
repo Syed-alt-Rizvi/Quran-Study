@@ -6,7 +6,15 @@
     <color name="widget_bg_dark">#0F172A</color>
     <color name="widget_surface_dark">#1E293B</color>
     <color name="widget_emerald">#059669</color>
+    <color name="widget_emerald_light">#34D399</color>
+    <color name="widget_emerald_dark">#064E3B</color>
     <color name="widget_gold">#F59E0B</color>
+    <color name="widget_gold_light">#FDE68A</color>
+    <color name="widget_blue">#38BDF8</color>
     <color name="widget_text_white">#F8FAFC</color>
     <color name="widget_text_muted">#94A3B8</color>
+    <color name="widget_card_bg">#1E293B</color>
+    <color name="widget_card_bg_emerald">#06392D</color>
+    <color name="widget_card_bg_blue">#0A2038</color>
+    <color name="widget_border_subtle">#334155</color>
 </resources>

@@ -2,4 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
+# SEO Sitemap & AI Crawlers Specification
 Sitemap: https://shiamarkaz.org/sitemap.xml
+LLMs-txt: https://shiamarkaz.org/llms.txt

@@ -75,36 +75,10 @@
             </intent-filter>
         </receiver>
 
-        <!-- Shia Prayer Times Widget -->
-        <receiver
-            android:name=".ShiaPrayerWidgetProvider"
-            android:label="Shia Prayer &amp; Markaz"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_shia_prayer_info" />
-        </receiver>
-
-        <!-- Daily Ayah of the Day Widget -->
-        <receiver
-            android:name=".DailyAyahWidgetProvider"
-            android:label="Daily Quran Ayah"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_daily_ayah_info" />
-        </receiver>
-
-        <!-- Shia Islamic Calendar Widget -->
+        <!-- 1. Shia Islamic Calendar & Prayer Times Widget -->
         <receiver
             android:name=".ShiaCalendarWidgetProvider"
-            android:label="Shia Islamic Calendar"
+            android:label="@string/widget_name_calendar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -114,58 +88,30 @@
                 android:resource="@xml/widget_shia_calendar_info" />
         </receiver>
 
-        <!-- Shia Islamic Calendar Compact Widget -->
+        <!-- 2. Mafatih al-Jinan Supplications & Daily Ziyarat Widget -->
         <receiver
-            android:name=".ShiaCalendarCompactWidgetProvider"
-            android:label="Shia Calendar (Date &amp; Day)"
+            android:name=".MafatihWidgetProvider"
+            android:label="@string/widget_name_mafatih"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_shia_calendar_compact_info" />
+                android:resource="@xml/widget_mafatih_info" />
         </receiver>
 
-        <!-- Shia Upcoming Occasions Calendar Widget -->
+        <!-- 3. Holy Quran & Shia Tafseer Widget -->
         <receiver
-            android:name=".ShiaCalendarEventsWidgetProvider"
-            android:label="Shia Upcoming Occasions"
+            android:name=".QuranWidgetProvider"
+            android:label="@string/widget_name_quran"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_shia_calendar_events_info" />
-        </receiver>
-
-        <!-- Shia Quran Tafseer Widget -->
-        <receiver
-            android:name=".TafseerWidgetProvider"
-            android:label="Shia Quran Tafseer"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_tafseer_info" />
-        </receiver>
-
-        <!-- Holy Quran Audio Player Widget -->
-        <receiver
-            android:name=".QuranAudioWidgetProvider"
-            android:label="Holy Quran Audio"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.tafseerenamoona.app.ACTION_PREV_SURAH" />
-                <action android:name="com.tafseerenamoona.app.ACTION_NEXT_SURAH" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_quran_audio_info" />
+                android:resource="@xml/widget_quran_info" />
         </receiver>
 
     </application>

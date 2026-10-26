@@ -27,7 +27,29 @@ import {
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+  // Environment check for development vs production
+  const isProd = process.env.NODE_ENV === "production" && !process.argv.some(a => a.endsWith(".ts") || a.includes("server.ts"));
+  const isDev = !isProd;
+
+  // Strict port selection: In dev mode, always bind to 3000 (or CLI --port) to satisfy platform iframe proxy
+  let PORT = 3000;
+  const portArgIndex = process.argv.indexOf("--port");
+  if (portArgIndex !== -1 && process.argv[portArgIndex + 1]) {
+    PORT = parseInt(process.argv[portArgIndex + 1], 10);
+  } else if (isProd && process.env.PORT) {
+    PORT = parseInt(process.env.PORT, 10);
+  } else {
+    PORT = 3000;
+  }
+
+  let HOST = "0.0.0.0";
+  const hostArgIndex = process.argv.indexOf("--host");
+  if (hostArgIndex !== -1 && process.argv[hostArgIndex + 1]) {
+    HOST = process.argv[hostArgIndex + 1];
+  } else if (process.env.HOST) {
+    HOST = process.env.HOST;
+  }
 
   app.use(cors());
   app.use(express.json({ limit: "50mb" }));
@@ -95,6 +117,38 @@ async function startServer() {
     });
   });
 
+  // Dedicated Favicon endpoint ensuring zero 404s for search crawlers and browser tabs
+  app.get(["/favicon.ico"], (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "favicon.ico"),
+      path.join(process.cwd(), "dist", "favicon.ico")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "image/x-icon");
+        res.setHeader("Cache-Control", "public, max-age=604800");
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).end();
+  });
+
+  // Dedicated LLMs.txt AI crawler permission specification
+  app.get(["/llms.txt", "/.well-known/llms.txt"], (req, res) => {
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "llms.txt"),
+      path.join(process.cwd(), "dist", "llms.txt")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).send("# Shia Markaz LLMs.txt not found");
+  });
+
   // Dedicated PWA Manifest endpoints ensuring 100% PWA installability compliance
   app.get(["/manifest.webmanifest", "/manifest.json"], (req, res) => {
     const candidatePaths = [
@@ -158,7 +212,7 @@ async function startServer() {
     const currentOrigin = `${protocol}://${host}`;
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${currentOrigin}/sitemap.xml\n`);
+    res.send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${currentOrigin}/sitemap.xml\nLLMs-txt: ${currentOrigin}/llms.txt\n`);
   });
 
   // In-memory LRU/map caches for Google Maps & AlAdhan to minimize quota consumption
@@ -1221,9 +1275,7 @@ async function startServer() {
     next();
   });
 
-  // Environment check for development vs production
-  const isDev = process.env.NODE_ENV === "development" || process.argv.some(a => a.includes("tsx"));
-  const isProd = !isDev;
+
 
   // Always serve genuine PWA service worker with zero-cache headers when built
   app.get('/sw.js', (req, res, next) => {
@@ -1390,8 +1442,9 @@ async function startServer() {
     });
   }
 
-  const server = app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`\n  ➜  Local:   http://localhost:${PORT}/`);
+    console.log(`  ➜  Network: http://${HOST}:${PORT}/\n`);
   });
 
   server.on("error", (err: any) => {

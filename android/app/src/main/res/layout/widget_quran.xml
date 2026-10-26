@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_quran_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_quran"
+    android:padding="12dp">
+
+    <!-- Header Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📖 قرآن مجید و تفاسیرِ شیعہ"
+            android:textColor="@color/widget_emerald_light"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/widget_quran_surah_ref"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="سورۃ الانسان (۷۶:۸)"
+            android:textColor="@color/widget_gold_light"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:background="@drawable/widget_tag_gold"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <!-- Center Card: Quranic Ayah, Translation & Tafseer -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/widget_card_rounded_emerald"
+        android:padding="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_quran_arabic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="وَيُطْعِمُونَ الطَّعَامَ عَلَىٰ حُبِّهِ مِسْكِينًا وَيَتِيمًا وَأَسِيرًا"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:gravity="right"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_quran_translation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="اور وہ اللہ کی محبت میں مسکین، یتیم اور قیدی کو کھانا کھلاتے ہیں"
+            android:textColor="@color/widget_gold_light"
+            android:textSize="10sp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_quran_tafseer_badge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="تفسیر نمونہ و الکوثر: شانِ نزول در فضیلت نذر اہل بیت اطہار (ع)"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="9sp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- Bottom Footer Row: Selection Note & Open Quran Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_quran_footer_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="آیتِ منتخبہ از کلام اللہ • تفسیر نمونہ و الکوثر"
+            android:textColor="@color/widget_emerald_light"
+            android:textSize="10sp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginRight="8dp" />
+
+        <TextView
+            android:id="@+id/widget_btn_open_quran"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="تلاوت و تفسیر ➔"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:background="@drawable/widget_button_rounded"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" />
+    </LinearLayout>
+
+</LinearLayout>

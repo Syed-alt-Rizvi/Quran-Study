@@ -1,0 +1,25 @@
+# Shia Markaz
+
+> Shia Markaz is an all-in-one Islamic educational platform and comprehensive digital repository for the Holy Quran, authentic Shia Tafseer (Tafseer-e-Namoona and Tafseer Al-Kauthar), complete Mafatih Al Jinan supplications and ziyaraat, Ja'fari prayer times and Shia Adhan, and Ahlulbayt scientific discourse.
+
+## Core Modules & Documentation
+
+- [The Holy Quran](https://shiamarkaz.org/?tab=quran): Complete text of all 114 Surahs and 30 Juz with authentic Arabic calligraphy, verse-by-verse Urdu and English translations, and international reciters.
+- [Shia Tafseer Namoona](https://shiamarkaz.org/?tab=quran&tafseer=namoona): Grand Ayatullah Naser Makarim Shirazi's comprehensive thematic exegesis with Urdu translations.
+- [Shia Tafseer Al-Kauthar](https://shiamarkaz.org/?tab=quran&tafseer=kauthar): Allama Sheikh Mohsin Ali Najafi's analytical exegesis with verse-by-verse commentary.
+- [Mafatih Al Jinan](https://shiamarkaz.org/?tab=mafatih): Complete catalog of 1,307 supplications, munajaat, and ziyaraat compiled by Sheikh Abbas Qummi with synchronous audio recitations.
+- [Shia Prayer Times & Adhan](https://shiamarkaz.org/?tab=adhan): Ja'fari Ithna Ashari astronomical calculation criteria (Fajr 16°, Maghrib sunset elevation, midnight calculation) with Shia Adhan audio.
+- [Shia Hijri Calendar](https://shiamarkaz.org/?tab=calendar): Islamic lunar calendar with significant Shia historical occasions (Wiladat and Shahadat of the 14 Infallibles).
+- [Imams & Science](https://shiamarkaz.org/?tab=science): Research repository documenting scientific, medical, and cosmological insights articulated by the Ahlulbayt (a.s).
+
+## API & Data Endpoints
+
+- [Prayer Times API](https://shiamarkaz.org/api/prayer-times): Latitude/longitude prayer calculation based on Ja'fari Ithna Ashari Method 0.
+- [Mafatih Catalog API](https://shiamarkaz.org/api/mafatih/items): Searchable index and verse metadata for supplications.
+- [Tafseer Namoona API](https://shiamarkaz.org/api/tafseer/namoona/1): Exegetical JSON endpoints for Quranic Surahs and Ayahs.
+
+## Policies & Compliance
+
+- [Privacy Policy](https://shiamarkaz.org/privacy): User privacy principles and data handling policies.
+- [Terms of Service](https://shiamarkaz.org/terms): Acceptable usage terms and community guidelines.
+- [Data Deletion](https://shiamarkaz.org/data-deletion): User data deletion instructions.

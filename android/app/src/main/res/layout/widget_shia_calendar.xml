@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/widget_bg_rounded"
-    android:padding="14dp">
+    android:padding="12dp">
 
     <!-- Header Row -->
     <LinearLayout
@@ -18,54 +18,154 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="🌙 Shia Islamic Calendar"
+            android:text="🌙 شیعہ تقویم و اوقاتِ نماز"
             android:textColor="@color/widget_gold"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/widget_calendar_gregorian"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today"
+            android:text="Monday, 26 Oct 2026"
             android:textColor="@color/widget_text_muted"
-            android:textSize="11sp" />
+            android:textSize="10sp"
+            android:singleLine="true" />
     </LinearLayout>
 
-    <!-- Hijri Date Display -->
-    <TextView
-        android:id="@+id/widget_calendar_hijri"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="۱۴ ربیع الثانی ۱۴۴۸ ھ"
-        android:textColor="@color/widget_emerald"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp" />
-
-    <!-- Shia Occasion of the Day -->
-    <TextView
-        android:id="@+id/widget_calendar_occasion"
+    <!-- Center Card: Hijri Date + Next Prayer & Daily Dhikr -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Shia Islamic Holy Day &amp; Recommended Ziyaraat"
-        android:textColor="@color/widget_text_white"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:ellipsize="end"
-        android:maxLines="2" />
+        android:orientation="horizontal"
+        android:background="@drawable/widget_card_rounded_emerald"
+        android:padding="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:gravity="center_vertical">
 
-    <!-- Bottom Button to Open Full Calendar -->
-    <Button
-        android:id="@+id/widget_btn_open_calendar"
+        <!-- Left: Hijri Date Block -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/widget_calendar_hijri_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="۱۴"
+                android:textColor="@color/widget_gold_light"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false" />
+
+            <TextView
+                android:id="@+id/widget_calendar_hijri_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ربیع الثانی ۱۴۴۸ ھ"
+                android:textColor="@color/widget_text_white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_calendar_day_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="پیر • Monday"
+                android:textColor="@color/widget_emerald_light"
+                android:textSize="10sp"
+                android:singleLine="true" />
+        </LinearLayout>
+
+        <!-- Vertical Divider -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#1B4E41"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp" />
+
+        <!-- Right: Next Prayer & Daily Dhikr Block -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="اگلی نماز • Next Shia Prayer:"
+                android:textColor="@color/widget_gold"
+                android:textSize="9sp"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/widget_calendar_next_prayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="نمازِ مغرب • 6:15 PM"
+                android:textColor="@color/widget_text_white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/widget_calendar_dhikr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="ذکر: یا قاضی الحاجات (۱۰۰ مرتبہ)"
+                android:textColor="@color/widget_text_muted"
+                android:textSize="10sp"
+                android:ellipsize="end"
+                android:maxLines="2" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Bottom Footer Row: Occasion & Open Calendar Button -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:text="View Full Shia Calendar"
-        android:textColor="@color/widget_text_white"
-        android:textSize="11sp"
-        android:background="@drawable/widget_button_rounded"
-        android:layout_marginTop="6dp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_calendar_occasion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ولادت باسعادت حضرت امام علی علیہ السلام"
+            android:textColor="@color/widget_gold_light"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginRight="8dp" />
+
+        <TextView
+            android:id="@+id/widget_btn_open_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="مکمل تقویم ➔"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:background="@drawable/widget_button_rounded"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" />
+    </LinearLayout>
+
 </LinearLayout>
