@@ -23,7 +23,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:ellipsize="end"
-            android:singleLine="true" />
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/widget_quran_surah_ref"
@@ -38,7 +38,7 @@
             android:paddingRight="6dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:singleLine="true" />
+            android:maxLines="1" />
     </LinearLayout>
 
     <!-- Center Card: Quranic Ayah, Translation & Tafseer -->
@@ -62,7 +62,7 @@
             android:textSize="13sp"
             android:textStyle="bold"
             android:gravity="right"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
@@ -73,7 +73,7 @@
             android:text="اور وہ اللہ کی محبت میں مسکین، یتیم اور قیدی کو کھانا کھلاتے ہیں"
             android:textColor="@color/widget_gold_light"
             android:textSize="10sp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
@@ -84,7 +84,7 @@
             android:text="تفسیر نمونہ و الکوثر: شانِ نزول در فضیلت نذر اہل بیت اطہار (ع)"
             android:textColor="@color/widget_text_muted"
             android:textSize="9sp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
 
@@ -103,7 +103,7 @@
             android:text="آیتِ منتخبہ از کلام اللہ • تفسیر نمونہ و الکوثر"
             android:textColor="@color/widget_emerald_light"
             android:textSize="10sp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginRight="8dp" />
 

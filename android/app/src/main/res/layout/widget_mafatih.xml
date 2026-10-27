@@ -23,7 +23,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:ellipsize="end"
-            android:singleLine="true" />
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/widget_mafatih_day_tag"
@@ -38,7 +38,7 @@
             android:paddingRight="6dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:singleLine="true" />
+            android:maxLines="1" />
     </LinearLayout>
 
     <!-- Center Card: Featured Dua & Excerpt -->
@@ -68,7 +68,7 @@
                 android:textColor="@color/widget_gold_light"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:ellipsize="end" />
 
             <TextView
@@ -78,7 +78,7 @@
                 android:text="اعمالِ شبِ جمعہ"
                 android:textColor="@color/widget_emerald_light"
                 android:textSize="10sp"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:layout_marginLeft="4dp" />
         </LinearLayout>
 
@@ -92,7 +92,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:gravity="right"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:text="اے اللہ! میں تیری اس رحمت کے طفیل سوال کرتا ہوں جو ہر چیز پر محیط ہے"
             android:textColor="@color/widget_text_muted"
             android:textSize="10sp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
 
@@ -123,7 +123,7 @@
             android:textColor="@color/widget_blue"
             android:textSize="11sp"
             android:textStyle="bold"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginRight="8dp" />
 

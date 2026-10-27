@@ -29,10 +29,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: 22
           cache: "npm"
@@ -94,8 +94,8 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > android/local.properties
           # Auto-accept all Android SDK licenses so Gradle never fails on missing license acceptance
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
-          # Ensure platforms 36 and 35 as well as build-tools 36.0.0 and 35.0.0 are installed
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "platforms;android-35" "build-tools;36.0.0" "build-tools;35.0.0" || true
+          # Ensure stable Android 15 (API 35) platform and build-tools are installed
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
           echo "✓ Android SDK and platform licenses configured."
 
       - name: Validate Gradle Wrapper & Permissions
