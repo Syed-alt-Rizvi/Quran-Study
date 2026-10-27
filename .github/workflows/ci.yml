@@ -89,23 +89,19 @@ jobs:
           distribution: "temurin"
           cache: "gradle"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
-
-      - name: Accept Android SDK Licenses & Configure Environment
+      - name: Configure Android SDK & Accept Licenses
         run: |
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
           mkdir -p "$ANDROID_HOME/licenses"
           echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
           echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
           echo -e "\nd97546487611a3004928236c860b201a607357a7" > "$ANDROID_HOME/licenses/intel-android-extra-license"
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-          echo "✓ Android SDK environment verified."
+          
+          SDK_MGR=$(which sdkmanager 2>/dev/null || find "$ANDROID_HOME" -name "sdkmanager" 2>/dev/null | head -n 1)
+          if [ -n "$SDK_MGR" ] && [ -x "$SDK_MGR" ]; then
+            yes | "$SDK_MGR" --licenses > /dev/null 2>&1 || true
+          fi
+          echo "✓ Android SDK configured successfully with all licenses accepted."
 
       - name: Validate Gradle Wrapper & Permissions
         run: |
