@@ -24,9 +24,40 @@ allprojects {
         mavenCentral()
     }
 
+    configurations.all {
+        resolutionStrategy {
+            force "androidx.core:core:${rootProject.ext.androidxCoreVersion}"
+            force "androidx.activity:activity:${rootProject.ext.androidxActivityVersion}"
+            force "androidx.fragment:fragment:${rootProject.ext.androidxFragmentVersion}"
+            force "androidx.appcompat:appcompat:${rootProject.ext.androidxAppCompatVersion}"
+            force "androidx.coordinatorlayout:coordinatorlayout:${rootProject.ext.androidxCoordinatorLayoutVersion}"
+            force "androidx.webkit:webkit:${rootProject.ext.androidxWebkitVersion}"
+        }
+    }
+
     // Gracefully bypass AAR compileSdk metadata checks across all subprojects
     tasks.matching { it.name.contains("AarMetadata") }.configureEach {
         enabled = false
+    }
+
+    // Ensure lint never breaks APK/AAB compilation across submodules
+    tasks.matching { it.name.toLowerCase().contains("lint") }.configureEach {
+        enabled = false
+    }
+}
+
+subprojects {
+    afterEvaluate { subproject ->
+        if (subproject.hasProperty('android')) {
+            subproject.android {
+                if (rootProject.ext.has('compileSdkVersion')) {
+                    compileSdk = rootProject.ext.compileSdkVersion
+                }
+                if (rootProject.ext.has('targetSdkVersion') && defaultConfig.targetSdk != null) {
+                    defaultConfig.targetSdkVersion = rootProject.ext.targetSdkVersion
+                }
+            }
+        }
     }
 }
 

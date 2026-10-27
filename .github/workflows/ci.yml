@@ -89,14 +89,23 @@ jobs:
           distribution: "temurin"
           cache: "gradle"
 
-      - name: Configure Android SDK & Licenses
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
+
+      - name: Accept Android SDK Licenses & Configure Environment
         run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+          echo -e "\nd97546487611a3004928236c860b201a607357a7" > "$ANDROID_HOME/licenses/intel-android-extra-license"
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
           echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-          # Auto-accept all Android SDK licenses so Gradle never fails on missing license acceptance
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
-          # Ensure stable Android 15 (API 35) platform and build-tools are installed
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
-          echo "✓ Android SDK and platform licenses configured."
+          echo "✓ Android SDK environment verified."
 
       - name: Validate Gradle Wrapper & Permissions
         run: |
@@ -139,14 +148,14 @@ jobs:
         working-directory: ./android
         run: |
           echo "Building debug APK for direct phone installation..."
-          ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8"
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Build Google Play Store Bundle (bundleRelease)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
           echo "Building release bundle for Google Play Store..."
-          ./gradlew bundleRelease --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8"
+          ./gradlew bundleRelease --no-daemon --stacktrace
 
       - name: Collect and Verify Distribution Artifacts
         run: |

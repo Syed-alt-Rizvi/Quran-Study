@@ -17,12 +17,12 @@ android {
     }
     signingConfigs {
         debug {
-            if (file('debug.keystore').exists()) {
-                storeFile file('debug.keystore')
-                storePassword 'android'
-                keyAlias 'androiddebugkey'
-                keyPassword 'android'
-            }
+            File localDebug = file('debug.keystore')
+            File defaultDebug = file("${System.getProperty('user.home')}/.android/debug.keystore")
+            storeFile = localDebug.exists() ? localDebug : defaultDebug
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
         }
         release {
             if (System.getenv("KEYSTORE_PATH") && file(System.getenv("KEYSTORE_PATH")).exists()) {
@@ -30,8 +30,10 @@ android {
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
                 keyPassword System.getenv("KEY_PASSWORD")
-            } else if (file('debug.keystore').exists()) {
-                storeFile file('debug.keystore')
+            } else {
+                File localDebug = file('debug.keystore')
+                File defaultDebug = file("${System.getProperty('user.home')}/.android/debug.keystore")
+                storeFile = localDebug.exists() ? localDebug : defaultDebug
                 storePassword 'android'
                 keyAlias 'androiddebugkey'
                 keyPassword 'android'
@@ -40,15 +42,13 @@ android {
     }
     buildTypes {
         debug {
-            if (file('debug.keystore').exists()) {
-                signingConfig signingConfigs.debug
-            }
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
             if (System.getenv("KEYSTORE_PATH") && file(System.getenv("KEYSTORE_PATH")).exists()) {
                 signingConfig signingConfigs.release
-            } else if (file('debug.keystore').exists()) {
+            } else {
                 signingConfig signingConfigs.debug
             }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
