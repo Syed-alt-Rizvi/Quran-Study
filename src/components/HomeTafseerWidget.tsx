@@ -67,25 +67,25 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
   const authorName = provider === 'namoona' ? item.tafseerNamoona.author : item.tafseerAlKauthar.author;
 
   return (
-    <div className="mb-4 rounded-3xl bg-slate-900 dark:bg-slate-950 text-white p-4 sm:p-5 shadow-sm border border-emerald-800/40 relative overflow-hidden">
+    <div className="mb-4 rounded-3xl liquid-glass-card glass-amber-fusion text-slate-900 dark:text-white p-4 sm:p-5 shadow-sm border border-amber-400/40 dark:border-amber-500/20 relative overflow-hidden">
       {/* Header Bar */}
       <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl liquid-glass bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-2xs">
             <BookOpen size={17} />
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 block">
               {isUrdu ? 'روزانہ کی شیعہ تفسیر' : 'Daily Shia Tafseer'}
             </span>
-            <h3 className="text-sm font-semibold text-emerald-100 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-emerald-100 flex items-center gap-1.5">
               <span>{surahName}</span>
             </h3>
           </div>
         </div>
 
         {/* Tafseer Source Switcher (Namoona vs Al-Kauthar) */}
-        <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-xl border border-emerald-700/50">
+        <div className="flex items-center gap-1 liquid-glass p-0.5 rounded-xl border border-white/30 dark:border-white/10">
           <button
             onClick={() => {
               hapticImpact(ImpactStyle.Light);
@@ -93,8 +93,8 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
             }}
             className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
               provider === 'namoona'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-emerald-300/70 hover:text-white'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Tafseer Namoona (Grand Ayatollah Naser Makarim Shirazi)"
           >
@@ -107,8 +107,8 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
             }}
             className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
               provider === 'kauthar'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-emerald-300/70 hover:text-white'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Al-Kauthar fi Tafseer (Allama Mohsin Ali Najafi)"
           >
@@ -118,11 +118,11 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
       </div>
 
       {/* Sacred Arabic Ayah Text */}
-      <div className="my-2.5 p-3 rounded-2xl bg-black/30 border border-emerald-800/40 relative z-10">
+      <div className="my-2.5 p-3.5 rounded-2xl liquid-glass border border-white/40 dark:border-white/10 relative z-10">
         <p
           dir="rtl"
           lang="ar"
-          className="font-arabic text-lg sm:text-xl text-amber-200/95 leading-[2.1] text-center select-text"
+          className="font-arabic text-lg sm:text-xl text-amber-800 dark:text-amber-200 leading-[2.1] text-center select-text font-normal"
           style={{ fontFamily: getArabicFontFamily(arabicFont) }}
         >
           {item.arabicText}
@@ -130,12 +130,12 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
       </div>
 
       {/* Translation */}
-      <div className="mb-3 relative z-10 text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-serif italic select-text">
+      <div className="mb-3 relative z-10 text-xs sm:text-sm text-slate-700 dark:text-emerald-100/90 leading-relaxed font-serif italic select-text">
         &ldquo;{isUrdu && item.urduTranslation ? item.urduTranslation : item.englishTranslation}&rdquo;
       </div>
 
       {/* Exegetical Commentary (Expandable) */}
-      <div className="relative z-10 pt-2 border-t border-emerald-800/50">
+      <div className="relative z-10 pt-2 border-t border-amber-300/30 dark:border-amber-500/20">
         <div className="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
           <span className="font-medium truncate max-w-[200px] sm:max-w-none">{authorName}</span>
           <button

@@ -193,13 +193,13 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-28 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Top Header */}
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-3">
+      <div className="sticky top-0 z-20 liquid-glass border-b border-white/30 dark:border-white/10 px-4 py-3 shadow-xs">
         <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             {onBack && (
               <button
                 onClick={onBack}
-                className="p-1.5 -ml-1 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-1.5 -ml-1 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
                 title="Back to Quran"
               >
                 <ArrowLeft size={18} />
@@ -210,7 +210,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
             </h1>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300 font-medium liquid-glass px-2.5 py-1 rounded-xl border border-white/40 dark:border-white/10 shadow-2xs">
             <span>Qibla {qiblaDeg}&deg;</span>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
 
       <div className="max-w-xl mx-auto px-4 pt-3 space-y-3.5">
         {/* City Location: Quiet & Minimalist */}
-        <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 p-3 sm:p-3.5">
+        <div className="liquid-glass-card rounded-2xl border border-white/40 dark:border-white/10 p-3 sm:p-3.5 shadow-xs">
           {!isSearching ? (
             <div className="flex items-center justify-between gap-2">
               <div 
@@ -228,11 +228,11 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 }}
                 className="flex items-center gap-2 cursor-pointer group min-w-0"
               >
-                <MapPin size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <MapPin size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   {userLocation.name}{userLocation.country ? `, ${userLocation.country}` : ''}
                 </span>
-                <span className="text-xs text-slate-400 font-normal underline ml-0.5">
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-normal underline ml-0.5">
                   Change
                 </span>
               </div>
@@ -240,10 +240,10 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
               <button
                 onClick={handleUseGPS}
                 disabled={locatingGPS}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+                className="p-1.5 rounded-xl liquid-glass text-slate-600 dark:text-slate-300 hover:text-amber-600 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors shrink-0 border border-white/40 dark:border-white/10 shadow-2xs cursor-pointer"
                 title="Detect GPS Location"
               >
-                {locatingGPS ? <Loader2 size={16} className="animate-spin text-emerald-600" /> : <Navigation size={16} />}
+                {locatingGPS ? <Loader2 size={16} className="animate-spin text-amber-600" /> : <Navigation size={16} />}
               </button>
             </div>
           ) : (
@@ -256,20 +256,20 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Enter city name..."
-                  className="w-full pl-8 pr-14 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-900 dark:text-slate-100"
+                  className="w-full pl-8 pr-14 py-2 text-sm rounded-xl liquid-glass border border-white/40 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-amber-500 text-slate-900 dark:text-slate-100"
                 />
                 <div className="absolute right-2 flex items-center gap-1">
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="p-1 text-slate-400 hover:text-slate-600"
+                      className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       <X size={13} />
                     </button>
                   )}
                   <button
                     onClick={() => setIsSearching(false)}
-                    className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-1 font-medium"
+                    className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-1 font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -277,10 +277,10 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
               </div>
 
               {/* City Suggestions */}
-              <div className="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+              <div className="max-h-56 overflow-y-auto divide-y divide-white/20 dark:divide-white/10 text-sm">
                 {isSearchingOnline && (
                   <div className="py-2 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-                    <Loader2 size={13} className="animate-spin text-emerald-600" />
+                    <Loader2 size={13} className="animate-spin text-amber-600" />
                     <span>Searching global cities...</span>
                   </div>
                 )}
@@ -289,13 +289,13 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                   <button
                     key={`${city.name}-${city.country}-${city.latitude}`}
                     onClick={() => handleSelectCity(city)}
-                    className="w-full text-left py-2 px-1.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                    className="w-full text-left py-2 px-1.5 flex items-center justify-between hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer rounded-lg"
                   >
                     <span className="font-medium text-slate-800 dark:text-slate-200">
                       {city.name}, <span className="text-slate-400 font-normal">{city.country}</span>
                     </span>
                     {city.isHolySite && (
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
                         Holy Site
                       </span>
                     )}
@@ -314,25 +314,25 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
 
         {/* Central Reverent Upcoming Prayer Card */}
         {nextPrayer && (
-          <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white p-5 border border-slate-800 shadow-sm relative overflow-hidden">
+          <div className="rounded-3xl liquid-glass-card glass-amber-fusion text-slate-900 dark:text-white p-5 border border-amber-400/40 dark:border-amber-500/20 shadow-md relative overflow-hidden">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-xs text-emerald-400 font-medium tracking-wide">
+                <span className="text-xs text-amber-700 dark:text-amber-300 font-bold tracking-wide uppercase">
                   {nextPrayer.isAdhanTime ? 'Next Adhan' : 'Upcoming Prayer'}
                 </span>
                 <div className="flex items-baseline gap-2.5 mt-0.5">
-                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                     {nextPrayer.nameEn}
                   </h2>
-                  <span className="text-base text-slate-400 font-arabic" dir="rtl">
+                  <span className="text-base text-amber-800 dark:text-amber-200 font-arabic font-normal" dir="rtl">
                     {nextPrayer.nameAr}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-xl sm:text-2xl font-bold text-emerald-200">
+                  <span className="text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-300">
                     {nextPrayer.time12}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-600 dark:text-slate-400">
                     &bull; in {nextPrayer.formattedCountdown}
                   </span>
                 </div>
@@ -349,10 +349,10 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                     shiaAdhanPlayer.playAdhan(nextPrayer.nameEn, adhanSettings.repeatCount || 1);
                   }
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
                   playerStatus.isPlaying
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-white/10 hover:bg-white/15 text-slate-200'
+                    ? 'bg-amber-500 text-slate-950 border border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)]'
+                    : 'liquid-glass border border-white/40 dark:border-white/15 text-slate-800 dark:text-slate-100 hover:bg-white/40'
                 }`}
                 title={playerStatus.isPlaying ? 'Stop' : 'Play Adhan'}
               >
@@ -373,17 +373,17 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
         )}
 
         {/* Today's Prayer Schedule: Clean, Minimalist Table */}
-        <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+        <div className="liquid-glass rounded-2xl border border-white/40 dark:border-white/10 overflow-hidden shadow-xs">
+          <div className="px-4 py-3 border-b border-white/30 dark:border-white/10 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
               Today's Schedule
             </span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
               {now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
             </span>
           </div>
 
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/70">
+          <div className="divide-y divide-white/20 dark:divide-white/10">
             {timings && (['fajr', 'sunrise', 'dhuhr', 'asr', 'sunset', 'maghrib', 'isha', 'midnight'] as ShiaPrayerKey[]).map((key) => {
               const time24 = timings[key];
               const time12 = format12Hour(time24);
@@ -396,23 +396,23 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                   key={key}
                   className={`px-4 py-2.5 flex items-center justify-between transition-colors ${
                     isNext
-                      ? 'bg-emerald-50/60 dark:bg-emerald-950/25'
+                      ? 'bg-amber-500/15 dark:bg-amber-500/20'
                       : ''
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm ${isNext ? 'font-bold text-emerald-700 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}>
+                    <span className={`text-sm ${isNext ? 'font-bold text-amber-700 dark:text-amber-300' : 'text-slate-800 dark:text-slate-200'}`}>
                       {info.en}
                     </span>
                     {isAdhan && (
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold liquid-glass px-1.5 py-0.5 rounded-md border border-amber-400/30">
                         Adhan
                       </span>
                     )}
                   </div>
 
                   <div className="flex items-baseline gap-2">
-                    <span className={`text-sm ${isNext ? 'font-bold text-emerald-700 dark:text-emerald-300' : 'font-medium text-slate-800 dark:text-slate-200'}`}>
+                    <span className={`text-sm ${isNext ? 'font-bold text-amber-700 dark:text-amber-300' : 'font-medium text-slate-800 dark:text-slate-200'}`}>
                       {time12}
                     </span>
                   </div>
@@ -423,7 +423,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
         </div>
 
         {/* Automatic Playback Controls: Clean & Unobtrusive */}
-        <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 p-3.5 space-y-3">
+        <div className="liquid-glass-card rounded-2xl border border-white/40 dark:border-white/10 p-3.5 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200">

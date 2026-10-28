@@ -219,11 +219,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
   return (
     <div className="min-h-screen pb-32 text-slate-900 dark:text-slate-100">
-      {/* Clean Minimalist Header */}
-      <header className="sticky top-0 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 app-header-safe pb-2.5 sm:pb-3 gpu-layer">
+      {/* Liquid Glass Minimalist Header */}
+      <header className="sticky top-0 z-30 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-2.5 sm:pb-3 shadow-xs gpu-layer">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-arabic font-bold text-sm sm:text-base shadow-xs select-none ring-1 ring-emerald-600/30 shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-emerald-700 to-teal-500 text-white flex items-center justify-center font-arabic font-bold text-sm sm:text-base shadow-[0_0_15px_rgba(16,185,129,0.35)] select-none ring-1 ring-white/40 shrink-0">
               ش
             </div>
             <div className="min-w-0">
@@ -243,7 +243,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 hapticImpact(ImpactStyle.Light);
                 onExit();
               }}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors flex items-center gap-1 cursor-pointer"
               title="Exit App (Dua e Khatm e Quran)"
               aria-label="Exit App and Recite Dua e Khatm e Quran"
             >
@@ -263,14 +263,14 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
       <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 overflow-x-hidden min-w-0">
         {/* Welcome Masthead */}
-        <section className="mb-3 pt-0.5 pb-2.5 border-b border-slate-200/70 dark:border-slate-800/70">
+        <section className="mb-3.5 p-3 sm:p-4 rounded-2xl liquid-glass-card glass-emerald-fusion border border-white/40 dark:border-white/10 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-3">
             <div className="min-w-0 flex-1">
               {/* Sacred Arabic Salutation */}
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-800/90 dark:text-emerald-400/90 font-medium select-none mb-0.5">
+              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 font-medium select-none mb-0.5">
                 <span className="font-arabic font-semibold text-xs sm:text-sm leading-none">{greeting.ar}</span>
-                <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">·</span>
-                <span className="text-slate-500 dark:text-slate-400 font-normal">{greeting.en}</span>
+                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+                <span className="text-slate-600 dark:text-slate-400 font-normal">{greeting.en}</span>
               </div>
 
               {/* Personal Reader Name & In-line Name Editing */}
@@ -322,9 +322,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               )}
 
               {/* Hadith Reflection from Ahlulbayt (a.s) */}
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-serif italic max-w-xl leading-snug line-clamp-2">
+              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-serif italic max-w-xl leading-snug line-clamp-2">
                 &ldquo;{reflection.quote}&rdquo;
-                <span className="not-italic text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 ml-1.5 font-sans">
+                <span className="not-italic text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 ml-1.5 font-sans">
                   — {reflection.source}
                 </span>
               </p>
@@ -332,10 +332,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
             {/* Daily Recitation Status */}
             {todayAyahs > 0 && !isEditingName && (
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 sm:text-right shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
+              <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 sm:text-right shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0 bg-white/40 dark:bg-slate-900/40 px-2.5 py-1 rounded-full border border-white/30 dark:border-white/10 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                 <span>
-                  <strong className="text-slate-700 dark:text-slate-300 font-semibold">{todayAyahs}</strong>{' '}
+                  <strong className="text-slate-800 dark:text-slate-200 font-semibold">{todayAyahs}</strong>{' '}
                   {todayAyahs === 1 ? 'ayah recited today' : 'ayahs recited today'}
                 </span>
               </div>
@@ -345,10 +345,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
         {/* Last Read Ayah Quick Resume */}
         {lastRead && activeTab === 'quran' && typeof lastRead.surahId === 'number' && lastRead.surahId >= 1 && lastRead.surahId <= 114 && (
-          <div className="mb-4 p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between gap-4">
+          <div className="mb-4 p-3.5 liquid-glass-card glass-emerald-fusion rounded-2xl border border-emerald-400/40 shadow-xs flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                {appLanguage === 'ur' ? 'جاری رکھیں' : 'Continue Reading'}
+              <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                <span>{appLanguage === 'ur' ? 'جاری رکھیں' : 'Continue Reading'}</span>
               </p>
               <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                 {appLanguage === 'ur' && SURAH_URDU_MAP[lastRead.surahId]
@@ -360,7 +361,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               onClick={() => onSelectSurah(lastRead.surahId, lastRead.ayahNumber)}
               onMouseEnter={() => prefetchSurah(lastRead.surahId)}
               onTouchStart={() => prefetchSurah(lastRead.surahId)}
-              className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl transition-all shadow-xs flex items-center gap-1"
+              className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs rounded-xl transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] flex items-center gap-1 cursor-pointer"
             >
               <span>Resume</span>
               <ArrowRight size={13} />
@@ -400,18 +401,18 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 placeholder={quranMode === 'surah' ? t('search_surah_placeholder', appLanguage) : t('search_juz_placeholder', appLanguage)}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-shadow text-xs sm:text-sm truncate"
+                className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-2xl liquid-glass border border-white/40 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-xs sm:text-sm truncate placeholder-slate-400"
               />
             </div>
 
             {/* Sub-Switch: Surahs (114) vs Juz (30) */}
             <div className="flex items-center justify-center mb-3">
-              <div className="flex gap-1.5 p-1 bg-slate-200/50 dark:bg-slate-900/50 rounded-xl w-full sm:max-w-xs border border-slate-200/60 dark:border-slate-800/60">
+              <div className="flex gap-1.5 p-1 liquid-glass rounded-2xl w-full sm:max-w-xs border border-white/30 dark:border-white/10 shadow-inner">
                 <button
                   onClick={() => { hapticImpact(ImpactStyle.Light); setQuranMode('surah'); }}
-                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-xl transition-all ${
                     quranMode === 'surah'
-                      ? 'bg-white dark:bg-slate-800 shadow-xs text-emerald-700 dark:text-emerald-400 font-bold'
+                      ? 'liquid-glass text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-white/60 dark:border-white/20'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -419,9 +420,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 </button>
                 <button
                   onClick={() => { hapticImpact(ImpactStyle.Light); setQuranMode('juz'); }}
-                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-xl transition-all ${
                     quranMode === 'juz'
-                      ? 'bg-white dark:bg-slate-800 shadow-xs text-emerald-700 dark:text-emerald-400 font-bold'
+                      ? 'liquid-glass text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-white/60 dark:border-white/20'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -473,11 +474,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                         onClick={() => { hapticImpact(ImpactStyle.Light); onSelectSurah(surah.number); }}
                         onMouseEnter={() => prefetchSurah(surah.number)}
                         onTouchStart={() => prefetchSurah(surah.number)}
-                        className="surah-card-render w-full text-left group flex flex-col justify-between p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/60 dark:hover:border-emerald-600/60 hover:shadow-md transition-all duration-150"
+                        className="surah-card-render w-full text-left group flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-emerald-400/60 dark:hover:border-emerald-400/50 hover:shadow-md transition-all duration-150"
                       >
                         {/* Arabic text ABOVE with Surah number badge */}
                         <div className="flex items-center justify-between w-full gap-2">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0 shadow-xs">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-500/20 group-hover:bg-emerald-600 group-hover:text-white group-hover:ring-emerald-600 transition-all shrink-0 shadow-xs">
                             {surah.number}
                           </div>
                           <div className="text-right flex-1 min-w-0">
@@ -493,7 +494,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                         </div>
 
                         {/* Title text NEATLY BELOW with Ayahs count & revelation type */}
-                        <div className="w-full mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/70 flex items-baseline justify-between gap-1.5">
+                        <div className="w-full mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-baseline justify-between gap-1.5">
                           <h3 className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                             {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
                               ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
@@ -511,7 +512,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                         </div>
 
                         {highestRead > 0 && (
-                          <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+                          <div className="w-full h-1 bg-slate-200/60 dark:bg-slate-700/60 rounded-full overflow-hidden mt-1.5">
                             <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
                           </div>
                         )}
@@ -522,7 +523,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               )
             ) : (
               filteredJuzs.length === 0 ? (
-                <div className="text-center py-10 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+                <div className="text-center py-10 px-4 liquid-glass-card rounded-2xl border border-white/40 dark:border-white/10">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
                     {appLanguage === 'ur' ? `کوئی پارہ نہیں ملا برائے "${searchQuery}"` : `No Juz found matching "${searchQuery}"`}
                   </p>
@@ -541,11 +542,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                       onClick={() => onSelectJuz(juz.number)}
                       onMouseEnter={() => prefetchJuz(juz.number)}
                       onTouchStart={() => prefetchJuz(juz.number)}
-                      className="juz-card-render w-full text-left group flex flex-col justify-between p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xs transition-all"
+                      className="juz-card-render w-full text-left group flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-emerald-400/50 hover:shadow-xs transition-all"
                     >
                       {/* Arabic text ABOVE with Juz number badge */}
                       <div className="flex items-center justify-between w-full gap-2">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 transition-colors shrink-0">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-500/20 group-hover:bg-emerald-600 group-hover:text-white group-hover:ring-emerald-600 transition-all shrink-0 shadow-xs">
                           {juz.number}
                         </div>
                         <span 
@@ -559,7 +560,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                       </div>
 
                       {/* Text NEATLY BELOW */}
-                      <div className="w-full mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/70 flex items-baseline justify-between gap-1.5">
+                      <div className="w-full mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-baseline justify-between gap-1.5">
                         <h3 className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate">
                           {appLanguage === 'ur' ? (JUZ_URDU_NAMES[juz.number] || juz.name) : juz.name}
                         </h3>
@@ -576,22 +577,22 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
         )}
 
         {/* Standardized Global Footer */}
-        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center">
+        <footer className="mt-12 pt-6 pb-8 border-t border-white/20 dark:border-white/10 text-center">
           <p className="text-xs text-slate-500 dark:text-slate-400">
             &copy; 2026 Shia Markaz. All Rights Reserved.
           </p>
         </footer>
       </main>
 
-      {/* Single Persistent Bottom Navigation Dock - Perfectly Sized for Every Phone & Screen Ratio */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 pt-1 pb-safe px-0.5 sm:px-2 shadow-lg gpu-layer">
-        <div className="max-w-lg mx-auto grid grid-cols-7 gap-0.5 items-center">
+      {/* Floating Liquid Glass Dock - VisionOS Native Mobile Touch Bar */}
+      <nav className="fixed bottom-2.5 sm:bottom-4 inset-x-2.5 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-lg w-auto sm:w-full z-40 liquid-glass-dock rounded-3xl p-1.5 sm:p-2 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] gpu-layer">
+        <div className="grid grid-cols-7 gap-1 items-center">
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('quran'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'quran'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <BookOpen size={17} className="shrink-0" />
@@ -600,10 +601,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('mafatih'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'mafatih'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold ring-1 ring-sky-500/40 shadow-[0_0_12px_rgba(14,165,233,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <KeyRound size={17} className="shrink-0" />
@@ -612,10 +613,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('adhan'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'adhan'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold ring-1 ring-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <Compass size={17} className="shrink-0" />
@@ -624,10 +625,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('calendar'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'calendar'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <CalendarIcon size={17} className="shrink-0" />
@@ -636,10 +637,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('science'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'science'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold ring-1 ring-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <Microscope size={17} className="shrink-0" />
@@ -648,10 +649,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('discuss'); }}
-            className={`flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl transition-all min-w-0 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
               activeTab === 'discuss'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold shadow-xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold ring-1 ring-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.3)]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
             }`}
           >
             <MessageCircle size={17} className="shrink-0" />
@@ -660,7 +661,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); onOpenSettings(); }}
-            className="flex flex-col items-center justify-center py-1 sm:py-1.5 px-0.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all min-w-0"
+            className="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all min-w-0"
           >
             <Settings size={17} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_settings', appLanguage)}</span>

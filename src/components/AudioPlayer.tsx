@@ -449,7 +449,7 @@ export default function AudioPlayer({
             onSelectMafatihItem(mafatihTrack.id);
           }
         }}
-        className={`fixed ${isOnHome ? 'bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-300/60 dark:border-emerald-800/60 shadow-2xl rounded-2xl sm:rounded-full px-3.5 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-500/70 dark:hover:border-emerald-600/70 group/bar gpu-layer`}
+        className={`fixed ${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-sky-400/70 group/bar gpu-layer`}
         title={isUrdu ? "متن پڑھنے کے لیے ٹیپ کریں" : "Tap to read supplication text"}
         dir={isUrdu ? "rtl" : "ltr"}
       >
@@ -598,7 +598,7 @@ export default function AudioPlayer({
     <div 
       id="bottom-audio-player-bar"
       onClick={handleContainerClick}
-      className={`fixed ${isOnHome ? 'bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-300/60 dark:border-emerald-800/60 shadow-2xl rounded-2xl sm:rounded-full px-3.5 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-500/70 dark:hover:border-emerald-600/70 group/bar gpu-layer`}
+      className={`fixed ${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-400/70 group/bar gpu-layer`}
       title="Tap to return to playing verse"
     >
       {/* Interactive Micro-Progress Bar Line across top of player */}

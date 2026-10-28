@@ -66,10 +66,10 @@ export default function PrivacyPolicyModal({
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            className="relative w-full max-w-2xl max-h-[85vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden z-10"
+            className="relative w-full max-w-2xl max-h-[85vh] liquid-glass-dock rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 flex flex-col overflow-hidden z-10 backdrop-blur-3xl"
           >
             {/* Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="p-4 sm:p-5 border-b border-white/30 dark:border-white/10 liquid-glass flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="text-emerald-600 dark:text-emerald-400" size={22} />
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">
@@ -85,12 +85,12 @@ export default function PrivacyPolicyModal({
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 px-4 text-xs font-semibold">
+            <div className="flex border-b border-white/20 dark:border-white/10 liquid-glass px-4 text-xs font-semibold">
               <button
                 onClick={() => setActiveTab('privacy')}
                 className={`py-3 px-3 border-b-2 transition-colors ${
                   activeTab === 'privacy'
-                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold'
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
@@ -100,7 +100,7 @@ export default function PrivacyPolicyModal({
                 onClick={() => setActiveTab('terms')}
                 className={`py-3 px-3 border-b-2 transition-colors ${
                   activeTab === 'terms'
-                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold'
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
@@ -110,7 +110,7 @@ export default function PrivacyPolicyModal({
                 onClick={() => setActiveTab('deletion')}
                 className={`py-3 px-3 border-b-2 transition-colors ${
                   activeTab === 'deletion'
-                    ? 'border-rose-600 text-rose-700 dark:text-rose-400'
+                    ? 'border-rose-600 text-rose-700 dark:text-rose-400 font-bold'
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
@@ -120,7 +120,7 @@ export default function PrivacyPolicyModal({
                 onClick={() => setActiveTab('licenses')}
                 className={`py-3 px-3 border-b-2 transition-colors ${
                   activeTab === 'licenses'
-                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+                    ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold'
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
@@ -357,10 +357,10 @@ export default function PrivacyPolicyModal({
                       </p>
                     </div>
 
-                    <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="p-3 rounded-xl border border-white/40 dark:border-white/10 liquid-glass">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">AlQuran Cloud & EveryAyah</span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Open Data</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded liquid-glass border border-emerald-500/30 text-emerald-700 dark:text-emerald-400">Open Data</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                         Quran text, translations, and verse-by-verse recitation audio services.
@@ -372,10 +372,10 @@ export default function PrivacyPolicyModal({
             </div>
 
             {/* Footer */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+            <div className="p-3.5 liquid-glass border-t border-white/20 dark:border-white/10 flex justify-end">
               <button
                 onClick={onClose}
-                className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors"
+                className="px-5 py-2 rounded-xl liquid-glass border border-white/30 dark:border-white/10 hover:border-emerald-500/50 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>

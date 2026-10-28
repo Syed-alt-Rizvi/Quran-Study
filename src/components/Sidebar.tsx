@@ -3,15 +3,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Moon, Sun, Type, Bookmark, BookOpen, Headphones, 
   Bell, Check, Trash2, ArrowRight, Clock,
-  Activity, Compass, Volume2, Heart, ShieldCheck,
+  Activity, Volume2, Heart, ShieldCheck,
   Languages, FileEdit, CheckCircle2, User,
   Code, Mail, Copy, Info, Shield, FileText,
   ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
   Smartphone, Vibrate, ExternalLink,
-  Microscope, MessageCircle, LogOut, RefreshCw, Calendar,
+  LogOut, RefreshCw, Calendar,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { useSettingsStore, AppTab } from '../store';
+import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 import { hapticImpact, hapticSelection } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
@@ -51,7 +51,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     lastRead, habitStats,
     tafseerNotes,
     userName, setUserName,
-    defaultAppTab, setDefaultAppTab,
     hapticsEnabled, toggleHaptics,
     mafatihFontSize, setMafatihFontSize,
     mafatihShowTranslation, toggleMafatihShowTranslation,
@@ -276,13 +275,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 280 }}
-          className="fixed inset-y-0 right-0 z-[65] w-full max-w-md bg-slate-50 dark:bg-slate-950 shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 pb-safe"
+          className="fixed inset-y-0 right-0 z-[65] w-full max-w-md liquid-glass-dock shadow-[-20px_0_60px_-4px_rgba(0,0,0,0.6)] flex flex-col border-l border-white/40 dark:border-white/10 pb-safe backdrop-blur-3xl"
         >
           {/* Top Header */}
-          <div className="px-5 modal-header-safe pb-3 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+          <div className="px-5 modal-header-safe pb-3 border-b border-white/30 dark:border-white/10 liquid-glass">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center font-arabic font-bold text-sm shadow-xs border border-emerald-400/30">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-arabic font-bold text-sm shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-white/40 shrink-0">
                   ش
                 </div>
                 <div>
@@ -303,7 +302,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       onClose();
                       onExitApp();
                     }}
-                    className="p-2 rounded-xl text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                    className="p-2 rounded-xl text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
                     title="Exit App (Dua e Khatm e Quran)"
                     aria-label="Exit App and Recite Dua e Khatm e Quran"
                   >
@@ -313,7 +312,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 <button
                   id="sidebar-close-btn"
                   onClick={() => { hapticImpact(ImpactStyle.Light); onClose(); }}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
                   aria-label="Close settings"
                 >
                   <X size={18} />
@@ -322,9 +321,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             </div>
 
             {/* User Profile & Greeting Bar */}
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/60 text-xs mb-3">
+            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl liquid-glass border border-white/35 dark:border-white/10 text-xs mb-3 shadow-2xs">
               <div className="flex items-center gap-2 flex-1 mr-2 min-w-0">
-                <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0 shadow-xs">
                   {userName ? userName.charAt(0).toUpperCase() : <User size={12} />}
                 </div>
                 {isEditingName ? (
@@ -339,13 +338,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         if (e.key === 'Escape') handleCancelName();
                       }}
                       placeholder="Enter your name"
-                      className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-emerald-500 text-slate-800 dark:text-slate-100 text-xs w-full focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-emerald-500 text-slate-800 dark:text-slate-100 text-xs w-full focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       autoFocus
                     />
                     <button
                       id="sidebar-user-name-save"
                       onClick={handleSaveName}
-                      className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded transition-colors"
+                      className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded-lg transition-colors cursor-pointer"
                       title="Save name"
                     >
                       <Check size={14} />
@@ -353,7 +352,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="sidebar-user-name-cancel"
                       onClick={handleCancelName}
-                      className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors"
+                      className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                       title="Cancel"
                     >
                       <X size={14} />
@@ -376,14 +375,14 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex-shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300 flex-shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                 <span>Offline Ready</span>
               </div>
             </div>
 
             {/* Navigation Tabs */}
-            <div className="grid grid-cols-6 gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/90 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
+            <div className="grid grid-cols-6 gap-1 p-1 liquid-glass rounded-2xl border border-white/35 dark:border-white/10 shadow-inner">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -392,16 +391,16 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     key={`sidebar-tab-${tab.id}`}
                     id={`sidebar-tab-btn-${tab.id}`}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`relative py-2 px-0.5 rounded-lg text-xs font-medium flex flex-col items-center justify-center gap-1 transition-all ${
+                    className={`relative py-2 px-0.5 rounded-xl text-xs font-medium flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                        ? 'liquid-glass text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-white/60 dark:border-white/20 ring-1 ring-emerald-500/30'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                     }`}
                   >
                     <div className="relative">
                       <Icon size={15} />
                       {tab.badge !== undefined && tab.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-2 min-w-[13px] h-[13px] rounded-full bg-emerald-600 text-white text-[8px] font-bold flex items-center justify-center px-0.5">
+                        <span className="absolute -top-1.5 -right-2 min-w-[13px] h-[13px] rounded-full bg-emerald-600 text-white text-[8px] font-bold flex items-center justify-center px-0.5 shadow-xs">
                           {tab.badge}
                         </span>
                       )}
@@ -420,7 +419,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {activeTab === 'display' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* SUB-SETTING: APP LANGUAGE & LOCALIZATION */}
-                <div className="p-4 rounded-2xl border border-emerald-300 dark:border-emerald-800/80 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-emerald-500/10 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/20 space-y-3.5 shadow-xs">
+                <div className="p-4 rounded-2xl border border-emerald-400/40 dark:border-emerald-500/30 liquid-glass-card glass-emerald-fusion space-y-3.5 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Languages size={18} className="text-emerald-700 dark:text-emerald-400" />
@@ -433,7 +432,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         </p>
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-600/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-mono font-bold">
+                    <span className="px-2 py-0.5 rounded-full liquid-glass border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[10px] font-mono font-bold">
                       {appLanguage === 'ur' ? 'اردو' : 'English'}
                     </span>
                   </div>
@@ -448,8 +447,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
                         appLanguage === 'en'
-                          ? 'bg-white dark:bg-slate-900 border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                          : 'bg-white/70 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -469,8 +468,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`p-3 rounded-xl border text-right transition-all cursor-pointer relative ${
                         appLanguage === 'ur'
-                          ? 'bg-white dark:bg-slate-900 border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                          : 'bg-white/70 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1 flex-row-reverse">
@@ -481,53 +480,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         مکمل اردو انٹرفیس
                       </span>
                     </button>
-                  </div>
-                </div>
-
-                {/* Default App Startup Tab */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Compass size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Default Startup Screen</span>
-                    </div>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                      On App Launch
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { id: 'quran' as AppTab, label: 'Holy Quran', desc: 'Surahs & Juz', icon: BookOpen },
-                      { id: 'mafatih' as AppTab, label: 'Mafatih Al Jinan', desc: 'Duas & Ziyaraat', icon: KeyRound },
-                      { id: 'adhan' as AppTab, label: 'Shia Adhan & Map', desc: 'Prayer Times & Adhan', icon: Compass },
-                      { id: 'calendar' as AppTab, label: 'Calander', desc: 'Shia Dates & Eids', icon: Calendar },
-                      { id: 'science' as AppTab, label: 'Imams & Science', desc: 'Hadith Discoveries', icon: Microscope },
-                      { id: 'discuss' as AppTab, label: 'Community', desc: 'Discussions', icon: MessageCircle },
-                    ].map((tabOption) => {
-                      const isSelected = defaultAppTab === tabOption.id;
-                      const Icon = tabOption.icon;
-                      return (
-                        <button
-                          key={`startup-tab-${tabOption.id}`}
-                          onClick={() => {
-                            hapticSelection();
-                            setDefaultAppTab(tabOption.id);
-                          }}
-                          className={`p-2.5 rounded-xl border text-left transition-all ${
-                            isSelected
-                              ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <Icon size={14} className={isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'} />
-                            {isSelected && <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />}
-                          </div>
-                          <span className="text-xs font-bold block">{tabOption.label}</span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400">{tabOption.desc}</span>
-                        </button>
-                      );
-                    })}
                   </div>
                 </div>
 
@@ -545,8 +497,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs cursor-pointer ${
                         !isDarkMode
-                          ? 'bg-amber-500/10 border-amber-500/80 text-amber-900 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/30'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                          ? 'liquid-glass border-amber-500/80 text-amber-900 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/30'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-amber-400/40'
                       }`}
                     >
                       <Sun size={17} className="text-amber-500" />
@@ -562,8 +514,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2.5 font-medium text-xs cursor-pointer ${
                         isDarkMode
-                          ? 'bg-emerald-500/10 border-emerald-500/80 text-emerald-300 shadow-xs ring-1 ring-emerald-500/30'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                          ? 'liquid-glass border-emerald-500/80 text-emerald-300 shadow-xs ring-1 ring-emerald-500/30'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-400/40'
                       }`}
                     >
                       <Moon size={17} className="text-emerald-400" />
@@ -574,7 +526,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Haptic Vibration Feedback Toggle */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-2 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <Vibrate size={17} className="text-emerald-600 dark:text-emerald-400" />
@@ -589,10 +541,10 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         toggleHaptics();
                         hapticSelection();
                       }}
-                      className={`w-11 h-6 rounded-full transition-colors relative ${hapticsEnabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      className={`w-11 h-6 rounded-full transition-colors relative border border-white/30 ${hapticsEnabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                       aria-label="Toggle haptic vibration"
                     >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${hapticsEnabled ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${hapticsEnabled ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                     </button>
                   </div>
                 </div>
@@ -619,15 +571,15 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           }}
                           className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
                             isSelected
-                              ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+                              ? 'liquid-glass border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs ring-1 ring-emerald-500/30'
+                              : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                           }`}
                         >
                           <div>
                             <div className="flex items-center gap-1.5">
                               <span className="font-bold text-xs text-slate-900 dark:text-slate-100">{font.name}</span>
                               {isSelected && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-semibold">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-500/30">
                                   Selected
                                 </span>
                               )}
@@ -647,7 +599,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Interface & Translation Typography */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-2.5 shadow-xs">
                   <div className="flex items-center gap-2">
                     <Languages size={16} className="text-emerald-600 dark:text-emerald-400" />
                     <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Interface & Translation Font</span>
@@ -663,8 +615,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         }}
                         className={`p-2.5 rounded-xl border text-center transition-all ${
                           englishFont === f.id
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold'
-                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                            ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                            : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-white/50'
                         }`}
                         style={{ fontFamily: f.id }}
                       >
@@ -680,13 +632,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {activeTab === 'quran' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Arabic Font Size Slider with Live Preview */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Type size={16} className="text-emerald-600 dark:text-emerald-400" />
                       <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Quran Verse Text Size</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                    <span className="px-2 py-0.5 rounded-md liquid-glass border border-emerald-500/30 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
                       {fontSize}px
                     </span>
                   </div>
@@ -701,12 +653,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       step="2"
                       value={fontSize}
                       onChange={(e) => setFontSize(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      className="flex-1 h-2 bg-slate-200/80 dark:bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                     />
                     <span className="text-xs font-bold text-slate-400">64px</span>
                   </div>
 
-                  <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
+                  <div className="pt-2 text-center border-t border-white/20 dark:border-white/10">
                     <p 
                       className="text-emerald-800 dark:text-emerald-200 leading-relaxed py-1"
                       style={{ fontSize: `${fontSize}px`, fontFamily: arabicFont }}
@@ -717,7 +669,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Translation Display Toggle */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <BookOpen size={17} className="text-emerald-600 dark:text-emerald-400" />
@@ -729,22 +681,22 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="toggle-show-translation-btn"
                       onClick={() => { hapticSelection(); toggleShowTranslation(); }}
-                      className={`w-11 h-6 rounded-full transition-colors relative ${showTranslation ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      className={`w-11 h-6 rounded-full transition-colors relative border border-white/30 ${showTranslation ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                       aria-label="Toggle verse translation"
                     >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${showTranslation ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${showTranslation ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                     </button>
                   </div>
 
                   {showTranslation && (
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex gap-2">
+                    <div className="pt-2 border-t border-white/20 dark:border-white/10 flex gap-2">
                       <button
                         id="translation-lang-ur-btn"
                         onClick={() => { hapticSelection(); toggleTranslationLanguage('ur'); }}
                         className={`flex-1 p-2 rounded-xl border text-center text-xs font-semibold transition-all ${
                           translationLanguages.includes('ur')
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                            : 'border-slate-200 dark:border-slate-700 text-slate-500'
+                            ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                            : 'liquid-glass border-white/30 dark:border-white/10 text-slate-500 hover:border-white/50'
                         }`}
                       >
                         اردو ترجمہ (Urdu)
@@ -754,8 +706,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         onClick={() => { hapticSelection(); toggleTranslationLanguage('en'); }}
                         className={`flex-1 p-2 rounded-xl border text-center text-xs font-semibold transition-all ${
                           translationLanguages.includes('en')
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                            : 'border-slate-200 dark:border-slate-700 text-slate-500'
+                            ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                            : 'liquid-glass border-white/30 dark:border-white/10 text-slate-500 hover:border-white/50'
                         }`}
                       >
                         English Translation
@@ -763,7 +715,6 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     </div>
                   )}
                 </div>
-
 
                 <div className="space-y-2">
                   <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -780,8 +731,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`w-full p-4 rounded-2xl border text-left transition-all relative overflow-hidden ${
                         tafseerProvider === 'namoona'
-                          ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+                          ? 'liquid-glass-card glass-emerald-fusion border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs ring-1 ring-emerald-500/30'
+                          : 'liquid-glass-card border-white/40 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                       }`}
                     >
                       <div className="flex items-start justify-between">
@@ -789,7 +740,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-sm text-slate-900 dark:text-slate-100">Tafseer-e-Namoona</span>
                             {tafseerProvider === 'namoona' && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">Selected</span>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white shadow-xs">Selected</span>
                             )}
                           </div>
                           <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">تفسیرِ نمونہ • جامع و تفصیلی</p>
@@ -809,20 +760,20 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       }}
                       className={`w-full p-4 rounded-2xl border text-left transition-all relative overflow-hidden ${
                         tafseerProvider === 'kauthar'
-                          ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+                          ? 'liquid-glass-card glass-emerald-fusion border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-xs ring-1 ring-emerald-500/30'
+                          : 'liquid-glass-card border-white/40 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-sm text-slate-900 dark:text-slate-100">Tafseer Al-Kauthar</span>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center gap-1 border border-emerald-500/30">
                               <Check size={10} />
                               Digital Edition
                             </span>
                             {tafseerProvider === 'kauthar' && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white ml-auto">Selected</span>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white ml-auto shadow-xs">Selected</span>
                             )}
                           </div>
                           <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">تفسیر الکوثر • علامہ شیخ محسن علی نجفی</p>
@@ -836,7 +787,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Accessible Zoom & Readability Slider */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ZoomIn size={16} className="text-emerald-600 dark:text-emerald-400" />
@@ -850,11 +801,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           hapticSelection();
                           setTafseerZoom(100);
                         }}
-                        className="text-[10px] text-slate-500 hover:text-emerald-600 dark:text-slate-400 px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="text-[10px] text-slate-600 dark:text-slate-400 hover:text-emerald-600 px-2 py-0.5 rounded-lg liquid-glass border border-white/20 transition-colors"
                       >
                         Reset (100%)
                       </button>
-                      <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                      <span className="px-2 py-0.5 rounded-md liquid-glass border border-emerald-500/30 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
                         {tafseerZoom}%
                       </span>
                     </div>
@@ -870,12 +821,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       step="10"
                       value={tafseerZoom}
                       onChange={(e) => setTafseerZoom(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      className="flex-1 h-2 bg-slate-200/80 dark:bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                     />
                     <span className="text-xs font-bold text-slate-400">250%</span>
                   </div>
 
-                  <div className="pt-2 text-right border-t border-slate-100 dark:border-slate-800">
+                  <div className="pt-2 text-right border-t border-white/20 dark:border-white/10">
                     <p 
                       className="font-urdu leading-relaxed text-slate-800 dark:text-slate-200 transition-[font-size] duration-150"
                       style={{ fontSize: `${Math.round(18 * (tafseerZoom / 100))}px` }}
@@ -886,7 +837,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Commentary Language Selectors */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-2.5 shadow-xs">
                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Exegesis Language Display</span>
                   <div className="flex gap-2">
                     <button
@@ -894,8 +845,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       onClick={() => { hapticSelection(); toggleTafseerLanguage('ur'); }}
                       className={`flex-1 p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
                         tafseerLanguages.includes('ur')
-                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-500'
+                          ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-500 hover:border-white/50'
                       }`}
                     >
                       اردو تفاسیر (Urdu)
@@ -905,8 +856,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       onClick={() => { hapticSelection(); toggleTafseerLanguage('en'); }}
                       className={`flex-1 p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
                         tafseerLanguages.includes('en')
-                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-500'
+                          ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-500 hover:border-white/50'
                       }`}
                     >
                       English Commentary
@@ -920,7 +871,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {activeTab === 'mafatih' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Supplications Arabic Font Size */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card glass-sapphire-fusion space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Type size={16} className="text-emerald-600 dark:text-emerald-400" />
@@ -928,7 +879,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         {isUrdu ? 'دعاؤں کا فونٹ سائز' : 'Dua & Ziyarat Text Size'}
                       </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                    <span className="px-2 py-0.5 rounded-md liquid-glass border border-emerald-500/30 text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
                       {mafatihFontSize}px
                     </span>
                   </div>
@@ -943,12 +894,12 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       step="2"
                       value={mafatihFontSize}
                       onChange={(e) => setMafatihFontSize(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      className="flex-1 h-2 bg-slate-200/80 dark:bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                     />
                     <span className="text-xs font-bold text-slate-400">64px</span>
                   </div>
 
-                  <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
+                  <div className="pt-2 text-center border-t border-white/20 dark:border-white/10">
                     <p 
                       className="text-emerald-800 dark:text-emerald-200 leading-relaxed py-1 font-arabic"
                       style={{ fontSize: `${mafatihFontSize}px`, fontFamily: arabicFont }}
@@ -962,7 +913,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Show English Translation in Mafatih */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <BookOpen size={17} className="text-emerald-600 dark:text-emerald-400" />
@@ -978,16 +929,16 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="toggle-mafatih-translation-btn"
                       onClick={() => { hapticSelection(); toggleMafatihShowTranslation(); }}
-                      className={`w-11 h-6 rounded-full transition-colors relative ${mafatihShowTranslation ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      className={`w-11 h-6 rounded-full transition-colors relative border border-white/30 ${mafatihShowTranslation ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                       aria-label="Toggle supplication translation"
                     >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${mafatihShowTranslation ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${mafatihShowTranslation ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                     </button>
                   </div>
                 </div>
 
                 {/* Supplication Audio & Reading Quality */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-2 shadow-xs">
                   <div className="flex items-center gap-2.5">
                     <Headphones size={17} className="text-emerald-600 dark:text-emerald-400" />
                     <div>
@@ -1002,7 +953,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Default Audio Playback Speed */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-2.5 shadow-xs">
                   <div className="flex items-center gap-2">
                     <Headphones size={16} className="text-emerald-600 dark:text-emerald-400" />
                     <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -1019,8 +970,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         }}
                         className={`py-2 rounded-xl border text-center text-xs font-bold transition-all ${
                           mafatihDefaultSpeed === speed
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                            : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                            ? 'liquid-glass border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs ring-1 ring-emerald-500/30'
+                            : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-white/50'
                         }`}
                       >
                         {speed}x
@@ -1057,7 +1008,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           }
                           onClose();
                         }}
-                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500/60 transition-all text-left group shadow-xs cursor-pointer"
+                        className="p-2.5 rounded-xl border border-white/40 dark:border-white/10 liquid-glass hover:border-emerald-500/60 transition-all text-left group shadow-xs cursor-pointer"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -1079,7 +1030,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
             {activeTab === 'audio' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Reciter List */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center gap-2">
                     <Headphones size={16} className="text-emerald-600 dark:text-emerald-400" />
                     <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Featured Qari / Reciter</span>
@@ -1098,8 +1049,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           }}
                           className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
                             isSelected
-                              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-800 dark:text-emerald-200 font-semibold shadow-xs'
-                              : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+                              ? 'liquid-glass border-emerald-500 text-emerald-800 dark:text-emerald-200 font-semibold shadow-xs ring-1 ring-emerald-500/30'
+                              : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
                           }`}
                         >
                           <div>
@@ -1114,7 +1065,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Follow Recitation Switch */}
-                <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card shadow-xs">
                   <div className="flex items-center gap-3">
                     <Volume2 size={18} className="text-emerald-600 dark:text-emerald-400" />
                     <div>
@@ -1125,23 +1076,23 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   <button
                     id="toggle-auto-scroll-audio-btn"
                     onClick={() => { hapticSelection(); toggleAutoScrollAudio(); }}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${autoScrollAudio ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    className={`w-11 h-6 rounded-full transition-colors relative border border-white/30 ${autoScrollAudio ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                     aria-label="Toggle follow recitation"
                   >
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${autoScrollAudio ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${autoScrollAudio ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* TAB 4: LIBRARY, SAVED & HABITS */}
+            {/* TAB 5: LIBRARY, SAVED & HABITS */}
             {activeTab === 'library' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Daily Study Activity */}
-                <div className="rounded-2xl p-4 bg-gradient-to-br from-emerald-500/10 via-slate-50 to-amber-500/10 dark:from-emerald-950/40 dark:via-slate-900 dark:to-amber-950/20 border border-emerald-500/20 dark:border-emerald-800/40 shadow-xs space-y-3">
+                <div className="rounded-2xl p-4 liquid-glass-card glass-emerald-fusion border border-emerald-400/40 dark:border-emerald-800/40 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <div className="p-1.5 rounded-lg liquid-glass border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                         <Activity size={16} />
                       </div>
                       <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
@@ -1152,11 +1103,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <div className="p-3 rounded-xl liquid-glass border border-white/40 dark:border-white/10 text-center">
                       <span className="block text-2xl font-bold text-slate-800 dark:text-slate-100">{todayAyahs}</span>
                       <span className="text-[11px] text-slate-500 font-medium">Ayahs Read</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <div className="p-3 rounded-xl liquid-glass border border-white/40 dark:border-white/10 text-center">
                       <span className="block text-2xl font-bold text-emerald-600 dark:text-emerald-400">{todayTafseer}</span>
                       <span className="text-[11px] text-slate-500 font-medium">Tafseer Studies</span>
                     </div>
@@ -1170,7 +1121,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         onSelectSurah?.(lastRead.surahId, lastRead.ayahNumber);
                         onClose();
                       }}
-                      className="w-full flex items-center justify-between p-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-all group"
+                      className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md border border-white/20 transition-all group"
                     >
                       <div className="flex items-center gap-2">
                         <BookOpen size={15} />
@@ -1194,7 +1145,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       {sortedBookmarks.map((b, bIdx) => (
                         <div
                           key={`bookmark-${b.surahId}-${b.ayahNumber}-${bIdx}`}
-                          className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500/50 transition-all group shadow-xs"
+                          className="flex items-center justify-between p-3 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass hover:border-emerald-500/50 transition-all group shadow-xs"
                         >
                           <button
                             id={`bookmark-jump-${b.surahId}-${b.ayahNumber}`}
@@ -1205,7 +1156,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                             }}
                             className="flex items-center gap-2.5 text-left flex-1 mr-2"
                           >
-                            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/40 shrink-0">
+                            <div className="w-8 h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-400/40 shrink-0">
                               {b.surahId}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -1243,7 +1194,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       ))}
                     </div>
                   ) : (
-                    <div className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center space-y-1.5 bg-white/50 dark:bg-slate-900/50">
+                    <div className="p-6 rounded-2xl border border-dashed border-white/30 dark:border-white/10 text-center space-y-1.5 liquid-glass">
                       <Bookmark size={22} className="mx-auto text-slate-300 dark:text-slate-600" />
                       <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">No bookmarked Ayahs yet</p>
                       <p className="text-[11px] text-slate-400">Tap the bookmark icon on any verse while reading to save it here.</p>
@@ -1272,7 +1223,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                                 onClose();
                               }
                             }}
-                            className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 cursor-pointer hover:border-emerald-500/50 transition-all shadow-xs"
+                            className="p-3.5 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass cursor-pointer hover:border-emerald-500/50 transition-all shadow-xs"
                           >
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
@@ -1291,7 +1242,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 )}
 
                 {/* Daily Reading Reminder */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <Bell size={17} className="text-emerald-600 dark:text-emerald-400" />
@@ -1305,15 +1256,15 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     <button
                       id="toggle-reminder-btn"
                       onClick={handleToggleReminder}
-                      className={`w-11 h-6 rounded-full transition-colors relative ${reminderTime ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      className={`w-11 h-6 rounded-full transition-colors relative border border-white/30 ${reminderTime ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                       aria-label="Toggle daily reminder"
                     >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${reminderTime ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${reminderTime ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                     </button>
                   </div>
 
                   {reminderTime && (
-                    <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="space-y-3 pt-2 border-t border-white/20 dark:border-white/10">
                       <div className="flex items-center gap-3">
                         <Clock size={16} className="text-slate-400" />
                         <input
@@ -1324,7 +1275,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                             setReminderTime(e.target.value);
                             hapticSelection();
                           }}
-                          className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
+                          className="px-3 py-1.5 rounded-xl border border-white/40 dark:border-white/10 liquid-glass text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
                         />
                       </div>
 
@@ -1345,7 +1296,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                             className={`p-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                               reminderTime === preset.time
                                 ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                : 'liquid-glass border border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-300'
                             }`}
                           >
                             {preset.label}
@@ -1358,11 +1309,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
               </div>
             )}
 
-            {/* TAB 5: ABOUT, SUPPORT & DEDICATION */}
+            {/* TAB 6: ABOUT, SUPPORT & DEDICATION */}
             {activeTab === 'about' && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 {/* Dedicated Collapsible Tab: Iltemas e Surah Fatiha */}
-                <div className="rounded-2xl border border-emerald-200/90 dark:border-emerald-800/60 bg-gradient-to-br from-emerald-50/70 via-white to-amber-50/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 p-4 shadow-xs space-y-3 transition-all">
+                <div className="rounded-2xl border border-amber-300/50 dark:border-amber-500/30 liquid-glass-card glass-gold-fusion p-4 shadow-xs space-y-3 transition-all">
                   <button
                     type="button"
                     onClick={() => {
@@ -1373,7 +1324,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     aria-expanded={isFatihaExpanded}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-600/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shadow-xs shrink-0">
+                      <div className="w-8 h-8 rounded-xl liquid-glass border border-amber-400/40 text-amber-700 dark:text-amber-300 flex items-center justify-center shadow-xs shrink-0">
                         <BookOpen size={17} />
                       </div>
                       <div className="truncate">
@@ -1385,7 +1336,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         </p>
                       </div>
                     </div>
-                    <div className="w-7 h-7 rounded-lg bg-emerald-100/60 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 transition-transform">
+                    <div className="w-7 h-7 rounded-lg liquid-glass border border-amber-400/30 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 transition-transform">
                       {isFatihaExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                     </div>
                   </button>
@@ -1397,23 +1348,23 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="overflow-hidden pt-2 border-t border-emerald-100 dark:border-emerald-900/50 space-y-3"
+                        className="overflow-hidden pt-2 border-t border-amber-200/50 dark:border-amber-900/50 space-y-3"
                       >
-                        <div className="p-3.5 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-emerald-200/60 dark:border-emerald-800/40 space-y-2.5 text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
-                          <p className="font-bold text-emerald-800 dark:text-emerald-300">
+                        <div className="p-3.5 rounded-xl liquid-glass border border-amber-300/40 dark:border-amber-500/20 space-y-2.5 text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                          <p className="font-bold text-amber-800 dark:text-amber-300">
                             Iltemas e Surah Fatiha:
                           </p>
                           <ul className="space-y-1.5 pl-1">
                             <li className="flex items-start gap-2">
-                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
+                              <span className="text-amber-600 dark:text-amber-400 font-bold">•</span>
                               <span className="font-medium">Madar e Aziz Sakina Banoo D/O Akhoon Mohd Kazim</span>
                             </li>
                             <li className="flex items-start gap-2">
-                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
+                              <span className="text-amber-600 dark:text-amber-400 font-bold">•</span>
                               <span className="font-medium">Dada Jaan Syed Abbas Rizvi S/O Syed Hassan Rizvi</span>
                             </li>
                           </ul>
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 italic">
+                          <div className="pt-2 border-t border-amber-200/30 dark:border-white/10 text-[11px] text-slate-600 dark:text-slate-400 italic">
                             Iltemas e Dua- Syed Murtaza Rizvi(Developer)
                           </div>
                         </div>
@@ -1423,9 +1374,9 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Voluntary Support via UPI */}
-                <div className="rounded-2xl border border-rose-200/80 dark:border-rose-900/40 bg-gradient-to-br from-rose-50/40 via-white to-amber-50/30 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/20 p-4 space-y-3.5 shadow-xs">
+                <div className="rounded-2xl border border-rose-300/40 dark:border-rose-800/40 liquid-glass-card p-4 space-y-3.5 shadow-xs">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs">
+                    <div className="w-8 h-8 rounded-xl liquid-glass border border-rose-400/30 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs">
                       <Heart size={17} className="fill-rose-500/20" />
                     </div>
                     <div>
@@ -1440,7 +1391,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-900 dark:text-emerald-200 text-[11px] flex items-center gap-2">
+                  <div className="p-2.5 rounded-xl liquid-glass border border-emerald-400/30 text-emerald-900 dark:text-emerald-200 text-[11px] flex items-center gap-2">
                     <ShieldCheck size={16} className="text-emerald-600 flex-shrink-0" />
                     <span><strong>100% Free Resource:</strong> No features require payment. Contributions are strictly voluntary.</span>
                   </div>
@@ -1457,7 +1408,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                           handleCopyUpi();
                         }
                       }}
-                      className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center justify-between transition-all active:scale-[0.99] group cursor-pointer"
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md border border-white/20 flex items-center justify-between transition-all active:scale-[0.99] group cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         <span className="px-1.5 py-0.5 rounded bg-white/20 text-[10px] tracking-wider">UPI</span>
@@ -1469,7 +1420,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       </div>
                     </button>
 
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <div className="p-2.5 rounded-xl liquid-glass border border-white/35 dark:border-white/10 flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
                           UPI ID
@@ -1481,7 +1432,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                       <button
                         id="copy-upi-btn"
                         onClick={handleCopyUpi}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-colors flex-shrink-0"
+                        className="px-3 py-1.5 rounded-lg liquid-glass border border-emerald-400/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-colors flex-shrink-0"
                       >
                         {copiedUpi ? (
                           <>
@@ -1503,7 +1454,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 <PWAInstallButton variant="full" />
 
                 {/* Legal, Privacy & Compliance */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
+                <div className="rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card p-4 shadow-xs space-y-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="text-emerald-600 dark:text-emerald-400" size={17} />
                     <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -1519,7 +1470,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'privacy' });
                       }}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
+                      className="p-2 rounded-xl liquid-glass hover:border-emerald-500/50 border border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <Shield size={12} className="text-emerald-600" />
                       <span>Privacy</span>
@@ -1532,7 +1483,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'terms' });
                       }}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
+                      className="p-2 rounded-xl liquid-glass hover:border-emerald-500/50 border border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <FileText size={12} className="text-emerald-600" />
                       <span>Terms</span>
@@ -1545,7 +1496,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'licenses' });
                       }}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
+                      className="p-2 rounded-xl liquid-glass hover:border-emerald-500/50 border border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <Code size={12} className="text-emerald-600" />
                       <span>Licenses</span>
@@ -1558,7 +1509,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         hapticSelection();
                         setPrivacyModal({ isOpen: true, tab: 'deletion' });
                       }}
-                      className="p-2 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
+                      className="p-2 rounded-xl liquid-glass hover:border-rose-500/50 border border-rose-300/40 dark:border-rose-800/40 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors min-h-[44px]"
                     >
                       <Trash2 size={12} className="text-rose-600" />
                       <span>Delete</span>
@@ -1567,7 +1518,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* App Information & Version */}
-                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center space-y-2">
+                <div className="p-3.5 rounded-2xl liquid-glass-card border border-white/40 dark:border-white/10 text-center space-y-2">
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Shia Quran & Tafseer</p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Tafseer-e-Namoona & Tafseer Al-Kauthar
@@ -1582,7 +1533,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     type="button"
                     onClick={handleManualCheckUpdate}
                     disabled={isCheckingUpdate}
-                    className="w-full mt-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-60"
+                    className="w-full mt-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs border border-white/20 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md disabled:opacity-60"
                   >
                     <RefreshCw size={13} className={isCheckingUpdate ? 'animate-spin' : ''} />
                     <span>{isCheckingUpdate ? 'Checking for updates...' : 'Check for Published Updates'}</span>
@@ -1602,7 +1553,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                         onClose();
                         onExitApp();
                       }}
-                      className="w-full mt-2 py-2.5 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      className="w-full mt-2 py-2.5 px-3 rounded-xl liquid-glass hover:border-emerald-400/50 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 border border-white/40 dark:border-white/10 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <LogOut size={15} />
                       <span>Exit App (Dua e Khatm e Quraan)</span>
@@ -1611,7 +1562,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 </div>
 
                 {/* Standardized Global Footer */}
-                <div className="pt-4 pb-2 text-center border-t border-slate-200/60 dark:border-slate-800/60">
+                <div className="pt-4 pb-2 text-center border-t border-white/20 dark:border-white/10">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     &copy; 2026 Shia Markaz. All Rights Reserved.
                   </p>

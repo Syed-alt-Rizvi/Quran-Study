@@ -125,3 +125,171 @@ html.capacitor-android .pb-safe,
 body.capacitor-android .pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px);
 }
+
+/* ============================================================
+   Liquid Glass & Vision-Aesthetic Design System
+   ============================================================ */
+
+/* Primary Liquid Glass Surface */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.dark .liquid-glass {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* High-Elevation Floating Liquid Glass Dock */
+.liquid-glass-dock {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 16px 48px -4px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.5), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+.dark .liquid-glass-dock {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 50px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Interactive Liquid Glass Card with Specular Refraction */
+.liquid-glass-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .liquid-glass-card {
+  background: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+}
+
+.liquid-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 12px 32px -4px rgba(16, 185, 129, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .liquid-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 14px 36px -4px rgba(5, 150, 105, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
+}
+
+/* Luminous Section Color Fusions (Fading into Liquid Glass) */
+.glass-emerald-fusion {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(20, 184, 166, 0.08) 50%, rgba(255, 255, 255, 0.4) 100%);
+}
+.dark .glass-emerald-fusion {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.25) 0%, rgba(13, 148, 136, 0.12) 50%, rgba(15, 23, 42, 0.55) 100%);
+}
+
+.glass-sapphire-fusion {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(255, 255, 255, 0.4) 100%);
+}
+.dark .glass-sapphire-fusion {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(37, 99, 235, 0.12) 50%, rgba(15, 23, 42, 0.55) 100%);
+}
+
+.glass-amber-fusion {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 88, 12, 0.08) 50%, rgba(255, 255, 255, 0.4) 100%);
+}
+.dark .glass-amber-fusion {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.28) 0%, rgba(194, 65, 12, 0.14) 50%, rgba(15, 23, 42, 0.55) 100%);
+}
+
+.glass-violet-fusion {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.08) 50%, rgba(255, 255, 255, 0.4) 100%);
+}
+.dark .glass-violet-fusion {
+  background: linear-gradient(135deg, rgba(109, 40, 217, 0.28) 0%, rgba(147, 51, 234, 0.14) 50%, rgba(15, 23, 42, 0.55) 100%);
+}
+
+.glass-gold-fusion {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.22) 0%, rgba(245, 158, 11, 0.1) 50%, rgba(255, 255, 255, 0.4) 100%);
+}
+.dark .glass-gold-fusion {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(180, 83, 9, 0.15) 50%, rgba(15, 23, 42, 0.6) 100%);
+}
+
+/* Ambient Floating Aurora Mesh (Fixed Behind Layout) */
+.aurora-mesh {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-orb-1 {
+  position: absolute;
+  top: -10%;
+  left: 15%;
+  width: 550px;
+  height: 550px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(16, 185, 129, 0.05) 55%, transparent 70%);
+  filter: blur(60px);
+  animation: floatOrb 22s ease-in-out infinite alternate;
+}
+
+.dark .aurora-orb-1 {
+  background: radial-gradient(circle, rgba(5, 150, 105, 0.32) 0%, rgba(16, 185, 129, 0.08) 55%, transparent 70%);
+}
+
+.aurora-orb-2 {
+  position: absolute;
+  top: 35%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, rgba(59, 130, 246, 0.05) 55%, transparent 70%);
+  filter: blur(70px);
+  animation: floatOrb 26s ease-in-out infinite alternate-reverse;
+}
+
+.dark .aurora-orb-2 {
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.28) 0%, rgba(37, 99, 235, 0.07) 55%, transparent 70%);
+}
+
+.aurora-orb-3 {
+  position: absolute;
+  bottom: 5%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(168, 85, 247, 0.04) 55%, transparent 70%);
+  filter: blur(65px);
+  animation: floatOrb 24s ease-in-out infinite alternate;
+}
+
+.dark .aurora-orb-3 {
+  background: radial-gradient(circle, rgba(109, 40, 217, 0.26) 0%, rgba(139, 92, 246, 0.06) 55%, transparent 70%);
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(30px, -25px) scale(1.08); }
+  100% { transform: translate(-20px, 35px) scale(0.95); }
+}

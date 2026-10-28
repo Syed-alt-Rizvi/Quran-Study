@@ -52,32 +52,34 @@ export default function HomeAdhanWidget({ onOpenMapAndPrayers }: HomeAdhanWidget
           onOpenMapAndPrayers();
         }
       }}
-      className="mb-3 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 text-white shadow-xs border border-emerald-800/60 hover:border-emerald-500/70 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
+      className="mb-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl liquid-glass-card glass-amber-fusion border border-amber-400/40 dark:border-amber-500/20 shadow-xs hover:border-amber-400/70 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
       title="View Adhan & Prayer Times"
     >
       {/* Left: Compass / Audio Playing icon + Next Prayer + Time + Countdown */}
-      <div className="flex items-center gap-2 min-w-0">
-        {isPlaying ? (
-          <Volume2 size={15} className="text-emerald-300 animate-pulse shrink-0" />
-        ) : (
-          <Compass size={15} className="text-emerald-400 shrink-0" />
-        )}
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="w-7 h-7 rounded-xl liquid-glass flex items-center justify-center border border-amber-400/40 text-amber-600 dark:text-amber-400 shrink-0 shadow-2xs">
+          {isPlaying ? (
+            <Volume2 size={15} className="text-amber-500 animate-pulse shrink-0" />
+          ) : (
+            <Compass size={15} className="text-amber-600 dark:text-amber-400 shrink-0" />
+          )}
+        </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium truncate">
-          <span className="font-semibold text-white tracking-tight">{nextPrayer.nameEn}</span>
-          <span className="text-emerald-300 font-bold">{nextPrayer.time12}</span>
-          <span className="text-[11px] text-emerald-200/70 font-normal">
+          <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight">{nextPrayer.nameEn}</span>
+          <span className="text-amber-600 dark:text-amber-400 font-extrabold">{nextPrayer.time12}</span>
+          <span className="text-[11px] text-slate-600 dark:text-slate-400 font-normal">
             ({nextPrayer.formattedCountdown})
           </span>
         </div>
       </div>
 
       {/* Right: City name + Chevron */}
-      <div className="flex items-center gap-1.5 shrink-0 text-emerald-200/80">
-        <span className="text-[11px] sm:text-xs font-normal truncate max-w-[110px] sm:max-w-[160px] text-emerald-100/80 hidden xs:inline">
+      <div className="flex items-center gap-1.5 shrink-0 text-slate-700 dark:text-slate-300">
+        <span className="text-[11px] sm:text-xs font-medium truncate max-w-[110px] sm:max-w-[160px] hidden xs:inline">
           {userLocation.name}
         </span>
-        <ChevronRight size={15} className="text-emerald-400 shrink-0" />
+        <ChevronRight size={15} className="text-amber-500 shrink-0" />
       </div>
     </div>
   );

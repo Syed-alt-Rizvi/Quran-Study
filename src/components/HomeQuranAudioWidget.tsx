@@ -117,18 +117,20 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             setIsExpanded(true);
           }
         }}
-        className="mb-3 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-900 text-white shadow-xs border border-emerald-800/60 hover:border-emerald-600/70 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
+        className="mb-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl liquid-glass-card glass-emerald-fusion border border-emerald-400/40 dark:border-emerald-500/20 shadow-xs hover:border-emerald-400/70 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
         title="Expand Quran Audio Player"
       >
         {/* Left: Icon + Active Surah Name + Status */}
-        <div className="flex items-center gap-2 min-w-0">
-          <Headphones size={15} className={`text-emerald-400 shrink-0 ${isCurrentSurahPlaying ? 'animate-pulse' : ''}`} />
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-7 h-7 rounded-xl liquid-glass flex items-center justify-center border border-emerald-400/40 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-2xs">
+            <Headphones size={15} className={`shrink-0 ${isCurrentSurahPlaying ? 'animate-pulse text-emerald-500' : ''}`} />
+          </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium truncate">
-            <span className="font-semibold text-white tracking-tight">
+            <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {isUrdu && urduSurahName ? `سورۃ ${urduSurahName}` : currentSurahMeta.englishName}
             </span>
-            <span className="text-[11px] text-emerald-300 font-normal">
+            <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-normal">
               {isCurrentSurahPlaying && currentAyah 
                 ? (isUrdu 
                     ? `(آیت ${currentAyah.numberInSurah}/${currentSurahMeta.numberOfAyahs})`
@@ -151,8 +153,8 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             disabled={loadingAudio}
             className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
               isCurrentSurahPlaying
-                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
-                : 'bg-emerald-600 text-white hover:bg-emerald-500'
+                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-xs'
+                : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-xs'
             }`}
             title={isCurrentSurahPlaying ? 'Pause Audio' : 'Play Audio'}
             aria-label={isCurrentSurahPlaying ? 'Pause' : 'Play'}
@@ -166,21 +168,21 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             )}
           </button>
 
-          <ChevronDown size={15} className="text-emerald-400/80 shrink-0" />
+          <ChevronDown size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mb-4 rounded-3xl bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-950 text-white p-4 sm:p-5 shadow-lg border border-emerald-800/40 relative overflow-hidden">
+    <div className="mb-4 rounded-3xl liquid-glass-card glass-emerald-fusion text-slate-900 dark:text-white p-4 sm:p-5 shadow-lg border border-emerald-400/40 dark:border-emerald-500/20 relative overflow-hidden">
       {/* Background Ambience */}
-      <div className="absolute top-0 right-1/4 w-40 h-40 bg-radial from-emerald-500/10 to-transparent pointer-events-none rounded-full blur-2xl" />
+      <div className="absolute top-0 right-1/4 w-40 h-40 bg-radial from-emerald-500/15 to-transparent pointer-events-none rounded-full blur-2xl" />
 
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-2xs">
             <Headphones size={17} />
           </div>
           <div>

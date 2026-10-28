@@ -292,24 +292,24 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
   return (
     <div className="space-y-4 pb-12 animate-in fade-in duration-300">
       {/* Top Banner & Hijri Masthead */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-teal-900 to-slate-950 text-white p-5 sm:p-6 shadow-xl border border-emerald-700/40">
+      <section className="relative overflow-hidden rounded-3xl liquid-glass-card glass-gold-fusion text-slate-900 dark:text-white p-5 sm:p-6 shadow-xl border border-amber-400/40 dark:border-amber-500/20">
         <div className="absolute top-0 right-0 -mt-6 -mr-6 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-emerald-300 text-xs font-semibold tracking-wider uppercase">
-              <Moon size={14} className="text-amber-300" />
+            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 text-xs font-semibold tracking-wider uppercase">
+              <Moon size={15} className="text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
               <span>Shia Islamic Calendar</span>
-              <span className="text-emerald-500">•</span>
+              <span className="text-amber-500">•</span>
               <span>{todayHijri.year} AH</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-arabic text-amber-100">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-arabic text-amber-900 dark:text-amber-100">
               {todayHijri.formatted}
             </h2>
 
-            <p className="text-xs sm:text-sm text-emerald-100/90 font-medium">
+            <p className="text-xs sm:text-sm text-slate-700 dark:text-emerald-100/90 font-medium">
               {new Date().toLocaleDateString('default', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
@@ -321,10 +321,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                 hapticImpact(ImpactStyle.Light);
                 setIsOffsetModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md text-xs font-medium text-white transition-all border border-white/15"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl liquid-glass active:scale-95 text-xs font-medium text-slate-800 dark:text-white transition-all border border-white/40 dark:border-white/15 shadow-2xs cursor-pointer"
               title="Adjust Hijri Date based on local moon sighting"
             >
-              <Sliders size={13} className="text-amber-300" />
+              <Sliders size={13} className="text-amber-500" />
               <span>Moon Offset: {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}d</span>
             </button>
 
@@ -334,10 +334,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                 hapticImpact(ImpactStyle.Light);
                 setIsNotificationDrawerOpen(true);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl backdrop-blur-md text-xs font-medium transition-all border active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border active:scale-95 cursor-pointer ${
                 calendarNotificationSettings.enabled 
-                  ? 'bg-amber-400 text-slate-950 border-amber-300 font-semibold shadow-xs' 
-                  : 'bg-white/10 text-white/80 border-white/15 hover:bg-white/20'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-semibold shadow-xs' 
+                  : 'liquid-glass text-slate-700 dark:text-white/80 border-white/40 dark:border-white/15 hover:bg-white/20'
               }`}
               title="Shia Calendar Notifications"
             >
@@ -357,7 +357,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
             {/* Jump to Today Button */}
             <button
               onClick={handleJumpToToday}
-              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold transition-all shadow-xs"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-bold transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] cursor-pointer"
             >
               Today
             </button>
@@ -366,40 +366,40 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
         {/* Today's Sacred Day Highlight */}
         {todayData.events.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-emerald-700/50">
-            <div className="flex items-start gap-3 bg-emerald-950/60 rounded-2xl p-3.5 border border-emerald-600/40">
-              <div className="p-2 rounded-xl bg-amber-400 text-slate-950 shrink-0 mt-0.5">
+          <div className="mt-4 pt-4 border-t border-amber-400/30 dark:border-amber-500/20">
+            <div className="flex items-start gap-3 liquid-glass rounded-2xl p-3.5 border border-white/40 dark:border-white/10 shadow-xs">
+              <div className="p-2 rounded-xl bg-amber-500 text-slate-950 shrink-0 mt-0.5 shadow-xs">
                 <Star size={16} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
                     Observed Today
                   </span>
                   {todayData.events[0].type === 'eid' && (
                     <>
-                      <span className="text-amber-400/60" aria-hidden="true">·</span>
-                      <span className="text-[11px] font-semibold text-emerald-300">
+                      <span className="text-amber-500/60" aria-hidden="true">·</span>
+                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
                         Eid Mubarak!
                       </span>
                     </>
                   )}
                 </div>
-                <h3 className="font-bold text-white text-sm sm:text-base">
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
                   {todayData.events[0].name}
                 </h3>
                 {todayData.events[0].arabicName && (
-                  <p className="font-arabic text-amber-200 text-sm mt-0.5">
+                  <p className="font-arabic text-amber-700 dark:text-amber-200 text-sm mt-0.5">
                     {todayData.events[0].arabicName}
                   </p>
                 )}
-                <p className="text-xs text-emerald-100/80 mt-1 line-clamp-2">
+                <p className="text-xs text-slate-600 dark:text-emerald-100/80 mt-1 line-clamp-2">
                   {todayData.events[0].shortDescription}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <button
                     onClick={() => setSelectedEvent(todayData.events[0])}
-                    className="text-xs font-semibold text-amber-300 hover:text-amber-200 underline flex items-center gap-1"
+                    className="text-xs font-semibold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>View Amaal &amp; Full History</span>
                     <ChevronRight size={14} />
@@ -407,7 +407,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   {todayData.events[0].recommendedDuas && todayData.events[0].recommendedDuas[0]?.mafatihId && onSelectMafatihItem && (
                     <button
                       onClick={() => onSelectMafatihItem(todayData.events[0].recommendedDuas![0].mafatihId!)}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-700/80 hover:bg-emerald-600 text-[11px] font-bold text-white flex items-center gap-1"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-[11px] font-bold text-white flex items-center gap-1 cursor-pointer shadow-xs"
                     >
                       <KeyRound size={12} />
                       <span>
@@ -425,16 +425,16 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
       </section>
 
       {/* View Switcher, Filter & Search Controls */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 liquid-glass rounded-2xl p-3 border border-white/40 dark:border-white/10 shadow-xs">
+        <div className="flex items-center gap-1 liquid-glass p-1 rounded-xl shrink-0 border border-white/30 dark:border-white/10">
           <button
             onClick={() => {
               hapticImpact(ImpactStyle.Light);
               setViewMode('month');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'month'
-                ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                ? 'liquid-glass text-emerald-800 dark:text-emerald-300 shadow-xs border border-white/60 dark:border-white/20'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
@@ -447,9 +447,9 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               hapticImpact(ImpactStyle.Light);
               setViewMode('list');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                ? 'liquid-glass text-emerald-800 dark:text-emerald-300 shadow-xs border border-white/60 dark:border-white/20'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
@@ -465,8 +465,8 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Shia events, Eids, Imams..."
-              className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border-none text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              placeholder="Search Shia events, Duas, Amaal..."
+              className="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl liquid-glass border border-white/40 dark:border-white/10 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             {searchQuery && (
               <button

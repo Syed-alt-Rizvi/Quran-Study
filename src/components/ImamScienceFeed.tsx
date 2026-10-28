@@ -142,15 +142,15 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
   return (
     <div className="space-y-6">
       {/* Archive Header & Mission Statement */}
-      <div className="border-b-[0.5px] border-slate-200 dark:border-slate-800 pb-5 mt-2">
-        <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold mb-1">
-          <Microscope size={14} />
+      <div className="relative overflow-hidden rounded-3xl liquid-glass-card glass-violet-fusion p-5 sm:p-6 text-slate-900 dark:text-white shadow-sm border border-purple-400/40 dark:border-purple-500/20 mt-2">
+        <div className="flex items-center gap-1.5 text-xs text-purple-700 dark:text-purple-300 font-bold uppercase tracking-wider mb-1">
+          <Microscope size={15} className="text-purple-600 dark:text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
           <span>Research &amp; Literature</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-slate-50">
-          Qur'an, Hadith & Scientific Wisdom
+          Qur'an, Hadith &amp; Scientific Wisdom
         </h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-2xl">
+        <p className="text-sm text-slate-700 dark:text-purple-100/90 mt-1 max-w-2xl leading-relaxed">
           Exploring scientific discoveries, natural biology, medicine, astronomy, and cosmic principles through the profound teachings of the Holy Qur'an and the Holy Ahlebait (a.s.).
         </p>
       </div>
@@ -167,12 +167,12 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
             placeholder="Search articles across biology, health, astronomy, Ahlebait teachings..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border-[0.5px] border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all shadow-xs"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl liquid-glass border border-white/40 dark:border-white/10 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition-all shadow-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
             >
               Clear
             </button>
@@ -186,15 +186,15 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
               hapticSelection();
               setSelectedCategory('all');
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'liquid-glass text-purple-900 dark:text-purple-200 shadow-xs font-bold border border-purple-400/50 ring-1 ring-purple-500/30'
+                : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             All Topics
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-              selectedCategory === 'all' ? 'bg-emerald-700 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+              selectedCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-white/40 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300'
             }`}>
               {articles.length}
             </span>
@@ -210,16 +210,16 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
                   hapticSelection();
                   setSelectedCategory(cat.name);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-600 text-white shadow-sm font-semibold'
-                    : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'liquid-glass text-purple-900 dark:text-purple-200 shadow-xs font-bold border border-purple-400/50 ring-1 ring-purple-500/30'
+                    : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 {cat.name}
                 {cat.count > 0 && (
                   <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-emerald-700 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    isSelected ? 'bg-purple-600 text-white' : 'bg-white/40 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300'
                   }`}>
                     {cat.count}
                   </span>
@@ -342,7 +342,7 @@ export default function ImamScienceFeed({ onSelectSurah }: ImamScienceFeedProps)
                 hapticImpact(ImpactStyle.Light);
                 setSelectedArticle(article);
               }}
-              className="group cursor-pointer flex flex-col bg-white dark:bg-slate-900 rounded-2xl border-[0.5px] border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
+              className="group cursor-pointer flex flex-col liquid-glass-card rounded-3xl border border-white/50 dark:border-white/10 hover:border-purple-400/60 dark:hover:border-purple-400/50 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
             >
               {/* Thumbnail with standard 540x360 ratio */}
               <div className="relative aspect-[3/2] bg-slate-100 dark:bg-slate-800 overflow-hidden">

@@ -303,29 +303,29 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
   return (
     <div className="space-y-4 sm:space-y-5 w-full max-w-full overflow-x-hidden min-w-0" dir={isUrdu ? 'rtl' : 'ltr'}>
       {/* Illuminated Sanctuary Header Banner with Sacred Identity */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900 via-teal-950 to-slate-900 p-4 sm:p-5 text-white shadow-sm border border-emerald-800/50 min-w-0 w-full max-w-full">
+      <div className="relative overflow-hidden rounded-3xl liquid-glass-card glass-sapphire-fusion p-4 sm:p-5 text-slate-900 dark:text-white shadow-sm border border-sky-400/40 dark:border-sky-500/20 min-w-0 w-full max-w-full">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-semibold uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-md liquid-glass text-sky-800 dark:text-sky-300 border border-sky-400/40 text-[10px] font-semibold uppercase tracking-wider">
                 {isUrdu ? 'کتابِ دعا و زیارت' : 'Sacred Supplications'}
               </span>
-              <span className="text-xs text-emerald-300 font-arabic font-medium">مَفَاتِيحُ الْجِنَانِ</span>
+              <span className="text-xs text-sky-700 dark:text-sky-300 font-arabic font-medium">مَفَاتِيحُ الْجِنَانِ</span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2 truncate">
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 truncate">
               <span>{isUrdu ? 'مفاتیح الجنان' : 'Mafatih Al Jinan'}</span>
-              <span className="text-xs font-normal text-emerald-200/80 hidden sm:inline">
+              <span className="text-xs font-normal text-sky-700/80 dark:text-sky-200/80 hidden sm:inline">
                 — {isUrdu ? 'محدث شیخ عباس قمی (رح)' : 'Sheikh Abbas Qummi (r.a)'}
               </span>
             </h2>
-            <p className="text-[11px] sm:text-xs text-emerald-100/80 mt-1 max-w-xl leading-relaxed break-words">
+            <p className="text-[11px] sm:text-xs text-slate-700 dark:text-sky-100/90 mt-1 max-w-xl leading-relaxed break-words">
               {isUrdu 
                 ? 'اہلبیتؑ کی مستند دعائیں، زیارات اور اعمال کا مکمل انسائیکلوپیڈیا با اعراب و آڈیو' 
                 : 'Complete 1,307 authentic Ahlulbayt (a.s) supplications, ziyaraat, and taqibaat with full text and synchronous recitations.'}
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-emerald-200 shrink-0 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs self-start sm:self-auto">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-2 text-xs font-mono text-sky-800 dark:text-sky-200 shrink-0 liquid-glass px-3 py-1.5 rounded-xl border border-white/40 dark:border-white/10 self-start sm:self-auto shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
             <span className="tabular-nums font-semibold">
               {isUrdu ? `${toUrduNumerals(items.length || 1307)} دعائیں` : `${items.length || 1307} Supplications`}
             </span>
@@ -353,7 +353,7 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
               <div
                 key={`fav-${fav.id}`}
                 onClick={() => handleSelectItem(fav.id)}
-                className="shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 transition-colors group cursor-pointer"
+                className="shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-sky-400/50 transition-all group cursor-pointer shadow-2xs"
               >
                 <button
                   type="button"
@@ -368,8 +368,8 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                   }}
                   className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
                     isFavPlaying
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-emerald-600 group-hover:text-white'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'liquid-glass text-slate-700 dark:text-slate-300 group-hover:bg-sky-600 group-hover:text-white border border-sky-400/20'
                   }`}
                   title={isFavPlaying ? (isUrdu ? 'روکیں' : 'Pause') : (isUrdu ? 'سنیں' : 'Listen')}
                 >
@@ -382,7 +382,7 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                   )}
                 </button>
                 <div className={isUrdu ? 'text-right' : 'text-left'}>
-                  <span className="text-xs font-medium text-slate-900 dark:text-slate-100 block group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors whitespace-nowrap">
+                  <span className="text-xs font-medium text-slate-900 dark:text-slate-100 block group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors whitespace-nowrap">
                     {primaryTitle}
                   </span>
                   <span className="text-[10px] text-slate-400 font-arabic block leading-none mt-0.5">
@@ -404,7 +404,7 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('mafatih_search_placeholder', appLanguage)}
-            className={`w-full ${isUrdu ? 'pr-9 pl-9 text-right' : 'pl-9 pr-9 text-left'} py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500`}
+            className={`w-full ${isUrdu ? 'pr-9 pl-9 text-right' : 'pl-9 pr-9 text-left'} py-2.5 rounded-2xl liquid-glass border border-white/40 dark:border-white/10 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50`}
           />
           {searchQuery && (
             <button
@@ -422,16 +422,16 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
             hapticImpact(ImpactStyle.Light);
             setOnlyAudio((prev) => !prev);
           }}
-          className={`flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-medium transition-colors shrink-0 cursor-pointer ${
+          className={`flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs font-medium transition-all shrink-0 cursor-pointer ${
             onlyAudio
-              ? 'bg-emerald-600 text-white border-emerald-600'
-              : 'bg-white dark:bg-slate-900 border-slate-200/70 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+              ? 'bg-sky-600 text-white border-sky-500 shadow-xs'
+              : 'liquid-glass border-white/40 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-sky-400/50'
           }`}
           title={isUrdu ? 'صرف آڈیو والی دعائیں دکھائیں' : 'Show recitations with audio recordings'}
         >
           <Headphones size={15} />
           <span>{t('with_audio', appLanguage)}</span>
-          <span className={`text-[10px] tabular-nums ${onlyAudio ? 'text-emerald-100' : 'text-slate-400'}`}>
+          <span className={`text-[10px] tabular-nums ${onlyAudio ? 'text-sky-100' : 'text-slate-400'}`}>
             ({isUrdu ? toUrduNumerals('320+') : '320+'})
           </span>
         </button>
@@ -450,10 +450,10 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
                 hapticImpact(ImpactStyle.Light);
                 setSelectedCategory(tab.id);
               }}
-              className={`shrink-0 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-1.5 whitespace-nowrap ${
+              className={`shrink-0 px-3 py-1.5 rounded-xl transition-all cursor-pointer font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 isSelected
-                  ? 'bg-slate-900 text-white dark:bg-emerald-600 dark:text-white'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200/70 dark:border-slate-800'
+                  ? 'liquid-glass text-sky-800 dark:text-sky-200 font-bold border border-sky-400/50 shadow-xs ring-1 ring-sky-500/30'
+                  : 'liquid-glass border-white/30 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
               <span>{displayLabel}</span>
@@ -524,7 +524,7 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
               <div
                 key={`maf-${item.id}`}
                 onClick={() => handleSelectItem(item.id)}
-                className={`w-full max-w-full min-w-0 p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-2xs hover:shadow-xs transition-all duration-200 group cursor-pointer flex flex-col justify-between space-y-3.5 overflow-hidden ${catStyle.border}`}
+                className={`w-full max-w-full min-w-0 p-4 sm:p-5 rounded-2xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-sky-400/60 dark:hover:border-sky-400/50 shadow-xs hover:shadow-md transition-all duration-200 group cursor-pointer flex flex-col justify-between space-y-3.5 overflow-hidden ${catStyle.border}`}
               >
                 <div className="min-w-0 w-full">
                   {/* Category badge & metadata header */}

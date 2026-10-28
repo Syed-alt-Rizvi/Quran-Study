@@ -365,11 +365,19 @@ export default function App() {
 
   return (
     <div 
-      className={`min-h-screen w-full ${isDarkMode ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30`}
+      className={`min-h-screen w-full relative ${isDarkMode ? 'dark' : ''} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden`}
       style={{ fontFamily: englishFont }}
     >
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <AnimatePresence mode="wait">
+      {/* Luminous Ambient Aurora Mesh for Liquid Glass Refractions */}
+      <div className="aurora-mesh" aria-hidden="true">
+        <div className="aurora-orb-1" />
+        <div className="aurora-orb-2" />
+        <div className="aurora-orb-3" />
+      </div>
+
+      <div className="relative z-10 min-h-screen flex flex-col">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <AnimatePresence mode="wait">
           {showWelcome ? (
             <WelcomeScreen key="welcome" onComplete={handleWelcomeComplete} />
           ) : isExiting ? (
@@ -462,6 +470,7 @@ export default function App() {
       )}
 
       <UpdateToast />
+      </div>
     </div>
   );
 }
