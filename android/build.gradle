@@ -35,10 +35,7 @@ allprojects {
         }
     }
 
-    // Gracefully bypass AAR compileSdk metadata checks across all subprojects
-    tasks.matching { it.name.contains("AarMetadata") }.configureEach {
-        enabled = false
-    }
+
 
     // Ensure lint never breaks APK/AAB compilation across submodules
     tasks.matching { it.name.toLowerCase().contains("lint") }.configureEach {
