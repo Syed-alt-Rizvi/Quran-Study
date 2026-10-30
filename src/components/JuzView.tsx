@@ -141,10 +141,12 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
       <div 
         id={`ayah-${surahId}-${ayah.numberInSurah}`}
         ref={ayahRef}
-        className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl border ${
-          isActivePlaying || isLastRead
-            ? 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500/70 dark:border-emerald-600/70 shadow-md ring-1 ring-emerald-400/30'
-            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700'
+        className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl liquid-glass-card border ${
+          isActivePlaying
+            ? 'glass-emerald-fusion border-emerald-500/80 ring-2 ring-emerald-500/30 shadow-lg'
+            : isLastRead
+            ? 'border-emerald-500/60 ring-1 ring-emerald-500/20 shadow-md'
+            : 'border-white/60 dark:border-white/10 hover:border-emerald-400/50 shadow-xs'
         }`}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
@@ -154,12 +156,12 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-3">
             <span 
-              className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-colors border ${
+              className={`w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition-colors border shadow-2xs ${
                 isActivePlaying
-                  ? 'bg-emerald-500 text-white border-emerald-400'
+                  ? 'bg-emerald-600 text-white border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.5)]'
                   : isLastRead
-                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                    ? 'glass-slab-tab text-emerald-800 dark:text-emerald-300 border-emerald-400/50 ring-1 ring-emerald-500/30'
+                    : 'glass-slab-tab text-slate-700 dark:text-slate-300 border-white/40 dark:border-white/15'
               }`}
             >
               {ayah.numberInSurah}
@@ -226,14 +228,14 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
 
         {/* Clean, high-contrast Ayah Tabs with subtle divider */}
         <div className="flex items-center justify-center gap-3 mt-4 mb-2">
-          <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
-          <div className="flex gap-1.5 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex-1 h-px bg-white/20 dark:bg-white/10"></div>
+          <div className="flex gap-1.5 p-1 rounded-xl liquid-glass border border-white/40 dark:border-white/10 shadow-inner">
             {showTranslation && (
               <button 
                 onClick={() => setActiveTab(activeTab === 'translation' ? 'none' : 'translation')}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   activeTab === 'translation'
-                    ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -242,16 +244,16 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
             )}
             <button 
               onClick={() => setActiveTab(activeTab === 'tafseer' ? 'none' : 'tafseer')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 activeTab === 'tafseer'
-                  ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {appLanguage === 'ur' ? 'تفسیر' : 'Tafseer'}
             </button>
           </div>
-          <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+          <div className="flex-1 h-px bg-white/20 dark:bg-white/10"></div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -597,13 +599,13 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-36 sm:pb-32 pb-safe">
-      <header className="sticky top-0 z-30 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md border-b-[0.5px] border-slate-200 dark:border-slate-800 app-header-safe pb-3">
+    <div className="min-h-screen pb-36 sm:pb-32 pb-safe text-slate-900 dark:text-slate-100">
+      <header className="sticky top-0 z-30 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-3 shadow-xs gpu-layer">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2">
             <button 
               onClick={onBack}
-              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
               title="Return to Quran List"
               aria-label="Back"
             >
@@ -613,7 +615,7 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
               <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-tight truncate">
                 {appLanguage === 'ur' ? `پارہ ${juz.number}` : `Juz ${juz.number}`}
               </h1>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 font-arabic leading-tight truncate">
+              <p className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight truncate">
                 {appLanguage === 'ur' && JUZ_URDU_NAMES[juz.number] ? JUZ_URDU_NAMES[juz.number] : `الجزء ${juz.number}`} • {juz.ayahs.length} {appLanguage === 'ur' ? 'آیات' : 'Ayahs'}
               </p>
             </div>
@@ -621,7 +623,7 @@ export default function JuzView({ juzId, targetAyah, targetSurah, onBack }: JuzV
 
           <div className="flex items-center gap-2">
             {/* Quick Arabic Font Size Adjuster for Older People */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-0.5 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
+            <div className="flex items-center liquid-glass rounded-full p-0.5 border border-white/40 dark:border-white/10 shadow-2xs">
               <button
                 type="button"
                 onClick={() => {

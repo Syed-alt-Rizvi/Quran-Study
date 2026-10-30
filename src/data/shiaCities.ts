@@ -5,6 +5,8 @@ export interface CityData {
   longitude: number;
   timezone?: string;
   isHolySite?: boolean;
+  state?: string;
+  displayName?: string;
 }
 
 export const POPULAR_CITIES: CityData[] = [
@@ -140,52 +142,142 @@ export async function searchCitiesOnline(query: string): Promise<CityData[]> {
   const clean = query.trim().toLowerCase();
   if (!clean || clean.length < 2) return [];
 
-  // Filter local database first
+  // Filter local database first for instant sub-millisecond response
   const localMatches = POPULAR_CITIES.filter(c => 
     c.name.toLowerCase().includes(clean) || 
     c.country.toLowerCase().includes(clean)
   );
 
-  // If we already have multiple good local matches, return them immediately
-  if (localMatches.length >= 3) {
-    return localMatches.slice(0, 8);
+  const seen = new Set<string>();
+  const results: CityData[] = [];
+
+  const addCity = (city: CityData) => {
+    const key = `${city.name.toLowerCase()}|${(city.country || '').toLowerCase()}|${city.latitude.toFixed(2)}|${city.longitude.toFixed(2)}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      results.push(city);
+    }
+  };
+
+  // Add all local matches first
+  for (const m of localMatches) {
+    addCity(m);
   }
 
-  // Fallback to free OpenStreetMap Nominatim for lesser-known towns/villages
+  // Always query global geocoding API to resolve ANY town, village, or city worldwide
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
-      { headers: { 'Accept': 'application/json' } }
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1`,
+      { headers: { 'Accept': 'application/json' }, signal: controller.signal }
     );
+    clearTimeout(timeout);
     if (res.ok) {
       const data = await res.json();
-      const onlineResults: CityData[] = data.map((item: any) => {
-        const addr = item.address || {};
-        const cityName = addr.city || addr.town || addr.village || addr.municipality || item.name || query;
-        const country = addr.country || '';
-        return {
-          name: cityName,
-          country: country,
-          latitude: parseFloat(item.lat),
-          longitude: parseFloat(item.lon)
-        };
-      });
-
-      // Combine with local matches and remove duplicates
-      const seen = new Set<string>();
-      const combined: CityData[] = [];
-      for (const item of [...localMatches, ...onlineResults]) {
-        const key = `${item.name.toLowerCase()}-${item.country.toLowerCase()}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          combined.push(item);
+      if (Array.isArray(data) && data.length > 0) {
+        for (const item of data) {
+          const addr = item.address || {};
+          const cityName = addr.village || addr.hamlet || addr.town || addr.city || addr.suburb || addr.municipality || addr.county || item.name || query;
+          const country = addr.country || '';
+          const state = addr.state || addr.province || addr.region || '';
+          const lat = parseFloat(item.lat);
+          const lon = parseFloat(item.lon);
+          if (!isNaN(lat) && !isNaN(lon)) {
+            addCity({
+              name: cityName,
+              state: state,
+              country: country,
+              latitude: Math.round(lat * 10000) / 10000,
+              longitude: Math.round(lon * 10000) / 10000,
+              displayName: item.display_name
+            });
+          }
         }
       }
-      return combined.slice(0, 8);
     }
   } catch (err) {
-    console.warn('Online city search error:', err);
+    console.warn('Nominatim search error or timeout:', err);
   }
 
-  return localMatches;
+  // If results are still sparse (e.g. fewer than 4), query Photon open geocoder
+  if (results.length < 4) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=10`,
+        { headers: { 'Accept': 'application/json' }, signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        const features = data?.features || [];
+        for (const f of features) {
+          const p = f.properties || {};
+          const coords = f.geometry?.coordinates || [];
+          const lon = coords[0];
+          const lat = coords[1];
+          const cityName = p.name || p.city || p.town || p.village || query;
+          const country = p.country || '';
+          const state = p.state || '';
+          if (typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon)) {
+            addCity({
+              name: cityName,
+              state: state,
+              country: country,
+              latitude: Math.round(lat * 10000) / 10000,
+              longitude: Math.round(lon * 10000) / 10000
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Photon geocoding fallback error:', e);
+    }
+  }
+
+  return results.slice(0, 15);
+}
+
+/**
+ * High-precision reverse geocoding to resolve any GPS coordinate to exact town/village/city and country
+ */
+export async function reverseGeocodeLocation(lat: number, lng: number): Promise<{ name: string; country: string; state?: string }> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      { headers: { 'Accept': 'application/json' }, signal: controller.signal }
+    );
+    clearTimeout(timeout);
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      const name = addr.village || addr.hamlet || addr.town || addr.city || addr.suburb || addr.municipality || addr.county || 'Detected Location';
+      const country = addr.country || '';
+      const state = addr.state || addr.province || addr.region || '';
+      return { name, country, state };
+    }
+  } catch {}
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeout);
+    if (res.ok) {
+      const data = await res.json();
+      const name = data.locality || data.city || data.principalSubdivision || 'Detected Location';
+      const country = data.countryName || '';
+      const state = data.principalSubdivision || '';
+      return { name, country, state };
+    }
+  } catch {}
+
+  return { name: 'GPS Location', country: '' };
 }

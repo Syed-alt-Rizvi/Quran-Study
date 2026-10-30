@@ -96,7 +96,7 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
       <div
         ref={(el) => registerRef(verse.index, el)}
         id={`verse-${verse.index}`}
-        className="py-3 px-4 sm:px-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex items-start gap-3 text-xs"
+        className="py-3 px-4 sm:px-5 rounded-2xl liquid-glass border border-emerald-500/35 text-slate-700 dark:text-slate-300 flex items-start gap-3 text-xs shadow-2xs"
       >
         <Compass size={15} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
         <div className="space-y-1 flex-1">
@@ -131,10 +131,10 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
     <div
       ref={(el) => registerRef(verse.index, el)}
       id={`verse-${verse.index}`}
-      className={`relative py-4 px-3.5 sm:px-5 transition-colors rounded-2xl border ${
+      className={`relative py-4 px-3.5 sm:px-5 transition-all rounded-2xl liquid-glass-card border shadow-xs ${
         isBookmarked
-          ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-500/40'
-          : 'bg-white dark:bg-slate-900 border-slate-200/70 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+          ? 'glass-emerald-fusion border-emerald-500/70 ring-1 ring-emerald-500/30 shadow-md'
+          : 'border-white/60 dark:border-white/10 hover:border-emerald-400/50'
       }`}
     >
       <div className="flex items-center justify-between mb-3">
@@ -270,7 +270,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   const displayCategory = isUrdu ? getMafatihUrduCategory(item.mainCategory) : item.mainCategory;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800 shadow-xl gpu-layer">
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] liquid-glass-dock border-t border-white/40 dark:border-white/10 shadow-2xl gpu-layer">
       <div className="max-w-4xl mx-auto flex flex-col space-y-2">
         {/* Scrubber Progress Slider */}
         <div className="flex items-center gap-3">
@@ -331,7 +331,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
             <button
               onClick={handleTogglePlay}
-              className="w-9 h-9 bg-slate-900 text-white dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 rounded-full transition-colors shrink-0 flex items-center justify-center cursor-pointer"
+              className="w-9 h-9 bg-gradient-to-tr from-emerald-600 to-teal-500 text-white hover:from-emerald-500 hover:to-teal-400 rounded-full transition-all shrink-0 flex items-center justify-center cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.4)]"
               title={isThisItemPlaying ? (isUrdu ? 'روکیں' : 'Pause') : (isUrdu ? 'سنیں' : 'Play')}
               aria-label={isThisItemPlaying ? 'Pause' : 'Play'}
             >
@@ -631,11 +631,11 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
 
   return (
     <div 
-      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200 w-full max-w-full overflow-x-hidden min-w-0`}
+      className={`min-h-screen text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200 w-full max-w-full overflow-x-hidden min-w-0`}
       dir={isUrdu ? 'rtl' : 'ltr'}
     >
       {/* Top Header Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 app-header-safe pb-3 shadow-2xs gpu-layer">
+      <header className="sticky top-0 z-40 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-3 shadow-xs gpu-layer">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-4">
           <div className="flex items-center gap-2 min-w-0">
             <button

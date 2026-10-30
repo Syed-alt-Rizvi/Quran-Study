@@ -55,6 +55,16 @@ subprojects {
                 }
             }
         }
+
+        // Fix for aarMetadataCheck directory validation in library submodules during AAR packaging
+        subproject.tasks.matching { it.name.contains("AarMetadata") || (it.name.startsWith("bundle") && it.name.endsWith("Aar")) }.configureEach { task ->
+            task.doFirst {
+                def checkDir = subproject.file("${subproject.layout.buildDirectory.asFile.get()}/intermediates/aar_metadata_check")
+                if (!checkDir.exists()) {
+                    checkDir.mkdirs()
+                }
+            }
+        }
     }
 }
 

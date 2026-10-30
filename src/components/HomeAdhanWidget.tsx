@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Compass, ChevronRight, Volume2 } from 'lucide-react';
+import { Clock, ChevronRight, Volume2 } from 'lucide-react';
 import { useSettingsStore } from '../store';
 import { getShiaPrayerTimes, ShiaPrayerTimings, getNextShiaPrayer } from '../utils/shiaPrayerTimes';
 import { shiaAdhanPlayer } from '../utils/shiaAdhanPlayer';
@@ -55,13 +55,13 @@ export default function HomeAdhanWidget({ onOpenMapAndPrayers }: HomeAdhanWidget
       className="mb-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl liquid-glass-card glass-amber-fusion border border-amber-400/40 dark:border-amber-500/20 shadow-xs hover:border-amber-400/70 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
       title="View Adhan & Prayer Times"
     >
-      {/* Left: Compass / Audio Playing icon + Next Prayer + Time + Countdown */}
+      {/* Left: Clock / Audio Playing icon + Next Prayer + Time + Countdown */}
       <div className="flex items-center gap-2.5 min-w-0">
         <div className="w-7 h-7 rounded-xl liquid-glass flex items-center justify-center border border-amber-400/40 text-amber-600 dark:text-amber-400 shrink-0 shadow-2xs">
           {isPlaying ? (
             <Volume2 size={15} className="text-amber-500 animate-pulse shrink-0" />
           ) : (
-            <Compass size={15} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <Clock size={15} className="text-amber-600 dark:text-amber-400 shrink-0" />
           )}
         </div>
 

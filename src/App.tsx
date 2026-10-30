@@ -12,6 +12,8 @@ import { Loader2 } from 'lucide-react';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import PermissionsModal from './components/PermissionsModal';
+import { isPermissionPromptNeeded } from './utils/permissionManager';
 
 // Code-split heavy views with resilient retry and chunk refresh logic
 const WelcomeScreen = lazyWithRetry(() => import('./components/WelcomeScreen'), 'WelcomeScreen');
@@ -61,6 +63,17 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasOpenedSidebar, setHasOpenedSidebar] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
+
+  // Check and prompt for essential permissions once installed/opened
+  useEffect(() => {
+    if (!showWelcome && isPermissionPromptNeeded()) {
+      const timer = setTimeout(() => {
+        setShowPermissionsModal(true);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [showWelcome]);
 
   const handleOpenSettings = () => {
     setHasOpenedSidebar(true);
@@ -365,7 +378,7 @@ export default function App() {
 
   return (
     <div 
-      className={`min-h-screen w-full relative ${isDarkMode ? 'dark' : ''} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden`}
+      className={`min-h-screen w-full relative ${isDarkMode ? 'dark' : ''} text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden`}
       style={{ fontFamily: englishFont }}
     >
       {/* Luminous Ambient Aurora Mesh for Liquid Glass Refractions */}
@@ -373,6 +386,7 @@ export default function App() {
         <div className="aurora-orb-1" />
         <div className="aurora-orb-2" />
         <div className="aurora-orb-3" />
+        <div className="aurora-orb-4" />
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col">
@@ -470,6 +484,10 @@ export default function App() {
       )}
 
       <UpdateToast />
+      <PermissionsModal 
+        isOpen={showPermissionsModal} 
+        onClose={() => setShowPermissionsModal(false)} 
+      />
       </div>
     </div>
   );

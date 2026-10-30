@@ -51,9 +51,9 @@ const CalendarDayCell = React.memo(function CalendarDayCell({
       onClick={() => onSelect(day)}
       className={`min-h-[72px] sm:min-h-[88px] p-1.5 sm:p-2 flex flex-col justify-between text-left transition-colors relative group gpu-layer ${
         isCurrentMonth
-          ? 'bg-white dark:bg-slate-900 hover:bg-emerald-50/50 dark:hover:bg-slate-800/60'
-          : 'bg-slate-50/70 dark:bg-slate-950/40 text-slate-400 dark:text-slate-600'
-      } ${isToday ? 'ring-2 ring-inset ring-emerald-500 dark:ring-emerald-400 bg-emerald-50/30 dark:bg-emerald-950/20' : ''}`}
+          ? 'bg-white/40 dark:bg-slate-900/40 hover:bg-emerald-500/15 dark:hover:bg-emerald-500/20 backdrop-blur-xs'
+          : 'bg-white/10 dark:bg-slate-950/20 text-slate-400 dark:text-slate-600'
+      } ${isToday ? 'ring-2 ring-inset ring-emerald-500 dark:ring-emerald-400 bg-emerald-500/20 dark:bg-emerald-950/40' : ''}`}
     >
       {/* Top Bar: Gregorian Day & Today Dot */}
       <div className="flex items-center justify-between w-full">
@@ -426,16 +426,16 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
       {/* View Switcher, Filter & Search Controls */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 liquid-glass rounded-2xl p-3 border border-white/40 dark:border-white/10 shadow-xs">
-        <div className="flex items-center gap-1 liquid-glass p-1 rounded-xl shrink-0 border border-white/30 dark:border-white/10">
+        <div className="flex items-center gap-1.5 liquid-glass p-1.5 rounded-2xl shrink-0 border border-white/40 dark:border-white/10 shadow-inner">
           <button
             onClick={() => {
               hapticImpact(ImpactStyle.Light);
               setViewMode('month');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'month'
-                ? 'liquid-glass text-emerald-800 dark:text-emerald-300 shadow-xs border border-white/60 dark:border-white/20'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-400'
             }`}
           >
             <CalendarDays size={14} />
@@ -447,10 +447,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               hapticImpact(ImpactStyle.Light);
               setViewMode('list');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'list'
-                ? 'liquid-glass text-emerald-800 dark:text-emerald-300 shadow-xs border border-white/60 dark:border-white/20'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-400'
             }`}
           >
             <ListFilter size={14} />
@@ -482,9 +482,9 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
       {/* MONTH GRID VIEW */}
       {viewMode === 'month' && (
-        <section className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+        <section className="liquid-glass-card rounded-3xl border border-white/50 dark:border-white/10 shadow-md overflow-hidden backdrop-blur-xl">
           {/* Month Header Navigation */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-200/80 dark:border-slate-800">
+          <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10">
             <div className="space-y-0.5">
               <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
                 {gregorianMonthName}
@@ -497,14 +497,14 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handlePrevMonth}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-2 rounded-xl liquid-glass border border-white/30 dark:border-white/10 hover:border-emerald-500/40 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
                 title="Previous Month"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={handleNextMonth}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-2 rounded-xl liquid-glass border border-white/30 dark:border-white/10 hover:border-emerald-500/40 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
                 title="Next Month"
               >
                 <ChevronRight size={16} />
@@ -513,7 +513,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
           </div>
 
           {/* Weekday Legend */}
-          <div className="grid grid-cols-7 text-center py-2.5 bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200/60 dark:border-slate-800/80 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          <div className="grid grid-cols-7 text-center py-2.5 liquid-glass border-b border-white/20 dark:border-white/10 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             <span>Sun</span>
             <span>Mon</span>
             <span>Tue</span>
@@ -524,7 +524,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
           </div>
 
           {/* Days Grid */}
-          <div className="grid grid-cols-7 gap-px bg-slate-200/70 dark:bg-slate-800 gpu-layer">
+          <div className="grid grid-cols-7 gap-px bg-white/20 dark:bg-white/5 gpu-layer">
             {daysInGrid.map((day, idx) => (
               <CalendarDayCell
                 key={`cal-grid-${day.gregorianYear}-${day.gregorianMonth}-${day.gregorianDay}-${idx}`}
@@ -537,7 +537,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
           </div>
 
           {/* Grid Footer Legend */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 liquid-glass border-t border-white/20 dark:border-white/10 text-[11px] text-slate-600 dark:text-slate-400">
             <div className="flex flex-wrap items-center gap-3">
               <span className="flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
@@ -582,10 +582,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                     hapticImpact(ImpactStyle.Light);
                     setFilterType(f.id as EventFilter);
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     filterType === f.id
-                      ? 'bg-emerald-700 text-white shadow-xs'
-                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'glass-slab-tab-active font-bold'
+                      : 'glass-slab-tab text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {f.label}
@@ -594,17 +594,17 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
             </div>
 
             {/* Sort Order Selector */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0 self-start sm:self-auto">
+            <div className="flex items-center gap-1 liquid-glass p-1 rounded-xl shrink-0 self-start sm:self-auto border border-white/40 dark:border-white/10 shadow-inner">
               <span className="text-[10px] uppercase font-bold text-slate-400 px-1.5">Sort:</span>
               <button
                 onClick={() => {
                   hapticImpact(ImpactStyle.Light);
                   setEventSortMode('upcoming');
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   eventSortMode === 'upcoming'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'glass-slab-tab-active font-bold'
+                    : 'glass-slab-tab text-slate-500 dark:text-slate-400'
                 }`}
                 title="Sort chronologically starting from today"
               >
@@ -615,10 +615,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   hapticImpact(ImpactStyle.Light);
                   setEventSortMode('calendar');
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   eventSortMode === 'calendar'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'glass-slab-tab-active font-bold'
+                    : 'glass-slab-tab text-slate-500 dark:text-slate-400'
                 }`}
                 title="Sort by Islamic month 1 to 12"
               >
@@ -629,10 +629,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   hapticImpact(ImpactStyle.Light);
                   setEventSortMode('alphabetical');
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   eventSortMode === 'alphabetical'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'glass-slab-tab-active font-bold'
+                    : 'glass-slab-tab text-slate-500 dark:text-slate-400'
                 }`}
                 title="Sort alphabetically by event name"
               >
@@ -665,7 +665,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                       hapticImpact(ImpactStyle.Light);
                       setSelectedEvent(ev);
                     }}
-                    className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between group"
+                    className="p-4 rounded-3xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-emerald-500/50 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
@@ -793,9 +793,9 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
 
       {/* DAY INSPECTION SHEET / MODAL */}
       {selectedDay && !selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-4">
+          <div className="liquid-glass-dock w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-white/60 dark:border-white/15 max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <div className="p-4 border-b border-white/20 dark:border-white/10 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
                   {selectedDay.date.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
@@ -806,7 +806,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               </div>
               <button
                 onClick={() => setSelectedDay(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-white/40 dark:hover:bg-slate-800/40 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -824,10 +824,10 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   <div
                     key={`day-ev-${ev.id}-${evIdx}`}
                     onClick={() => setSelectedEvent(ev)}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/60 cursor-pointer transition-all"
+                    className="p-4 rounded-2xl liquid-glass border border-white/40 dark:border-white/10 hover:border-emerald-500/60 cursor-pointer transition-all shadow-2xs"
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded liquid-glass border border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
                         {ev.type}
                       </span>
                       {ev.isFastingRecommended && (
@@ -862,9 +862,9 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
       {/* FULL EVENT DETAIL MODAL / SHEET */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md p-0 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="liquid-glass-dock w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border border-white/60 dark:border-white/15 max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="relative p-5 sm:p-6 bg-gradient-to-r from-emerald-900 to-teal-950 text-white">
+            <div className="relative p-5 sm:p-6 bg-gradient-to-r from-emerald-900 to-teal-950 text-white border-b border-white/10">
               <button
                 onClick={() => setSelectedEvent(null)}
                 className="absolute top-4 right-4 p-2 rounded-xl bg-black/30 hover:bg-black/50 text-white transition-colors"

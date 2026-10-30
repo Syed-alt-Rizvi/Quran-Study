@@ -144,14 +144,14 @@ jobs:
         working-directory: ./android
         run: |
           echo "Building debug APK for direct phone installation..."
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Build Google Play Store Bundle (bundleRelease)
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target != 'direct_install_apk' }}
         working-directory: ./android
         run: |
           echo "Building release bundle for Google Play Store..."
-          ./gradlew bundleRelease --no-daemon --stacktrace
+          ./gradlew :app:bundleRelease --no-daemon --stacktrace
 
       - name: Collect and Verify Distribution Artifacts
         run: |

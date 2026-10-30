@@ -9,7 +9,7 @@ import {
   ZoomIn, ZoomOut, Palette, Sliders, KeyRound,
   Smartphone, Vibrate, ExternalLink,
   LogOut, RefreshCw, Calendar,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Share2, Bluetooth, Wifi
 } from 'lucide-react';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
@@ -63,9 +63,11 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
   const [tempName, setTempName] = useState(userName || '');
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const upiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const emailTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shareTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [privacyModal, setPrivacyModal] = useState<{
     isOpen: boolean;
@@ -189,6 +191,40 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     hapticSelection();
     if (emailTimeoutRef.current) clearTimeout(emailTimeoutRef.current);
     emailTimeoutRef.current = setTimeout(() => setCopiedEmail(false), 2500);
+  };
+
+  const handleShareApp = async () => {
+    hapticImpact(ImpactStyle.Medium);
+    const shareData = {
+      title: 'Shia Markaz - Holy Quran, Mafatih & Adhan',
+      text: 'Install Shia Markaz: Complete Holy Quran with Shia Tafseer (Namoona & Al-Kauthar), 1,307 Mafatih al-Jinan supplications & high-precision Shia Adhan prayer times.',
+      url: window.location.origin,
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData);
+        setShareSuccess(true);
+        if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+        shareTimeoutRef.current = setTimeout(() => setShareSuccess(false), 3000);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          handleCopyAppShare();
+        }
+      }
+    } else {
+      handleCopyAppShare();
+    }
+  };
+
+  const handleCopyAppShare = () => {
+    try {
+      const textToCopy = `Shia Markaz - Complete Holy Quran with Shia Tafseer, 1,307 authentic Mafatih al-Jinan supplications & Adhan: ${window.location.origin}`;
+      navigator.clipboard.writeText(textToCopy);
+      setShareSuccess(true);
+      if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+      shareTimeoutRef.current = setTimeout(() => setShareSuccess(false), 3000);
+    } catch {}
   };
 
   const handleToggleReminder = async () => {
@@ -1452,6 +1488,78 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
 
                 {/* Download Web App (Android / iOS) */}
                 <PWAInstallButton variant="full" />
+
+                {/* Direct App Sharing via Android Share Sheet (Bluetooth, Hotspot, Quick Share, Third-party apps) */}
+                <div className="p-4 rounded-2xl liquid-glass-card glass-emerald-fusion border border-emerald-500/40 dark:border-emerald-400/20 shadow-xs space-y-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                      <Share2 size={16} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        Share Shia Markaz App
+                      </h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Transfer via Bluetooth, Hotspot, Quick Share, WhatsApp, or any app
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-600 dark:text-slate-300">
+                    <span className="px-2 py-0.5 rounded-lg liquid-glass border border-white/40 dark:border-white/10 flex items-center gap-1">
+                      <Bluetooth size={11} className="text-sky-600 dark:text-sky-400" /> Bluetooth
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg liquid-glass border border-white/40 dark:border-white/10 flex items-center gap-1">
+                      <Wifi size={11} className="text-emerald-600 dark:text-emerald-400" /> Hotspot / Quick Share
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg liquid-glass border border-white/40 dark:border-white/10">
+                      WhatsApp &amp; Telegram
+                    </span>
+                  </div>
+
+                  <button
+                    id="sidebar-share-app-btn"
+                    type="button"
+                    onClick={handleShareApp}
+                    className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md border border-white/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+                  >
+                    {shareSuccess ? (
+                      <>
+                        <Check size={15} className="text-emerald-200" />
+                        <span>Share Sheet Opened / Link Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 size={15} />
+                        <span>Share App via Bluetooth / Hotspot / Social</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Device Hardware & Android Permissions Hub */}
+                <div className="p-3 rounded-2xl liquid-glass border border-white/35 dark:border-white/10 flex items-center justify-between gap-2 shadow-2xs">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Device Permissions &amp; Hardware</span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                      GPS Location (Adhan &amp; Qibla) • Notifications • Background Alarms
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      hapticImpact(ImpactStyle.Light);
+                      const { requestAppPermissions } = await import('../utils/permissionManager');
+                      await requestAppPermissions();
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg liquid-glass border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-500/10 transition-colors shrink-0 cursor-pointer"
+                  >
+                    Recheck
+                  </button>
+                </div>
 
                 {/* Legal, Privacy & Compliance */}
                 <div className="rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card p-4 shadow-xs space-y-3">

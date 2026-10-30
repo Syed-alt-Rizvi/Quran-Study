@@ -12,7 +12,9 @@ export const TRANSLATIONS = {
     tab_mafatih: "Mafatih",
     tab_adhan: "Adhan",
     tab_calendar: "Calendar",
+    tab_qibla: "Qibla",
     tab_science: "Science",
+    qibla_finder: "Qibla Finder",
     tab_discuss: "Community",
     tab_settings: "Settings",
 
@@ -195,7 +197,9 @@ export const TRANSLATIONS = {
     tab_mafatih: "مفاتیح",
     tab_adhan: "اذان",
     tab_calendar: "تقویم",
+    tab_qibla: "قبلہ",
     tab_science: "علوم",
+    qibla_finder: "قبلہ نما",
     tab_discuss: "مجلس",
     tab_settings: "ترتیبات",
 

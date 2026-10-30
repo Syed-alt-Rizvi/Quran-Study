@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { fetchSurahs, SurahMeta, prefetchSurah, prefetchJuz } from '../api';
 import staticSurahs from '../surahList.json';
 import { 
-  Search, BookOpen, Settings, Microscope, ArrowRight, 
+  Search, BookOpen, Settings, ArrowRight, 
   MessageCircle, AlertTriangle, KeyRound, Edit3, Check, X,
-  LogOut, Calendar as CalendarIcon, Compass
+  LogOut, Calendar as CalendarIcon, Compass, Clock
 } from "lucide-react";
 import GlobalDiscussions from "./GlobalDiscussions";
-import ImamScienceFeed from "./ImamScienceFeed";
+import QiblaFinder from "./QiblaFinder";
 import MafatihView from "./MafatihView";
 import CalendarView from "./CalendarView";
 import AdhanMapScreen from "./AdhanMapScreen";
@@ -254,7 +254,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               {activeTab === 'quran' && t('tab_quran', appLanguage)}
               {activeTab === 'mafatih' && t('tab_mafatih', appLanguage)}
               {activeTab === 'calendar' && t('tab_calendar', appLanguage)}
-              {activeTab === 'science' && t('tab_science', appLanguage)}
+              {activeTab === 'qibla' && t('tab_qibla', appLanguage)}
               {activeTab === 'discuss' && t('tab_discuss', appLanguage)}
             </span>
           </div>
@@ -376,8 +376,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           <CalendarView onSelectMafatihItem={onSelectMafatihItem} onOpenSettings={onOpenSettings} />
         ) : activeTab === 'adhan' ? (
           <AdhanMapScreen onBack={() => setActiveTab('quran')} />
-        ) : activeTab === 'science' ? (
-          <ImamScienceFeed onSelectSurah={onSelectSurah} />
+        ) : activeTab === 'qibla' ? (
+          <QiblaFinder onBack={() => setActiveTab('quran')} />
         ) : activeTab === 'discuss' ? (
           <GlobalDiscussions />
         ) : (
@@ -407,23 +407,23 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
             {/* Sub-Switch: Surahs (114) vs Juz (30) */}
             <div className="flex items-center justify-center mb-3">
-              <div className="flex gap-1.5 p-1 liquid-glass rounded-2xl w-full sm:max-w-xs border border-white/30 dark:border-white/10 shadow-inner">
+              <div className="flex gap-2 p-1.5 liquid-glass rounded-2xl w-full sm:max-w-xs border border-white/50 dark:border-white/15 shadow-inner">
                 <button
                   onClick={() => { hapticImpact(ImpactStyle.Light); setQuranMode('surah'); }}
-                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-xl transition-all ${
+                  className={`flex-1 py-1.5 sm:py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
                     quranMode === 'surah'
-                      ? 'liquid-glass text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-white/60 dark:border-white/20'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'glass-slab-tab-active font-bold'
+                      : 'glass-slab-tab text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {t('quran_114_surahs', appLanguage)}
                 </button>
                 <button
                   onClick={() => { hapticImpact(ImpactStyle.Light); setQuranMode('juz'); }}
-                  className={`flex-1 py-1 sm:py-1.5 text-xs font-semibold rounded-xl transition-all ${
+                  className={`flex-1 py-1.5 sm:py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
                     quranMode === 'juz'
-                      ? 'liquid-glass text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-white/60 dark:border-white/20'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'glass-slab-tab-active font-bold'
+                      : 'glass-slab-tab text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {t('quran_30_juz', appLanguage)}
@@ -438,7 +438,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 ))}
               </div>
             ) : error && surahs.length === 0 ? (
-              <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs max-w-md mx-auto my-4">
+              <div className="p-8 text-center liquid-glass-card border border-white/40 dark:border-white/10 rounded-2xl shadow-xs max-w-md mx-auto my-4">
                 <AlertTriangle size={24} className="text-rose-500 mx-auto mb-2" />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1">Failed to Load</h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">{error}</p>
@@ -585,14 +585,14 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
       </main>
 
       {/* Floating Liquid Glass Dock - VisionOS Native Mobile Touch Bar */}
-      <nav className="fixed bottom-2.5 sm:bottom-4 inset-x-2.5 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-lg w-auto sm:w-full z-40 liquid-glass-dock rounded-3xl p-1.5 sm:p-2 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] gpu-layer">
-        <div className="grid grid-cols-7 gap-1 items-center">
+      <nav className="fixed bottom-2.5 sm:bottom-4 inset-x-2.5 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-lg w-auto sm:w-full z-40 liquid-glass-dock rounded-3xl p-1.5 sm:p-2 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.65)] gpu-layer">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5 items-center">
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('quran'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'quran'
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
             <BookOpen size={17} className="shrink-0" />
@@ -601,10 +601,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('mafatih'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'mafatih'
-                ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold ring-1 ring-sky-500/40 shadow-[0_0_12px_rgba(14,165,233,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
             <KeyRound size={17} className="shrink-0" />
@@ -613,22 +613,22 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('adhan'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'adhan'
-                ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold ring-1 ring-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <Compass size={17} className="shrink-0" />
+            <Clock size={17} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_adhan', appLanguage)}</span>
           </button>
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('calendar'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'calendar'
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
             <CalendarIcon size={17} className="shrink-0" />
@@ -636,23 +636,23 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           </button>
 
           <button
-            onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('science'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
-              activeTab === 'science'
-                ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold ring-1 ring-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+            onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('qibla'); }}
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
+              activeTab === 'qibla'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <Microscope size={17} className="shrink-0" />
-            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_science', appLanguage)}</span>
+            <Compass size={17} className="shrink-0" />
+            <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_qibla', appLanguage)}</span>
           </button>
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('discuss'); }}
-            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl transition-all duration-200 min-w-0 ${
+            className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'discuss'
-                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold ring-1 ring-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.3)]'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-800/30'
+                ? 'glass-slab-tab-active font-bold'
+                : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
             <MessageCircle size={17} className="shrink-0" />
@@ -661,7 +661,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); onOpenSettings(); }}
-            className="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all min-w-0"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl glass-slab-tab text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all min-w-0 cursor-pointer"
           >
             <Settings size={17} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_settings', appLanguage)}</span>

@@ -11,7 +11,7 @@ import { shiaAdhanPlayer } from '../utils/shiaAdhanPlayer';
 import { useSettingsStore } from '../store';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
-import { POPULAR_CITIES, CityData, searchCitiesOnline } from '../data/shiaCities';
+import { POPULAR_CITIES, CityData, searchCitiesOnline, reverseGeocodeLocation } from '../data/shiaCities';
 
 interface AdhanMapScreenProps {
   onBack?: () => void;
@@ -146,27 +146,13 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        let detectedName = 'Current Location';
-        let detectedCountry = '';
-
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-          if (res.ok) {
-            const data = await res.json();
-            const addr = data.address || {};
-            detectedName = addr.city || addr.town || addr.village || addr.county || 'Current Location';
-            detectedCountry = addr.country || '';
-          }
-        } catch {}
+        const detected = await reverseGeocodeLocation(lat, lng);
 
         setUserLocation({
-          name: detectedName,
-          country: detectedCountry,
-          latitude: lat,
-          longitude: lng
+          name: detected.name,
+          country: detected.country,
+          latitude: Math.round(lat * 10000) / 10000,
+          longitude: Math.round(lng * 10000) / 10000
         });
         setLocatingGPS(false);
         setIsSearching(false);
@@ -191,7 +177,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
   }, [userLocation.latitude, userLocation.longitude]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-28 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen pb-28 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Top Header */}
       <div className="sticky top-0 z-20 liquid-glass border-b border-white/30 dark:border-white/10 px-4 py-3 shadow-xs">
         <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
@@ -450,7 +436,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
             </button>
           </div>
 
-          {/* Three Daily Adhan Toggles */}
+          {/* Three Daily Adhan Toggles as Firm Glass Slabs */}
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => {
@@ -458,17 +444,17 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 shiaAdhanPlayer.unlockAudio();
                 updateAdhanSettings({ autoPlayFajr: adhanSettings.autoPlayFajr === false });
               }}
-              className={`p-2 rounded-xl border text-center transition-all ${
+              className={`p-2.5 rounded-2xl text-center transition-all cursor-pointer ${
                 adhanSettings.autoPlayFajr !== false
-                  ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-medium'
-                  : 'border-slate-200 dark:border-slate-800 text-slate-400'
+                  ? 'glass-slab-tab-active font-bold'
+                  : 'glass-slab-tab text-slate-500 dark:text-slate-400'
               }`}
             >
-              <div className="text-xs font-semibold flex items-center justify-center gap-1">
-                {adhanSettings.autoPlayFajr !== false ? <Bell size={12} /> : <BellOff size={12} />}
+              <div className="text-xs font-bold flex items-center justify-center gap-1">
+                {adhanSettings.autoPlayFajr !== false ? <Bell size={12} className="text-emerald-500 dark:text-emerald-300" /> : <BellOff size={12} />}
                 <span>Fajr</span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5">{timings?.fajr ? format12Hour(timings.fajr) : '--:--'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{timings?.fajr ? format12Hour(timings.fajr) : '--:--'}</p>
             </button>
 
             <button
@@ -477,17 +463,17 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 shiaAdhanPlayer.unlockAudio();
                 updateAdhanSettings({ autoPlayDhuhr: adhanSettings.autoPlayDhuhr === false });
               }}
-              className={`p-2 rounded-xl border text-center transition-all ${
+              className={`p-2.5 rounded-2xl text-center transition-all cursor-pointer ${
                 adhanSettings.autoPlayDhuhr !== false
-                  ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-medium'
-                  : 'border-slate-200 dark:border-slate-800 text-slate-400'
+                  ? 'glass-slab-tab-active font-bold'
+                  : 'glass-slab-tab text-slate-500 dark:text-slate-400'
               }`}
             >
-              <div className="text-xs font-semibold flex items-center justify-center gap-1">
-                {adhanSettings.autoPlayDhuhr !== false ? <Bell size={12} /> : <BellOff size={12} />}
+              <div className="text-xs font-bold flex items-center justify-center gap-1">
+                {adhanSettings.autoPlayDhuhr !== false ? <Bell size={12} className="text-emerald-500 dark:text-emerald-300" /> : <BellOff size={12} />}
                 <span>Dhuhr</span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5">{timings?.dhuhr ? format12Hour(timings.dhuhr) : '--:--'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{timings?.dhuhr ? format12Hour(timings.dhuhr) : '--:--'}</p>
             </button>
 
             <button
@@ -496,17 +482,17 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 shiaAdhanPlayer.unlockAudio();
                 updateAdhanSettings({ autoPlayMaghrib: adhanSettings.autoPlayMaghrib === false });
               }}
-              className={`p-2 rounded-xl border text-center transition-all ${
+              className={`p-2.5 rounded-2xl text-center transition-all cursor-pointer ${
                 adhanSettings.autoPlayMaghrib !== false
-                  ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-medium'
-                  : 'border-slate-200 dark:border-slate-800 text-slate-400'
+                  ? 'glass-slab-tab-active font-bold'
+                  : 'glass-slab-tab text-slate-500 dark:text-slate-400'
               }`}
             >
-              <div className="text-xs font-semibold flex items-center justify-center gap-1">
-                {adhanSettings.autoPlayMaghrib !== false ? <Bell size={12} /> : <BellOff size={12} />}
+              <div className="text-xs font-bold flex items-center justify-center gap-1">
+                {adhanSettings.autoPlayMaghrib !== false ? <Bell size={12} className="text-emerald-500 dark:text-emerald-300" /> : <BellOff size={12} />}
                 <span>Maghrib</span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5">{timings?.maghrib ? format12Hour(timings.maghrib) : '--:--'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{timings?.maghrib ? format12Hour(timings.maghrib) : '--:--'}</p>
             </button>
           </div>
 

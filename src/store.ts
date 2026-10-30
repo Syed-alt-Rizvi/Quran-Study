@@ -20,7 +20,7 @@ interface HabitStats {
   dailyTafseerRead: Record<string, number>;
 }
 
-export type AppTab = 'quran' | 'mafatih' | 'calendar' | 'adhan' | 'science' | 'discuss';
+export type AppTab = 'quran' | 'mafatih' | 'calendar' | 'adhan' | 'qibla' | 'discuss';
 
 export interface UserLocation {
   name: string;
@@ -81,8 +81,10 @@ interface SettingsState {
   // Shia Adhan & Global Map Location Settings
   userLocation: UserLocation;
   adhanSettings: AdhanSettings;
+  qiblaCalibrationOffset: number;
   setUserLocation: (loc: UserLocation) => void;
   updateAdhanSettings: (partial: Partial<AdhanSettings>) => void;
+  setQiblaCalibrationOffset: (offset: number) => void;
 
   appLanguage: 'en' | 'ur';
   setAppLanguage: (lang: 'en' | 'ur') => void;
@@ -193,6 +195,7 @@ export const useSettingsStore = create<SettingsState>()(
         volume: 0.9,
         notificationsEnabled: true
       },
+      qiblaCalibrationOffset: 0,
       setUserLocation: (loc) => set({ userLocation: loc }),
       updateAdhanSettings: (partial) => set((state) => ({
         adhanSettings: {
@@ -200,6 +203,7 @@ export const useSettingsStore = create<SettingsState>()(
           ...partial
         }
       })),
+      setQiblaCalibrationOffset: (offset: number) => set({ qiblaCalibrationOffset: offset }),
       appLanguage: 'en',
       setAppLanguage: (lang: 'en' | 'ur') => set((state) => {
         return {
@@ -483,6 +487,15 @@ export const useSettingsStore = create<SettingsState>()(
                 } catch {}
               }
             } catch {}
+          }
+
+          if (parsed && parsed.state) {
+            if ((parsed.state.currentAppTab as string) === 'science') {
+              parsed.state.currentAppTab = 'qibla';
+            }
+            if ((parsed.state.defaultAppTab as string) === 'science') {
+              parsed.state.defaultAppTab = 'qibla';
+            }
           }
 
           return parsed;
