@@ -104,37 +104,49 @@ export function estimateMagneticDeclination(latitude: number, longitude: number)
 }
 
 /**
- * W3C Device Orientation Tilt-Compensated Heading
- * Projects the top-of-device vector onto the horizontal plane using intrinsic Z-X-Y Euler rotation angles (alpha, beta, gamma).
- * Prevents compass distortion when the device is held naturally at a tilted angle (30° to 70°).
+ * Pure 2D Planar Compass Heading Extraction
+ * Ensures only 2D horizontal yaw motion of the phone affects the compass heading.
+ * Discards 3D pitch/roll distortion (beta and gamma) for rock-solid, precise Qibla tracking.
  */
-export function calculateTiltCompensatedHeading(
-  alpha: number,
-  beta: number | null,
-  gamma: number | null
-): number {
-  const alphaRad = toRadians(alpha);
-  const betaRad = toRadians(beta ?? 0);
-  const gammaRad = toRadians(gamma ?? 0);
+/**
+ * Safely get device screen orientation angle in degrees (0, 90, 180, 270)
+ */
+export function getScreenAngle(): number {
+  if (typeof window === 'undefined') return 0;
+  if (window.screen?.orientation && typeof window.screen.orientation.angle === 'number') {
+    return window.screen.orientation.angle;
+  }
+  if (typeof (window as any).orientation === 'number') {
+    return (window as any).orientation;
+  }
+  return 0;
+}
 
-  const cA = Math.cos(alphaRad);
-  const sA = Math.sin(alphaRad);
-  const cB = Math.cos(betaRad);
-  const sB = Math.sin(betaRad);
-  const cG = Math.cos(gammaRad);
-  const sG = Math.sin(gammaRad);
-
-  // Projection of device Y-axis (top of device) onto the Earth horizontal plane
-  const rA = -cA * sG - sA * sB * cG;
-  const rB = -sA * sG + cA * sB * cG;
-
-  // When lying completely flat (beta near 0, gamma near 0), rA and rB approach 0
-  if (Math.hypot(rA, rB) < 1e-4) {
-    return (360 - alpha) % 360;
+/**
+ * Pure 2D Planar Compass Heading Extraction
+ * Ensures only 2D horizontal yaw motion of the phone affects the compass heading.
+ * Discards 3D pitch/roll distortion (beta and gamma) for rock-solid, precise Qibla tracking.
+ */
+export function extract2DCompassHeading(
+  alpha: number | null | undefined,
+  webkitCompassHeading?: number | null | undefined,
+  screenAngle: number = 0
+): number | null {
+  // 1. iOS Safari provides webkitCompassHeading directly relative to True/Magnetic North in 2D
+  // (Screen orientation angle is already factored in natively by iOS WebKit)
+  if (webkitCompassHeading !== undefined && webkitCompassHeading !== null && !isNaN(webkitCompassHeading)) {
+    return (webkitCompassHeading + 360) % 360;
   }
 
-  const deg = toDegrees(Math.atan2(rA, rB));
-  return (deg + 360) % 360;
+  // 2. Android / W3C: alpha is 2D planar rotation around the vertical earth axis
+  // e.alpha increases counter-clockwise, so (360 - alpha) is clockwise compass heading.
+  // Add screenAngle to correctly map physical sensor axes when rotated (e.g. landscape mode).
+  if (alpha !== null && alpha !== undefined && !isNaN(alpha)) {
+    const rawHeading = ((360 - alpha) % 360 + 360) % 360;
+    return (rawHeading + screenAngle + 360) % 360;
+  }
+
+  return null;
 }
 
 /**

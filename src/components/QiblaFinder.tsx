@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Compass, 
-  MapPin, 
   Navigation, 
   CheckCircle2, 
   Crosshair, 
@@ -9,14 +8,19 @@ import {
   Check, 
   X, 
   Loader2,
-  ShieldCheck,
-  Sliders
+  Sliders,
+  AlertCircle
 } from 'lucide-react';
 import { useSettingsStore } from '../store';
 import { 
   calculateGeodesicQibla, 
   estimateMagneticDeclination, 
-  calculateTiltCompensatedHeading,
+  extract2DCompassHeading,
+  getScreenAngle,
+  degreesToUnitVector,
+  unitVectorToDegrees,
+  lowPassFilterVector,
+  Vector2D,
   QiblaResult 
 } from '../utils/qiblaApi';
 import { POPULAR_CITIES, CityData, searchCitiesOnline, reverseGeocodeLocation } from '../data/shiaCities';
@@ -39,52 +43,276 @@ const QUICK_SHRINES: CityData[] = [
   { name: 'Samarra', country: 'Iraq', latitude: 34.1983, longitude: 43.8742, timezone: 'Asia/Baghdad', isHolySite: true },
 ];
 
+export interface LiveGPSData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude: number | null;
+  speed: number | null;
+  timestamp: number;
+}
+
 export default function QiblaFinder({ onBack }: QiblaFinderProps) {
-  const { userLocation, setUserLocation, appLanguage } = useSettingsStore();
+  const { 
+    userLocation, 
+    setUserLocation, 
+    appLanguage,
+    qiblaCalibrationOffset,
+    setQiblaCalibrationOffset
+  } = useSettingsStore();
   const isUrdu = appLanguage === 'ur';
 
+  // Live Phone GPS Hardware Pipeline
+  const [liveGPS, setLiveGPS] = useState<LiveGPSData | null>(null);
+  const [isLiveGPSActive, setIsLiveGPSActive] = useState<boolean>(true);
+  const [gpsPermissionState, setGpsPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'checking'>('checking');
+  const [gpsErrorMsg, setGpsErrorMsg] = useState<string | null>(null);
+  const [isAcquiringGPS, setIsAcquiringGPS] = useState<boolean>(false);
+  const watchIdRef = useRef<number | null>(null);
+
+  // Active Coordinates for True Qibla Determination:
+  // Uses High-Accuracy Live Satellite GPS when enabled & locked, otherwise falls back gracefully to city preset
+  const activeCoordinates = useMemo(() => {
+    if (isLiveGPSActive && liveGPS) {
+      return {
+        latitude: liveGPS.latitude,
+        longitude: liveGPS.longitude,
+        accuracy: liveGPS.accuracy,
+        isGPS: true,
+        displayName: userLocation.name || 'Live GPS Position',
+        displayCountry: userLocation.country || ''
+      };
+    }
+    return {
+      latitude: userLocation.latitude,
+      longitude: userLocation.longitude,
+      accuracy: null,
+      isGPS: false,
+      displayName: userLocation.name,
+      displayCountry: userLocation.country
+    };
+  }, [isLiveGPSActive, liveGPS, userLocation]);
+
   // 1. Pure Local Spherical Geodesy (Pillars App Great-Circle Azimuth to Mecca)
+  // Evaluated directly against the user's live physical GPS coordinates
   const qiblaData: QiblaResult = useMemo(() => {
-    const geo = calculateGeodesicQibla(userLocation.latitude, userLocation.longitude);
+    const geo = calculateGeodesicQibla(activeCoordinates.latitude, activeCoordinates.longitude);
     return {
       direction: geo.direction,
       compassBearing: geo.compassBearing,
       distanceKm: geo.distanceKm,
-      location: { latitude: userLocation.latitude, longitude: userLocation.longitude },
+      location: { latitude: activeCoordinates.latitude, longitude: activeCoordinates.longitude },
       source: 'geodesic'
     };
-  }, [userLocation.latitude, userLocation.longitude]);
+  }, [activeCoordinates.latitude, activeCoordinates.longitude]);
 
-  // Local magnetic declination for true north alignment
+  // Local magnetic declination for true north alignment from exact active coordinates
   const magneticDeclination = useMemo(() => {
-    return estimateMagneticDeclination(userLocation.latitude, userLocation.longitude);
-  }, [userLocation.latitude, userLocation.longitude]);
+    return estimateMagneticDeclination(activeCoordinates.latitude, activeCoordinates.longitude);
+  }, [activeCoordinates.latitude, activeCoordinates.longitude]);
 
   // 2. High-Performance Decoupled Hardware Sensor & Direct GPU Transform State
   // Telemetry state is only updated on whole degree changes to prevent 60 FPS React re-render lag
   const [normalizedFacing, setNormalizedFacing] = useState<number>(0);
   const [isAligned, setIsAligned] = useState<boolean>(false);
   const [hasCompassSensor, setHasCompassSensor] = useState<boolean>(false);
-  const [needsSensorPermission, setNeedsSensorPermission] = useState<boolean>(false);
-  const [sensorPermissionGranted, setSensorPermissionGranted] = useState<boolean>(false);
   const [manualHeading, setManualHeading] = useState<number | null>(null);
 
   // Direct DOM references for 60/120 FPS GPU transforms (Zero React Render Overhead)
   const dialRef = useRef<HTMLDivElement>(null);
   const targetHeadingRef = useRef<number>(0);
-  const currentAngleRef = useRef<number>(0);
+  const smoothedVectorRef = useRef<Vector2D>({ x: 0, y: 1 });
+  const renderedAngleRef = useRef<number>(0);
   const rafIdRef = useRef<number | null>(null);
   const hasAbsoluteRef = useRef<boolean>(false);
   const lastFacingRef = useRef<number>(0);
   const prevAlignedRef = useRef<boolean>(false);
+  const offsetRef = useRef<number>(qiblaCalibrationOffset);
+  offsetRef.current = qiblaCalibrationOffset;
 
   // 3. Search Bar State
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CityData[]>(() => POPULAR_CITIES.slice(0, 10));
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
-  const [locatingGPS, setLocatingGPS] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // High-Accuracy Continuous Live GPS Watcher
+  const startLiveGPSWatch = useCallback(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGpsPermissionState('denied');
+      setGpsErrorMsg('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
+    setIsAcquiringGPS(true);
+    setGpsErrorMsg(null);
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      async (pos) => {
+        const { latitude, longitude, accuracy, altitude, speed } = pos.coords;
+        setLiveGPS({
+          latitude,
+          longitude,
+          accuracy,
+          altitude: altitude ?? null,
+          speed: speed ?? null,
+          timestamp: pos.timestamp
+        });
+        setIsLiveGPSActive(true);
+        setIsAcquiringGPS(false);
+        setGpsPermissionState('granted');
+        setGpsErrorMsg(null);
+
+        // Keep local reverse-geocoded place name synced
+        try {
+          const detected = await reverseGeocodeLocation(latitude, longitude);
+          if (detected && detected.name) {
+            setUserLocation({
+              name: detected.name,
+              country: detected.country,
+              latitude: Math.round(latitude * 10000) / 10000,
+              longitude: Math.round(longitude * 10000) / 10000
+            });
+          }
+        } catch (e) {
+          console.warn('Reverse geocode error:', e);
+        }
+      },
+      (err) => {
+        setIsAcquiringGPS(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGpsPermissionState('denied');
+          setGpsErrorMsg('Location permission was denied. Tap "Allow GPS" or check browser settings.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGpsErrorMsg('GPS satellite signal unavailable. Using city preset.');
+        } else if (err.code === err.TIMEOUT) {
+          setGpsErrorMsg('GPS request timed out. Retrying...');
+        }
+      },
+      {
+        enableHighAccuracy: true, // Hardware GPS satellites
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  }, [setUserLocation]);
+
+  // Request explicit GPS permission on tap
+  const handleRequestGPSPermission = useCallback(() => {
+    hapticImpact(ImpactStyle.Medium);
+    setIsAcquiringGPS(true);
+    setGpsErrorMsg(null);
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGpsPermissionState('denied');
+      setGpsErrorMsg('Geolocation is not supported on this device.');
+      setIsAcquiringGPS(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude, accuracy, altitude, speed } = pos.coords;
+        setLiveGPS({
+          latitude,
+          longitude,
+          accuracy,
+          altitude: altitude ?? null,
+          speed: speed ?? null,
+          timestamp: pos.timestamp
+        });
+        setIsLiveGPSActive(true);
+        setGpsPermissionState('granted');
+        setIsAcquiringGPS(false);
+        setGpsErrorMsg(null);
+
+        // Start continuous watcher
+        startLiveGPSWatch();
+
+        try {
+          const detected = await reverseGeocodeLocation(latitude, longitude);
+          if (detected && detected.name) {
+            setUserLocation({
+              name: detected.name,
+              country: detected.country,
+              latitude: Math.round(latitude * 10000) / 10000,
+              longitude: Math.round(longitude * 10000) / 10000
+            });
+          }
+        } catch {}
+      },
+      (err) => {
+        setIsAcquiringGPS(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGpsPermissionState('denied');
+          setGpsErrorMsg('Location permission was denied. Please allow location access in your device/browser settings.');
+        } else {
+          setGpsErrorMsg('Could not acquire GPS fix. Please ensure device location is enabled.');
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  }, [startLiveGPSWatch, setUserLocation]);
+
+  // Switch back to phone GPS from manual city search
+  const handleSwitchToLiveGPS = useCallback(() => {
+    hapticImpact(ImpactStyle.Light);
+    setIsLiveGPSActive(true);
+    if (!liveGPS) {
+      handleRequestGPSPermission();
+    } else {
+      startLiveGPSWatch();
+    }
+  }, [liveGPS, handleRequestGPSPermission, startLiveGPSWatch]);
+
+  // Check permission & automatically start live GPS on mount
+  useEffect(() => {
+    let isMounted = true;
+    if (typeof navigator !== 'undefined' && navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' as PermissionName })
+        .then((perm) => {
+          if (!isMounted) return;
+          setGpsPermissionState(perm.state as 'prompt' | 'granted' | 'denied');
+          if (perm.state === 'granted') {
+            startLiveGPSWatch();
+          }
+          perm.onchange = () => {
+            if (!isMounted) return;
+            setGpsPermissionState(perm.state as 'prompt' | 'granted' | 'denied');
+            if (perm.state === 'granted') {
+              startLiveGPSWatch();
+            }
+          };
+        })
+        .catch(() => {
+          if (isMounted) {
+            setGpsPermissionState('prompt');
+            startLiveGPSWatch();
+          }
+        });
+    } else {
+      setGpsPermissionState('prompt');
+      startLiveGPSWatch();
+    }
+
+    return () => {
+      isMounted = false;
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+    };
+  }, [startLiveGPSWatch]);
 
   // Register modal back handler when search is active
   useEffect(() => {
@@ -94,38 +322,58 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
     }
   }, [isSearching]);
 
-  // Check iOS 13+ sensor permission requirement
+  // Automatically activate live compass motion sensors on mount and on first user interaction
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof (window as any).DeviceOrientationEvent !== 'undefined' &&
-      typeof (window as any).DeviceOrientationEvent.requestPermission === 'function'
-    ) {
-      setNeedsSensorPermission(true);
-    }
+    let isActive = true;
+
+    const requestSensorPermission = async () => {
+      if (
+        typeof window !== 'undefined' &&
+        typeof (window as any).DeviceOrientationEvent !== 'undefined' &&
+        typeof (window as any).DeviceOrientationEvent.requestPermission === 'function'
+      ) {
+        try {
+          const response = await (window as any).DeviceOrientationEvent.requestPermission();
+          if (response === 'granted' && isActive) {
+            setHasCompassSensor(true);
+          }
+        } catch {
+          // If browser requires user gesture on iOS, hook seamlessly to first touch or click
+          const handleFirstInteraction = async () => {
+            try {
+              if (typeof (window as any).DeviceOrientationEvent?.requestPermission === 'function') {
+                const res = await (window as any).DeviceOrientationEvent.requestPermission();
+                if (res === 'granted' && isActive) {
+                  setHasCompassSensor(true);
+                }
+              }
+            } catch {}
+          };
+
+          window.addEventListener('touchstart', handleFirstInteraction, { once: true, passive: true });
+          window.addEventListener('click', handleFirstInteraction, { once: true, passive: true });
+          window.addEventListener('pointerdown', handleFirstInteraction, { once: true, passive: true });
+        }
+      }
+    };
+
+    requestSensorPermission();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
-  // Request explicit iOS motion permission
-  const requestCompassPermission = async () => {
+  // 1-Tap 90° Offset Adjustment for Devices with Misaligned Sensor HAL / Hardware
+  const handleCycleOffset = (newOffset: number) => {
     hapticImpact(ImpactStyle.Light);
-    if (
-      typeof window !== 'undefined' &&
-      typeof (window as any).DeviceOrientationEvent?.requestPermission === 'function'
-    ) {
-      try {
-        const response = await (window as any).DeviceOrientationEvent.requestPermission();
-        if (response === 'granted') {
-          setSensorPermissionGranted(true);
-          setNeedsSensorPermission(false);
-          setHasCompassSensor(true);
-        }
-      } catch (err) {
-        console.warn('Compass sensor permission error:', err);
-      }
-    }
+    const diff = (newOffset - qiblaCalibrationOffset + 360) % 360;
+    setQiblaCalibrationOffset(newOffset);
+    offsetRef.current = newOffset;
+    targetHeadingRef.current = (targetHeadingRef.current + diff + 360) % 360;
   };
 
-  // 4. Ultra-Smooth Lag-Free Render Loop (Direct GPU Transform, Zero-Jitter Dynamic Damping)
+  // 4. Ultra-Smooth Lag-Free Render Loop (2D Unit-Vector Filtering, Direct GPU Transform)
   const startRafLoop = useCallback(() => {
     if (rafIdRef.current !== null) return;
 
@@ -136,26 +384,33 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
       lastTime = time;
 
       const target = targetHeadingRef.current;
-      const current = currentAngleRef.current;
+      const targetVec = degreesToUnitVector(target);
+      const currentVec = smoothedVectorRef.current;
 
-      // Shortest angular delta (-180° to +180°)
-      const diff = (((target - (current % 360)) + 540) % 360) - 180;
-      const absDiff = Math.abs(diff);
+      // Measure angular difference in degrees via dot product
+      const dot = Math.max(-1, Math.min(1, currentVec.x * targetVec.x + currentVec.y * targetVec.y));
+      const angleDiffDeg = Math.acos(dot) * (180 / Math.PI);
 
-      // Deadband noise filter: eliminates micro sensor tremble when phone is still
-      if (absDiff > 0.15) {
+      // Deadband noise filter: eliminates micro sensor tremble when phone is held still
+      if (angleDiffDeg > 0.15) {
         // Fast dynamic responsiveness: instantly tracks rapid movement (> 4°), smoothly eases when settling
-        const speed = absDiff > 4 ? 26 : 18;
+        const speed = angleDiffDeg > 4 ? 26 : 18;
         const factor = Math.min(1, dt * speed);
-        currentAngleRef.current = current + diff * factor;
+
+        smoothedVectorRef.current = lowPassFilterVector(currentVec, targetVec, factor);
+        const smoothedDeg = unitVectorToDegrees(smoothedVectorRef.current);
+
+        // Continuous angular unwrapping so CSS transform does not snap across 0°/360°
+        let delta = ((smoothedDeg - (renderedAngleRef.current % 360)) + 540) % 360 - 180;
+        renderedAngleRef.current += delta;
 
         // Direct DOM update on GPU compositor thread (Zero React re-render lag)
         if (dialRef.current) {
-          dialRef.current.style.transform = `rotate3d(0, 0, 1, ${-currentAngleRef.current}deg)`;
+          dialRef.current.style.transform = `rotate3d(0, 0, 1, ${-renderedAngleRef.current}deg)`;
         }
 
         // Throttled degree & alignment updates to React state
-        const deg = Math.round(((currentAngleRef.current % 360) + 360) % 360);
+        const deg = Math.round(((smoothedDeg % 360) + 360) % 360);
         if (deg !== lastFacingRef.current) {
           lastFacingRef.current = deg;
           setNormalizedFacing(deg);
@@ -192,37 +447,26 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
   useEffect(() => {
     startRafLoop();
 
-    const getScreenAngle = () => {
-      if (typeof window === 'undefined') return 0;
-      if (window.screen?.orientation?.angle !== undefined) {
-        return window.screen.orientation.angle;
-      }
-      if (typeof window.orientation === 'number') {
-        return window.orientation;
-      }
-      return 0;
-    };
-
     // 1. Android Absolute Orientation Listener (Google Chrome on Android)
     const handleAbsoluteOrientation = (e: any) => {
-      if (e.alpha === null || e.alpha === undefined) return;
+      const screenAngle = getScreenAngle();
+      const heading2D = extract2DCompassHeading(e.alpha, null, screenAngle);
+      if (heading2D === null) return;
       hasAbsoluteRef.current = true;
       setHasCompassSensor(true);
-
-      // W3C Tilt-compensated heading relative to True North
-      const tiltHeading = calculateTiltCompensatedHeading(e.alpha, e.beta, e.gamma);
-      const screenAngle = getScreenAngle();
-      targetHeadingRef.current = (tiltHeading + screenAngle + 360) % 360;
+      targetHeadingRef.current = (heading2D + offsetRef.current + 360) % 360;
     };
 
     // 2. Standard / iOS DeviceOrientation Listener
     const handleDeviceOrientation = (e: any) => {
-      // iOS Safari provides webkitCompassHeading directly relative to True/Magnetic North, pre-compensated
+      // iOS Safari provides webkitCompassHeading directly relative to True/Magnetic North in 2D
       if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
-        setHasCompassSensor(true);
-        const screenAngle = getScreenAngle();
-        targetHeadingRef.current = (e.webkitCompassHeading + screenAngle + 360) % 360;
-        return;
+        const heading2D = extract2DCompassHeading(null, e.webkitCompassHeading);
+        if (heading2D !== null) {
+          setHasCompassSensor(true);
+          targetHeadingRef.current = (heading2D + offsetRef.current + 360) % 360;
+          return;
+        }
       }
 
       // If Android absolute listener is active, ignore relative orientation events
@@ -230,21 +474,25 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
         return;
       }
 
+      const screenAngle = getScreenAngle();
+
       // If standard event reports absolute: true
       if (e.absolute === true && e.alpha !== null) {
-        setHasCompassSensor(true);
-        const tiltHeading = calculateTiltCompensatedHeading(e.alpha, e.beta, e.gamma);
-        const screenAngle = getScreenAngle();
-        targetHeadingRef.current = (tiltHeading + screenAngle + 360) % 360;
-        return;
+        const heading2D = extract2DCompassHeading(e.alpha, null, screenAngle);
+        if (heading2D !== null) {
+          setHasCompassSensor(true);
+          targetHeadingRef.current = (heading2D + offsetRef.current + 360) % 360;
+          return;
+        }
       }
 
-      // Fallback: Apply magnetic declination offset
+      // Fallback: Pure 2D planar rotation with magnetic declination offset
       if (e.alpha !== null && !hasAbsoluteRef.current) {
-        setHasCompassSensor(true);
-        const tiltHeading = calculateTiltCompensatedHeading(e.alpha, e.beta, e.gamma);
-        const screenAngle = getScreenAngle();
-        targetHeadingRef.current = (tiltHeading + magneticDeclination + screenAngle + 360) % 360;
+        const heading2D = extract2DCompassHeading(e.alpha, null, screenAngle);
+        if (heading2D !== null) {
+          setHasCompassSensor(true);
+          targetHeadingRef.current = (heading2D + magneticDeclination + offsetRef.current + 360) % 360;
+        }
       }
     };
 
@@ -272,7 +520,7 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
         window.removeEventListener('deviceorientation', handleDeviceOrientation);
       }
     };
-  }, [magneticDeclination, startRafLoop, stopRafLoop]);
+  }, [magneticDeclination, startRafLoop, stopRafLoop, qiblaCalibrationOffset]);
 
   // Angular difference between device facing direction and Qibla for turn instructions
   const angleDiff = useMemo(() => {
@@ -309,37 +557,14 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
     }
   }, [searchQuery]);
 
-  // High-precision GPS Detect with reverse-geocoding
+  // High-precision Live Phone GPS activation
   const handleDetectGPS = () => {
-    if (!navigator.geolocation) return;
-    hapticImpact(ImpactStyle.Light);
-    setLocatingGPS(true);
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const detected = await reverseGeocodeLocation(lat, lng);
-
-        setUserLocation({
-          name: detected.name,
-          country: detected.country,
-          latitude: Math.round(lat * 10000) / 10000,
-          longitude: Math.round(lng * 10000) / 10000
-        });
-        setLocatingGPS(false);
-        setIsSearching(false);
-      },
-      (err) => {
-        console.warn('GPS location error:', err);
-        setLocatingGPS(false);
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
+    handleRequestGPSPermission();
   };
 
   const handleSelectCity = (city: CityData) => {
     hapticImpact(ImpactStyle.Light);
+    setIsLiveGPSActive(false); // Explicitly switch to viewing chosen city preset
     setUserLocation({
       name: city.name,
       country: city.country,
@@ -358,88 +583,89 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
 
   return (
     <div className="space-y-3.5 max-w-xl mx-auto px-1 sm:px-2 pb-6 min-w-0" dir={isUrdu ? 'rtl' : 'ltr'}>
-      {/* 1. TOP SEARCH BAR (For every village, town, or city on Earth) */}
-      <div className="liquid-glass-card rounded-2xl border border-white/60 dark:border-white/12 p-2.5 sm:p-3 shadow-md transition-all">
-        {!isSearching ? (
-          <div className="flex items-center justify-between gap-2.5">
-            <button
-              onClick={() => {
-                hapticImpact(ImpactStyle.Light);
-                setIsSearching(true);
+      {/* 1. LOCATION SEARCH & LIVE GPS CALCULATION */}
+      <div className="liquid-glass-card rounded-2xl border border-white/60 dark:border-white/12 p-2 sm:p-2.5 shadow-md">
+        <div className="flex items-center gap-2">
+          {/* Search bar asking for location */}
+          <div className="relative flex-1 min-w-0">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (!isSearching) setIsSearching(true);
               }}
-              className="flex items-center gap-2.5 flex-1 text-left min-w-0 cursor-pointer group py-0.5"
-              title="Search every village, town, or city on Earth"
-            >
-              <div className="w-8 h-8 rounded-xl liquid-glass flex items-center justify-center border border-emerald-400/40 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                <Search size={16} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                    {userLocation.name}{userLocation.country ? `, ${userLocation.country}` : ''}
-                  </span>
-                  <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold underline underline-offset-2">
-                    {isUrdu ? 'شہر / بستی بدلیں' : 'Change Location'}
-                  </span>
-                </div>
-                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                  Lat: {userLocation.latitude.toFixed(4)}° • Lng: {userLocation.longitude.toFixed(4)}°
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={handleDetectGPS}
-              disabled={locatingGPS}
-              className="px-3 py-1.5 rounded-xl liquid-glass border border-emerald-400/40 text-slate-700 dark:text-slate-200 hover:text-emerald-600 flex items-center gap-1.5 text-xs font-semibold cursor-pointer shrink-0 shadow-2xs transition-colors"
-              title="Detect Current GPS Location"
-            >
-              {locatingGPS ? <Loader2 size={14} className="animate-spin text-emerald-600" /> : <Navigation size={14} className="text-emerald-500" />}
-              <span className="hidden xs:inline">{isUrdu ? 'جی پی ایس' : 'GPS'}</span>
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2.5">
-            {/* Input with Instant Live Suggestions */}
-            <div className="relative flex items-center">
-              <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={isUrdu ? 'کسی بھی شہر، بستی یا گاؤں کا نام...' : 'Search every village, town, or city...'}
-                className="w-full pl-9 pr-16 py-2.5 text-sm rounded-xl liquid-glass border border-emerald-400/60 dark:border-emerald-400/30 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 dark:text-slate-100 placeholder-slate-400 shadow-inner"
-              />
-              <div className="absolute right-2 flex items-center gap-1">
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-                <button
-                  onClick={() => setIsSearching(false)}
-                  className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-1.5 py-1 font-semibold cursor-pointer"
-                >
-                  {isUrdu ? 'بند کریں' : 'Cancel'}
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Action Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+              onFocus={() => setIsSearching(true)}
+              placeholder={
+                isUrdu
+                  ? 'مقام یا شہر تلاش کریں...'
+                  : activeCoordinates.displayName
+                  ? `Search location (${activeCoordinates.displayName})`
+                  : 'Search location or city...'
+              }
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl liquid-glass border border-white/40 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400"
+            />
+            {searchQuery ? (
               <button
-                onClick={handleDetectGPS}
-                disabled={locatingGPS}
-                className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-semibold flex items-center gap-1 shrink-0 shadow-xs cursor-pointer hover:bg-emerald-500 transition-colors"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                {locatingGPS ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
-                <span>{isUrdu ? 'موجودہ جی پی ایس' : 'Current GPS'}</span>
+                <X size={14} />
               </button>
+            ) : isSearching ? (
+              <button
+                onClick={() => setIsSearching(false)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-semibold cursor-pointer"
+              >
+                {isUrdu ? 'بند' : 'Close'}
+              </button>
+            ) : null}
+          </div>
 
+          {/* Simple button for asking GPS permission and calculating Qibla direction */}
+          <button
+            onClick={() => {
+              setIsSearching(false);
+              handleDetectGPS();
+            }}
+            disabled={isAcquiringGPS}
+            className={`px-3 sm:px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 text-xs sm:text-sm shrink-0 cursor-pointer shadow-md transition-all active:scale-95 ${
+              activeCoordinates.isGPS
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+            }`}
+            title={isUrdu ? 'فون GPS کی اجازت دیں اور سمت معلوم کریں' : 'Ask permission & calculate Qibla using GPS'}
+          >
+            {isAcquiringGPS ? (
+              <Loader2 size={15} className="animate-spin text-white" />
+            ) : (
+              <Navigation size={15} className={activeCoordinates.isGPS ? "fill-emerald-600 dark:fill-emerald-400" : ""} />
+            )}
+            <span>
+              {isAcquiringGPS
+                ? (isUrdu ? 'تلاش جاری...' : 'Locating...')
+                : activeCoordinates.isGPS
+                ? (isUrdu ? 'GPS فعال' : 'GPS Active')
+                : (isUrdu ? 'GPS اجازت دیں' : 'Use GPS')}
+            </span>
+          </button>
+        </div>
+
+        {/* GPS Error note if permission denied */}
+        {gpsErrorMsg && (
+          <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5 px-1 pt-1.5">
+            <AlertCircle size={13} className="shrink-0" />
+            <span>{gpsErrorMsg}</span>
+          </div>
+        )}
+
+        {/* Search Results Dropdown when searching */}
+        {isSearching && (
+          <div className="mt-2.5 space-y-2 pt-2 border-t border-white/20 dark:border-white/10">
+            {/* Quick Shrines */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
               {QUICK_SHRINES.map((shrine) => (
                 <button
                   key={`shrine-${shrine.name}`}
@@ -452,23 +678,23 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
             </div>
 
             {/* Global Search Results List */}
-            <div className="max-h-60 overflow-y-auto divide-y divide-white/20 dark:divide-white/10 text-xs rounded-xl liquid-glass border border-white/30 dark:border-white/10">
+            <div className="max-h-56 overflow-y-auto divide-y divide-white/20 dark:divide-white/10 text-xs rounded-xl liquid-glass border border-white/30 dark:border-white/10">
               {isSearchingOnline && (
                 <div className="py-2.5 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2">
                   <Loader2 size={14} className="animate-spin text-emerald-600" />
-                  <span>{isUrdu ? 'تلاش جاری ہے...' : 'Searching places globally...'}</span>
+                  <span>{isUrdu ? 'تلاش جاری ہے...' : 'Searching places...'}</span>
                 </div>
               )}
 
               {searchResults.map((city) => {
                 const itemQibla = calculateGeodesicQibla(city.latitude, city.longitude);
-                const isSelected = userLocation.name === city.name && Math.abs(userLocation.latitude - city.latitude) < 0.01;
+                const isSelected = !activeCoordinates.isGPS && userLocation.name === city.name && Math.abs(userLocation.latitude - city.latitude) < 0.01;
 
                 return (
                   <button
                     key={`${city.name}-${city.country}-${city.latitude}-${city.longitude}`}
                     onClick={() => handleSelectCity(city)}
-                    className={`w-full text-left p-2.5 flex items-start justify-between gap-2 hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
+                    className={`w-full text-left p-2.5 flex items-center justify-between gap-2 hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
                       isSelected ? 'bg-emerald-500/15 dark:bg-emerald-500/20 font-bold' : ''
                     }`}
                   >
@@ -485,37 +711,27 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
                         <span className="text-slate-500 dark:text-slate-400 font-normal">
                           {city.country}
                         </span>
-                        {city.isHolySite && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300 font-semibold border border-amber-500/30">
-                            Sacred Shrine
-                          </span>
-                        )}
                       </div>
-
                       <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-0.5 tabular-nums">
                         Lat: {city.latitude.toFixed(4)}° • Lng: {city.longitude.toFixed(4)}°
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0 flex flex-col items-end">
+                    <div className="text-right shrink-0 flex items-center gap-2">
                       <div className="px-2 py-0.5 rounded-lg bg-emerald-500/15 dark:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 font-bold text-[11px] flex items-center gap-1 border border-emerald-500/30">
                         <Compass size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <span>{itemQibla.direction}° {itemQibla.compassBearing}</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
-                        {itemQibla.distanceKm.toLocaleString()} km
-                      </span>
+                      {isSelected && (
+                        <Check size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      )}
                     </div>
-
-                    {isSelected && (
-                      <Check size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 self-center ml-1" />
-                    )}
                   </button>
                 );
               })}
 
               {!isSearchingOnline && searchResults.length === 0 && searchQuery && (
-                <div className="py-5 text-center text-xs text-slate-400">
+                <div className="py-4 text-center text-xs text-slate-400">
                   No places found matching &ldquo;{searchQuery}&rdquo;
                 </div>
               )}
@@ -575,7 +791,7 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
               <div 
                 ref={dialRef}
                 className="absolute inset-0"
-                style={{ willChange: 'transform' }}
+                style={{ willChange: 'transform', transform: 'rotate3d(0, 0, 1, 0deg)' }}
               >
                 {/* 360 Degree Ticks */}
                 {[...Array(36)].map((_, i) => {
@@ -645,9 +861,14 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
                 >
                   أَشْهَدُ أَنَّ عَلِيّاً وَلِيُّ اللَّهِ
                 </h3>
-                <span className="text-[10px] text-emerald-400/90 font-mono font-bold mt-1 tracking-tight">
-                  {userLocation.name}
-                </span>
+                <div className="flex items-center justify-center gap-1 mt-1">
+                  {activeCoordinates.isGPS && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  )}
+                  <span className="text-[10px] text-emerald-400/90 font-mono font-bold tracking-tight">
+                    {activeCoordinates.displayName}
+                  </span>
+                </div>
               </div>
 
               {/* 3D Center Glass Bevel Reflection */}
@@ -694,18 +915,6 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
           </div>
         </div>
 
-        {/* Required Permissions Trigger (iOS DeviceOrientation / Sensors) */}
-        {needsSensorPermission && !sensorPermissionGranted && (
-          <div className="mt-3.5 w-full max-w-sm">
-            <button
-              onClick={requestCompassPermission}
-              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-colors"
-            >
-              <ShieldCheck size={16} />
-              <span>{isUrdu ? 'فون کمپاس سینسر فعال کریں' : 'Enable Live Compass Motion Sensor'}</span>
-            </button>
-          </div>
-        )}
 
         {/* Desktop / Laptop Fallback Slider when physical magnetometer is absent */}
         {!hasCompassSensor && (
@@ -729,20 +938,33 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
         )}
       </div>
 
-      {/* 4. CALIBRATION NOTICE (Pillars App Style - Clean, Calm, Non-Messy) */}
-      <div className="p-3 sm:p-3.5 rounded-2xl liquid-glass border border-white/50 dark:border-white/10 flex items-center gap-3 text-left">
-        <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30 font-bold text-lg select-none">
-          ∞
-        </div>
-        <div className="min-w-0 flex-1">
-          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-            {isUrdu ? 'بہترین درستگی کے لیے کیلیبریشن' : 'Calibrate Your Compass'}
-          </h4>
-          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed mt-0.5">
-            {isUrdu 
-              ? 'فون کو مقناطیسی اشیاء یا کور سے دور رکھیں۔ درستگی کے لیے فون کو 8 (انفینٹی) کی شکل میں چند بار گھمائیں۔'
-              : 'Hold your phone flat away from magnetic objects. If the compass drifts, move your phone in a figure-8 motion a few times to calibrate.'}
-          </p>
+      {/* 4. CALIBRATION & 90° ALIGN */}
+      <div className="flex items-center justify-between px-3 py-2 rounded-xl liquid-glass border border-white/40 dark:border-white/10 text-xs text-slate-600 dark:text-slate-400">
+        <span className="flex items-center gap-1.5 truncate">
+          <span className="text-amber-500 font-bold select-none">∞</span>
+          <span className="text-[11px] truncate">
+            {isUrdu ? 'فون کو 8 کی شکل میں گھما کر کیلیبریٹ کریں' : 'Move phone in figure-8 motion to calibrate'}
+          </span>
+        </span>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          {qiblaCalibrationOffset !== 0 && (
+            <button
+              onClick={() => handleCycleOffset(0)}
+              className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 cursor-pointer"
+              title="Reset offset to 0°"
+            >
+              {isUrdu ? '0°' : 'Reset 0°'}
+            </button>
+          )}
+          <button
+            onClick={() => handleCycleOffset((qiblaCalibrationOffset + 90) % 360)}
+            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 cursor-pointer flex items-center gap-1"
+            title="Rotate compass alignment by 90°"
+          >
+            <span>⟳</span>
+            <span>{qiblaCalibrationOffset > 0 ? `+${qiblaCalibrationOffset}°` : isUrdu ? '90° رخ' : '90° Align'}</span>
+          </button>
         </div>
       </div>
     </div>
