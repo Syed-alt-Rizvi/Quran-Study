@@ -255,11 +255,16 @@ export default function GlobalDiscussions() {
           ayahRef: data.ayahRef || null
         });
       });
-      if (docs.length > 0) {
-        setDiscussions(docs);
-      } else {
-        setDiscussions(DEFAULT_COMMUNITY_DISCUSSIONS);
-      }
+
+      setDiscussions(prev => {
+        const map = new Map<string, DBRow>();
+        DEFAULT_COMMUNITY_DISCUSSIONS.forEach(d => map.set(d.discussion.id, d));
+        prev.forEach(d => map.set(d.discussion.id, d));
+        docs.forEach(d => map.set(d.discussion.id, d));
+        return Array.from(map.values()).sort((a, b) => 
+          new Date(b.discussion.createdAt).getTime() - new Date(a.discussion.createdAt).getTime()
+        );
+      });
       setLoading(false);
     }, (error) => {
       console.warn("Firestore listener notice:", error);
@@ -267,16 +272,38 @@ export default function GlobalDiscussions() {
         .then(res => res.ok ? res.json() : [])
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
-            setDiscussions(data);
-          } else {
-            setDiscussions(DEFAULT_COMMUNITY_DISCUSSIONS);
+            setDiscussions(prev => {
+              const map = new Map<string, DBRow>();
+              DEFAULT_COMMUNITY_DISCUSSIONS.forEach(d => map.set(d.discussion.id, d));
+              prev.forEach(d => map.set(d.discussion.id, d));
+              data.forEach(d => { if (d?.discussion?.id) map.set(d.discussion.id, d); });
+              return Array.from(map.values()).sort((a, b) => 
+                new Date(b.discussion.createdAt).getTime() - new Date(a.discussion.createdAt).getTime()
+              );
+            });
           }
         })
-        .catch(() => {
-          setDiscussions(DEFAULT_COMMUNITY_DISCUSSIONS);
-        })
+        .catch(() => {})
         .finally(() => setLoading(false));
     });
+
+    // Also fetch initial discussion rows from backend API in parallel for instant global feed sync
+    fetch(getApiUrl('/api/discussions'))
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDiscussions(prev => {
+            const map = new Map<string, DBRow>();
+            DEFAULT_COMMUNITY_DISCUSSIONS.forEach(d => map.set(d.discussion.id, d));
+            prev.forEach(d => map.set(d.discussion.id, d));
+            data.forEach(d => { if (d?.discussion?.id) map.set(d.discussion.id, d); });
+            return Array.from(map.values()).sort((a, b) => 
+              new Date(b.discussion.createdAt).getTime() - new Date(a.discussion.createdAt).getTime()
+            );
+          });
+        }
+      })
+      .catch(() => {});
 
     return () => {
       unsubscribeDb();

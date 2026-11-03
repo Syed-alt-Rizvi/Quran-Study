@@ -292,16 +292,16 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
   return (
     <div className="space-y-4 pb-12 animate-in fade-in duration-300">
       {/* Top Banner & Hijri Masthead */}
-      <section className="relative overflow-hidden rounded-3xl liquid-glass-card glass-gold-fusion text-slate-900 dark:text-white p-5 sm:p-6 shadow-xl border border-amber-400/40 dark:border-amber-500/20">
+      <section className="relative overflow-hidden rounded-3xl liquid-glass-card glass-amber-fusion text-slate-900 dark:text-white p-5 sm:p-6 shadow-xl border border-amber-400/40 dark:border-amber-500/20">
         <div className="absolute top-0 right-0 -mt-6 -mr-6 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 text-xs font-semibold tracking-wider uppercase">
-              <Moon size={15} className="text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+              <Moon size={15} strokeWidth={1.6} className="text-amber-600 dark:text-amber-400" />
               <span>Shia Islamic Calendar</span>
-              <span className="text-amber-500">•</span>
+              <span className="text-amber-500/60">·</span>
               <span>{todayHijri.year} AH</span>
             </div>
 
@@ -324,7 +324,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl liquid-glass active:scale-95 text-xs font-medium text-slate-800 dark:text-white transition-all border border-white/40 dark:border-white/15 shadow-2xs cursor-pointer"
               title="Adjust Hijri Date based on local moon sighting"
             >
-              <Sliders size={13} className="text-amber-500" />
+              <Sliders size={13} className="text-amber-600 dark:text-amber-400" />
               <span>Moon Offset: {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}d</span>
             </button>
 
@@ -336,7 +336,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border active:scale-95 cursor-pointer ${
                 calendarNotificationSettings.enabled 
-                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-semibold shadow-xs' 
+                  ? 'bg-amber-600 text-white border-amber-500 font-semibold shadow-xs' 
                   : 'liquid-glass text-slate-700 dark:text-white/80 border-white/40 dark:border-white/15 hover:bg-white/20'
               }`}
               title="Shia Calendar Notifications"
@@ -357,7 +357,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
             {/* Jump to Today Button */}
             <button
               onClick={handleJumpToToday}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-bold transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
               Today
             </button>

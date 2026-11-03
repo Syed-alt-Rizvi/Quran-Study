@@ -94,7 +94,7 @@ export default function App() {
       }
       const metaTheme = document.querySelector('meta[name="theme-color"]');
       if (metaTheme) {
-        metaTheme.setAttribute('content', isDarkMode ? '#020617' : '#047857');
+        metaTheme.setAttribute('content', isDarkMode ? '#04110d' : '#047857');
       }
     }
   }, [isDarkMode]);
@@ -381,14 +381,6 @@ export default function App() {
       className={`min-h-screen w-full relative ${isDarkMode ? 'dark' : ''} text-slate-900 dark:text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden`}
       style={{ fontFamily: englishFont }}
     >
-      {/* Luminous Ambient Aurora Mesh for Liquid Glass Refractions */}
-      <div className="aurora-mesh" aria-hidden="true">
-        <div className="aurora-orb-1" />
-        <div className="aurora-orb-2" />
-        <div className="aurora-orb-3" />
-        <div className="aurora-orb-4" />
-      </div>
-
       <div className="relative z-10 min-h-screen flex flex-col">
         <Suspense fallback={<ViewLoadingFallback />}>
           <AnimatePresence mode="wait">

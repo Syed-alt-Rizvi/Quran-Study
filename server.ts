@@ -7,10 +7,10 @@ import crypto from "crypto";
 import { Readable } from "stream";
 import { db } from "./src/db/index.ts";
 
-import { discussions, ayahReferences, tafseerReferences, imamScienceArticles, imamScienceCategories } from "./src/db/schema.ts";
+import { discussions, ayahReferences, tafseerReferences } from "./src/db/schema.ts";
 import { eq, desc, asc, and, like, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { fetchTafseerAlKauthar, crawlSurahKauthar } from "./server/balaghScraper.ts";
+import { fetchTafseerAlKauthar, crawlSurahKauthar, getOrFetchKautharSurah } from "./server/balaghScraper.ts";
 import {
   getMafatihCategories,
   getMafatihItemsList,
@@ -614,14 +614,11 @@ async function startServer() {
         return res.status(400).json({ error: "Invalid surah number" });
       }
 
-      const surahBundlePath = path.join(process.cwd(), "public", "tafseer_kauthar", `surah_${s}.json`);
-      if (fs.existsSync(surahBundlePath)) {
-        const fileContent = fs.readFileSync(surahBundlePath, "utf8");
-        return res.json(JSON.parse(fileContent));
-      }
-
-      res.status(404).json({ error: `Surah ${s} bundle not yet created. Ayahs can be fetched dynamically.` });
+      const surahData = await getOrFetchKautharSurah(s);
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.json(surahData);
     } catch (e: any) {
+      console.error(`[BalaghScraper] Error fetching Surah ${req.params.surah}:`, e.message);
       res.status(500).json({ error: e.message });
     }
   });
@@ -757,143 +754,6 @@ async function startServer() {
       }
       
       res.json({ success: true, id });
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
-
-  // Imam & Science API Endpoints
-  app.get("/api/imam-science/articles", async (req, res) => {
-    try {
-      const { category, search, sort = "shortest", limit = "60", offset = "0", includeContent = "false" } = req.query;
-      const parsedLimit = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 60));
-      const parsedOffset = Math.max(0, parseInt(offset as string, 10) || 0);
-
-      let articlesQuery = db.select().from(imamScienceArticles);
-      let articles;
-
-      if (sort === "longest") {
-        articles = await articlesQuery.orderBy(desc(imamScienceArticles.wordCount)).execute();
-      } else if (sort === "recent") {
-        articles = await articlesQuery.orderBy(desc(imamScienceArticles.createdAt)).execute();
-      } else if (sort === "title") {
-        articles = await articlesQuery.orderBy(asc(imamScienceArticles.title)).execute();
-      } else {
-        // Default: Shortest on top, lengthy ones and books on the bottom
-        articles = await articlesQuery.orderBy(asc(imamScienceArticles.wordCount)).execute();
-      }
-
-      // Filter by category
-      if (category && category !== "all") {
-        const catStr = (category as string).toLowerCase();
-        articles = articles.filter(a => {
-          if (a.primaryCategory.toLowerCase() === catStr) return true;
-          try {
-            const cats: string[] = JSON.parse(a.categoriesJson || "[]");
-            return cats.some(c => c.toLowerCase().includes(catStr) || c.toLowerCase().replace(/[^a-z0-9]+/g, "-") === catStr);
-          } catch {
-            return false;
-          }
-        });
-      }
-
-      // Filter by search query
-      if (search && typeof search === "string" && search.trim().length > 0) {
-        const q = search.toLowerCase().trim();
-        articles = articles.filter(a => 
-          a.title.toLowerCase().includes(q) || 
-          (a.excerpt && a.excerpt.toLowerCase().includes(q)) ||
-          a.content.toLowerCase().includes(q)
-        );
-      }
-
-      const total = articles.length;
-      const shouldIncludeFullContent = includeContent === "true";
-
-      const paginated = articles.slice(parsedOffset, parsedOffset + parsedLimit).map(a => ({
-        id: a.id,
-        slug: a.slug,
-        title: a.title,
-        excerpt: a.excerpt,
-        primaryCategory: a.primaryCategory,
-        categories: JSON.parse(a.categoriesJson || "[]"),
-        imageUrl: a.imageUrl,
-        imageAlt: a.imageAlt,
-        readingTime: a.readingTime,
-        wordCount: a.wordCount,
-        sourceUrl: a.sourceUrl,
-        author: a.author,
-        publishedDate: a.publishedDate,
-        highlights: JSON.parse(a.highlightsJson || "[]"),
-        headings: JSON.parse(a.headingsJson || "[]"),
-        content: shouldIncludeFullContent ? a.content : (a.content.length > 500 ? a.content.slice(0, 500) + "..." : a.content)
-      }));
-
-      res.json({ total, articles: paginated });
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
-
-  app.get("/api/imam-science/articles/:slug", async (req, res) => {
-    try {
-      const slug = req.params.slug;
-
-      const found = await db.select().from(imamScienceArticles).where(or(
-        eq(imamScienceArticles.slug, slug),
-        eq(imamScienceArticles.id, slug)
-      )).limit(1).execute();
-
-      if (found.length === 0) {
-        try {
-          const staticPath = path.join(process.cwd(), "public", "imam_science_data.json");
-          if (fs.existsSync(staticPath)) {
-            const data = JSON.parse(fs.readFileSync(staticPath, "utf-8"));
-            const art = data.articles?.find((a: any) => a.slug === slug || a.id === slug);
-            if (art) {
-              return res.json({
-                ...art,
-                categories: art.categories || [],
-                highlights: art.highlights || [],
-                headings: art.headings || []
-              });
-            }
-          }
-        } catch {}
-        return res.status(404).json({ error: "Article not found" });
-      }
-
-      const article = found[0];
-      res.json({
-        ...article,
-        categories: JSON.parse(article.categoriesJson || "[]"),
-        highlights: JSON.parse(article.highlightsJson || "[]"),
-        headings: JSON.parse(article.headingsJson || "[]")
-      });
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
-
-  app.get("/api/imam-science/categories", async (req, res) => {
-    try {
-      const categories = await db.select().from(imamScienceCategories).orderBy(desc(imamScienceCategories.count)).execute();
-      res.json(categories);
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
-
-  // Alias for backward compatibility
-  app.get("/api/science", async (req, res) => {
-    try {
-      const articles = await db.select().from(imamScienceArticles).orderBy(asc(imamScienceArticles.wordCount)).limit(50).execute();
-      res.json(articles.map(a => ({
-        ...a,
-        categories: JSON.parse(a.categoriesJson || "[]"),
-        highlights: JSON.parse(a.highlightsJson || "[]"),
-        content: a.content.length > 500 ? a.content.slice(0, 500) + "..." : a.content
-      })));
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }

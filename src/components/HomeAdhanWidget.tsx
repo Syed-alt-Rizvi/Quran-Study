@@ -57,13 +57,11 @@ export default function HomeAdhanWidget({ onOpenMapAndPrayers }: HomeAdhanWidget
     >
       {/* Left: Clock / Audio Playing icon + Next Prayer + Time + Countdown */}
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="w-7 h-7 rounded-xl liquid-glass flex items-center justify-center border border-amber-400/40 text-amber-600 dark:text-amber-400 shrink-0 shadow-2xs">
-          {isPlaying ? (
-            <Volume2 size={15} className="text-amber-500 animate-pulse shrink-0" />
-          ) : (
-            <Clock size={15} className="text-amber-600 dark:text-amber-400 shrink-0" />
-          )}
-        </div>
+        {isPlaying ? (
+          <Volume2 size={17} strokeWidth={1.6} className="text-amber-500 animate-pulse shrink-0" />
+        ) : (
+          <Clock size={17} strokeWidth={1.6} className="text-amber-600 dark:text-amber-400 shrink-0" />
+        )}
 
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium truncate">
           <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight">{nextPrayer.nameEn}</span>
@@ -79,7 +77,7 @@ export default function HomeAdhanWidget({ onOpenMapAndPrayers }: HomeAdhanWidget
         <span className="text-[11px] sm:text-xs font-medium truncate max-w-[110px] sm:max-w-[160px] hidden xs:inline">
           {userLocation.name}
         </span>
-        <ChevronRight size={15} className="text-amber-500 shrink-0" />
+        <ChevronRight size={15} strokeWidth={1.6} className="text-amber-500 shrink-0" />
       </div>
     </div>
   );

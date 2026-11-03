@@ -315,19 +315,13 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
         >
           {/* Top Header */}
           <div className="px-5 modal-header-safe pb-3 border-b border-white/30 dark:border-white/10 liquid-glass">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-arabic font-bold text-sm shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-white/40 shrink-0">
-                  ش
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-                    {isUrdu ? 'شیعہ مرکز ترتیبات' : 'Shia Markaz Settings'}
-                  </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {isUrdu ? 'قرآنِ مجید • مفاتیح الجنان • ترتیبات' : 'Quran • Mafatih Al Jinan • Global Controls'}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center min-w-0">
+                <h2 className={`text-2xl sm:text-3xl tracking-wide leading-none text-black dark:text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.08)] select-none ${
+                  isUrdu ? 'font-arabic font-bold' : "font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold"
+                }`}>
+                  {isUrdu ? 'ترتیبات' : 'Settings'}
+                </h2>
               </div>
 
               <div className="flex items-center gap-1">
@@ -342,7 +336,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                     title="Exit App (Dua e Khatm e Quran)"
                     aria-label="Exit App and Recite Dua e Khatm e Quran"
                   >
-                    <LogOut size={18} />
+                    <LogOut size={18} strokeWidth={1.6} />
                   </button>
                 )}
                 <button
@@ -351,7 +345,7 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
                   aria-label="Close settings"
                 >
-                  <X size={18} />
+                  <X size={18} strokeWidth={1.6} />
                 </button>
               </div>
             </div>
@@ -411,8 +405,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300 flex-shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex-shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
                 <span>Offline Ready</span>
               </div>
             </div>

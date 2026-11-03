@@ -13,7 +13,6 @@ export const TRANSLATIONS = {
     tab_adhan: "Adhan",
     tab_calendar: "Calendar",
     tab_qibla: "Qibla",
-    tab_science: "Science",
     qibla_finder: "Qibla Finder",
     tab_discuss: "Community",
     tab_settings: "Settings",
@@ -147,17 +146,6 @@ export const TRANSLATIONS = {
     recommended_duas: "Recommended Duas & Ziyaraat",
     today: "Today",
 
-    // Science Section
-    science_title: "Sciences of the Ahlulbayt (a.s)",
-    science_subtitle: "Wisdom of Imam Sadiq (a.s) & Imam Ali (a.s) on medicine, astronomy, nature & physics",
-    science_search: "Search scientific discourses...",
-    science_all_topics: "All Fields",
-    science_medicine: "Medicine & Health",
-    science_nature: "Natural Sciences",
-    science_astronomy: "Cosmology & Stars",
-    science_theology: "Divine Wisdom & Physics",
-    read_article: "Read Discourse",
-
     // Community / Discussions
     community_title: "Community Reflections",
     community_guidelines: "Community Guidelines & Reverence",
@@ -198,7 +186,6 @@ export const TRANSLATIONS = {
     tab_adhan: "اذان",
     tab_calendar: "تقویم",
     tab_qibla: "قبلہ",
-    tab_science: "علوم",
     qibla_finder: "قبلہ نما",
     tab_discuss: "مجلس",
     tab_settings: "ترتیبات",
@@ -331,17 +318,6 @@ export const TRANSLATIONS = {
     special_events: "مقدس ایام و اعیاد",
     recommended_duas: "مستحب دعائیں و زیارات",
     today: "آج",
-
-    // Science Section
-    science_title: "علومِ آلِ محمد (ع)",
-    science_subtitle: "امام جعفر صادق (ع) اور امام علی (ع) کے طب، فلکیات، فطرت اور فزکس پر ارشادات",
-    science_search: "علمی مباحث تلاش کریں...",
-    science_all_topics: "تمام شعبے",
-    science_medicine: "طب و صحت",
-    science_nature: "علومِ فطرت",
-    science_astronomy: "فلکیات و کائنات",
-    science_theology: "حکمتِ الٰہی و کائنات",
-    read_article: "مضمون پڑھیں",
 
     // Community / Discussions
     community_title: "مجلسِ افکار و تدبر",

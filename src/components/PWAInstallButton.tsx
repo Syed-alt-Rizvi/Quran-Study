@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Download } from 'lucide-react';
+import { Smartphone, Download } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { PWAInstallModal } from './PWAInstallModal';
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
+import { useSettingsStore } from '../store';
 
 interface PWAInstallButtonProps {
   className?: string;
@@ -14,8 +15,10 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
   className = '',
   variant = 'compact'
 }) => {
-  const { isInstalled, isInstallable, isInIframe, install } = usePWAInstall();
+  const { isInstalled, isInstallable, install } = usePWAInstall();
+  const { appLanguage } = useSettingsStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isUrdu = appLanguage === 'ur';
 
   // If already running inside installed standalone mode, suppress
   if (isInstalled) {
@@ -37,30 +40,36 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
       {variant === 'compact' && (
         <button
           onClick={handleClick}
-          title="Download app to your phone"
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all active:scale-95 ${className}`}
+          title={isUrdu ? 'موبائل پر انسٹال کریں' : 'Install app to your home screen'}
+          className={`group relative inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full liquid-glass border border-amber-400/40 dark:border-amber-400/25 text-slate-800 dark:text-amber-100 hover:border-amber-400/70 hover:text-amber-600 dark:hover:text-amber-200 transition-all duration-200 shadow-2xs hover:shadow-[0_2px_12px_-2px_rgba(251,191,36,0.25)] active:scale-95 cursor-pointer select-none ${className}`}
         >
-          <Download size={13} className="shrink-0 animate-bounce" />
-          <span className="truncate">Install App</span>
+          {/* Subtle golden ambient glimmer pip */}
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 dark:bg-amber-300 ring-2 ring-amber-400/25 shrink-0" />
+          <Smartphone size={12} strokeWidth={1.6} className="text-amber-600 dark:text-amber-400 shrink-0 transition-transform group-hover:-translate-y-0.5" />
+          <span className="font-sans tracking-wide leading-none">{isUrdu ? 'ایپ انسٹال کریں' : 'Install App'}</span>
         </button>
       )}
 
       {variant === 'full' && (
         <button
           onClick={handleClick}
-          className={`w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 font-semibold text-xs hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors shadow-xs ${className}`}
+          className={`w-full flex items-center justify-between p-3.5 rounded-2xl liquid-glass-card glass-amber-fusion border border-amber-400/30 dark:border-amber-500/20 text-slate-900 dark:text-slate-100 font-medium text-xs hover:border-amber-400/60 transition-all shadow-xs active:scale-[0.99] cursor-pointer ${className}`}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-              <Download size={16} />
+            <div className="w-8 h-8 rounded-xl liquid-glass border border-amber-400/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 shadow-2xs">
+              <Smartphone size={16} strokeWidth={1.6} />
             </div>
             <div className="text-left">
-              <p className="font-bold text-slate-900 dark:text-slate-100 text-xs">Download Web App</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Add to Android or iPhone Home Screen</p>
+              <p className="font-bold text-slate-900 dark:text-slate-100 text-xs">
+                {isUrdu ? 'موبائل ایپ انسٹال کریں' : 'Install Shia Markaz'}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
+                {isUrdu ? 'ہوم اسکرین پر شامل کریں (آف لائن رسائی)' : 'Add to Home Screen for fast offline access'}
+              </p>
             </div>
           </div>
-          <span className="px-2.5 py-1 bg-emerald-600 text-white text-[11px] font-bold rounded-lg shrink-0">
-            Install
+          <span className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-semibold rounded-lg shrink-0 shadow-xs transition-colors">
+            {isUrdu ? 'انسٹال' : 'Install'}
           </span>
         </button>
       )}

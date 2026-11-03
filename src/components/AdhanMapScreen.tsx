@@ -191,7 +191,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 <ArrowLeft size={18} />
               </button>
             )}
-            <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h1 className="text-lg sm:text-xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold text-slate-900 dark:text-slate-100 leading-none">
               Prayer Times &amp; Adhan
             </h1>
           </div>

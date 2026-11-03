@@ -66,53 +66,105 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
   const commentaryText = provider === 'namoona' ? item.tafseerNamoona.text : item.tafseerAlKauthar.text;
   const authorName = provider === 'namoona' ? item.tafseerNamoona.author : item.tafseerAlKauthar.author;
 
+  if (!isExpanded) {
+    return (
+      <div 
+        onClick={() => {
+          hapticImpact(ImpactStyle.Light);
+          setIsExpanded(true);
+        }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(true);
+          }
+        }}
+        className="mb-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl liquid-glass-card glass-amber-fusion border border-amber-400/30 dark:border-amber-500/20 shadow-xs hover:border-amber-400/60 active:scale-[0.99] transition-all flex items-center justify-between gap-2 cursor-pointer select-none"
+        title="View Daily Tafseer"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <BookOpen size={17} strokeWidth={1.6} className="text-amber-600 dark:text-amber-400 shrink-0" />
+
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium truncate">
+            <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              {isUrdu ? 'روزانہ کی تفسیر' : 'Daily Tafseer'}
+            </span>
+            <span className="text-[11px] text-amber-700 dark:text-amber-300 font-normal truncate">
+              {surahName}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold shrink-0">
+          <span className="hidden xs:inline">{isUrdu ? 'پڑھیں' : 'Read'}</span>
+          <ChevronDown size={15} strokeWidth={1.6} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="mb-4 rounded-3xl liquid-glass-card glass-amber-fusion text-slate-900 dark:text-white p-4 sm:p-5 shadow-sm border border-amber-400/40 dark:border-amber-500/20 relative overflow-hidden">
+    <div className="mb-4 rounded-3xl liquid-glass-card glass-amber-fusion p-4 sm:p-5 shadow-sm border border-amber-400/40 dark:border-amber-500/20 relative overflow-hidden">
       {/* Header Bar */}
       <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl liquid-glass bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-2xs">
-            <BookOpen size={17} />
-          </div>
-          <div>
+        <div className="flex items-center gap-2 min-w-0">
+          <BookOpen size={18} strokeWidth={1.6} className="text-amber-600 dark:text-amber-400 shrink-0" />
+          <div className="min-w-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 block">
               {isUrdu ? 'روزانہ کی شیعہ تفسیر' : 'Daily Shia Tafseer'}
             </span>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-emerald-100 flex items-center gap-1.5">
-              <span>{surahName}</span>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+              {surahName}
             </h3>
           </div>
         </div>
 
-        {/* Tafseer Source Switcher (Namoona vs Al-Kauthar) */}
-        <div className="flex items-center gap-1 liquid-glass p-0.5 rounded-xl border border-white/30 dark:border-white/10">
+        {/* Tafseer Source Switcher (Namoona vs Al-Kauthar) & Collapse Button */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 liquid-glass p-0.5 rounded-xl border border-white/30 dark:border-white/10">
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                setTafseerProvider('namoona');
+              }}
+              className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                provider === 'namoona'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Tafseer Namoona (Ayatollah Naser Makarim Shirazi)"
+            >
+              {isUrdu ? 'نمونہ' : 'Namoona'}
+            </button>
+            <button
+              onClick={() => {
+                hapticImpact(ImpactStyle.Light);
+                setTafseerProvider('kauthar');
+              }}
+              className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                provider === 'kauthar'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Al-Kauthar fi Tafseer (Allama Mohsin Ali Najafi)"
+            >
+              {isUrdu ? 'الکوثر' : 'Al-Kauthar'}
+            </button>
+          </div>
+
           <button
+            type="button"
             onClick={() => {
               hapticImpact(ImpactStyle.Light);
-              setTafseerProvider('namoona');
+              setIsExpanded(false);
             }}
-            className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
-              provider === 'namoona'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Tafseer Namoona (Grand Ayatollah Naser Makarim Shirazi)"
+            className="p-1.5 rounded-xl liquid-glass text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer border border-white/30 dark:border-white/10"
+            title="Collapse Daily Tafseer"
+            aria-label="Collapse"
           >
-            {isUrdu ? 'نمونہ' : 'Namoona'}
-          </button>
-          <button
-            onClick={() => {
-              hapticImpact(ImpactStyle.Light);
-              setTafseerProvider('kauthar');
-            }}
-            className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
-              provider === 'kauthar'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Al-Kauthar fi Tafseer (Allama Mohsin Ali Najafi)"
-          >
-            {isUrdu ? 'الکوثر' : 'Al-Kauthar'}
+            <ChevronUp size={15} strokeWidth={1.6} />
           </button>
         </div>
       </div>
@@ -122,7 +174,7 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
         <p
           dir="rtl"
           lang="ar"
-          className="font-arabic text-lg sm:text-xl text-amber-800 dark:text-amber-200 leading-[2.1] text-center select-text font-normal"
+          className="font-arabic text-lg sm:text-xl text-slate-900 dark:text-amber-200 leading-[2.2] text-center select-text font-normal"
           style={{ fontFamily: getArabicFontFamily(arabicFont) }}
         >
           {item.arabicText}
@@ -130,73 +182,61 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
       </div>
 
       {/* Translation */}
-      <div className="mb-3 relative z-10 text-xs sm:text-sm text-slate-700 dark:text-emerald-100/90 leading-relaxed font-serif italic select-text">
+      <div className="mb-3 relative z-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-serif italic select-text">
         &ldquo;{isUrdu && item.urduTranslation ? item.urduTranslation : item.englishTranslation}&rdquo;
       </div>
 
-      {/* Exegetical Commentary (Expandable) */}
-      <div className="relative z-10 pt-2 border-t border-amber-300/30 dark:border-amber-500/20">
-        <div className="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
-          <span className="font-medium truncate max-w-[200px] sm:max-w-none">{authorName}</span>
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
-          >
-            <span>{isExpanded ? (isUrdu ? 'مختصر کریں' : 'Show less') : (isUrdu ? 'مکمل تفسیر پڑھیں' : 'Read commentary')}</span>
-            {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
+      {/* Exegetical Commentary */}
+      <div className="relative z-10 pt-2.5 border-t border-amber-300/30 dark:border-amber-500/20">
+        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1.5">
+          <span className="font-medium truncate">{authorName}</span>
         </div>
 
-        <p
-          className={`text-xs text-slate-200 leading-relaxed transition-all ${
-            isExpanded ? 'line-clamp-none' : 'line-clamp-2'
-          }`}
-        >
+        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
           {commentaryText}
         </p>
 
-        {/* Key Themes Chips if available */}
-        {isExpanded && item.tafseerNamoona.keyThemes && (
-          <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2 border-t border-emerald-800/40">
+        {/* Clean Unboxed Key Themes with Typographic Separator */}
+        {item.tafseerNamoona.keyThemes && item.tafseerNamoona.keyThemes.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap mt-2.5 pt-2 border-t border-white/20 dark:border-white/10 text-[11px] text-slate-500 dark:text-slate-400">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">Themes:</span>
             {item.tafseerNamoona.keyThemes.map((theme, idx) => (
-              <span
-                key={`theme-${idx}`}
-                className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-800/50 text-emerald-200 border border-emerald-700/50"
-              >
-                {theme}
-              </span>
+              <React.Fragment key={`theme-${idx}`}>
+                {idx > 0 && <span aria-hidden="true">&bull;</span>}
+                <span>{theme}</span>
+              </React.Fragment>
             ))}
           </div>
         )}
       </div>
 
       {/* Bottom Actions Bar */}
-      <div className="mt-3.5 pt-2.5 border-t border-emerald-800/60 flex items-center justify-between gap-2 relative z-10">
+      <div className="mt-3.5 pt-2.5 border-t border-white/20 dark:border-white/10 flex items-center justify-between gap-2 relative z-10">
         <div className="flex items-center gap-1.5">
           <button
             onClick={handlePrev}
-            className="px-2.5 py-1 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium liquid-glass border border-white/40 dark:border-white/10 hover:border-amber-400 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
             title="Previous Ayah"
           >
             &larr;
           </button>
-          <span className="text-[11px] text-emerald-300/70 font-mono">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
             {activeKeyIndex + 1}/{FEATURED_KEYS.length}
           </span>
           <button
             onClick={handleNext}
-            className="px-2.5 py-1 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium liquid-glass border border-white/40 dark:border-white/10 hover:border-amber-400 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
             title="Next Ayah"
           >
             &rarr;
           </button>
           <button
             onClick={handleShare}
-            className="p-1.5 rounded-xl text-emerald-300/80 hover:text-white hover:bg-white/10 transition-colors ml-1 cursor-pointer"
+            className="p-1.5 rounded-xl liquid-glass border border-white/40 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors ml-1 cursor-pointer"
             title="Copy Ayah and Tafseer text"
             aria-label="Copy"
           >
-            {copied ? <Check size={14} className="text-emerald-400" /> : <Share2 size={14} />}
+            {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
           </button>
         </div>
 
@@ -205,7 +245,7 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
             hapticImpact(ImpactStyle.Medium);
             onOpenSurahTafseer(item.surahNumber, item.ayahNumber);
           }}
-          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-emerald-950 font-bold text-xs transition-all shadow-md flex items-center gap-1 cursor-pointer"
+          className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-semibold text-xs transition-all shadow-xs flex items-center gap-1 cursor-pointer"
         >
           <span>{isUrdu ? 'مکمل سورہ کھولیں' : 'Open in Quran'}</span>
           <ChevronRight size={14} />

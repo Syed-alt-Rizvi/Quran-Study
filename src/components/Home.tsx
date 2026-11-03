@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { fetchSurahs, SurahMeta, prefetchSurah, prefetchJuz } from '../api';
 import staticSurahs from '../surahList.json';
 import { 
-  Search, BookOpen, Settings, ArrowRight, 
+  Search, BookOpen, Settings, ArrowRight, ChevronRight,
   MessageCircle, AlertTriangle, KeyRound, Edit3, Check, X,
   LogOut, Calendar as CalendarIcon, Compass, Clock
 } from "lucide-react";
@@ -219,136 +219,143 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
   return (
     <div className="min-h-screen pb-32 text-slate-900 dark:text-slate-100">
-      {/* Liquid Glass Minimalist Header */}
-      <header className="sticky top-0 z-30 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-2.5 sm:pb-3 shadow-xs gpu-layer">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-emerald-700 to-teal-500 text-white flex items-center justify-center font-arabic font-bold text-sm sm:text-base shadow-[0_0_15px_rgba(16,185,129,0.35)] select-none ring-1 ring-white/40 shrink-0">
-              ش
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-tight truncate">
-                {t('app_title', appLanguage)}
-              </h1>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate">
-                {t('app_subtitle', appLanguage)}
-              </p>
-            </div>
+      {/* Liquid Glass Minimalist Header with Fine Gold Sheen & Balanced Centered Layout */}
+      <header className="sticky top-0 z-30 liquid-glass border-b border-emerald-500/20 dark:border-emerald-400/15 app-header-safe pb-2.5 sm:pb-3 shadow-xs gpu-layer relative">
+        {/* Ethereal Gold Ambient Highlight Line */}
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 dark:via-amber-400/25 to-transparent pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4 relative z-10 px-0.5">
+          {/* Left Balancing Space */}
+          <div className="flex-1 min-w-0" />
+
+          {/* Center: Shia Markaz Golden Calligraphy with Words' Edges Painted in Emerald Green (No squircle box) */}
+          <div className="flex-shrink-0 flex items-center justify-center">
+            <h1 
+              dir="rtl"
+              lang="ar"
+              className="font-arabic font-bold text-2xl sm:text-3xl leading-none select-none tracking-wide transition-colors shia-markaz-calligraphy py-0.5"
+            >
+              {appLanguage === 'ur' ? 'شیعہ مرکز' : 'شِيعَة مَرْكَز'}
+            </h1>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 text-right shrink-0">
+          {/* Right Action Elements: PWA Jewel + Exit App Button */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end shrink-0">
             <PWAInstallButton variant="compact" />
             <button
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 onExit();
               }}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors flex items-center gap-1 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-[11px] font-medium rounded-full liquid-glass border border-white/40 dark:border-white/12 text-slate-600 hover:text-emerald-700 dark:text-slate-300 dark:hover:text-amber-300 hover:border-emerald-500/30 dark:hover:border-amber-400/30 shadow-2xs transition-all active:scale-95 cursor-pointer shrink-0"
               title="Exit App (Dua e Khatm e Quran)"
               aria-label="Exit App and Recite Dua e Khatm e Quran"
             >
-              <LogOut size={16} className="shrink-0" />
-              <span className="hidden sm:inline text-[11px] font-medium">{t('exit', appLanguage)}</span>
+              <LogOut size={12} strokeWidth={1.6} className="shrink-0" />
+              <span className="hidden sm:inline">{t('exit', appLanguage)}</span>
             </button>
-            <span className="hidden min-[380px]:inline text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate max-w-[110px] sm:max-w-none">
-              {activeTab === 'quran' && t('tab_quran', appLanguage)}
-              {activeTab === 'mafatih' && t('tab_mafatih', appLanguage)}
-              {activeTab === 'calendar' && t('tab_calendar', appLanguage)}
-              {activeTab === 'qibla' && t('tab_qibla', appLanguage)}
-              {activeTab === 'discuss' && t('tab_discuss', appLanguage)}
-            </span>
           </div>
         </div>
       </header>
 
       <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 overflow-x-hidden min-w-0">
-        {/* Welcome Masthead */}
-        <section className="mb-3.5 p-3 sm:p-4 rounded-2xl liquid-glass-card glass-emerald-fusion border border-white/40 dark:border-white/10 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-3">
-            <div className="min-w-0 flex-1">
-              {/* Sacred Arabic Salutation */}
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 font-medium select-none mb-0.5">
-                <span className="font-arabic font-semibold text-xs sm:text-sm leading-none">{greeting.ar}</span>
-                <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
-                <span className="text-slate-600 dark:text-slate-400 font-normal">{greeting.en}</span>
-              </div>
-
-              {/* Personal Reader Name & In-line Name Editing */}
-              {isEditingName ? (
-                <div className="flex items-center gap-2 mt-0.5">
-                  <input
-                    type="text"
-                    autoFocus
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveName();
-                      if (e.key === 'Escape') handleCancelName();
-                    }}
-                    placeholder="Enter your name..."
-                    className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold text-slate-900 dark:text-slate-100 bg-transparent border-b-2 border-emerald-600 dark:border-emerald-400 focus:outline-none px-0 py-0.5 max-w-sm transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSaveName}
-                    className="p-1 text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors"
-                    title="Save Name"
-                  >
-                    <Check size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelName}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                    title="Cancel"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              ) : (
-                <div 
-                  onClick={() => {
-                    hapticImpact(ImpactStyle.Light);
-                    setIsEditingName(true);
-                  }}
-                  className="group inline-flex items-baseline gap-2 cursor-pointer select-none"
-                  title="Click to edit name"
-                >
-                  <h2 className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold tracking-wide text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight">
-                    {userName && userName.trim().length > 0 ? userName.trim() : 'Welcome'}
-                  </h2>
-                  <Edit3 size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0" />
-                </div>
-              )}
-
-              {/* Hadith Reflection from Ahlulbayt (a.s) */}
-              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-serif italic max-w-xl leading-snug line-clamp-2">
-                &ldquo;{reflection.quote}&rdquo;
-                <span className="not-italic text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 ml-1.5 font-sans">
-                  — {reflection.source}
-                </span>
-              </p>
+        {/* Welcome Masthead with Islamic Rosette Watermark & Gold Accent (Homescreen Only) */}
+        {activeTab === 'quran' && (
+          <section className="mb-3.5 p-3 sm:p-4 rounded-2xl liquid-glass-card glass-emerald-fusion border border-white/40 dark:border-white/10 shadow-xs relative overflow-hidden">
+            {/* Subtle Golden Sheen on Top Edge */}
+            <div className="absolute top-0 inset-x-8 h-px bg-gradient-to-r from-transparent via-amber-400/35 dark:via-amber-400/20 to-transparent pointer-events-none" />
+            
+            {/* Background Sacred Geometric Rosette Watermark */}
+            <div className="absolute -right-4 -bottom-6 text-emerald-600/[0.04] dark:text-emerald-400/[0.04] select-none pointer-events-none text-8xl font-arabic leading-none" aria-hidden="true">
+              ۞
             </div>
 
-            {/* Daily Recitation Status */}
-            {todayAyahs > 0 && !isEditingName && (
-              <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 sm:text-right shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0 bg-white/40 dark:bg-slate-900/40 px-2.5 py-1 rounded-full border border-white/30 dark:border-white/10 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                <span>
-                  <strong className="text-slate-800 dark:text-slate-200 font-semibold">{todayAyahs}</strong>{' '}
-                  {todayAyahs === 1 ? 'ayah recited today' : 'ayahs recited today'}
-                </span>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-3 relative z-10">
+              <div className="min-w-0 flex-1">
+                {/* Sacred Arabic Salutation */}
+                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 font-medium select-none mb-0.5">
+                  <span className="font-arabic font-semibold text-xs sm:text-sm leading-none">{greeting.ar}</span>
+                  <span className="text-amber-500/80 dark:text-amber-400/70 text-[9px]" aria-hidden="true">✦</span>
+                  <span className="text-slate-600 dark:text-slate-400 font-normal">{greeting.en}</span>
+                </div>
+
+                {/* Personal Reader Name & In-line Name Editing */}
+                {isEditingName ? (
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveName();
+                        if (e.key === 'Escape') handleCancelName();
+                      }}
+                      placeholder="Enter your name..."
+                      className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold text-slate-900 dark:text-slate-100 bg-transparent border-b-2 border-emerald-600 dark:border-emerald-400 focus:outline-none px-0 py-0.5 max-w-sm transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveName}
+                      className="p-1 text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors"
+                      title="Save Name"
+                    >
+                      <Check size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelName}
+                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                      title="Cancel"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => {
+                      hapticImpact(ImpactStyle.Light);
+                      setIsEditingName(true);
+                    }}
+                    className="group inline-flex items-baseline gap-2 cursor-pointer select-none"
+                    title="Click to edit name"
+                  >
+                    <h2 className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold tracking-wide text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight">
+                      {userName && userName.trim().length > 0 ? userName.trim() : 'Welcome'}
+                    </h2>
+                    <Edit3 size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0" />
+                  </div>
+                )}
+
+                {/* Hadith Reflection from Ahlulbayt (a.s) */}
+                <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-serif italic max-w-xl leading-snug line-clamp-2">
+                  &ldquo;{reflection.quote}&rdquo;
+                  <span className="not-italic text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 ml-1.5 font-sans">
+                    — {reflection.source}
+                  </span>
+                </p>
               </div>
-            )}
-          </div>
-        </section>
+
+              {/* Daily Recitation Status Pill */}
+              {todayAyahs > 0 && !isEditingName && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass border border-emerald-500/30 dark:border-emerald-400/20 text-xs text-slate-700 dark:text-slate-200 font-medium sm:text-right shrink-0 self-start sm:self-auto shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+                  <span>
+                    <strong className="text-emerald-700 dark:text-emerald-300 font-bold">{todayAyahs}</strong>{' '}
+                    {todayAyahs === 1 ? 'ayah recited today' : 'ayahs recited today'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Last Read Ayah Quick Resume */}
         {lastRead && activeTab === 'quran' && typeof lastRead.surahId === 'number' && lastRead.surahId >= 1 && lastRead.surahId <= 114 && (
-          <div className="mb-4 p-3.5 liquid-glass-card glass-emerald-fusion rounded-2xl border border-emerald-400/40 shadow-xs flex items-center justify-between gap-4">
+          <div className="mb-4 p-3.5 liquid-glass-card glass-emerald-fusion rounded-2xl border border-emerald-400/30 dark:border-emerald-500/20 shadow-xs flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              <p className="text-[10px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen size={12} className="text-emerald-600 dark:text-emerald-400" />
                 <span>{appLanguage === 'ur' ? 'جاری رکھیں' : 'Continue Reading'}</span>
               </p>
               <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
@@ -361,10 +368,10 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
               onClick={() => onSelectSurah(lastRead.surahId, lastRead.ayahNumber)}
               onMouseEnter={() => prefetchSurah(lastRead.surahId)}
               onTouchStart={() => prefetchSurah(lastRead.surahId)}
-              className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs rounded-xl transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-medium text-xs rounded-xl transition-all shadow-xs flex items-center gap-1 cursor-pointer"
             >
-              <span>Resume</span>
-              <ArrowRight size={13} />
+              <span>{appLanguage === 'ur' ? 'پڑھیں' : 'Resume'}</span>
+              <ChevronRight size={14} />
             </button>
           </div>
         )}
@@ -476,11 +483,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                         onTouchStart={() => prefetchSurah(surah.number)}
                         className="surah-card-render w-full text-left group flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-emerald-400/60 dark:hover:border-emerald-400/50 hover:shadow-md transition-all duration-150"
                       >
-                        {/* Arabic text ABOVE with Surah number badge */}
+                        {/* Arabic text ABOVE with Surah number */}
                         <div className="flex items-center justify-between w-full gap-2">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-500/20 group-hover:bg-emerald-600 group-hover:text-white group-hover:ring-emerald-600 transition-all shrink-0 shadow-xs">
-                            {surah.number}
-                          </div>
+                          <span className="text-xs sm:text-sm font-mono font-bold tracking-wider text-emerald-800/80 dark:text-emerald-400/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 select-none shrink-0 transition-colors">
+                            {String(surah.number).padStart(2, '0')}
+                          </span>
                           <div className="text-right flex-1 min-w-0">
                             <span 
                               dir="rtl"
@@ -544,11 +551,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                       onTouchStart={() => prefetchJuz(juz.number)}
                       className="juz-card-render w-full text-left group flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl liquid-glass-card border border-white/50 dark:border-white/10 hover:border-emerald-400/50 hover:shadow-xs transition-all"
                     >
-                      {/* Arabic text ABOVE with Juz number badge */}
+                      {/* Arabic text ABOVE with Juz number */}
                       <div className="flex items-center justify-between w-full gap-2">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-500/20 group-hover:bg-emerald-600 group-hover:text-white group-hover:ring-emerald-600 transition-all shrink-0 shadow-xs">
-                          {juz.number}
-                        </div>
+                        <span className="text-xs sm:text-sm font-mono font-bold tracking-wider text-emerald-800/80 dark:text-emerald-400/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 select-none shrink-0 transition-colors">
+                          {String(juz.number).padStart(2, '0')}
+                        </span>
                         <span 
                           dir="rtl"
                           lang="ar"
@@ -595,7 +602,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <BookOpen size={17} className="shrink-0" />
+            <BookOpen size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_quran', appLanguage)}</span>
           </button>
 
@@ -607,7 +614,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <KeyRound size={17} className="shrink-0" />
+            <KeyRound size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_mafatih', appLanguage)}</span>
           </button>
 
@@ -619,7 +626,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <Clock size={17} className="shrink-0" />
+            <Clock size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_adhan', appLanguage)}</span>
           </button>
 
@@ -631,7 +638,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <CalendarIcon size={17} className="shrink-0" />
+            <CalendarIcon size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_calendar', appLanguage)}</span>
           </button>
 
@@ -643,7 +650,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <Compass size={17} className="shrink-0" />
+            <Compass size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_qibla', appLanguage)}</span>
           </button>
 
@@ -655,7 +662,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 : 'glass-slab-tab text-slate-600 dark:text-slate-300'
             }`}
           >
-            <MessageCircle size={17} className="shrink-0" />
+            <MessageCircle size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_discuss', appLanguage)}</span>
           </button>
 
@@ -663,7 +670,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             onClick={() => { hapticImpact(ImpactStyle.Light); onOpenSettings(); }}
             className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl glass-slab-tab text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all min-w-0 cursor-pointer"
           >
-            <Settings size={17} className="shrink-0" />
+            <Settings size={18} strokeWidth={1.6} className="shrink-0" />
             <span className="text-[8px] sm:text-[9.5px] font-medium leading-tight truncate max-w-full text-center mt-0.5">{t('tab_settings', appLanguage)}</span>
           </button>
         </div>

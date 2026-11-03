@@ -22,50 +22,16 @@ service cloud.firestore {
     }
 
     function isValidDiscussion(data) {
-      return data.keys().hasAll(['content', 'author', 'userId', 'createdAt', 'isModerated']) &&
-             data.size() >= 5 && data.size() <= 10 &&
-             data.content is string && data.content.size() > 0 && data.content.size() <= 5000 &&
-             data.author is string && data.author.size() > 0 && data.author.size() <= 100 &&
-             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
-             data.isModerated is bool &&
-             (
-               !('email' in data) || (data.email is string && data.email.size() <= 255)
-             ) &&
-             (
-               !('replyToId' in data) || (data.replyToId is string && data.replyToId.size() <= 128)
-             ) &&
-             (
-               !('isOfficialAnswer' in data) || (data.isOfficialAnswer is bool)
-             ) &&
-             (
-               !('isAnnouncement' in data) || (data.isAnnouncement is bool)
-             ) &&
-             (
-               !('ayahRef' in data) || (
-                 data.ayahRef is map &&
-                 data.ayahRef.keys().hasAll(['surahNumber', 'ayahNumber']) &&
-                 data.ayahRef.surahNumber is number &&
-                 data.ayahRef.ayahNumber is number &&
-                 (!('surahName' in data.ayahRef) || (data.ayahRef.surahName is string && data.ayahRef.surahName.size() <= 100))
-               )
-             );
+      return data.content is string && data.content.size() > 0 && data.content.size() <= 10000 &&
+             data.author is string && data.author.size() > 0 && data.author.size() <= 150 &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128;
     }
 
     match /discussions/{discussionId} {
-      allow read: if true; // Public read
-      allow list: if true; // Client filters, but public data is public
-      
-      allow create: if isGuest() &&
-                    isValidId(discussionId) &&
-                    isValidDiscussion(incoming()) &&
-                    incoming().createdAt == request.time &&
-                    incoming().isModerated == false;
-                    
-      // Allow deletion for moderation / spam cleanup
-      allow delete: if true; 
-
-      // Allow updating moderation flag or official answer
+      allow read, list: if true; // Public read & real-time snapshot sync across all devices
+      allow create: if isValidDiscussion(incoming());
       allow update: if true;
+      allow delete: if true;
     }
 
     // App users telemetry & location

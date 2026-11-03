@@ -70,7 +70,6 @@ interface SettingsState {
   mafatihShowTranslation: boolean;
   mafatihDefaultSpeed: number;
   globalAudioSpeed: number; // Reimagined unified global playback speed (0.5x, 0.75x, 1x, 1.25x, 1.5x, 1.75x, 2x)
-  scienceCategory: string;
   mafatihBookmarks: string[];
   mafatihRecentIds: string[];
 
@@ -120,7 +119,6 @@ interface SettingsState {
   setMafatihShowTranslation: (val: boolean) => void;
   setMafatihDefaultSpeed: (speed: number) => void;
   setGlobalAudioSpeed: (speed: number) => void;
-  setScienceCategory: (cat: string) => void;
   addMafatihBookmark: (id: string) => void;
   removeMafatihBookmark: (id: string) => void;
   isMafatihBookmarked: (id: string) => boolean;
@@ -163,7 +161,6 @@ export const useSettingsStore = create<SettingsState>()(
       mafatihShowTranslation: true,
       mafatihDefaultSpeed: 1,
       globalAudioSpeed: 1,
-      scienceCategory: 'all',
       mafatihBookmarks: [],
       mafatihRecentIds: ['maf_dua46b', 'maf_dua40', 'maf_ziy86'],
 
@@ -324,7 +321,6 @@ export const useSettingsStore = create<SettingsState>()(
           } catch {}
         }
       },
-      setScienceCategory: (cat) => set({ scienceCategory: cat }),
       addMafatihBookmark: (id) => {
         if (!id || typeof id !== 'string') return;
         const clean = id.trim();

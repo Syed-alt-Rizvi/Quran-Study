@@ -749,18 +749,18 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
           }`} 
         />
 
-        {/* Alignment Status Header Pill */}
+        {/* Alignment Status Header */}
         <div className="mb-2 z-10">
           {isAligned ? (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-400/80 shadow-[0_0_24px_rgba(16,185,129,0.55)] animate-pulse">
-              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-300" />
-              <span className="text-xs sm:text-sm font-bold tracking-tight">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-600/15 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-200 border border-emerald-500/30 shadow-xs">
+              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-300 shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold tracking-tight">
                 {isUrdu ? 'قبلۂ شریف کی سمت درست ہے! (کعبہ رخ)' : 'Directly Facing the Holy Kaaba!'}
               </span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full liquid-glass text-slate-700 dark:text-slate-300 border border-white/40 dark:border-white/10 text-xs font-semibold shadow-xs">
-              <Crosshair size={13} className="text-emerald-500" />
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full liquid-glass text-slate-700 dark:text-slate-300 border border-white/40 dark:border-white/10 text-xs font-medium shadow-xs">
+              <Crosshair size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>
                 {angleDiff > 0
                   ? isUrdu
@@ -785,7 +785,7 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
           {/* Outer 3D Beveled Ring Housing */}
           <div className={`w-full h-full compass-3d-housing ${isAligned ? 'compass-3d-housing-aligned' : ''}`}>
             {/* Deep Sunken Dial Plate */}
-            <div className="compass-3d-dial flex items-center justify-center">
+            <div className="compass-3d-dial relative flex items-center justify-center">
               
               {/* Rotating Compass Ring (Direct 60/120 FPS GPU Transform) */}
               <div 
@@ -819,16 +819,16 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
 
                 {/* Cardinal Markers: North (Ruby Red), South, East, West */}
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                  <span className="text-[13px] font-black text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]">N</span>
+                  <span className="text-[13px] font-bold text-rose-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">N</span>
                 </div>
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                  <span className="text-[11px] font-bold text-slate-400">S</span>
+                  <span className="text-[11px] font-medium text-slate-400">S</span>
                 </div>
                 <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                  <span className="text-[11px] font-bold text-slate-400">E</span>
+                  <span className="text-[11px] font-medium text-slate-400">E</span>
                 </div>
                 <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                  <span className="text-[11px] font-bold text-slate-400">W</span>
+                  <span className="text-[11px] font-medium text-slate-400">W</span>
                 </div>
 
                 {/* Qibla Indicator Marker Pin at exact Great-Circle azimuth angle on the rotating dial */}
@@ -837,38 +837,40 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
                   style={{ transform: `rotate(${qiblaData.direction}deg)` }}
                 >
                   <div className="flex flex-col items-center -mt-2">
-                    {/* Glowing Kaaba Crest */}
-                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-700 via-teal-600 to-emerald-400 text-white flex items-center justify-center font-bold text-xs border-2 border-amber-300 ring-2 ring-emerald-400/60 shadow-lg ${
-                      isAligned ? 'animate-bounce shadow-[0_0_24px_rgba(16,185,129,1)] scale-110' : 'shadow-[0_0_14px_rgba(16,185,129,0.7)]'
+                    {/* Kaaba Crest */}
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-emerald-800 via-teal-700 to-emerald-600 text-white flex items-center justify-center font-bold text-xs border border-amber-300/80 shadow-md transition-transform duration-300 ${
+                      isAligned ? 'scale-105 ring-2 ring-emerald-400/80 shadow-[0_0_16px_rgba(52,211,153,0.5)]' : ''
                     }`}>
                       🕋
                     </div>
                     {/* Direction Ray Line */}
-                    <div className="w-1.5 h-16 bg-gradient-to-b from-amber-400 via-emerald-400 to-transparent mt-0.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                    <div className="w-1 h-14 bg-gradient-to-b from-amber-400/90 via-emerald-400/50 to-transparent mt-0.5 rounded-full" />
                   </div>
                 </div>
               </div>
 
-              {/* SACRED ARABIC INSCRIPTION IN THE 3D CENTER: Pure Arabic Calligraphy */}
-              <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-2 pointer-events-none select-none max-w-[210px]">
+              {/* SACRED ARABIC INSCRIPTION: Elevated in the Upper Hemisphere comfortably above center */}
+              <div className="absolute top-[40px] sm:top-[46px] inset-x-0 mx-auto z-10 flex flex-col items-center justify-center text-center px-4 pointer-events-none select-none max-w-[220px]">
                 <h3 
-                  className={`font-arabic text-base sm:text-lg font-black leading-snug transition-all duration-300 ${
+                  className={`font-arabic text-base sm:text-lg font-bold leading-none tracking-wide transition-all duration-300 ${
                     isAligned 
-                      ? 'text-amber-200 drop-shadow-[0_2px_16px_rgba(251,191,36,0.9)] scale-105' 
-                      : 'text-amber-300/90 dark:text-amber-200/90 drop-shadow-[0_2px_10px_rgba(245,158,11,0.5)]'
+                      ? 'text-amber-300 dark:text-[#fde68a] drop-shadow-[0_0_12px_rgba(251,191,36,0.6)] scale-105' 
+                      : 'text-amber-200/90 dark:text-[#fde68a]/85 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]'
                   }`}
                   style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif" }}
                 >
                   أَشْهَدُ أَنَّ عَلِيّاً وَلِيُّ اللَّهِ
                 </h3>
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  {activeCoordinates.isGPS && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  )}
-                  <span className="text-[10px] text-emerald-400/90 font-mono font-bold tracking-tight">
-                    {activeCoordinates.displayName}
-                  </span>
-                </div>
+              </div>
+
+              {/* Location & GPS Indicator: Positioned in the Lower Hemisphere below the center hub */}
+              <div className="absolute bottom-[48px] sm:bottom-[54px] inset-x-0 mx-auto z-10 flex items-center justify-center gap-1.5 px-4 pointer-events-none select-none max-w-[200px]">
+                {activeCoordinates.isGPS && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/90 shrink-0" />
+                )}
+                <span className="text-[10px] text-emerald-300/85 font-mono font-medium tracking-tight truncate">
+                  {activeCoordinates.displayName}
+                </span>
               </div>
 
               {/* 3D Center Glass Bevel Reflection */}
@@ -876,8 +878,8 @@ export default function QiblaFinder({ onBack }: QiblaFinderProps) {
 
               {/* Fixed 3D Center Hub */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-slate-950 to-slate-800 text-white flex items-center justify-center shadow-lg border-2 border-emerald-400 ring-2 ring-black/40">
-                  <div className={`w-2 h-2 rounded-full ${isAligned ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
+                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-slate-950 to-slate-800 flex items-center justify-center shadow-md border border-amber-400/60 dark:border-emerald-500/40">
+                  <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isAligned ? 'bg-amber-300 shadow-[0_0_6px_rgba(251,191,36,0.6)]' : 'bg-emerald-400/90'}`} />
                 </div>
               </div>
 

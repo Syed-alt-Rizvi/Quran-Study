@@ -156,7 +156,36 @@ export async function fetchTafseer(
       } catch (e) {}
     };
 
-    // 2. Try static pre-bundled or server on-demand JSON route
+    // 2a. Try static pre-bundled or cached whole-surah JSON bundle (instant 0ms offline)
+    try {
+      const surahRes = await fetch(getApiUrl(`/tafseer_kauthar/surah_${surahNumber}.json`));
+      if (surahRes.ok) {
+        const text = await surahRes.text();
+        if (text && !text.trim().startsWith('<') && !text.includes('<!DOCTYPE')) {
+          const surahBundle = JSON.parse(text);
+          if (surahBundle) {
+            let item: any = null;
+            if (Array.isArray(surahBundle)) {
+              item = surahBundle.find((it: any) => it.ayah === ayahNumber);
+              surahBundle.forEach((it: any) => {
+                if (it && it.ayah) cacheKautharItem(it, it.ayah);
+              });
+            } else if (typeof surahBundle === 'object') {
+              item = surahBundle[ayahNumber] || surahBundle[String(ayahNumber)];
+              for (const [aStr, it] of Object.entries(surahBundle)) {
+                const aNum = Number(aStr);
+                if (!isNaN(aNum) && it) cacheKautharItem(it as TafseerContent, aNum);
+              }
+            }
+            if (item && (item.ur || item.tafseer_text)) {
+              return item;
+            }
+          }
+        }
+      }
+    } catch (e) {}
+
+    // 2b. Try static individual ayah JSON file
     try {
       const staticRes = await fetch(getApiUrl(`/tafseer_kauthar/s${surahNumber}_a${ayahNumber}.json`));
       if (staticRes.ok) {
@@ -168,7 +197,7 @@ export async function fetchTafseer(
       }
     } catch (e) {}
 
-    // 3. Try backend API proxy route with smart range mapping
+    // 3. Try backend API proxy route with smart range mapping and comprehensive scraping
     const endpoint = getApiUrl(`/api/tafseer/kauthar/${surahNumber}/${ayahNumber}`);
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -189,7 +218,7 @@ export async function fetchTafseer(
         if (item && (item.ur || item.tafseer_text) && ((item.ur?.length || 0) > 30 || (item.tafseer_text?.length || 0) > 50)) {
           cacheKautharItem(item, ayahNumber);
 
-          // If the item covers a range (e.g. 1 - 2, 16 - 18), cache it for all ayahs in that range
+          // If the item covers a range (e.g. 1 - 2, 2 - 5, 16 - 18), cache it for all ayahs in that range
           if (item.ayah_range) {
             const match = item.ayah_range.match(/(\d+)\s*[-–]\s*(\d+)/);
             if (match) {
@@ -240,27 +269,20 @@ export async function fetchTafseer(
       }
     }
 
-    // 5. Fallback for Web Browser: fetch via reliable web CORS proxies
+    // 5. Fallback for Web Browser: fetch via allorigins proxy
     if (!Capacitor.isNativePlatform()) {
-      const corsProxies = [
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(balaghDirectUrl)}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(balaghDirectUrl)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(balaghDirectUrl)}`
-      ];
-
-      for (const proxyUrl of corsProxies) {
-        try {
-          const res = await fetch(proxyUrl);
-          if (res.ok) {
-            const html = await res.text();
-            const parsed = parseKautharHtml(html, surahNumber, ayahNumber);
-            if (parsed && (parsed.ur || parsed.tafseer_text)) {
-              cacheKautharItem(parsed, ayahNumber);
-              return parsed;
-            }
+      try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(balaghDirectUrl)}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+        if (res.ok) {
+          const html = await res.text();
+          const parsed = parseKautharHtml(html, surahNumber, ayahNumber);
+          if (parsed && (parsed.ur || parsed.tafseer_text)) {
+            cacheKautharItem(parsed, ayahNumber);
+            return parsed;
           }
-        } catch (proxyErr) {}
-      }
+        }
+      } catch (proxyErr) {}
     }
 
     throw new Error(`تفسیر الکوثر: سورہ ${surahNumber} آیت ${ayahNumber} کا مواد لوڈ نہیں ہو سکا۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔`);

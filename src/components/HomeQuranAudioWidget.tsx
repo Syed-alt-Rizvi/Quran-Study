@@ -122,9 +122,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
       >
         {/* Left: Icon + Active Surah Name + Status */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-xl liquid-glass flex items-center justify-center border border-emerald-400/40 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-2xs">
-            <Headphones size={15} className={`shrink-0 ${isCurrentSurahPlaying ? 'animate-pulse text-emerald-500' : ''}`} />
-          </div>
+          <Headphones size={17} strokeWidth={1.6} className={`shrink-0 text-emerald-600 dark:text-emerald-400 ${isCurrentSurahPlaying ? 'animate-pulse text-emerald-500' : ''}`} />
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium truncate">
             <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight">
@@ -168,7 +166,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             )}
           </button>
 
-          <ChevronDown size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <ChevronDown size={15} strokeWidth={1.6} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
         </div>
       </div>
     );
@@ -182,16 +180,14 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl liquid-glass text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-2xs">
-            <Headphones size={17} />
-          </div>
+          <Headphones size={18} strokeWidth={1.6} className="text-emerald-700 dark:text-emerald-300 shrink-0" />
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
               {isUrdu ? 'قرآن آڈیو پلیئر' : "Holy Qur'an Audio Player"}
             </span>
-            <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               <span>{isUrdu && urduSurahName ? `سورۃ ${urduSurahName}` : currentSurahMeta.englishName}</span>
-              <span className="text-xs text-emerald-400/80">({currentSurahMeta.numberOfAyahs} {isUrdu ? 'آیات' : 'Ayahs'})</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-300">({currentSurahMeta.numberOfAyahs} {isUrdu ? 'آیات' : 'Ayahs'})</span>
             </h3>
           </div>
         </div>
@@ -210,7 +206,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
                 }).catch(() => {});
               }
             }}
-            className="bg-black/50 text-emerald-200 text-[11px] font-medium rounded-xl px-2.5 py-1.5 border border-emerald-800/60 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            className="liquid-glass text-slate-800 dark:text-emerald-200 text-[11px] font-medium rounded-xl px-2.5 py-1.5 border border-emerald-500/30 dark:border-emerald-800/60 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
             title="Select Reciter"
           >
             {RECITERS.map((r) => (
@@ -226,27 +222,27 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
               hapticImpact(ImpactStyle.Light);
               setIsExpanded(false);
             }}
-            className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-300 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl liquid-glass border border-emerald-500/20 hover:border-emerald-500/40 text-slate-600 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white transition-colors cursor-pointer"
             title="Collapse Audio Player"
             aria-label="Collapse"
           >
-            <ChevronUp size={15} />
+            <ChevronUp size={15} strokeWidth={1.6} />
           </button>
         </div>
       </div>
 
       {/* Center Surah Calligraphy & Recitation Details */}
-      <div className="my-2.5 p-3 rounded-2xl bg-black/40 border border-emerald-800/40 flex items-center justify-between gap-3 relative z-10">
+      <div className="my-2.5 p-3 rounded-2xl liquid-glass border border-emerald-500/20 dark:border-emerald-800/40 flex items-center justify-between gap-3 relative z-10">
         <div className="min-w-0">
           <p
             dir="rtl"
             lang="ar"
-            className="font-arabic text-xl sm:text-2xl text-emerald-200 font-normal truncate leading-relaxed"
+            className="font-arabic text-xl sm:text-2xl text-emerald-800 dark:text-emerald-200 font-normal truncate leading-relaxed"
             style={{ fontFamily: getArabicFontFamily(arabicFont) }}
           >
             {currentSurahMeta.name}
           </p>
-          <p className="text-[11px] text-slate-400 truncate">
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate">
             {isCurrentSurahPlaying && currentAyah
               ? (isUrdu ? `آیت ${currentAyah.numberInSurah} جاری ہے` : `Reciting Ayah ${currentAyah.numberInSurah} of ${currentSurahMeta.numberOfAyahs}`)
               : (currentSurahMeta.englishNameTranslation || 'Chapter of the Holy Quran')}
@@ -285,7 +281,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
               }
             }}
             disabled={selectedSurahId <= 1}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 text-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg liquid-glass border border-emerald-500/20 hover:border-emerald-500/40 disabled:opacity-40 text-slate-700 dark:text-white transition-colors cursor-pointer"
             title="Previous Surah"
           >
             <SkipBack size={15} />
@@ -297,7 +293,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
               }
             }}
             disabled={selectedSurahId >= 114}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 text-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg liquid-glass border border-emerald-500/20 hover:border-emerald-500/40 disabled:opacity-40 text-slate-700 dark:text-white transition-colors cursor-pointer"
             title="Next Surah"
           >
             <SkipForward size={15} />
@@ -308,7 +304,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
         <select
           value={selectedSurahId}
           onChange={handleDropdownChange}
-          className="flex-1 bg-black/40 text-slate-200 text-xs rounded-xl px-2.5 py-1.5 border border-emerald-800/50 focus:outline-none focus:border-emerald-500 transition-colors truncate cursor-pointer"
+          className="flex-1 liquid-glass text-slate-800 dark:text-slate-200 text-xs rounded-xl px-2.5 py-1.5 border border-emerald-500/25 dark:border-emerald-800/50 focus:outline-none focus:border-emerald-500 transition-colors truncate cursor-pointer"
         >
           {Array.isArray(staticSurahs) &&
             staticSurahs.map((s: any) => (
@@ -323,7 +319,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
             hapticImpact(ImpactStyle.Light);
             onSelectSurah(selectedSurahId);
           }}
-          className="p-1.5 rounded-xl bg-emerald-700/60 hover:bg-emerald-600 text-emerald-200 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+          className="p-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white transition-colors flex items-center gap-1 cursor-pointer"
           title="Open Full Surah View"
         >
           <ExternalLink size={15} />
@@ -331,8 +327,8 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
       </div>
 
       {/* Quick Play Beloved Surah Chips */}
-      <div className="mt-3 pt-2.5 border-t border-emerald-800/50 relative z-10">
-        <p className="text-[10px] text-slate-400 mb-1.5 font-medium uppercase tracking-wider">
+      <div className="mt-3 pt-2.5 border-t border-emerald-500/20 dark:border-emerald-800/50 relative z-10">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1.5 font-medium uppercase tracking-wider">
           {isUrdu ? 'مقبول سورتیں:' : 'Quick Recitations:'}
         </p>
         <div className="flex flex-wrap gap-1.5">
@@ -345,7 +341,7 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
                 className={`px-2.5 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   isThisActive
                     ? 'bg-emerald-600 text-white shadow-xs ring-1 ring-emerald-400/50'
-                    : 'bg-black/40 hover:bg-black/60 text-emerald-300/80 hover:text-white border border-emerald-800/40'
+                    : 'liquid-glass text-slate-700 dark:text-emerald-200/90 border border-emerald-500/20 dark:border-emerald-800/40 hover:border-emerald-500'
                 }`}
               >
                 <span>{s.nameEn}</span>

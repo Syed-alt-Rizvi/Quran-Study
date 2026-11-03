@@ -43,18 +43,93 @@ const DIST_MAPS_DIR = path.join(DIST_CACHE_DIR, "maps");
 const surahAyahMaps: Record<number, Record<number, AyahOptionInfo>> = {};
 
 /**
+ * Multi-tier resilient fetch with direct curl, node fetch, and proxy fallback
+ */
+async function fetchRawHtmlWithFallback(url: string, timeoutMs = 12000): Promise<string> {
+  // 1. Direct curl (without -4, with dual-stack HTTP/2 and modern browser headers)
+  try {
+    const { stdout } = await execFilePromise(
+      "curl",
+      [
+        "-L",
+        "-s",
+        "-m",
+        String(Math.round(timeoutMs / 1000)),
+        "-A",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "-H",
+        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "-H",
+        "Accept-Language: en-US,en;q=0.9,ur;q=0.8,ar;q=0.7",
+        url
+      ],
+      { maxBuffer: 20 * 1024 * 1024 }
+    );
+    if (stdout && stdout.length > 500) {
+      return stdout;
+    }
+  } catch (err: any) {
+    // curl failed, try node fetch
+  }
+
+  // 2. Direct fetch with AbortSignal
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(timeoutMs),
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      }
+    });
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.length > 500) return text;
+    }
+  } catch (e) {}
+
+  // 3. Fallback via allorigins proxy
+  try {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl, {
+      signal: AbortSignal.timeout(timeoutMs + 4000),
+      headers: {
+        "User-Agent": "Mozilla/5.0"
+      }
+    });
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.length > 500) return text;
+    }
+  } catch (e) {}
+
+  throw new Error(`Failed to retrieve HTML from ${url}`);
+}
+
+/**
  * Clean and normalize extracted Tafseer HTML from Balagh ul Quran
+ * Retains 100% of the authentic commentary, lexical notes, hadith, and lessons.
  */
 function sanitizeBalaghHtml(htmlSnippet: string): string {
   if (!htmlSnippet) return "";
   const $ = cheerio.load(htmlSnippet);
 
-  // Remove navigation elements, search elements, or script tags
+  // Remove scripts, styles, forms, buttons, header/footer chrome
   $("script, style, iframe, form, button, a.btn, a.sp, .btn-with-arrow, header, footer, nav, .breadcrumb").remove();
   $("#msg2, #suraname, #frmAyaat, #header, #headerSearch").remove();
 
-  // Remove footer navigation rows or links pointing back to other tafseer sections
+  // Remove links pointing back to other tafseer sections
   $("a[href*='tafseer.php']").remove();
+
+  // Remove navigation rows with both 'پیچھے' and 'آگے'
+  $("div.row").each((_, el) => {
+    const $el = $(el);
+    const text = $el.text().trim();
+    if (text.includes("پیچھے") && text.includes("آگے")) {
+      $el.remove();
+    } else if (text.startsWith("تفسیر قرآن سورہ") && !text.includes("تشریح کلمات") && !text.includes("تفسیر آیات") && !text.includes("تفسیرآیات") && text.length > 400) {
+      $el.remove();
+    }
+  });
 
   // Remove empty tags
   $("p, div, span").each((_, el) => {
@@ -65,23 +140,12 @@ function sanitizeBalaghHtml(htmlSnippet: string): string {
     }
   });
 
-  // Remove rows that only contain other surah navigation links
-  $("div.row").each((_, el) => {
-    const $el = $(el);
-    const text = $el.text().trim();
-    if (text.includes("پیچھے") && text.includes("آگے")) {
-      $el.remove();
-    } else if (text.startsWith("تفسیر قرآن سورہ") && !text.includes("تشریح کلمات") && !text.includes("تفسیرآیات")) {
-      $el.remove();
-    }
-  });
-
   return $.html();
 }
 
 /**
  * Retrieve or dynamically scrape the exact ayah-to-ano mapping for any surah
- * Balagh ul Quran groups certain ayahs together (e.g. 1-2, 11-12, 16-18) in #idAyaat
+ * Balagh ul Quran groups certain ayahs together (e.g. 1-2, 2-5, 11-12, 16-18) in #idAyaat
  */
 export async function getSurahAyahMap(surah: number): Promise<Record<number, AyahOptionInfo>> {
   if (surahAyahMaps[surah] && Object.keys(surahAyahMaps[surah]).length > 0) {
@@ -107,23 +171,9 @@ export async function getSurahAyahMap(surah: number): Promise<Record<number, Aya
   const targetUrl = `https://balaghulquran.com/tafseer.php?sno=${surah}`;
   let html = "";
   try {
-    const { stdout } = await execFilePromise(
-      "curl",
-      [
-        "-4",
-        "-L",
-        "-s",
-        "-m",
-        "15",
-        "-A",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        targetUrl
-      ],
-      { maxBuffer: 10 * 1024 * 1024 }
-    );
-    html = stdout;
+    html = await fetchRawHtmlWithFallback(targetUrl, 10000);
   } catch (err: any) {
-    console.warn(`[getSurahAyahMap] Failed to curl surah ${surah} map:`, err?.message);
+    console.warn(`[getSurahAyahMap] Failed to fetch surah ${surah} map:`, err?.message);
   }
 
   const map: Record<number, AyahOptionInfo> = {};
@@ -187,8 +237,23 @@ export async function fetchTafseerAlKauthar(
       if (fs.existsSync(p)) {
         try {
           const cached = JSON.parse(fs.readFileSync(p, "utf-8"));
-          if (cached && cached.ur && cached.ur.length > 50 && cached.tafseer_text && cached.tafseer_text.length > 100) {
+          if (cached && cached.ur && cached.ur.length > 50 && (cached.tafseer_text || cached.ur.length > 100)) {
             return cached;
+          }
+        } catch (e) {}
+      }
+    }
+
+    // Also check if whole surah bundle is already on disk
+    const surahBundlePath = path.join(CACHE_DIR, `surah_${surah}.json`);
+    const distBundlePath = path.join(DIST_CACHE_DIR, `surah_${surah}.json`);
+    for (const p of [surahBundlePath, distBundlePath]) {
+      if (fs.existsSync(p)) {
+        try {
+          const bundle = JSON.parse(fs.readFileSync(p, "utf-8"));
+          const item = bundle[ayah] || bundle[String(ayah)];
+          if (item && item.ur && item.ur.length > 50) {
+            return item;
           }
         } catch (e) {}
       }
@@ -207,40 +272,8 @@ export async function fetchTafseerAlKauthar(
 
   let html = "";
   try {
-    const { stdout } = await execFilePromise(
-      "curl",
-      [
-        "-4",
-        "-L",
-        "-s",
-        "-m",
-        "15",
-        "-A",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "-H",
-        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "-H",
-        "Accept-Language: en-US,en;q=0.9,ur;q=0.8",
-        targetUrl
-      ],
-      { maxBuffer: 15 * 1024 * 1024 }
-    );
-    html = stdout;
+    html = await fetchRawHtmlWithFallback(targetUrl, 12000);
   } catch (err: any) {
-    try {
-      const res = await fetch(targetUrl, {
-        headers: { 
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-        }
-      });
-      html = await res.text();
-    } catch (fetchErr: any) {
-      throw new Error(`Failed to fetch Tafseer from Balagh ul Quran: ${err.message || fetchErr.message}`);
-    }
-  }
-
-  if (!html || html.length < 500) {
     // If ano failed and ayah > 1, check if the previous ayah already contains this ayah's tafseer
     if (ayah > 1) {
       const prevFile = path.join(CACHE_DIR, `s${surah}_a${ayah - 1}.json`);
@@ -257,38 +290,45 @@ export async function fetchTafseerAlKauthar(
         } catch (e) {}
       }
     }
+    throw new Error(`Failed to fetch Tafseer from Balagh ul Quran for Surah ${surah} Ayah ${ayah}: ${err.message}`);
+  }
+
+  if (!html || html.length < 500) {
     throw new Error(`Empty or invalid response from balaghulquran.com for Surah ${surah}, Ayah ${ayah}`);
   }
 
   // 3. Parse HTML with Cheerio
   const $ = cheerio.load(html);
 
-  // Remove navigation rows and unneeded controls
-  $("section.section .container > .row").each((_, el) => {
-    const $el = $(el);
-    const text = $el.text();
-    if (
-      $el.find("#msg2").length > 0 ||
-      $el.find("#suraname").length > 0 ||
-      (text.includes("پیچھے") && text.includes("آگے")) ||
-      (text.startsWith("تفسیر قرآن سورہ") && !text.includes("تشریح کلمات") && !text.includes("تفسیرآیات"))
-    ) {
-      $el.remove();
-    }
-  });
+  // Extract range from #msg2 before sanitizing
+  const msg2Text = $("#msg2").text().trim();
 
-  // Extract clean structured Urdu text
+  // Extract clean structured Urdu text by traversing all content rows
   let urduText = "";
-  $("section.section .container > .row").each((_, el) => {
+  const allRows = $("section.section .container .row, section.section .row");
+
+  allRows.each((_, el) => {
     const $el = $(el);
     const rowText = $el.text().trim().replace(/[ \t]+/g, " ");
-    if (rowText && !rowText.startsWith("تفسیر قرآن سورہ") && !rowText.includes("پیچھے") && !rowText.includes("آگے")) {
-      urduText += rowText + "\n\n";
+    
+    // Filter out previous/next buttons and footer directory
+    if (!rowText) return;
+    if (rowText.includes("پیچھے") && rowText.includes("آگے")) return;
+    if (rowText.startsWith("تفسیر قرآن سورہ") && !rowText.includes("تشریح کلمات") && !rowText.includes("تفسیر آیات") && !rowText.includes("تفسیرآیات") && rowText.length > 400) {
+      return;
+    }
+
+    // Clean video button labels
+    $el.find("a, button, .btn").filter((_, a) => $(a).text().includes("ویڈیو") || $(a).text().includes("درس")).remove();
+
+    const cleaned = $el.text().trim().replace(/[ \t]+/g, " ");
+    if (cleaned && !cleaned.includes("پیچھے") && !cleaned.includes("آگے")) {
+      urduText += cleaned + "\n\n";
     }
   });
 
-  // Extract clean HTML
-  const rawHtmlContainer = $("section.section .container").html() || "";
+  // Extract clean HTML container
+  const rawHtmlContainer = $("section.section .container").html() || $("section.section").html() || "";
   const cleanHtml = sanitizeBalaghHtml(rawHtmlContainer);
 
   if (!urduText.trim() && (!cleanHtml || cleanHtml.length < 100)) {
@@ -302,7 +342,7 @@ export async function fetchTafseerAlKauthar(
     tafseer_text: cleanHtml.trim(),
     en: "Tafseer Al-Kauthar by Allama Sheikh Mohsin Ali Najafi",
     tafseer_title: "تفسیر الکوثر — علامہ شیخ محسن علی نجفی",
-    ayah_range: targetLabel,
+    ayah_range: targetLabel || (msg2Text.includes("آیات") ? msg2Text : undefined),
     fetchedAt: new Date().toISOString()
   };
 
@@ -333,6 +373,71 @@ export async function fetchTafseerAlKauthar(
 }
 
 /**
+ * Get or dynamically build complete Surah bundle for Tafseer Al-Kauthar
+ */
+export async function getOrFetchKautharSurah(surah: number): Promise<Record<number, KautharTafseerItem>> {
+  const surahBundlePath = path.join(CACHE_DIR, `surah_${surah}.json`);
+  const distBundlePath = path.join(DIST_CACHE_DIR, `surah_${surah}.json`);
+
+  for (const p of [surahBundlePath, distBundlePath]) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = fs.readFileSync(p, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+  }
+
+  const map = await getSurahAyahMap(surah);
+  const bundle: Record<number, KautharTafseerItem> = {};
+
+  // Deduplicate unique ano options
+  const uniqueAnos = new Map<string, number>();
+  for (const [aStr, info] of Object.entries(map)) {
+    const aNum = Number(aStr);
+    if (!uniqueAnos.has(info.ano)) {
+      uniqueAnos.set(info.ano, aNum);
+    }
+  }
+
+  // Fetch groups in small concurrent batches of 3
+  const entries = Array.from(uniqueAnos.entries());
+  const BATCH_SIZE = 3;
+  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+    const batch = entries.slice(i, i + BATCH_SIZE);
+    await Promise.all(
+      batch.map(async ([ano, repAyah]) => {
+        try {
+          const item = await fetchTafseerAlKauthar(surah, repAyah);
+          const range = map[repAyah]?.range || [repAyah, repAyah];
+          for (let a = range[0]; a <= range[1]; a++) {
+            bundle[a] = { ...item, ayah: a };
+          }
+        } catch (err: any) {
+          console.warn(`[getOrFetchKautharSurah] Notice fetching surah ${surah} ano ${ano}:`, err?.message);
+        }
+      })
+    );
+    await new Promise(r => setTimeout(r, 60));
+  }
+
+  if (Object.keys(bundle).length > 0) {
+    const payload = JSON.stringify(bundle, null, 2);
+    try {
+      fs.writeFileSync(surahBundlePath, payload, "utf-8");
+      if (fs.existsSync(DIST_CACHE_DIR)) {
+        fs.writeFileSync(distBundlePath, payload, "utf-8");
+      }
+    } catch (e) {}
+  }
+
+  return bundle;
+}
+
+/**
  * Background crawler for full surahs
  */
 export async function crawlSurahKauthar(
@@ -340,31 +445,8 @@ export async function crawlSurahKauthar(
   totalAyahs: number,
   onProgress?: (current: number, total: number) => void
 ): Promise<KautharTafseerItem[]> {
-  const items: KautharTafseerItem[] = [];
-
-  for (let a = 1; a <= totalAyahs; a++) {
-    try {
-      const item = await fetchTafseerAlKauthar(surah, a);
-      items.push(item);
-      if (onProgress) onProgress(a, totalAyahs);
-      await new Promise(r => setTimeout(r, 120));
-    } catch (e: any) {
-      console.warn(`Error crawling Surah ${surah} Ayah ${a}:`, e.message);
-    }
-  }
-
-  // Save complete surah JSON bundle for instant batch loading
-  const surahBundlePath = path.join(CACHE_DIR, `surah_${surah}.json`);
-  const distBundlePath = path.join(DIST_CACHE_DIR, `surah_${surah}.json`);
-  try {
-    const bundlePayload = JSON.stringify(items, null, 2);
-    fs.writeFileSync(surahBundlePath, bundlePayload, "utf-8");
-    if (fs.existsSync(DIST_CACHE_DIR)) {
-      fs.writeFileSync(distBundlePath, bundlePayload, "utf-8");
-    }
-  } catch (e) {
-    console.error(`Could not write surah bundle for Surah ${surah}:`, e);
-  }
-
+  const bundle = await getOrFetchKautharSurah(surah);
+  const items = Object.values(bundle);
+  if (onProgress) onProgress(items.length, totalAyahs);
   return items;
 }

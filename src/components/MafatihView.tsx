@@ -316,15 +316,14 @@ export const MafatihView: React.FC<MafatihViewProps> = ({ onSelectItem }) => {
 
         <div className="relative z-10 flex items-center justify-between gap-3 min-w-0">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-lg liquid-glass text-sky-900 dark:text-sky-200 border border-sky-400/50 text-[10px] font-bold uppercase tracking-wider shadow-2xs">
-                {isUrdu ? 'کتابِ دعا و زیارت' : 'Sacred Supplications'}
-              </span>
-              <span className="text-sm text-sky-800 dark:text-sky-300 font-arabic font-bold">مَفَاتِيحُ الْجِنَانِ</span>
+            <div className="flex items-center gap-2 mb-1 flex-wrap text-[11px] text-sky-800 dark:text-sky-300 font-medium">
+              <span>{isUrdu ? 'کتابِ دعا و زیارت' : 'Sacred Supplications'}</span>
+              <span aria-hidden="true" className="opacity-60">·</span>
+              <span className="font-arabic font-bold text-sm">مَفَاتِيحُ الْجِنَانِ</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 truncate">
+            <h2 className="text-xl sm:text-2xl font-['Cormorant_Garamond',_'Playfair_Display',_Georgia,_serif] italic font-semibold tracking-wide text-slate-900 dark:text-white flex items-center gap-2 truncate">
               <span>{isUrdu ? 'مفاتیح الجنان' : 'Mafatih Al Jinan'}</span>
-              <span className="text-xs font-normal text-sky-800/80 dark:text-sky-200/80 hidden sm:inline">
+              <span className="text-xs font-normal not-italic text-sky-800/80 dark:text-sky-200/80 hidden sm:inline font-sans">
                 — {isUrdu ? 'محدث شیخ عباس قمی (رح)' : 'Sheikh Abbas Qummi (r.a)'}
               </span>
             </h2>
