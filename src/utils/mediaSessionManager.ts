@@ -36,7 +36,16 @@ const DEFAULT_ARTWORK = [
   { src: toAbsoluteUrl('/pwa-512x512.png'), sizes: '512x512', type: 'image/png' }
 ];
 
+import { syncNativeMediaNotification, clearNativeMediaNotification } from './nativeMediaBridge';
+
 export function updateMediaSession(config: MediaSessionConfig) {
+  // Synchronize OS-level native media notification & WakeLock on Android
+  syncNativeMediaNotification(
+    config.title || "The Holy Qur'an",
+    config.artist || "Recitation",
+    config.playbackState === 'playing'
+  );
+
   if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
     return;
   }
@@ -112,6 +121,8 @@ export function updateMediaSession(config: MediaSessionConfig) {
 }
 
 export function clearMediaSession() {
+  clearNativeMediaNotification();
+
   if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
     return;
   }

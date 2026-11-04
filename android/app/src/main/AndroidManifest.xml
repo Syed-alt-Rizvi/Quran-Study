@@ -55,6 +55,13 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!-- Quran & Sacred Audio Background Foreground Media Service -->
+        <service
+            android:name=".BackgroundMediaService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <!-- Shia Adhan Alarm Receiver (Triggered by AlarmManager.setAlarmClock) -->
         <receiver
             android:name=".AdhanAlarmReceiver"

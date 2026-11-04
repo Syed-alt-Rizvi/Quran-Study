@@ -5,6 +5,7 @@ import { useAudioStore } from './audioStore';
 import { getCanonicalMafatihId } from './mafatihApi';
 import { audioFocusCoordinator } from './utils/audioFocus';
 import { updateMediaSession as syncMediaSession, clearMediaSession } from './utils/mediaSessionManager';
+import { subscribeToMediaActions } from './utils/nativeMediaBridge';
 
 export interface MafatihAudioTrack {
   id: string;
@@ -453,3 +454,18 @@ export const useMafatihAudioStore = create<MafatihAudioState>((set, get) => {
     },
   };
 });
+
+if (typeof window !== 'undefined') {
+  subscribeToMediaActions((action) => {
+    const state = useMafatihAudioStore.getState();
+    if (state.currentTrack) {
+      if (action === 'play') {
+        state.resume();
+      } else if (action === 'pause') {
+        state.pause();
+      } else if (action === 'stop') {
+        state.stop();
+      }
+    }
+  });
+}

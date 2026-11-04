@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(AdhanNativePlugin.class);
+        registerPlugin(MediaNativePlugin.class);
         super.onCreate(savedInstanceState);
         handleWidgetIntent(getIntent());
 

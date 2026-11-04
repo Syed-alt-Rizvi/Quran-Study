@@ -209,9 +209,11 @@
     <!-- Google Tag Manager (noscript fallback) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-SHIAMARKAZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <!-- Main Application Mounting Container with Semantic Fallback Content for Crawlers & SEO Audits -->
-    <div id="root">
-      <!-- Semantic Static HTML Pre-Rendered for Search Engine Indexation (React replaces this automatically upon hydration) -->
+    <!-- Main Application Mounting Container (clean container prevents Webview layout flash) -->
+    <div id="root"></div>
+
+    <!-- Fallback Content for Web Crawlers and Browsers with JavaScript Disabled -->
+    <noscript>
       <header style="max-width: 960px; margin: 0 auto; padding: 24px 16px; border-bottom: 1px solid #e2e8f0;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
           <div>
@@ -230,7 +232,6 @@
           <a href="/?tab=mafatih" style="color: #047857; text-decoration: none; padding: 7px 14px; background: #ecfdf5; border-radius: 8px;">Mafatih Al Jinan Duas &amp; Ziyaraat</a>
           <a href="/?tab=adhan" style="color: #047857; text-decoration: none; padding: 7px 14px; background: #ecfdf5; border-radius: 8px;">Shia Prayer Times &amp; Adhan</a>
           <a href="/?tab=calendar" style="color: #047857; text-decoration: none; padding: 7px 14px; background: #ecfdf5; border-radius: 8px;">Shia Islamic Hijri Calendar</a>
-          <a href="/?tab=science" style="color: #047857; text-decoration: none; padding: 7px 14px; background: #ecfdf5; border-radius: 8px;">Ahlulbayt Science &amp; Exegesis</a>
           <a href="/?tab=discuss" style="color: #047857; text-decoration: none; padding: 7px 14px; background: #ecfdf5; border-radius: 8px;">Community Reflections</a>
           <a href="/privacy" style="color: #64748b; text-decoration: none; padding: 7px 14px;">Privacy Policy</a>
           <a href="/terms" style="color: #64748b; text-decoration: none; padding: 7px 14px;">Terms of Service</a>
@@ -274,12 +275,6 @@
             <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
               Immerse yourself in the immortal words of the Ahlulbayt (a.s) compiled by Sheikh Abbas Qummi in <strong>Mafatih Al Jinan</strong>. Access cherished supplications including <em>Dua Kumayl, Dua Tawassul, Dua al-Faraj, Dua al-Ahd, Dua al-Iftitah, Dua al-Mashlool, Dua al-Mujir</em>, and esteemed Ziyaraat including <em>Ziyarat Ashura, Ziyarat Waritha, Ziyarat Ale-Yasin</em>, alongside <em>Hadith al-Kisa</em>. Each recitation provides verse-by-verse Arabic typography, translations, and soothing streaming audio playback.
             </p>
-            <h3 style="font-size: 17px; font-weight: 600; color: #047857; margin-bottom: 10px;">
-              Cherished Duas: Dua Kumayl, Dua Tawassul, Dua al-Ahd &amp; Ziyarat Ashura
-            </h3>
-            <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
-              Every supplication is rendered with diacritically accurate Arabic vocalization, synchronous Urdu translations, and English transliterations to facilitate deep contemplation and spiritual connection during daily prayers and sacred Thursday nights.
-            </p>
           </section>
 
           <section id="prayer-times-overview" style="margin-bottom: 40px;">
@@ -289,12 +284,6 @@
             <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
               Calculate exact Ja'fari prayer times (Fajr, Sunrise, Dhuhr, Asr, Sunset, Maghrib, Isha, and Midnight) worldwide based on authentic Ithna Ashari astronomical criteria. Experience authentic Shia Adhan notifications incorporating the sacred third testimony (<em>Ashhadu anna Aliyyan Waliyyullah</em>) and track the sacred Qibla direction towards the Holy Ka'bah in Makkah.
             </p>
-            <h3 style="font-size: 17px; font-weight: 600; color: #047857; margin-bottom: 10px;">
-              Precise Ja'fari Prayer Times &amp; Triple Testimony Shia Adhan
-            </h3>
-            <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
-              Unlike conventional calculation methods, the Ja'fari methodology applies twilight angles of 16 degrees for Fajr and 14 degrees for Isha, with Maghrib determined strictly by the disappearance of the eastern redness after sunset.
-            </p>
           </section>
 
           <section id="calendar-overview" style="margin-bottom: 40px;">
@@ -302,16 +291,7 @@
               Shia Islamic Hijri Calendar &amp; Historical Occasions Chronicle
             </h2>
             <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
-              Stay spiritually aligned throughout the Islamic lunar year with the comprehensive Shia calendar. Track all major Islamic occasions, including the Wiladat and Shahadat of the Holy Prophet Muhammad (s.a.w.w), Lady Fatimah az-Zahra (s.a), Imam Ali (a.s), and the Holy Imams of Ahlulbayt (a.s), alongside sacred Eids (Eid al-Ghadeer, Eid al-Fitr, Eid al-Adha, Eid al-Mubahala) and recommended fasting days.
-            </p>
-          </section>
-
-          <section id="science-overview" style="margin-bottom: 40px;">
-            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 14px;">
-              Quran, Hadith &amp; Modern Science Insights from the Ahlulbayt (a.s)
-            </h2>
-            <p style="font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 14px;">
-              Explore the profound harmony between Quranic revelations, scientific discovery, and the profound discourses of the Ahlulbayt (a.s). Read authentic analyses on cosmology, embryology, medicine (Tibbal-Rida), natural theology, and Imam Ja'far al-Sadiq's (a.s) teachings on physics and chemistry.
+              Stay spiritually aligned throughout the Islamic lunar year with the comprehensive Shia calendar. Track all major Islamic occasions, including the Wiladat and Shahadat of the Holy Prophet Muhammad (s.a.w.w), Lady Fatimah az-Zahra (s.a), Imam Ali (a.s), and the Holy Imams of Ahlulbayt (a.s).
             </p>
           </section>
 
@@ -334,10 +314,7 @@
           <a href="/data-deletion" style="color: #047857; text-decoration: none; margin: 0 8px;">Data Deletion</a>
         </p>
       </footer>
-    </div>
 
-    <!-- Fallback for Web Crawlers and Browsers with JavaScript Disabled -->
-    <noscript>
       <div style="max-width: 800px; margin: 20px auto; padding: 20px; background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; color: #991b1b; font-family: sans-serif;">
         <h3 style="margin-top: 0;">JavaScript Required for Full Interactive Experience</h3>
         <p>Shia Markaz requires JavaScript to play audio recitations and enable live search. You can still access full text content by browsing our chapters below:</p>

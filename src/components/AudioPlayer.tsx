@@ -27,6 +27,7 @@ import {
 } from '../utils/quranAudioEngine';
 import { audioFocusCoordinator } from '../utils/audioFocus';
 import { updateMediaSession as syncMediaSession, clearMediaSession } from '../utils/mediaSessionManager';
+import { subscribeToMediaActions } from '../utils/nativeMediaBridge';
 
 interface AudioPlayerProps {
   onSelectSurah?: (surahId: number, targetAyah?: number) => void;
@@ -351,6 +352,28 @@ export default function AudioPlayer({
     prev, 
     next
   ]);
+
+  // Listen for native Android notification action clicks (Play, Pause, Next, Prev, Stop)
+  useEffect(() => {
+    const unsubscribe = subscribeToMediaActions((action) => {
+      if (action === 'play') {
+        play();
+      } else if (action === 'pause') {
+        pause();
+      } else if (action === 'next') {
+        if (currentIndex < playlist.length - 1) {
+          next();
+        }
+      } else if (action === 'prev') {
+        if (currentIndex > 0) {
+          prev();
+        }
+      } else if (action === 'stop') {
+        stop();
+      }
+    });
+    return unsubscribe;
+  }, [play, pause, next, prev, stop, currentIndex, playlist.length]);
 
   // Keyboard navigation shortcuts (Space: Play/Pause, Left/Right: Prev/Next)
   useEffect(() => {

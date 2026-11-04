@@ -26,6 +26,8 @@ jobs:
     name: Build Web & Android Artifacts
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      NODE_OPTIONS: "--no-deprecation"
 
     steps:
       - name: Checkout Code
@@ -40,7 +42,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm config set engine-strict false
-          npm ci --prefer-offline --no-fund --no-audit --loglevel=error || npm install --legacy-peer-deps --no-fund --no-audit --loglevel=error
+          npm install --legacy-peer-deps --no-fund --no-audit --loglevel=error
 
       - name: Code Quality & Typecheck
         run: |
@@ -72,6 +74,7 @@ jobs:
         run: |
           node prepare-assets.cjs || true
           npx cap sync android || npx @capacitor/cli sync android
+          sed -i '/flatDir[[:space:]]*{/,/}/d' android/capacitor-cordova-android-plugins/build.gradle android/app/build.gradle 2>/dev/null || true
           rm -f android/app/src/main/assets/public/server.cjs || true
           mkdir -p android/app/src/main/res/raw
           if [ -f "public/audio/shia_adhan.mp3" ]; then
