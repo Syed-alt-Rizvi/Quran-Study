@@ -520,20 +520,6 @@ async function startServer() {
     ]);
   });
 
-  // Non-blocking background seed check
-  (async () => {
-    try {
-      const existingArticles = await db.select().from(imamScienceArticles).limit(1).execute();
-      if (existingArticles.length === 0) {
-        console.log("Database empty. Seeding Imam & Science articles in background...");
-        const { seed } = await import("./src/db/seed");
-        await seed();
-        console.log("Database seeding completed.");
-      }
-    } catch (e) {
-      console.error("Failed to seed database:", e);
-    }
-  })();
 
 
   // Fast cached API route for proxying HTML to bypass CORS on the web

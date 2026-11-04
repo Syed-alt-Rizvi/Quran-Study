@@ -31,16 +31,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4.2.2
 
-      - name: Set up Node.js 20 LTS
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4.2.0
         with:
-          node-version: 20
+          node-version: 22
           cache: "npm"
 
       - name: Install Dependencies
         run: |
           npm config set engine-strict false
-          npm ci --prefer-offline --no-fund --no-audit || npm install --legacy-peer-deps --no-fund --no-audit
+          npm ci --prefer-offline --no-fund --no-audit --loglevel=error || npm install --legacy-peer-deps --no-fund --no-audit --loglevel=error
 
       - name: Code Quality & Typecheck
         run: |
