@@ -43,6 +43,12 @@ public class AdhanAlarmReceiver extends BroadcastReceiver {
                     prayerName = "Prayer Time";
                 }
 
+                try {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+                    String todayStr = sdf.format(new java.util.Date());
+                    AdhanStorage.markPrayerPlayed(context, prayerName, todayStr);
+                } catch (Exception ignored) {}
+
                 Intent serviceIntent = new Intent(context, AdhanPlaybackService.class);
                 serviceIntent.setAction(AdhanPlaybackService.ACTION_START_PLAYBACK);
                 serviceIntent.putExtra(AdhanPlaybackService.EXTRA_PRAYER_NAME, prayerName);

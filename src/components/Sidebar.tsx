@@ -20,6 +20,7 @@ import { PWAInstallButton } from './PWAInstallButton';
 import { getApiUrl } from '../utils/apiBase';
 import { SURAH_URDU_MAP } from '../data/surahUrduNames';
 import staticSurahs from '../surahList.json';
+import { shiaAdhanPlayer } from '../utils/shiaAdhanPlayer';
 
 import { registerModal } from '../utils/modalBackHandler';
 
@@ -55,7 +56,8 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
     mafatihFontSize, setMafatihFontSize,
     mafatihShowTranslation, toggleMafatihShowTranslation,
     mafatihDefaultSpeed, setMafatihDefaultSpeed,
-    appLanguage, setAppLanguage
+    appLanguage, setAppLanguage,
+    adhanSettings, updateAdhanSettings
   } = useSettingsStore();
 
   const [activeTab, setActiveTab] = useState<TabCategory>('display');
@@ -1111,6 +1113,88 @@ export default function Sidebar({ isOpen, onClose, onSelectSurah, onSelectMafati
                   >
                     <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${autoScrollAudio ? 'translate-x-6 left-0' : 'translate-x-1 left-0'}`} />
                   </button>
+                </div>
+
+                {/* Shia Adhan Voice Selection */}
+                <div className="p-4 rounded-2xl border border-white/40 dark:border-white/10 liquid-glass-card space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Bell size={17} className="text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">
+                          {isUrdu ? 'اذان کی آواز' : 'Shia Adhan Voice'}
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          {isUrdu 
+                            ? 'نماز کے اوقات میں اذان کا انتخاب'
+                            : 'Recitation style for prayer notifications'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg liquid-glass border border-emerald-500/30 text-emerald-700 dark:text-emerald-300">
+                      {adhanSettings.adhanVoice === 'short' 
+                        ? (isUrdu ? 'مختصر اذان' : 'Short (72s)') 
+                        : (isUrdu ? 'مکمل اذان' : 'Full (5m)')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Full Option */}
+                    <button
+                      type="button"
+                      id="sidebar-adhan-voice-full"
+                      onClick={() => {
+                        hapticSelection();
+                        updateAdhanSettings({ adhanVoice: 'full' });
+                        shiaAdhanPlayer.setAdhanVoice('full');
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
+                        (adhanSettings.adhanVoice || 'full') === 'full'
+                          ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-xs">
+                          {isUrdu ? 'مکمل اذان' : 'Adhan (Full)'}
+                        </span>
+                        {(adhanSettings.adhanVoice || 'full') === 'full' && (
+                          <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">
+                        {isUrdu ? 'مکمل تلاوت (~5 منٹ)' : 'Full 5-min recitation'}
+                      </span>
+                    </button>
+
+                    {/* Short Option */}
+                    <button
+                      type="button"
+                      id="sidebar-adhan-voice-short"
+                      onClick={() => {
+                        hapticSelection();
+                        updateAdhanSettings({ adhanVoice: 'short' });
+                        shiaAdhanPlayer.setAdhanVoice('short');
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
+                        adhanSettings.adhanVoice === 'short'
+                          ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                          : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-xs">
+                          {isUrdu ? 'مختصر اذان' : 'Adhan (Short)'}
+                        </span>
+                        {adhanSettings.adhanVoice === 'short' && (
+                          <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">
+                        {isUrdu ? '4 تکبیریں (~72 سیکنڈ)' : '4 Takbirs alert (~72s)'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

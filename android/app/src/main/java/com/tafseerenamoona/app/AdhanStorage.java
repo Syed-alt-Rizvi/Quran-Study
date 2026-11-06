@@ -29,6 +29,7 @@ public class AdhanStorage {
     private static final String KEY_AUTOPLAY_FAJR = "autoplay_fajr";
     private static final String KEY_AUTOPLAY_DHUHR = "autoplay_dhuhr";
     private static final String KEY_AUTOPLAY_MAGHRIB = "autoplay_maghrib";
+    private static final String KEY_ADHAN_VOICE = "adhan_voice";
 
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_LONGITUDE = "longitude";
@@ -52,7 +53,8 @@ public class AdhanStorage {
             boolean autoPlayDhuhr,
             boolean autoPlayMaghrib,
             double latitude,
-            double longitude
+            double longitude,
+            String adhanVoice
     ) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString(KEY_TODAY_DATE, todayDate);
@@ -69,6 +71,10 @@ public class AdhanStorage {
         editor.putBoolean(KEY_AUTOPLAY_DHUHR, autoPlayDhuhr);
         editor.putBoolean(KEY_AUTOPLAY_MAGHRIB, autoPlayMaghrib);
 
+        if (adhanVoice != null && !adhanVoice.isEmpty()) {
+            editor.putString(KEY_ADHAN_VOICE, adhanVoice);
+        }
+
         editor.putString(KEY_LATITUDE, String.valueOf(latitude));
         editor.putString(KEY_LONGITUDE, String.valueOf(longitude));
         editor.putLong(KEY_LAST_SCHEDULED_TIMESTAMP, System.currentTimeMillis());
@@ -76,6 +82,31 @@ public class AdhanStorage {
 
         // Update home screen widget with fresh timings
         updateWidgets(context, fajrToday, dhuhrToday, maghribToday);
+    }
+
+    public static void saveTimings(
+            Context context,
+            String todayDate,
+            String fajrToday,
+            String dhuhrToday,
+            String maghribToday,
+            String tomorrowDate,
+            String fajrTomorrow,
+            String dhuhrTomorrow,
+            String maghribTomorrow,
+            boolean autoPlayFajr,
+            boolean autoPlayDhuhr,
+            boolean autoPlayMaghrib,
+            double latitude,
+            double longitude
+    ) {
+        saveTimings(
+                context,
+                todayDate, fajrToday, dhuhrToday, maghribToday,
+                tomorrowDate, fajrTomorrow, dhuhrTomorrow, maghribTomorrow,
+                autoPlayFajr, autoPlayDhuhr, autoPlayMaghrib,
+                latitude, longitude, "full"
+        );
     }
 
     public static String getFajrToday(Context context) {
@@ -120,6 +151,14 @@ public class AdhanStorage {
 
     public static boolean isMaghribEnabled(Context context) {
         return getPrefs(context).getBoolean(KEY_AUTOPLAY_MAGHRIB, true);
+    }
+
+    public static String getAdhanVoice(Context context) {
+        return getPrefs(context).getString(KEY_ADHAN_VOICE, "full");
+    }
+
+    public static void setAdhanVoice(Context context, String adhanVoice) {
+        getPrefs(context).edit().putString(KEY_ADHAN_VOICE, adhanVoice).apply();
     }
 
     public static double getLatitude(Context context) {
@@ -177,5 +216,37 @@ public class AdhanStorage {
                 context.sendBroadcast(updateIntent);
             }
         } catch (Exception ignored) {}
+    }
+
+    private static final String KEY_LAST_PLAYED_FAJR = "last_played_fajr";
+    private static final String KEY_LAST_PLAYED_DHUHR = "last_played_dhuhr";
+    private static final String KEY_LAST_PLAYED_MAGHRIB = "last_played_maghrib";
+
+    public static void markPrayerPlayed(Context context, String prayerName, String dateStr) {
+        if (prayerName == null || context == null) return;
+        String lower = prayerName.toLowerCase();
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        if (lower.contains("fajr")) {
+            editor.putString(KEY_LAST_PLAYED_FAJR, dateStr);
+        } else if (lower.contains("dhuhr") || lower.contains("zuhr")) {
+            editor.putString(KEY_LAST_PLAYED_DHUHR, dateStr);
+        } else if (lower.contains("maghrib")) {
+            editor.putString(KEY_LAST_PLAYED_MAGHRIB, dateStr);
+        }
+        editor.apply();
+    }
+
+    public static boolean isPrayerPlayedToday(Context context, String prayerName, String todayDate) {
+        if (prayerName == null || todayDate == null || context == null) return false;
+        String lower = prayerName.toLowerCase();
+        SharedPreferences prefs = getPrefs(context);
+        if (lower.contains("fajr")) {
+            return todayDate.equals(prefs.getString(KEY_LAST_PLAYED_FAJR, ""));
+        } else if (lower.contains("dhuhr") || lower.contains("zuhr")) {
+            return todayDate.equals(prefs.getString(KEY_LAST_PLAYED_DHUHR, ""));
+        } else if (lower.contains("maghrib")) {
+            return todayDate.equals(prefs.getString(KEY_LAST_PLAYED_MAGHRIB, ""));
+        }
+        return false;
     }
 }

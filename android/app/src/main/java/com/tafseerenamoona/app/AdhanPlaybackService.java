@@ -35,6 +35,9 @@ public class AdhanPlaybackService extends Service {
     private static final String CHANNEL_ID = "shia_adhan_alarm_playback_channel";
     private static final int NOTIFICATION_ID = 911001;
 
+    public static volatile boolean isPlaying = false;
+    public static volatile String currentPrayer = null;
+
     private MediaPlayer mediaPlayer;
     private PowerManager.WakeLock wakeLock;
     private AudioManager audioManager;
@@ -63,6 +66,9 @@ public class AdhanPlaybackService extends Service {
         if (prayerName == null || prayerName.isEmpty()) {
             prayerName = "Prayer Time";
         }
+
+        isPlaying = true;
+        currentPrayer = prayerName;
 
         // 1. Immediately start foreground with ongoing notification (mandatory within 5s)
         Notification notification = buildForegroundNotification(prayerName);
@@ -117,9 +123,14 @@ public class AdhanPlaybackService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
+        boolean isShort = "short".equalsIgnoreCase(AdhanStorage.getAdhanVoice(this));
+        String contentText = isShort
+                ? "Allāhu Akbar (4 Takbirs) • Ja'fari Prayer Call"
+                : "Allāhu Akbar • Ja'fari Prayer Call in Progress";
+
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Shia Adhan • " + prayerName)
-                .setContentText("Allāhu Akbar • Ja'fari Prayer Call in Progress")
+                .setContentText(contentText)
                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
                 .setContentIntent(contentPendingIntent)
                 .setOngoing(true)
@@ -175,8 +186,10 @@ public class AdhanPlaybackService extends Service {
                     .build();
             mediaPlayer.setAudioAttributes(audioAttributes);
 
-            // Raw resource URI for bundled authentic Shia Adhan MP3
-            Uri audioUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.shia_adhan);
+            // Raw resource URI based on selected adhan voice (full vs short)
+            String voice = AdhanStorage.getAdhanVoice(this);
+            int rawResId = "short".equalsIgnoreCase(voice) ? R.raw.shia_adhan_short : R.raw.shia_adhan;
+            Uri audioUri = Uri.parse("android.resource://" + getPackageName() + "/" + rawResId);
             mediaPlayer.setDataSource(this, audioUri);
             mediaPlayer.setLooping(false);
 
@@ -247,6 +260,9 @@ public class AdhanPlaybackService extends Service {
     }
 
     private void stopAdhan() {
+        isPlaying = false;
+        currentPrayer = null;
+
         try {
             if (mediaPlayer != null) {
                 if (mediaPlayer.isPlaying()) {

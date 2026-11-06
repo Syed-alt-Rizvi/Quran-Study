@@ -3,6 +3,37 @@
 
 import { ShiaPrayerTimings } from './shiaPrayerTimes';
 import { audioFocusCoordinator } from './audioFocus';
+import { registerPlugin, Capacitor } from '@capacitor/core';
+
+export interface AdhanNativePlugin {
+  scheduleAlarms(options: {
+    todayDate: string;
+    fajrToday: string;
+    dhuhrToday: string;
+    maghribToday: string;
+    tomorrowDate: string;
+    fajrTomorrow: string;
+    dhuhrTomorrow: string;
+    maghribTomorrow: string;
+    autoPlayFajr: boolean;
+    autoPlayDhuhr: boolean;
+    autoPlayMaghrib: boolean;
+    latitude: number;
+    longitude: number;
+    adhanVoice?: 'full' | 'short';
+  }): Promise<{ success: boolean; message: string }>;
+  cancelAllAlarms(): Promise<{ success: boolean }>;
+  checkExactAlarmPermission(): Promise<{ granted: boolean; required: boolean; sdkInt: number }>;
+  requestExactAlarmPermission(): Promise<{ opened: boolean; alreadyGranted?: boolean }>;
+  checkBatteryOptimization(): Promise<{ ignoringBatteryOptimizations: boolean }>;
+  requestIgnoreBatteryOptimization(): Promise<{ requested: boolean; error?: string }>;
+  playAdhanNow(options?: { prayerName?: string }): Promise<{ success: boolean }>;
+  stopAdhanPlayback(): Promise<{ success: boolean }>;
+  isAdhanPlaying(): Promise<{ isPlaying: boolean; currentPrayer?: string }>;
+  getAlarmStatus(): Promise<any>;
+}
+
+export const AdhanNative = registerPlugin<AdhanNativePlugin>('AdhanNative');
 
 export interface ShiaAdhanLine {
   arabic: string;
@@ -98,10 +129,12 @@ class ShiaAdhanPlayerService {
     dhuhr: '',
     maghrib: ''
   };
+  private currentVoice: 'full' | 'short' = 'full';
 
   constructor() {
     if (typeof window !== 'undefined') {
       this.loadLastPlayedDate();
+      this.loadAdhanVoice();
       this.initAudio();
       this.setupGlobalUnlockListeners();
 
@@ -123,12 +156,16 @@ class ShiaAdhanPlayerService {
       import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
         LocalNotifications.addListener('localNotificationReceived', (notification: any) => {
           if (notification?.extra?.type === 'adhan') {
-            this.playAdhan(notification.extra.prayer || 'Shia Adhan', 1);
+            if (!this.isPlaying) {
+              this.playAdhan(notification.extra.prayer || 'Shia Adhan', 1);
+            }
           }
         });
         LocalNotifications.addListener('localNotificationActionPerformed', (action: any) => {
           if (action?.notification?.extra?.type === 'adhan') {
-            this.playAdhan(action.notification.extra.prayer || 'Shia Adhan', 1);
+            if (!this.isPlaying) {
+              this.playAdhan(action.notification.extra.prayer || 'Shia Adhan', 1);
+            }
           }
         });
       }).catch(() => {});
@@ -204,12 +241,30 @@ class ShiaAdhanPlayerService {
     } catch {}
   }
 
+  private loadAdhanVoice() {
+    try {
+      const stored = localStorage.getItem('adhan-settings-storage');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.state?.adhanSettings?.adhanVoice) {
+          this.currentVoice = parsed.state.adhanSettings.adhanVoice;
+        }
+      }
+    } catch {}
+  }
+
+  public resolveAudioUrl(voice?: 'full' | 'short'): string {
+    const v = voice || this.currentVoice;
+    const filename = v === 'short' ? 'shia_adhan_short.mp3' : 'shia_adhan.mp3';
+    return typeof window !== 'undefined' && window.location.origin
+      ? `${window.location.origin}/audio/${filename}`
+      : `/audio/${filename}`;
+  }
+
   private initAudio() {
     if (this.audio) return;
     try {
-      const audioUrl = typeof window !== 'undefined' && window.location.origin
-        ? `${window.location.origin}/audio/shia_adhan.mp3`
-        : '/audio/shia_adhan.mp3';
+      const audioUrl = this.resolveAudioUrl();
 
       this.audio = new Audio(audioUrl);
       this.audio.preload = 'auto';
@@ -332,15 +387,81 @@ class ShiaAdhanPlayerService {
       volume: this.audio?.volume ?? 0.9,
       repeatCount: this.repeatCount,
       currentRepeat: this.currentRepeat,
-      isUnlocked: this.isUnlocked
+      isUnlocked: this.isUnlocked,
+      adhanVoice: this.currentVoice
     };
   }
 
-  public async playAdhan(prayerName: string = 'Shia Adhan', repeats: number = 1): Promise<boolean> {
+  public setAdhanVoice(voice: 'full' | 'short') {
+    this.currentVoice = voice;
+    if (this.audio) {
+      const targetUrl = this.resolveAudioUrl(voice);
+      const filename = voice === 'short' ? 'shia_adhan_short.mp3' : 'shia_adhan.mp3';
+      if (!this.audio.src.includes(filename) && !this.isPlaying) {
+        this.audio.src = targetUrl;
+        this.audio.load();
+      }
+    }
+    this.notify();
+  }
+
+  public getAdhanVoice(): 'full' | 'short' {
+    return this.currentVoice;
+  }
+
+  public async playPreview(voice: 'full' | 'short'): Promise<boolean> {
+    if (this.isPlaying && this.currentVoice === voice) {
+      this.stopAdhan();
+      return false;
+    }
+    this.stopAdhan();
+    this.setAdhanVoice(voice);
+    return this.playAdhan(voice === 'short' ? 'Adhan (Short • 4 Takbirs)' : 'Adhan (Full • 5 min)', 1, voice);
+  }
+
+  public async playAdhan(
+    prayerName: string = 'Shia Adhan',
+    repeats: number = 1,
+    voiceOverride?: 'full' | 'short'
+  ): Promise<boolean> {
+    if (voiceOverride) {
+      this.currentVoice = voiceOverride;
+    }
+
+    // 1. Guard against duplicate invocation: If web audio is already actively playing, DO NOT start another!
+    if (this.isPlaying || (this.audio && !this.audio.paused && !this.audio.ended && this.audio.currentTime > 0)) {
+      console.log(`[AdhanPlayer] Adhan is already actively playing (${this.currentPrayerName || prayerName}), skipping duplicate playback request.`);
+      return true;
+    }
+
+    // 2. Guard against native Android playback: If native AdhanPlaybackService is already playing, DO NOT start web audio on top!
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      try {
+        const nativeStatus = await AdhanNative.isAdhanPlaying();
+        if (nativeStatus?.isPlaying) {
+          console.log(`[AdhanPlayer] Native Android AdhanPlaybackService is already actively playing (${nativeStatus.currentPrayer || prayerName}), syncing in-app UI state without double playback.`);
+          this.isPlaying = true;
+          this.currentPrayerName = nativeStatus.currentPrayer || prayerName;
+          this.notify();
+          return true;
+        }
+      } catch (err) {
+        console.warn('[AdhanPlayer] Could not query native playback status:', err);
+      }
+    }
+
     if (!this.audio) {
       this.initAudio();
     }
     if (!this.audio) return false;
+
+    // Ensure audio element source matches the selected adhan voice
+    const targetUrl = this.resolveAudioUrl(this.currentVoice);
+    const filename = this.currentVoice === 'short' ? 'shia_adhan_short.mp3' : 'shia_adhan.mp3';
+    if (!this.audio.src.includes(filename)) {
+      this.audio.src = targetUrl;
+      this.audio.load();
+    }
 
     // Pause Quran recitation and Mafatih audio so they do not collide
     if (typeof window !== 'undefined') {
@@ -424,6 +545,11 @@ class ShiaAdhanPlayerService {
     if (this.audio) {
       this.audio.pause();
     }
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      try {
+        AdhanNative.stopAdhanPlayback().catch(() => {});
+      } catch {}
+    }
     this.isPlaying = false;
     this.releaseWakeLock();
     this.clearMediaSession();
@@ -435,6 +561,11 @@ class ShiaAdhanPlayerService {
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0;
+    }
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      try {
+        AdhanNative.stopAdhanPlayback().catch(() => {});
+      } catch {}
     }
     this.isPlaying = false;
     this.currentPrayerName = null;
@@ -461,16 +592,42 @@ class ShiaAdhanPlayerService {
 
   // Scheduler check invoked continuously every second by the unthrottled ticker
   // Triggers automatically thrice daily: at Fajr, Dhuhr, and Maghrib
-  public checkScheduledTimes(
+  public async checkScheduledTimes(
     timings: { fajr: string; dhuhr: string; maghrib: string } | null,
     settings: {
       autoPlayFajr?: boolean;
       autoPlayDhuhr?: boolean;
       autoPlayMaghrib?: boolean;
       repeatCount?: number;
+      adhanVoice?: 'full' | 'short';
     }
   ) {
     if (!timings) return;
+
+    if (settings.adhanVoice) {
+      this.currentVoice = settings.adhanVoice;
+    }
+
+    // 1. If in-app audio is already actively playing, DO NOT trigger another playback
+    if (this.isPlaying || (this.audio && !this.audio.paused && !this.audio.ended && this.audio.currentTime > 0)) {
+      return;
+    }
+
+    // 2. Check native Android status: If native service is currently playing, sync UI state and do not double-play
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      try {
+        const nativeStatus = await AdhanNative.isAdhanPlaying();
+        if (nativeStatus?.isPlaying) {
+          if (!this.isPlaying) {
+            this.isPlaying = true;
+            this.currentPrayerName = nativeStatus.currentPrayer || 'Shia Adhan';
+            this.notify();
+          }
+          return;
+        }
+      } catch {}
+    }
+
     const now = new Date();
     const currentMins = now.getHours() * 60 + now.getMinutes();
     const y = now.getFullYear();
@@ -482,6 +639,7 @@ class ShiaAdhanPlayerService {
     const autoDhuhr = settings.autoPlayDhuhr !== false;
     const autoMaghrib = settings.autoPlayMaghrib !== false;
     const repeats = settings.repeatCount || 1;
+    const voice = settings.adhanVoice || this.currentVoice;
 
     // 1. Fajr (Subh) Adhan
     const fajrMins = timeToMinutes(timings.fajr);
@@ -489,12 +647,9 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - fajrMins;
       // Trigger if current time is within [0, 5] minutes of Fajr and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.fajr !== todayKey) {
-        this.playAdhan('Fajr (Subh)', repeats).then(ok => {
-          if (ok) {
-            this.lastPlayedDate.fajr = todayKey;
-            this.saveLastPlayedDate();
-          }
-        });
+        this.lastPlayedDate.fajr = todayKey;
+        this.saveLastPlayedDate();
+        this.playAdhan('Fajr (Subh)', repeats, voice);
         return;
       }
     }
@@ -505,12 +660,9 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - dhuhrMins;
       // Trigger if current time is within [0, 5] minutes of Dhuhr and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.dhuhr !== todayKey) {
-        this.playAdhan('Dhuhr (Zuhr)', repeats).then(ok => {
-          if (ok) {
-            this.lastPlayedDate.dhuhr = todayKey;
-            this.saveLastPlayedDate();
-          }
-        });
+        this.lastPlayedDate.dhuhr = todayKey;
+        this.saveLastPlayedDate();
+        this.playAdhan('Dhuhr (Zuhr)', repeats, voice);
         return;
       }
     }
@@ -521,12 +673,9 @@ class ShiaAdhanPlayerService {
       const diff = currentMins - maghribMins;
       // Trigger if current time is within [0, 5] minutes of Maghrib and hasn't played today
       if (diff >= 0 && diff <= 5 && this.lastPlayedDate.maghrib !== todayKey) {
-        this.playAdhan('Maghrib', repeats).then(ok => {
-          if (ok) {
-            this.lastPlayedDate.maghrib = todayKey;
-            this.saveLastPlayedDate();
-          }
-        });
+        this.lastPlayedDate.maghrib = todayKey;
+        this.saveLastPlayedDate();
+        this.playAdhan('Maghrib', repeats, voice);
         return;
       }
     }
@@ -534,36 +683,6 @@ class ShiaAdhanPlayerService {
 }
 
 export const shiaAdhanPlayer = new ShiaAdhanPlayerService();
-
-import { registerPlugin, Capacitor } from '@capacitor/core';
-
-export interface AdhanNativePlugin {
-  scheduleAlarms(options: {
-    todayDate: string;
-    fajrToday: string;
-    dhuhrToday: string;
-    maghribToday: string;
-    tomorrowDate: string;
-    fajrTomorrow: string;
-    dhuhrTomorrow: string;
-    maghribTomorrow: string;
-    autoPlayFajr: boolean;
-    autoPlayDhuhr: boolean;
-    autoPlayMaghrib: boolean;
-    latitude: number;
-    longitude: number;
-  }): Promise<{ success: boolean; message: string }>;
-  cancelAllAlarms(): Promise<{ success: boolean }>;
-  checkExactAlarmPermission(): Promise<{ granted: boolean; required: boolean; sdkInt: number }>;
-  requestExactAlarmPermission(): Promise<{ opened: boolean; alreadyGranted?: boolean }>;
-  checkBatteryOptimization(): Promise<{ ignoringBatteryOptimizations: boolean }>;
-  requestIgnoreBatteryOptimization(): Promise<{ requested: boolean; error?: string }>;
-  playAdhanNow(options?: { prayerName?: string }): Promise<{ success: boolean }>;
-  stopAdhanPlayback(): Promise<{ success: boolean }>;
-  getAlarmStatus(): Promise<any>;
-}
-
-export const AdhanNative = registerPlugin<AdhanNativePlugin>('AdhanNative');
 
 /**
  * High-Precision Adhan Native Scheduler
@@ -594,6 +713,7 @@ export async function scheduleNativeAdhanAlarms(
     longitude?: number;
     todayDateStr?: string;
     tomorrowDateStr?: string;
+    adhanVoice?: 'full' | 'short';
   }
 ) {
   const autoFajr = options?.autoPlayFajr !== false;
@@ -601,6 +721,8 @@ export async function scheduleNativeAdhanAlarms(
   const autoMaghrib = options?.autoPlayMaghrib !== false;
   const lat = options?.latitude || 0;
   const lng = options?.longitude || 0;
+  const adhanVoice = options?.adhanVoice || 'full';
+  const soundFile = adhanVoice === 'short' ? 'shia_adhan_short.mp3' : 'shia_adhan.mp3';
 
   const now = new Date();
   const formatYMD = (d: Date) => {
@@ -639,6 +761,7 @@ export async function scheduleNativeAdhanAlarms(
         autoPlayMaghrib: autoMaghrib,
         latitude: lat,
         longitude: lng,
+        adhanVoice,
       });
       return;
     } catch (err) {
@@ -662,7 +785,7 @@ export async function scheduleNativeAdhanAlarms(
         description: 'Authentic Shia Ithna-Ashari Adhan Announcements',
         importance: 5,
         visibility: 1,
-        sound: 'shia_adhan.mp3',
+        sound: soundFile,
         vibration: true,
         lights: true,
       }).catch(() => {});
@@ -723,7 +846,7 @@ export async function scheduleNativeAdhanAlarms(
               title: `Shia Adhan • ${p.name}`,
               body: `It is now time for ${p.name} prayer. (Ja'fari Method)`,
               channelId: 'shia_adhan_alarm',
-              sound: 'shia_adhan.mp3',
+              sound: soundFile,
               // On iOS, 'schedule: { at: targetDate }' maps to UNCalendarNotificationTrigger
               schedule: { at: targetDate, allowWhileIdle: true },
               extra: { prayer: p.name, type: 'adhan', critical: true },

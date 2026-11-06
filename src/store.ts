@@ -38,6 +38,7 @@ export interface AdhanSettings {
   repeatCount: number; // Plays adhan three times as specified by user
   volume: number;
   notificationsEnabled: boolean;
+  adhanVoice: 'full' | 'short'; // 'full' (5 min complete recitation) or 'short' (4 Takbirs alert)
 }
 
 interface SettingsState {
@@ -190,7 +191,8 @@ export const useSettingsStore = create<SettingsState>()(
         autoPlayMaghrib: true,
         repeatCount: 3, // Plays adhan three times as specified
         volume: 0.9,
-        notificationsEnabled: true
+        notificationsEnabled: true,
+        adhanVoice: 'full'
       },
       qiblaCalibrationOffset: 0,
       setUserLocation: (loc) => set({ userLocation: loc }),
@@ -429,12 +431,14 @@ export const useSettingsStore = create<SettingsState>()(
             autoPlayMaghrib: true,
             repeatCount: 1,
             volume: 0.9,
-            notificationsEnabled: true
+            notificationsEnabled: true,
+            adhanVoice: 'full'
           };
         } else {
           if (state.adhanSettings.autoPlayFajr === undefined) state.adhanSettings.autoPlayFajr = true;
           if (state.adhanSettings.autoPlayDhuhr === undefined) state.adhanSettings.autoPlayDhuhr = true;
           if (state.adhanSettings.autoPlayMaghrib === undefined) state.adhanSettings.autoPlayMaghrib = true;
+          if (!state.adhanSettings.adhanVoice) state.adhanSettings.adhanVoice = 'full';
         }
         return state;
       },

@@ -38,12 +38,20 @@ export function useGlobalAdhanScheduler() {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         todayDateStr: getLocalDateKey(date),
-        tomorrowDateStr: getLocalDateKey(tomorrowDate)
+        tomorrowDateStr: getLocalDateKey(tomorrowDate),
+        adhanVoice: adhanSettings.adhanVoice
       });
     } catch (err) {
       console.warn('Global adhan scheduler failed to refresh timings:', err);
     }
   }, [userLocation.latitude, userLocation.longitude, adhanSettings]);
+
+  // Keep adhan player's active voice synchronized with adhanSettings
+  useEffect(() => {
+    if (adhanSettings.adhanVoice) {
+      shiaAdhanPlayer.setAdhanVoice(adhanSettings.adhanVoice);
+    }
+  }, [adhanSettings.adhanVoice]);
 
   // Initial load on mount or coordinate change
   useEffect(() => {
@@ -77,7 +85,8 @@ export function useGlobalAdhanScheduler() {
             autoPlayFajr: adhanSettings.autoPlayFajr,
             autoPlayDhuhr: adhanSettings.autoPlayDhuhr,
             autoPlayMaghrib: adhanSettings.autoPlayMaghrib,
-            repeatCount: adhanSettings.repeatCount || 1
+            repeatCount: adhanSettings.repeatCount || 1,
+            adhanVoice: adhanSettings.adhanVoice
           }
         );
       }

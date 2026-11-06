@@ -43,6 +43,7 @@ public class AdhanNativePlugin extends Plugin {
 
         double latitude = call.getDouble("latitude", 0.0);
         double longitude = call.getDouble("longitude", 0.0);
+        String adhanVoice = call.getString("adhanVoice", "full");
 
         try {
             // 1. Save all timings and settings persistently in SharedPreferences
@@ -51,7 +52,7 @@ public class AdhanNativePlugin extends Plugin {
                     todayDate, fajrToday, dhuhrToday, maghribToday,
                     tomorrowDate, fajrTomorrow, dhuhrTomorrow, maghribTomorrow,
                     autoPlayFajr, autoPlayDhuhr, autoPlayMaghrib,
-                    latitude, longitude
+                    latitude, longitude, adhanVoice
             );
 
             // 2. Schedule alarms via AlarmManager.setAlarmClock()
@@ -196,6 +197,14 @@ public class AdhanNativePlugin extends Plugin {
     }
 
     @PluginMethod
+    public void isAdhanPlaying(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("isPlaying", AdhanPlaybackService.isPlaying);
+        ret.put("currentPrayer", AdhanPlaybackService.currentPrayer != null ? AdhanPlaybackService.currentPrayer : "");
+        call.resolve(ret);
+    }
+
+    @PluginMethod
     public void getAlarmStatus(PluginCall call) {
         Context context = getContext();
         JSObject ret = new JSObject();
@@ -208,6 +217,9 @@ public class AdhanNativePlugin extends Plugin {
         ret.put("autoPlayDhuhr", AdhanStorage.isDhuhrEnabled(context));
         ret.put("autoPlayMaghrib", AdhanStorage.isMaghribEnabled(context));
         ret.put("canScheduleExactAlarms", AdhanScheduler.canScheduleExactAlarms(context));
+        ret.put("adhanVoice", AdhanStorage.getAdhanVoice(context));
+        ret.put("isAdhanPlaying", AdhanPlaybackService.isPlaying);
+        ret.put("currentPrayer", AdhanPlaybackService.currentPrayer != null ? AdhanPlaybackService.currentPrayer : "");
         call.resolve(ret);
     }
 }

@@ -34,5 +34,6 @@ Thumbs.db
 
 # Bulk raw data packets (keep essential top duas and single consolidated feed/database)
 public/imam_science_articles/
+public/assets/aistudio/
 
 

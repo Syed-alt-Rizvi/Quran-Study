@@ -25,7 +25,8 @@ function formatAudioTime(seconds: number): string {
 }
 
 export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
-  const { userLocation, setUserLocation, adhanSettings, updateAdhanSettings } = useSettingsStore();
+  const { userLocation, setUserLocation, adhanSettings, updateAdhanSettings, appLanguage } = useSettingsStore();
+  const isUrdu = appLanguage === 'ur';
 
   const [timings, setTimings] = useState<ShiaPrayerTimings | null>(null);
   const [loadingTimings, setLoadingTimings] = useState(false);
@@ -332,7 +333,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                   if (playerStatus.isPlaying) {
                     shiaAdhanPlayer.stopAdhan();
                   } else {
-                    shiaAdhanPlayer.playAdhan(nextPrayer.nameEn, adhanSettings.repeatCount || 1);
+                    shiaAdhanPlayer.playAdhan(nextPrayer.nameEn, adhanSettings.repeatCount || 1, adhanSettings.adhanVoice);
                   }
                 }}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
@@ -427,7 +428,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                 if (playerStatus.isPlaying) {
                   shiaAdhanPlayer.stopAdhan();
                 } else {
-                  shiaAdhanPlayer.playAdhan('Adhan Sound Test', 1);
+                  shiaAdhanPlayer.playAdhan('Adhan Sound Test', 1, adhanSettings.adhanVoice);
                 }
               }}
               className="text-xs text-emerald-600 dark:text-emerald-400 font-medium hover:underline"
@@ -517,6 +518,145 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
             </span>
           </div>
 
+          {/* Adhan Voice / Recitation Selector */}
+          <div className="pt-3 border-t border-white/20 dark:border-white/10 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">
+                  {isUrdu ? 'اذان کی آواز • انتخاب' : 'Adhan Voice • Recitation'}
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  {isUrdu 
+                    ? 'مکمل اذان یا 4 تکبیروں پر مشتمل مختصر اذان'
+                    : 'Choose full 5-minute call or 4-Takbir short alert'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg liquid-glass border border-emerald-500/30 text-emerald-700 dark:text-emerald-300">
+                {adhanSettings.adhanVoice === 'short' 
+                  ? (isUrdu ? 'مختصر اذان' : 'Short (72s)') 
+                  : (isUrdu ? 'مکمل اذان' : 'Full (5m)')}
+              </span>
+            </div>
+
+            {/* Segmented Voice Selector */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* Full Adhan Option */}
+              <div
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  shiaAdhanPlayer.unlockAudio();
+                  updateAdhanSettings({ adhanVoice: 'full' });
+                  shiaAdhanPlayer.setAdhanVoice('full');
+                }}
+                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                  (adhanSettings.adhanVoice || 'full') === 'full'
+                    ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                    : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-xs">
+                      {isUrdu ? 'مکمل اذان' : 'Adhan (Full)'}
+                    </span>
+                    {(adhanSettings.adhanVoice || 'full') === 'full' && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    )}
+                  </div>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                    {isUrdu ? 'مکمل تلاوت • سید ہانی الموسوی (~5 منٹ)' : 'Complete Shia recitation (~5 min)'}
+                  </span>
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-white/20 dark:border-white/10 flex items-center justify-between">
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-mono">
+                    ~5:00 min
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      hapticImpact(ImpactStyle.Light);
+                      shiaAdhanPlayer.unlockAudio();
+                      shiaAdhanPlayer.playPreview('full');
+                    }}
+                    className="px-2 py-1 rounded-lg liquid-glass border border-white/30 dark:border-white/10 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-white/40 flex items-center gap-1 cursor-pointer"
+                    title="Audition Full Adhan"
+                  >
+                    {playerStatus.isPlaying && (playerStatus.adhanVoice === 'full' || playerStatus.currentPrayerName?.includes('Full')) ? (
+                      <>
+                        <Pause size={10} className="fill-current" />
+                        <span>Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play size={10} className="fill-current" />
+                        <span>Listen</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Short Adhan Option */}
+              <div
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  shiaAdhanPlayer.unlockAudio();
+                  updateAdhanSettings({ adhanVoice: 'short' });
+                  shiaAdhanPlayer.setAdhanVoice('short');
+                }}
+                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                  adhanSettings.adhanVoice === 'short'
+                    ? 'liquid-glass border-emerald-500 ring-2 ring-emerald-500/30 text-emerald-950 dark:text-emerald-100 shadow-xs font-semibold'
+                    : 'liquid-glass border-white/30 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-emerald-400/40'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-xs">
+                      {isUrdu ? 'مختصر اذان' : 'Adhan (Short)'}
+                    </span>
+                    {adhanSettings.adhanVoice === 'short' && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    )}
+                  </div>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                    {isUrdu ? 'صرف 4 تکبیریں • نرم اختتام (~72 سیکنڈ)' : 'First 4 Takbirs with gentle fade-out (~72s)'}
+                  </span>
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-white/20 dark:border-white/10 flex items-center justify-between">
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-mono">
+                    ~1:12 min
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      hapticImpact(ImpactStyle.Light);
+                      shiaAdhanPlayer.unlockAudio();
+                      shiaAdhanPlayer.playPreview('short');
+                    }}
+                    className="px-2 py-1 rounded-lg liquid-glass border border-white/30 dark:border-white/10 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-white/40 flex items-center gap-1 cursor-pointer"
+                    title="Audition Short Adhan"
+                  >
+                    {playerStatus.isPlaying && (playerStatus.adhanVoice === 'short' || playerStatus.currentPrayerName?.includes('Short')) ? (
+                      <>
+                        <Pause size={10} className="fill-current" />
+                        <span>Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play size={10} className="fill-current" />
+                        <span>Listen</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
