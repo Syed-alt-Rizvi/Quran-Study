@@ -135,11 +135,18 @@ export const fastStorage = {
         };
       });
     } catch {
-      // Fallback: localStorage (with strict size ceiling to prevent synchronous quota crash)
+      // Fallback: In-memory L1 already preserves the data for this session.
+      // Only persist tiny metadata (<4KB) to localStorage; never store bulky tafseer or prayer caches in localStorage.
       try {
-        const str = JSON.stringify(value);
-        if (str.length < 300000) {
-          localStorage.setItem(key, str);
+        if (
+          !key.startsWith('tafseer_') && 
+          !key.startsWith('prefetch_') && 
+          !key.startsWith('shia_prayers_')
+        ) {
+          const str = JSON.stringify(value);
+          if (str.length < 4096) {
+            localStorage.setItem(key, str);
+          }
         }
       } catch {}
     }

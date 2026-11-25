@@ -10,73 +10,88 @@
     "Namaz (to dispel) Fear of Oppressors"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ (TO DISPEL) FEAR OF OPPRESSORS\n\nAs quoted from Makarim al-Akhlaq, you may bathe yourself, offer a two unit prayer, raise your dress up so that your knees appear at the place of prayer, and repeat the following supplicatory prayer one hundred times:\n\nUpon accomplishment, you may say the following supplicatory prayer:\n\nYou may now mention the name of your enemy and his father’s name.\n\nThis is the supplicatory prayer of the Holy Prophet (s.a.w.a.) on the day of the Battle of Uhud.",
-  "versesCount": 13,
+  "introduction": "NAMAZ (TO DISPEL) FEAR OF OPPRESSORS",
+  "versesCount": 16,
   "verses": [
     {
       "index": 1,
+      "arabic": "",
+      "translation": "As quoted from Makarim al-Akhlaq, you may bathe yourself, offer a two unit prayer, raise your dress up so that your knees appear at the place of prayer, and repeat the following supplicatory prayer one hundred times:"
+    },
+    {
+      "index": 2,
       "arabic": "يَا حَىُّ يَا قَيُّوْمُ",
       "translation": ""
     },
     {
-      "index": 2,
+      "index": 3,
       "arabic": "يَا حَيًّا لَاۤ اِلٰهَ اِلَّا اَنْتَ",
       "translation": ""
     },
     {
-      "index": 3,
+      "index": 4,
       "arabic": "بِرَحْمَتِكَ اَسْتَغِيْثُ",
       "translation": ""
     },
     {
-      "index": 4,
+      "index": 5,
       "arabic": "فَصَلِّ عَلٰى مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ",
       "translation": ""
     },
     {
-      "index": 5,
+      "index": 6,
       "arabic": "وَّاَغِثْنِىْ السَّاعَةَ السَّاعَةَ۔",
       "translation": ""
     },
     {
-      "index": 6,
+      "index": 7,
+      "arabic": "",
+      "translation": "Upon accomplishment, you may say the following supplicatory prayer:"
+    },
+    {
+      "index": 8,
       "arabic": "اَسْئَلُكَ اَللّٰهُمَّ اَنْ تُصَلِّىَ عَلٰى مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ",
       "translation": ""
     },
     {
-      "index": 7,
+      "index": 9,
       "arabic": "وَّ اَنْ تَلْطُفَ لِىْ",
       "translation": ""
     },
     {
-      "index": 8,
+      "index": 10,
       "arabic": "وَ اَنْ تَغْلِبَ لِىْ",
       "translation": ""
     },
     {
-      "index": 9,
+      "index": 11,
       "arabic": "وَ اَنْ تَمْكُرَلِىْ",
       "translation": ""
     },
     {
-      "index": 10,
+      "index": 12,
       "arabic": "وَ اَنْ تَخْدَعَ لِىْ",
       "translation": ""
     },
     {
-      "index": 11,
+      "index": 13,
       "arabic": "وَ اَنْ تَكِيْدَلِىْ",
       "translation": ""
     },
     {
-      "index": 12,
+      "index": 14,
       "arabic": "وَ اَنْ تَكْفِيَنِىْ مَؤُنَةَ",
       "translation": ""
     },
     {
-      "index": 13,
+      "index": 15,
       "arabic": "فَلَانُ بْنُ فُلَانٍ۔",
       "translation": ""
+    },
+    {
+      "index": 16,
+      "arabic": "",
+      "translation": "You may now mention the name of your enemy and his father’s name.\n\nThis is the supplicatory prayer of the Holy Prophet (s.a.w.a.) on the day of the Battle of Uhud."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe104&lang=en"

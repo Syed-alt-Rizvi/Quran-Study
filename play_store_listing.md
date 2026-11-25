@@ -7,19 +7,19 @@
 
 ## 1. Store Listing Metadata
 
-### App Title (28 / 30 characters max)
+### App Title (30 / 30 characters max)
 ```
-Shia Quran & Tafseer Namoona
+Shia Markaz: Quran & Mafatih
 ```
 
-### Short Description (75 / 80 characters max)
+### Short Description (78 / 80 characters max)
 ```
-Shia Quran with Tafseer Namoona, Urdu audio, offline reading & reflections.
+Shia Quran with Tafseer Namoona, Mafatih Al Jinan, Shia Adhan & Music Player.
 ```
 
 ### Category
 - **Primary Category:** Books & Reference
-- **Secondary / Tags:** Education, Quran, Tafseer, Islamic Studies, Audio Recitation
+- **Secondary / Tags:** Education, Quran, Mafatih, Tafseer, Islamic Studies, Audio Player
 
 ### Content Rating
 - **Rating:** Everyone (ESRB) / PEGI 3 / USK 0
@@ -30,28 +30,38 @@ Shia Quran with Tafseer Namoona, Urdu audio, offline reading & reflections.
 ## 2. Full Description (Google Play Formatted)
 
 ```
-Welcome to Shia Quran & Tafseer Namoona — an authentic, ad-free Islamic study platform designed for dedicated Quran reflection, research, and daily recitation.
+Welcome to Shia Markaz — an authentic, ad-free Islamic study platform and devotional center designed for dedicated Quran reflection, research, supplication recitation, and daily prayers.
 
-Explore the complete Holy Quran with authentic Shia exegetical works, including the renowned Tafseer-e-Namoona (by Grand Ayatollah Naser Makarem Shirazi) and Tafseer Al-Kauthar (by Allama Mohsin Ali Najafi).
+Explore the complete Holy Quran with authentic Shia exegetical works, including the renowned Tafseer-e-Namoona (by Grand Ayatollah Naser Makarem Shirazi) and Tafseer Al-Kauthar (by Allama Mohsin Ali Najafi), alongside the complete Mafatih al-Jinan supplication treasury.
 
 KEY FEATURES:
 
 📖 COMPLETE QURANIC TEXT & JUZ INDEX
 • Crisp Uthmani and Indopak Quranic scripts with full tashkeel.
-• Read by Surah or Juz (Parah) with smooth, distraction-free scrolling.
+• Read by Surah (114) or Juz (30 Parahs) with smooth, distraction-free scrolling.
 • Multiple high-readability Arabic typefaces: Amiri, Scheherazade New, and Lateef.
 
 📚 AUTHENTIC SHIA TAFSEER & TRANSLATIONS
 • Tafseer-e-Namoona (Urdu & English) verse-by-verse commentary.
 • Tafseer Al-Kauthar (Urdu) contextual and historical explanations.
 • English and Urdu translations by renowned scholars.
-• Side-by-side reading view with resizable text and tafseer zoom controls.
+• Side-by-side reading view with resizable text and accessible zoom controls.
 
-🎧 HIGH-QUALITY AUDIO RECITATIONS
-• Verse-by-verse audio playback synchronized with live text highlighting.
-• World-renowned reciters including Abdul Basit, Mishary Alafasy, and Urdu verse translations.
+🤲 COMPLETE MAFATIH AL-JINAN TREASURY
+• Comprehensive collection of Duas, Ziyaraat, Munajaat, Amaal, and Taqibaat.
+• Dua Kumayl, Ziyarat Ashura, Hadith al-Kisa, Dua Tawassul, Dua Nudbah, Dua Faraj, Dua Sabah, and Whispered Prayers of Imam Sajjad (a.s).
+• Translation toggle beneath every verse card for bilingual comprehension.
+
+🎵 DEDICATED DEVOTIONAL MUSIC PLAYER
+• Dedicated audio player with unique, bespoke sacred geometric album artwork for every Surah, Dua, and Ziyarat.
+• Verse-by-verse Quran playback synchronized with live text highlighting.
+• High-definition supplication recitations with scrubbable seek bar, repeat loop, and speed controls.
 • Background audio playback with Android Media Notification integration.
-• Customizable playback speed (0.75x to 1.5x) and auto-scroll synchronization.
+
+🕌 SHIA PRAYER TIMES, QIBLA & ADHAN
+• Accurate Shia Ja'fari prayer times calculation with customizable juristic methods.
+• Authentic Shia Adhan notifications with real-time countdown.
+• Live interactive compass Qibla finder.
 
 💬 COMMUNITY REFLECTIONS & STUDY NOTES
 • Connect with fellow students of knowledge through Ayah reflections.

@@ -10,8 +10,8 @@
     "Dua Tawassul"
   ],
   "audioUrl": "https://www.ya-mahdi.net/apps_audio/mohsin_farahmad/tavassol_farahmand.m4a",
-  "introduction": "DUA TAWASSUL\n\n‘Allamah al-Majlisi has quoted some considerable books to have mentioned that Muhammad ibn Baabwayh reported this supplication of Seeking Intercession (Dua al-tawassul) from the Holy Imams (a.s.). Commenting, he added, “Whenever I said this supplication for any matter, I could find the traces of response immediately.” The supplication is as follows:\n\nYou may now beseech Almighty Allah to grant your needs, and they will be settled, if Allah permits. According to another narration, you may say the following words thereafter:",
-  "versesCount": 169,
+  "introduction": "DUA TAWASSUL\n\n‘Allamah al-Majlisi has quoted some considerable books to have mentioned that Muhammad ibn Baabwayh reported this supplication of Seeking Intercession (Dua al-tawassul) from the Holy Imams (a.s.). Commenting, he added, “Whenever I said this supplication for any matter, I could find the traces of response immediately.” The supplication is as follows:",
+  "versesCount": 170,
   "verses": [
     {
       "index": 1,
@@ -775,86 +775,91 @@
     },
     {
       "index": 153,
+      "arabic": "",
+      "translation": "You may now beseech Almighty Allah to grant your needs, and they will be settled, if Allah permits. According to another narration, you may say the following words thereafter:"
+    },
+    {
+      "index": 154,
       "arabic": "يَا سَادَتِىْ وَمَوَالِىَّ",
       "translation": "O my chiefs and masters!"
     },
     {
-      "index": 154,
+      "index": 155,
       "arabic": "اِنِّىْ تَوَجَّهْتُ بِكُمْ",
       "translation": "I am turning my face toward Allah in the names of you [all],"
     },
     {
-      "index": 155,
+      "index": 156,
       "arabic": "اَئِمَّتِىْ وَعُدَّتِىْ",
       "translation": "for you are my leaders and my supporters"
     },
     {
-      "index": 156,
+      "index": 157,
       "arabic": "لِيَوْمِ فَقْرِىْ وَحَاجَتِىْ",
       "translation": "on the day of my destitution and neediness"
     },
     {
-      "index": 157,
+      "index": 158,
       "arabic": "اِلَى اللهِ",
       "translation": "before Allah."
     },
     {
-      "index": 158,
+      "index": 159,
       "arabic": "وَتَوَسَّلْتُ بِكُمْ اِلَى اللهِ",
       "translation": "I am seeking your advocacy for me before Allah"
     },
     {
-      "index": 159,
+      "index": 160,
       "arabic": "وَاسْتَشْفَعْتُ بِكُمْ اِلَى اللهِ",
       "translation": "and seeking your intercession for me before Allah;"
     },
     {
-      "index": 160,
+      "index": 161,
       "arabic": "فَاشْفَعُوْا لِىْ عِنْدَ اللهِ",
       "translation": "so, (please) intercede for me before Allah"
     },
     {
-      "index": 161,
+      "index": 162,
       "arabic": "وَاسْتَنْقِذُوْنِىْ مِنْ ذُنُوْبِىْ عِنْدَ اللهِ",
       "translation": "and save me from my sins before Allah,"
     },
     {
-      "index": 162,
+      "index": 163,
       "arabic": "فَاِنَّكُمْ وَسِيْلَتِىْ اِلَى اللهِ",
       "translation": "for you are my means to Allah"
     },
     {
-      "index": 163,
+      "index": 164,
       "arabic": "وَبِحُبِّكُمْ وَبِقُرْبِكُمْ اَرْجُوْ نَجَاةً مِنَ اللهِ",
       "translation": "and through my love for you and my seeking nearness to you do I hope for salvation from Allah."
     },
     {
-      "index": 164,
+      "index": 165,
       "arabic": "فَكُوْنُوْا عِنْدَ اللهِ رَجَاۤئِىْ",
       "translation": "So, be my hope before Allah."
     },
     {
-      "index": 165,
+      "index": 166,
       "arabic": "يَا سَادَتِىْ يَا اَوْلِيَاۤءَ اللهِ",
       "translation": "O my masters! O Allah’s intimate servants!"
     },
     {
-      "index": 166,
+      "index": 167,
       "arabic": "صَلَّى اللهُ عَلَيْهِمْ اَجْمَعِيْنَ",
       "translation": "May Allah bless you all"
     },
     {
-      "index": 167,
+      "index": 168,
       "arabic": "وَلَعَنَ اللهُ اَعْدَاۤءَ اللهِ ظَالِمِيْهِمْ",
       "translation": "and may Allah curse the enemies of Allah; those who wronged you,"
     },
     {
-      "index": 168,
+      "index": 169,
       "arabic": "مِنَ الْاَوَّلِيْنَ وَالْاٰخِرِيْنَ",
       "translation": "from the past and the last generations."
     },
     {
-      "index": 169,
+      "index": 170,
       "arabic": "اٰمِيْنَ رَبَّ الْعَالَمِيْنَ۔",
       "translation": "Respond to us, O Lord of the Worlds!"
     }

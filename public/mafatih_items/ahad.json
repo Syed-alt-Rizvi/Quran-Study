@@ -10,8 +10,8 @@
     "Dua e Ahad"
   ],
   "audioUrl": "https://www.ya-mahdi.net/apps_audio/aba_thar/ahd-abozarhalvaji128.m4a",
-  "introduction": "DUA E AHAD\n\nImam Ja’far al-Sadiq (‘a) is reported to have said, “Whoever prays Almighty Allah with this supplicatory prayer of covenant for forty mornings, will be one of the supporters of our Rising Imam. If he dies before that (i.e. the advent of the Imam), Almighty Allah will take him out of his grave and give him one thousand rewards for each word of this supplicatory prayer and erase from him one thousand of his wrongdoings.”\n\nThe supplicatory prayer is as follows:\n\nYou may then pat your right thigh with your hand three times and, at each time, say the following words:",
-  "versesCount": 79,
+  "introduction": "DUA E AHAD\n\nImam Ja’far al-Sadiq (‘a) is reported to have said, “Whoever prays Almighty Allah with this supplicatory prayer of covenant for forty mornings, will be one of the supporters of our Rising Imam. If he dies before that (i.e. the advent of the Imam), Almighty Allah will take him out of his grave and give him one thousand rewards for each word of this supplicatory prayer and erase from him one thousand of his wrongdoings.”\n\nThe supplicatory prayer is as follows:",
+  "versesCount": 80,
   "verses": [
     {
       "index": 1,
@@ -405,6 +405,11 @@
     },
     {
       "index": 79,
+      "arabic": "",
+      "translation": "You may then pat your right thigh with your hand three times and, at each time, say the following words:"
+    },
+    {
+      "index": 80,
       "arabic": "اَلْعَجَلَ اَلْعَجَلَ يَا مَوْلَايَ يَا صَاحِبَ الزَّمَانِ",
       "translation": "(We pray for Your) earliest advent, earliest advent, O Patron of the Age."
     }

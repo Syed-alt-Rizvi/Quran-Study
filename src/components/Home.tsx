@@ -1,18 +1,30 @@
 import { hapticImpact } from '../utils/haptics';
 import { ImpactStyle } from '@capacitor/haptics';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { fetchSurahs, SurahMeta, prefetchSurah, prefetchJuz } from '../api';
 import staticSurahs from '../surahList.json';
 import { 
   Search, BookOpen, Settings, ArrowRight, ChevronRight,
   MessageCircle, AlertTriangle, KeyRound, Edit3, Check, X,
-  LogOut, Calendar as CalendarIcon, Compass, Clock
+  LogOut, Calendar as CalendarIcon, Compass, Clock, Loader2
 } from "lucide-react";
-import GlobalDiscussions from "./GlobalDiscussions";
-import QiblaFinder from "./QiblaFinder";
-import MafatihView from "./MafatihView";
-import CalendarView from "./CalendarView";
-import AdhanMapScreen from "./AdhanMapScreen";
+import { lazyWithRetry } from '../utils/lazyWithRetry';
+import { updateBrowserRoute } from '../utils/urlRouter';
+
+// Code-split heavy sub-views into isolated chunks (<250kB initial bundle)
+const GlobalDiscussions = lazyWithRetry(() => import("./GlobalDiscussions"), 'GlobalDiscussions');
+const QiblaFinder = lazyWithRetry(() => import("./QiblaFinder"), 'QiblaFinder');
+const MafatihView = lazyWithRetry(() => import("./MafatihView"), 'MafatihView');
+const CalendarView = lazyWithRetry(() => import("./CalendarView"), 'CalendarView');
+const AdhanMapScreen = lazyWithRetry(() => import("./AdhanMapScreen"), 'AdhanMapScreen');
+
+// Background speculative prefetching triggers
+export const prefetchMafatihView = () => import("./MafatihView").catch(() => {});
+export const prefetchCalendarView = () => import("./CalendarView").catch(() => {});
+export const prefetchAdhanMapScreen = () => import("./AdhanMapScreen").catch(() => {});
+export const prefetchQiblaFinder = () => import("./QiblaFinder").catch(() => {});
+export const prefetchGlobalDiscussions = () => import("./GlobalDiscussions").catch(() => {});
+
 import HomeAdhanWidget from "./HomeAdhanWidget";
 import HomeTafseerWidget from "./HomeTafseerWidget";
 import HomeQuranAudioWidget from "./HomeQuranAudioWidget";
@@ -76,7 +88,22 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
   const activeTab = currentAppTab || defaultAppTab || 'quran';
   const setActiveTab = (tab: AppTab) => {
     setCurrentAppTab(tab);
+    updateBrowserRoute({ type: 'home', tab });
   };
+
+  // Speculative idle prefetching of heavy sub-views after initial Quran catalog renders
+  useEffect(() => {
+    const preloader = () => {
+      prefetchMafatihView();
+      setTimeout(prefetchCalendarView, 400);
+      setTimeout(prefetchAdhanMapScreen, 800);
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(preloader, { timeout: 2500 });
+    } else {
+      setTimeout(preloader, 1200);
+    }
+  }, []);
   const [quranMode, setQuranMode] = useState<'surah' | 'juz'>('surah');
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(userName || '');
@@ -275,7 +302,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 {/* Sacred Arabic Salutation */}
                 <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 font-medium select-none mb-0.5">
                   <span className="font-arabic font-semibold text-xs sm:text-sm leading-none">{greeting.ar}</span>
-                  <span className="text-amber-500/80 dark:text-amber-400/70 text-[9px]" aria-hidden="true">✦</span>
+                  <span className="text-amber-500/70 dark:text-amber-400/60 font-serif text-[11px]" aria-hidden="true">·</span>
                   <span className="text-slate-600 dark:text-slate-400 font-normal">{greeting.en}</span>
                 </div>
 
@@ -336,14 +363,11 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                 </p>
               </div>
 
-              {/* Daily Recitation Status Pill */}
+              {/* Daily Recitation Editorial Counter (Zero-Pill Architecture) */}
               {todayAyahs > 0 && !isEditingName && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass border border-emerald-500/30 dark:border-emerald-400/20 text-xs text-slate-700 dark:text-slate-200 font-medium sm:text-right shrink-0 self-start sm:self-auto shadow-2xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                  <span>
-                    <strong className="text-emerald-700 dark:text-emerald-300 font-bold">{todayAyahs}</strong>{' '}
-                    {todayAyahs === 1 ? 'ayah recited today' : 'ayahs recited today'}
-                  </span>
+                <div className="text-xs text-slate-600 dark:text-slate-300 font-serif sm:text-right shrink-0 self-start sm:self-auto pt-1 select-none">
+                  <span className="font-sans font-bold text-emerald-700 dark:text-emerald-400 text-sm tabular-nums">{todayAyahs}</span>{' '}
+                  <span className="italic">{todayAyahs === 1 ? (appLanguage === 'ur' ? 'آیت تلاوت کی گئی' : 'ayah recited today') : (appLanguage === 'ur' ? 'آیات تلاوت کی گئیں' : 'ayahs recited today')}</span>
                 </div>
               )}
             </div>
@@ -376,19 +400,29 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
           </div>
         )}
 
-        {/* View Switcher Content */}
-        {activeTab === 'mafatih' ? (
-          <MafatihView onSelectItem={onSelectMafatihItem} />
-        ) : activeTab === 'calendar' ? (
-          <CalendarView onSelectMafatihItem={onSelectMafatihItem} onOpenSettings={onOpenSettings} />
-        ) : activeTab === 'adhan' ? (
-          <AdhanMapScreen onBack={() => setActiveTab('quran')} />
-        ) : activeTab === 'qibla' ? (
-          <QiblaFinder onBack={() => setActiveTab('quran')} />
-        ) : activeTab === 'discuss' ? (
-          <GlobalDiscussions />
-        ) : (
-          <div>
+        {/* View Switcher Content with Smooth Modular Chunk Fallback */}
+        <Suspense fallback={
+          <div className="min-h-[50vh] flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-400/10 flex items-center justify-center mb-3 text-emerald-600 dark:text-emerald-400">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+              Loading {activeTab.toUpperCase()}...
+            </p>
+          </div>
+        }>
+          {activeTab === 'mafatih' ? (
+            <MafatihView onSelectItem={onSelectMafatihItem} />
+          ) : activeTab === 'calendar' ? (
+            <CalendarView onSelectMafatihItem={onSelectMafatihItem} onOpenSettings={onOpenSettings} />
+          ) : activeTab === 'adhan' ? (
+            <AdhanMapScreen onBack={() => setActiveTab('quran')} />
+          ) : activeTab === 'qibla' ? (
+            <QiblaFinder onBack={() => setActiveTab('quran')} />
+          ) : activeTab === 'discuss' ? (
+            <GlobalDiscussions />
+          ) : (
+            <div>
             {/* Quick Shia Prayer & Adhan Countdown Widget */}
             <HomeAdhanWidget onOpenMapAndPrayers={() => { hapticImpact(ImpactStyle.Light); setActiveTab('adhan'); }} />
 
@@ -507,9 +541,9 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
                               ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
                               : surah.englishName}
                           </h3>
-                          <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
+                          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
                             <span>{surah.numberOfAyahs} {t('ayahs', appLanguage)}</span>
-                            <span>&bull;</span>
+                            <span className="text-slate-400/80">·</span>
                             <span>
                               {appLanguage === 'ur'
                                 ? (SURAH_URDU_MAP[surah.number]?.typeUrdu || (surah.revelationType === 'Meccan' ? 'مکی' : 'مدنی'))
@@ -582,6 +616,7 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
             )}
           </div>
         )}
+        </Suspense>
 
         {/* Standardized Global Footer */}
         <footer className="mt-12 pt-6 pb-8 border-t border-white/20 dark:border-white/10 text-center">
@@ -608,6 +643,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('mafatih'); }}
+            onMouseEnter={prefetchMafatihView}
+            onTouchStart={prefetchMafatihView}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'mafatih'
                 ? 'glass-slab-tab-active font-bold'
@@ -620,6 +657,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('adhan'); }}
+            onMouseEnter={prefetchAdhanMapScreen}
+            onTouchStart={prefetchAdhanMapScreen}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'adhan'
                 ? 'glass-slab-tab-active font-bold'
@@ -632,6 +671,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('calendar'); }}
+            onMouseEnter={prefetchCalendarView}
+            onTouchStart={prefetchCalendarView}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'calendar'
                 ? 'glass-slab-tab-active font-bold'
@@ -644,6 +685,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('qibla'); }}
+            onMouseEnter={prefetchQiblaFinder}
+            onTouchStart={prefetchQiblaFinder}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'qibla'
                 ? 'glass-slab-tab-active font-bold'
@@ -656,6 +699,8 @@ export default function Home({ onSelectSurah, onSelectJuz, onSelectMafatihItem, 
 
           <button
             onClick={() => { hapticImpact(ImpactStyle.Light); setActiveTab('discuss'); }}
+            onMouseEnter={prefetchGlobalDiscussions}
+            onTouchStart={prefetchGlobalDiscussions}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 min-w-0 cursor-pointer ${
               activeTab === 'discuss'
                 ? 'glass-slab-tab-active font-bold'

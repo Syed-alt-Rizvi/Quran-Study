@@ -10,8 +10,8 @@
     "Saturday - Ziyarat of Holy Prophet (s)"
   ],
   "audioUrl": "https://ya-mahdi.net/apps_audio/z_saturday.m4a",
-  "introduction": "ZIYARAH ON SATURDAYS\n\nZIYARAH OF THE HOLY PROPHET\n\nThen repeat the following three times:\n\nThen say the following:\n\nAs for myself, ‘Abbas al-Qummi the author of this book, whenever I address this form of Ziyarah to the Holy Prophet (s.a.w.a.) I begin with the following form that Imam al-Rida(a.s.) taught to al-Bizanti. In this respect, it has been authentically narrated that when Abu-Basir asked him about the most proper form of visiting the Holy Prophet’s tomb and invoking Allah’s salutations upon him after the prayer, Imam Ali ibn Musa al-Rida(a.s.) answered that he may say:",
-  "versesCount": 82,
+  "introduction": "ZIYARAH ON SATURDAYS\n\nZIYARAH OF THE HOLY PROPHET",
+  "versesCount": 85,
   "verses": [
     {
       "index": 1,
@@ -125,7 +125,7 @@
     },
     {
       "index": 23,
-      "arabic": "مِنَ الْاَوَّلِيْنَ وَ الْاٰخِرِيْنَ",
+      "arabic": "مِنَ الْاَوَّلِيْنَ وَ ا��ْاٰخِرِيْنَ",
       "translation": "from the past and the late generations,"
     },
     {
@@ -245,181 +245,196 @@
     },
     {
       "index": 47,
+      "arabic": "",
+      "translation": "Then repeat the following three times:"
+    },
+    {
+      "index": 48,
       "arabic": "اِنَّا لِلّٰهِ وَ اِنَّا اِلَيْهِ رَاجِعُوْنَ",
       "translation": "Verily, we are Allah's and verily unto Him shall we return."
     },
     {
-      "index": 48,
+      "index": 49,
+      "arabic": "",
+      "translation": "Then say the following:"
+    },
+    {
+      "index": 50,
       "arabic": "اُصِبْنَا بِكَ يَا حَبِيْبَ قُلُوْبِنَا",
       "translation": "We are stricken by losing you, O beloved of our hearts!"
     },
     {
-      "index": 49,
+      "index": 51,
       "arabic": "فَمَا اَعْظَمَ الْمُصِيْبَةَ بِكَ",
       "translation": "Too shocking is our misfortune of losing you!"
     },
     {
-      "index": 50,
+      "index": 52,
       "arabic": "حَيْثُ انْقَطَعَ عَنَّا الْوَحْيُ",
       "translation": "Because the Revelation has been interrupted"
     },
     {
-      "index": 51,
+      "index": 53,
       "arabic": "وَ حَيْثُ فَقَدْنَاكَ",
       "translation": "and because we have missed you."
     },
     {
-      "index": 52,
+      "index": 54,
       "arabic": "فَاِنَّا لِلّٰهِ وَ اِنَّا اِلَيْهِ رَاجِعُوْنَ",
       "translation": "Nevertheless, we are Allah’s and to Him shall we return."
     },
     {
-      "index": 53,
+      "index": 55,
       "arabic": "يَا سَيِّدَنَا يَا رَسُوْلَ اللّٰهِ",
       "translation": "O our master, O Allah’s Messenger!"
     },
     {
-      "index": 54,
+      "index": 56,
       "arabic": "صَلَوَاتُ اللّٰهِ عَلَيْكَ وَ عَلٰى اٰلِ بَيْتِكَ [الطَّيِّبِيْنَ‏] الطَّاهِرِيْنَ",
       "translation": "May Allah’s blessings be upon you and upon your Household, the immaculate."
     },
     {
-      "index": 55,
+      "index": 57,
       "arabic": "هٰذَا يَوْمُ السَّبْتِ وَ هُوَ يَوْمُكَ",
       "translation": "This day is Saturday, which is your day,"
     },
     {
-      "index": 56,
+      "index": 58,
       "arabic": "وَ اَنَا فِيْهِ ضَيْفُكَ وَ جَارُكَ",
       "translation": "and on this day I am your guest and in your vicinity;"
     },
     {
-      "index": 57,
+      "index": 59,
       "arabic": "فَاَضِفْنِيْ وَ اَجِرْنِي",
       "translation": "so, receive me as your guest and as your neighbor."
     },
     {
-      "index": 58,
+      "index": 60,
       "arabic": "فَاِنَّكَ كَرِيْمٌ تُحِبُّ الضِّيَافَةَ",
       "translation": "Indeed, you are generous and hospitable"
     },
     {
-      "index": 59,
+      "index": 61,
       "arabic": "وَ مَأْمُوْرٌ بِالْاِجَارَةِ",
       "translation": "and you are commanded [by Allah] to host your neighbors."
     },
     {
-      "index": 60,
+      "index": 62,
       "arabic": "فَاَضِفْنِيْ وَ اَحْسِنْ ضِيَافَتِيْ",
       "translation": "So, receive me as your guest and treat me hospitably;"
     },
     {
-      "index": 61,
+      "index": 63,
       "arabic": "وَ اَجِرْنَا وَ اَحْسِنْ اِجَارَتَنَا",
       "translation": "and accept us as your neighbors and treat us in due hospitability;"
     },
     {
-      "index": 62,
+      "index": 64,
       "arabic": "بِمَنْزِلَةِ اللّٰهِ عِنْدَكَ وَ عِنْدَ اٰلِ بَيْتِكَ",
       "translation": "[I ask you] in the name of Allah’s standing with you and with your Household"
     },
     {
-      "index": 63,
+      "index": 65,
       "arabic": "وَ بِمَنْزِلَتِهِمْ عِنْدَهُ",
       "translation": "and in the name of their standing with Him"
     },
     {
-      "index": 64,
+      "index": 66,
       "arabic": "وَ بِمَا اسْتَوْدَعَكُمْ مِنْ عِلْمِهِ",
       "translation": "and in the name of the knowledge that He has entrusted with you all."
     },
     {
-      "index": 65,
+      "index": 67,
       "arabic": "فَاِنَّهُ اَكْرَمُ الْاَكْرَمِيْنَ۔",
       "translation": "Verily, He is the most generous of all those who show generosity."
     },
     {
-      "index": 66,
+      "index": 68,
+      "arabic": "",
+      "translation": "As for myself, ‘Abbas al-Qummi the author of this book, whenever I address this form of Ziyarah to the Holy Prophet (s.a.w.a.) I begin with the following form that Imam al-Rida(a.s.) taught to al-Bizanti. In this respect, it has been authentically narrated that when Abu-Basir asked him about the most proper form of visiting the Holy Prophet’s tomb and invoking Allah’s salutations upon him after the prayer, Imam Ali ibn Musa al-Rida(a.s.) answered that he may say:"
+    },
+    {
+      "index": 69,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا رَسُوْلَ اللّٰهِ",
       "translation": "Peace be upon you, O Allah’s Messenger."
     },
     {
-      "index": 67,
+      "index": 70,
       "arabic": "وَ رَحْمَةُ اللّٰهِ وَ بَرَكَاتُهُ",
       "translation": "May Allah’s mercy and blessings be upon you,too."
     },
     {
-      "index": 68,
+      "index": 71,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا مُحَمَّدَ بْنَ عَبْدِ اللّٰهِ",
       "translation": "Peace be upon you, O Muhammad, the son of 'Abdullah."
     },
     {
-      "index": 69,
+      "index": 72,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا خِيَرَةَ اللّٰهِ",
       "translation": "Peace be upon you, O most preferred of Allah."
     },
     {
-      "index": 70,
+      "index": 73,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا حَبِيْبَ اللّٰهِ",
       "translation": "Peace be upon you, O most-beloved of Allah."
     },
     {
-      "index": 71,
+      "index": 74,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا صِفْوَةَ اللّٰهِ",
       "translation": "Peace be upon you, O choicest of Allah."
     },
     {
-      "index": 72,
+      "index": 75,
       "arabic": "اَلسَّلَامُ عَلَيْكَ يَا اَمِيْنَ اللّٰهِ",
       "translation": "Peace be upon you, O trustee of Allah."
     },
     {
-      "index": 73,
+      "index": 76,
       "arabic": "اَشْهَدُ اَنَّكَ رَسُوْلُ اللّٰهِ",
       "translation": "I bear witness that you are the messenger of Allah"
     },
     {
-      "index": 74,
+      "index": 77,
       "arabic": "وَ اَشْهَدُ اَنَّكَ مُحَمَّدُ بْنُ عَبْدِ اللّٰهِ",
       "translation": "and I bear witness that you are Muhammad, the son of 'Abdullah."
     },
     {
-      "index": 75,
+      "index": 78,
       "arabic": "وَ اَشْهَدُ اَنَّكَ قَدْ نَصَحْتَ لِاُمَّتِكَ",
       "translation": "And I bear witness that you have truly well-wished for your nation,"
     },
     {
-      "index": 76,
+      "index": 79,
       "arabic": "وَ جَاهَدْتَ فِي سَبِيْلِ رَبِّكَ",
       "translation": "striven hard in the way of your Lord,"
     },
     {
-      "index": 77,
+      "index": 80,
       "arabic": "وَ عَبَدْتَهُ حَتّٰى اَتَاكَ الْيَقِيْنُ",
       "translation": "and worshipped Him until death came upon you."
     },
     {
-      "index": 78,
+      "index": 81,
       "arabic": "فَجَزَاكَ اللهُ يَا رَسُوْلَ اللّٰهِ",
       "translation": "May Allah reward you, O Allah’s Messenger,"
     },
     {
-      "index": 79,
+      "index": 82,
       "arabic": "اَفْضَلَ مَا جَزٰى نَبِيًّا عَنْ اُمَّتِهِ",
       "translation": "with the best of that with which He has ever rewarded a Prophet on behalf of his people."
     },
     {
-      "index": 80,
+      "index": 83,
       "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
       "translation": "O Allah, (please) send blessings to Muhammad and the Household of Muhammad"
     },
     {
-      "index": 81,
+      "index": 84,
       "arabic": "اَفْضَلَ مَا صَلَّيْتَ عَلٰى اِبْرَاهِيْمَوَ اٰلِ اِبْرَاهِيْمَ",
       "translation": "with the best blessings You have ever conferred upon Abraham and the Household of Abraham."
     },
     {
-      "index": 82,
+      "index": 85,
       "arabic": "اِنَّكَ حَمِيْدٌ مَجِيْدٌ۔",
       "translation": "Verily, You are All-laudable, All-glorious."
     }

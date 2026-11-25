@@ -7,6 +7,7 @@ import staticSurahs from '../surahList.json';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { SURAH_URDU_MAP } from '../data/surahUrduNames';
 import { getArabicFontFamily } from '../utils/arabicFonts';
+import { SacredAlbumArt } from './SacredAlbumArt';
 
 interface HomeQuranAudioWidgetProps {
   onSelectSurah: (surahId: number, targetAyah?: number) => void;
@@ -233,20 +234,32 @@ export default function HomeQuranAudioWidget({ onSelectSurah }: HomeQuranAudioWi
 
       {/* Center Surah Calligraphy & Recitation Details */}
       <div className="my-2.5 p-3 rounded-2xl liquid-glass border border-emerald-500/20 dark:border-emerald-800/40 flex items-center justify-between gap-3 relative z-10">
-        <div className="min-w-0">
-          <p
-            dir="rtl"
-            lang="ar"
-            className="font-arabic text-xl sm:text-2xl text-emerald-800 dark:text-emerald-200 font-normal truncate leading-relaxed"
-            style={{ fontFamily: getArabicFontFamily(arabicFont) }}
-          >
-            {currentSurahMeta.name}
-          </p>
-          <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate">
-            {isCurrentSurahPlaying && currentAyah
-              ? (isUrdu ? `آیت ${currentAyah.numberInSurah} جاری ہے` : `Reciting Ayah ${currentAyah.numberInSurah} of ${currentSurahMeta.numberOfAyahs}`)
-              : (currentSurahMeta.englishNameTranslation || 'Chapter of the Holy Quran')}
-          </p>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="shrink-0">
+            <SacredAlbumArt
+              type="quran"
+              surahNumber={currentSurahMeta.number}
+              title={currentSurahMeta.englishName}
+              isPlaying={isCurrentSurahPlaying}
+              size="sm"
+              className="w-11 h-11 rounded-xl shadow-xs"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p
+              dir="rtl"
+              lang="ar"
+              className="font-arabic text-lg sm:text-xl text-emerald-800 dark:text-emerald-200 font-normal truncate leading-relaxed"
+              style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+            >
+              {currentSurahMeta.name}
+            </p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate">
+              {isCurrentSurahPlaying && currentAyah
+                ? (isUrdu ? `آیت ${currentAyah.numberInSurah} جاری ہے` : `Reciting Ayah ${currentAyah.numberInSurah} of ${currentSurahMeta.numberOfAyahs}`)
+                : (currentSurahMeta.englishNameTranslation || 'Chapter of the Holy Quran')}
+            </p>
+          </div>
         </div>
 
         {/* Play / Pause Primary Button */}

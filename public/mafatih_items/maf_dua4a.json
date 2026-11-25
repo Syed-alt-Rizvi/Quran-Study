@@ -10,8 +10,8 @@
     "Namaz e Ghufaylah"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ E GHUFAYLAH\n\nYou may then offer the Ghufaylah Prayer in the period between the Sunset (maghrib) and the Evening (Isha’) Prayers. This prayer consists of two units in the first of which you should recite, after Surah al-Faatehah, the following verses (Surah al-Anbiya’ 21:87-88):\n\nIn the second unit, you should recite, after Surah al-Faatehah, the following verse (6:59):\n\nAfter that, you should raise your both hands for Qunut, saying:\n\nYou may then mention your needs.\n\nThen, say the following:\n\nYou may then pray to Him for your personal needs, for it has been narrated that anyone who offers this prayer and supplicates Almighty Allah will have his requests granted.",
-  "versesCount": 23,
+  "introduction": "NAMAZ E GHUFAYLAH\n\nYou may then offer the Ghufaylah Prayer in the period between the Sunset (maghrib) and the Evening (Isha’) Prayers. This prayer consists of two units in the first of which you should recite, after Surah al-Faatehah, the following verses (Surah al-Anbiya’ 21:87-88):",
+  "versesCount": 27,
   "verses": [
     {
       "index": 1,
@@ -50,83 +50,103 @@
     },
     {
       "index": 8,
+      "arabic": "",
+      "translation": "In the second unit, you should recite, after Surah al-Faatehah, the following verse (6:59):"
+    },
+    {
+      "index": 9,
       "arabic": "وَعِنْدَهٗ مَفَاتِحُ الْغَيْبِ",
       "translation": ""
     },
     {
-      "index": 9,
+      "index": 10,
       "arabic": "لَا يَعْلَمُهَاۤ اِلَّا هُوَ‌ؕ",
       "translation": ""
     },
     {
-      "index": 10,
+      "index": 11,
       "arabic": "وَيَعْلَمُ مَا فِى الْبَرِّ وَالْبَحْرِ‌ؕ",
       "translation": ""
     },
     {
-      "index": 11,
+      "index": 12,
       "arabic": "وَمَا تَسْقُطُ مِنْ وَّرَقَةٍ اِلَّا يَعْلَمُهَا",
       "translation": ""
     },
     {
-      "index": 12,
+      "index": 13,
       "arabic": "وَلَا حَبَّةٍ فِىْ ظُلُمٰتِ الْاَرْضِ",
       "translation": ""
     },
     {
-      "index": 13,
+      "index": 14,
       "arabic": "وَلَا رَطْبٍ وَّلَا يَابِسٍ",
       "translation": ""
     },
     {
-      "index": 14,
+      "index": 15,
       "arabic": "اِلَّا فِىْ كِتٰبٍ مُّبِيْنٍ‏(59)",
       "translation": ""
     },
     {
-      "index": 15,
+      "index": 16,
+      "arabic": "",
+      "translation": "After that, you should raise your both hands for Qunut, saying:"
+    },
+    {
+      "index": 17,
       "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ بِمَفَاتِحِ الْغَيْبِ",
       "translation": ""
     },
     {
-      "index": 16,
+      "index": 18,
       "arabic": "الَّتِيْ لَا يَعْلَمُهَا اِلَّا اَنْتَ",
       "translation": ""
     },
     {
-      "index": 17,
+      "index": 19,
       "arabic": "اَنْ تُصَلِّيَ عَلٰى مُحَمَّدٍ وَ اٰلِهِ وَ اَنْ .. تَفْعَلَ بِيْ كَذَا وَ كَذَا۔",
       "translation": ""
     },
     {
-      "index": 18,
+      "index": 20,
+      "arabic": "",
+      "translation": "You may then mention your needs.\n\nThen, say the following:"
+    },
+    {
+      "index": 21,
       "arabic": "اَللّٰهُمَّ اَنْتَ وَلِيُّ نِعْمَتِيْ",
       "translation": ""
     },
     {
-      "index": 19,
+      "index": 22,
       "arabic": "وَ الْقَادِرُ عَلٰى طَلِبَتِيْ",
       "translation": ""
     },
     {
-      "index": 20,
+      "index": 23,
       "arabic": "تَعْلَمُ حَاجَتِيْ",
       "translation": ""
     },
     {
-      "index": 21,
+      "index": 24,
       "arabic": "فَاَسْاَلُكَ بِحَقِّ مُحَمَّدٍ وَ اٰلِهِ",
       "translation": ""
     },
     {
-      "index": 22,
+      "index": 25,
       "arabic": "عَلَيْهِ وَ عَلَيْهِمُ السَّلَامُ",
       "translation": ""
     },
     {
-      "index": 23,
+      "index": 26,
       "arabic": "لَمَّا قَضَيْتَهَا لِيْ۔",
       "translation": ""
+    },
+    {
+      "index": 27,
+      "arabic": "",
+      "translation": "You may then pray to Him for your personal needs, for it has been narrated that anyone who offers this prayer and supplicates Almighty Allah will have his requests granted."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua4a&lang=en"

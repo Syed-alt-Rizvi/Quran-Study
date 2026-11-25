@@ -9,7 +9,8 @@
     "start": "node server.ts",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "node -e \"const fs=require('fs'); if(!fs.existsSync('firebase-applet-config.json') && fs.existsSync('firebase-applet-config.example.json')) fs.copyFileSync('firebase-applet-config.example.json', 'firebase-applet-config.json')\""
   },
   "engines": {
     "node": ">=22.0.0"

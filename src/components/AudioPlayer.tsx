@@ -18,7 +18,9 @@ import { useMafatihAudioStore } from '../mafatihAudioStore';
 import { useSettingsStore } from '../store';
 import { hapticSelection, hapticImpact, ImpactStyle } from '../utils/haptics';
 import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
+import { getMafatihArabicTitle, getMafatihEnglishTitle } from '../utils/mafatihArabic';
 import { t } from '../i18n';
+import { SacredAlbumArt } from './SacredAlbumArt';
 import { 
   resolveAyahAudio, 
   recordAudioOutcome, 
@@ -34,6 +36,7 @@ interface AudioPlayerProps {
   onSelectJuz?: (juzId: number, targetAyah?: number, targetSurah?: number) => void;
   onSelectMafatihItem?: (itemId: string) => void;
   selectedMafatihItem?: string | null;
+  selectedSurah?: number | null;
   isOnHome?: boolean;
 }
 
@@ -44,6 +47,7 @@ export default function AudioPlayer({
   onSelectJuz, 
   onSelectMafatihItem, 
   selectedMafatihItem, 
+  selectedSurah,
   isOnHome 
 }: AudioPlayerProps) {
   const { 
@@ -138,6 +142,18 @@ export default function AudioPlayer({
     handleNavigate(e);
   };
 
+  // Handle track finished (support looping verse for Hifz memorization)
+  const handleEnded = useCallback(() => {
+    if (isLoopingAyah && audioRef.current) {
+      try {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      } catch {}
+    } else {
+      next();
+    }
+  }, [isLoopingAyah, next]);
+
   // Synchronize audio focus & pause when external subsystem requests focus
   useEffect(() => {
     const handlePauseQuran = () => {
@@ -156,7 +172,7 @@ export default function AudioPlayer({
     }
   }, [globalAudioSpeed, audioSrc]);
 
-  // Main Audio Element Lifecycle & Playback Management
+  // Main Audio Element Lifecycle & Playback Management (Immediate Swift Playback)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioSrc) return;
@@ -196,19 +212,7 @@ export default function AudioPlayer({
     };
 
     if (isPlaying) {
-      if (audio.readyState >= 2) {
-        attemptPlay();
-      } else {
-        const onCanPlay = () => {
-          attemptPlay();
-          audio.removeEventListener('canplay', onCanPlay);
-        };
-        audio.addEventListener('canplay', onCanPlay);
-        return () => {
-          isMounted = false;
-          audio.removeEventListener('canplay', onCanPlay);
-        };
-      }
+      attemptPlay();
     } else {
       audio.pause();
     }
@@ -217,6 +221,21 @@ export default function AudioPlayer({
       isMounted = false;
     };
   }, [isPlaying, audioSrc, currentIndex, globalAudioSpeed, fallbackAttempted, pause, setStoreBuffering]);
+
+  // Swift Buffering Watchdog: If buffering stalls on active stream for > 1.8s, auto-switch to alternate mirror
+  useEffect(() => {
+    if (!isPlaying || !isBuffering || fallbackAttempted || !audioSrc) return;
+
+    const timer = setTimeout(() => {
+      if (isPlaying && isBuffering && !fallbackAttempted) {
+        console.warn("[QuranAudio] Buffer timeout on active stream. Swiftly switching to secondary mirror.");
+        recordAudioOutcome('cdn', false);
+        setFallbackAttempted(true);
+      }
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, [isPlaying, isBuffering, fallbackAttempted, audioSrc]);
 
   // Audio Event Listeners (timeupdate, loadedmetadata, buffering, playbackRate)
   useEffect(() => {
@@ -258,11 +277,17 @@ export default function AudioPlayer({
       setStoreBuffering(false);
     };
 
+    const onLoadedData = () => {
+      setIsBuffering(false);
+      setStoreBuffering(false);
+    };
+
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('loadeddata', onLoadedData);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdate);
@@ -270,6 +295,7 @@ export default function AudioPlayer({
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('loadeddata', onLoadedData);
     };
   }, [audioSrc, globalAudioSpeed, setStoreBuffering]);
 
@@ -437,19 +463,53 @@ export default function AudioPlayer({
   const skipMafatih = useMafatihAudioStore((s) => s.skip);
   const stopMafatih = useMafatihAudioStore((s) => s.stop);
 
-  const hasQuranAudio = playlist.length > 0 && !!currentAyah;
-  const hasMafatihAudio = !!mafatihTrack && (isMafatihPlaying || mafatihCurrentTime > 0);
+  const surahViewMode = useAudioStore((s) => s.surahViewMode);
+  const mafatihViewMode = useAudioStore((s) => s.mafatihViewMode);
 
-  // If user is currently inside MafatihItemView reading any supplication,
-  // MafatihItemView displays its own docked dedicated reader player at the bottom.
-  const isReadingThisMafatihItem = !!selectedMafatihItem;
+  // The Native Quran Audio Tag Engine - MUST always remain mounted in DOM to stream audio swiftly
+  const quranAudioEngine = audioSrc ? (
+    <audio 
+      ref={audioRef} 
+      src={audioSrc} 
+      preload="auto"
+      onEnded={handleEnded} 
+      onError={(e) => {
+        console.warn("[QuranAudio] Primary audio load failure for:", audioSrc, e);
+        if (!fallbackAttempted) {
+          recordAudioOutcome('cdn', false);
+          setFallbackAttempted(true);
+        } else {
+          recordAudioOutcome('mirror', false);
+          pause();
+        }
+      }}
+    />
+  ) : null;
 
-  if (!hasQuranAudio && (!hasMafatihAudio || isReadingThisMafatihItem)) {
-    return null;
+  // Must only exist in text mode / home while the sound is actively playing
+  const isQuranSoundPlaying = (isPlaying || isBuffering) && playlist.length > 0 && !!currentAyah;
+  const isMafatihSoundPlaying = (isMafatihPlaying || isMafatihBuffering) && !!mafatihTrack;
+
+  // Determine whether any visible bottom floating bar should appear:
+  // 1. In dedicated player mode, NO bottom bar should appear (neither Quran nor Mafatih)
+  const isSurahInPlayerMode = Boolean(selectedSurah && surahViewMode === 'player');
+  const isMafatihInPlayerMode = Boolean(selectedMafatihItem && mafatihViewMode === 'player');
+
+  // 2. In Mafatih item text mode, MafatihItemView renders its own docked bar while sound is playing
+  const isMafatihItemReaderActive = Boolean(selectedMafatihItem && isMafatihSoundPlaying);
+
+  // 3. Floating bottom bars ONLY exist while sound is actively playing in text mode / home
+  const showQuranBar = !isSurahInPlayerMode && !isMafatihInPlayerMode && isQuranSoundPlaying;
+  const showMafatihBar = !isSurahInPlayerMode && !isMafatihInPlayerMode && !isMafatihItemReaderActive && !showQuranBar && isMafatihSoundPlaying && Boolean(mafatihTrack);
+
+  // If no bottom bar should show (e.g. in Player mode, or when paused/stopped),
+  // return ONLY the audio engine so Quran audio plays swiftly in the background without UI collision
+  if (!showQuranBar && !showMafatihBar) {
+    return quranAudioEngine;
   }
 
   // Render floating audio player for Mafatih when Quran is not playing
-  if (!hasQuranAudio && hasMafatihAudio && mafatihTrack) {
+  if (showMafatihBar && mafatihTrack) {
     const mProgress = mafatihDuration > 0 ? Math.min(100, (mafatihCurrentTime / mafatihDuration) * 100) : 0;
     const formatMTime = (secs: number) => {
       if (isNaN(secs) || secs <= 0) return isUrdu ? toUrduNumerals('00:00') : '00:00';
@@ -459,23 +519,26 @@ export default function AudioPlayer({
       return isUrdu ? toUrduNumerals(str) : str;
     };
 
-    const displayMTitle = isUrdu ? getMafatihUrduTitle(mafatihTrack.id, mafatihTrack.title) : mafatihTrack.title;
+    const displayMTitle = isUrdu ? getMafatihUrduTitle(mafatihTrack.id, mafatihTrack.title) : getMafatihEnglishTitle(mafatihTrack.id, mafatihTrack.title);
     const displayMCat = isUrdu ? getMafatihUrduCategory(mafatihTrack.category) : (mafatihTrack.category || 'Supplication Recitation');
+    const arMTitle = getMafatihArabicTitle(mafatihTrack.id, mafatihTrack.title, mafatihTrack.category);
 
     return (
-      <div 
-        id="global-mafatih-audio-bar"
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest('button')) return;
-          if (mafatihTrack.id && onSelectMafatihItem) {
-            hapticSelection();
-            onSelectMafatihItem(mafatihTrack.id);
-          }
-        }}
-        className={`fixed ${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-sky-400/70 group/bar gpu-layer`}
-        title={isUrdu ? "متن پڑھنے کے لیے ٹیپ کریں" : "Tap to read supplication text"}
-        dir={isUrdu ? "rtl" : "ltr"}
-      >
+      <>
+        {quranAudioEngine}
+        <div 
+          id="global-mafatih-audio-bar"
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            if (mafatihTrack.id && onSelectMafatihItem) {
+              hapticSelection();
+              onSelectMafatihItem(mafatihTrack.id);
+            }
+          }}
+          className={`fixed ${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-sky-400/70 group/bar gpu-layer`}
+          title={isUrdu ? "متن پڑھنے کے لیے ٹیپ کریں" : "Tap to read supplication text"}
+          dir={isUrdu ? "rtl" : "ltr"}
+        >
         {/* Interactive Progress Bar */}
         <div 
           onClick={(e) => {
@@ -501,8 +564,17 @@ export default function AudioPlayer({
         <div className="flex items-center justify-between gap-2">
           {/* Track Info */}
           <div className="flex items-center gap-2.5 overflow-hidden flex-1 p-1 -ml-1">
-            <div className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <Volume2 size={16} className={isMafatihPlaying ? "animate-pulse" : ""} />
+            <div className="shrink-0">
+              <SacredAlbumArt
+                type="mafatih"
+                itemId={mafatihTrack.id}
+                title={mafatihTrack.title}
+                arabicTitle={arMTitle}
+                category={mafatihTrack.category}
+                isPlaying={isMafatihPlaying}
+                size="sm"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-xs"
+              />
             </div>
             <div className="truncate min-w-0">
               <div className="flex items-center gap-1.5">
@@ -600,20 +672,9 @@ export default function AudioPlayer({
           </div>
         </div>
       </div>
-    );
-  }
-
-  // Handle track finished (support looping verse for Hifz memorization)
-  const handleEnded = () => {
-    if (isLoopingAyah && audioRef.current) {
-      try {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
-      } catch {}
-    } else {
-      next();
-    }
-  };
+    </>
+  );
+}
 
   const progressPercent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
 
@@ -621,7 +682,7 @@ export default function AudioPlayer({
     <div 
       id="bottom-audio-player-bar"
       onClick={handleContainerClick}
-      className={`fixed ${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-400/70 group/bar gpu-layer`}
+      className={`fixed ${selectedSurah ? 'lg:hidden ' : ''}${isOnHome ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))]' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))]'} left-1/2 -translate-x-1/2 w-[94%] max-w-lg liquid-glass-dock border border-white/60 dark:border-white/15 shadow-[0_20px_50px_-8px_rgba(0,0,0,0.5)] rounded-3xl sm:rounded-full px-4 py-2.5 sm:px-5 sm:py-3 z-50 flex flex-col gap-1.5 cursor-pointer transition-all hover:border-emerald-400/70 group/bar gpu-layer`}
       title="Tap to return to playing verse"
     >
       {/* Interactive Micro-Progress Bar Line across top of player */}
@@ -639,34 +700,46 @@ export default function AudioPlayer({
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        {/* Clickable Track Info */}
-        <button
-          id="audio-player-track-info-btn"
-          type="button"
-          onClick={handleNavigate}
-          className="flex flex-col text-left mr-2 sm:mr-3 overflow-hidden flex-1 group/info p-1 -ml-1 rounded-xl hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 transition-colors focus:outline-none"
-          aria-label={`Go to ${currentAyah.surahName || `Surah ${currentAyah.surahNumber}`} Ayah ${currentAyah.numberInSurah}`}
-        >
-          <div className="flex items-center gap-1 min-w-0">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 truncate">
-              {currentAyah.surahName || `Surah ${currentAyah.surahNumber}`}
-            </span>
-            <ChevronRight size={13} className="text-emerald-500 opacity-60 group-hover/info:opacity-100 group-hover/info:translate-x-0.5 transition-all shrink-0" />
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:inline truncate">
-              • {activeReciterProfile.name}
-            </span>
+        {/* Clickable Track Info with Album Art */}
+        <div className="flex items-center gap-2.5 overflow-hidden flex-1 p-1 -ml-1">
+          <div className="shrink-0">
+            <SacredAlbumArt
+              type="quran"
+              surahNumber={currentAyah.surahNumber || (surahId && surahId > 0 ? surahId : 1)}
+              title={currentAyah.surahName || `Surah ${currentAyah.surahNumber || surahId}`}
+              isPlaying={isPlaying}
+              size="sm"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-xs"
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 truncate font-semibold">
-              {isUrdu ? `${t('ayah', appLanguage)} ${toUrduNumerals(currentAyah.numberInSurah)}` : `Ayah ${currentAyah.numberInSurah}`}
-            </span>
-            {duration > 0 && (
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-                {Math.floor(currentTime)}s / {Math.floor(duration)}s
+          <button
+            id="audio-player-track-info-btn"
+            type="button"
+            onClick={handleNavigate}
+            className="flex flex-col text-left mr-2 sm:mr-3 overflow-hidden flex-1 group/info rounded-xl hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 transition-colors focus:outline-none"
+            aria-label={`Go to ${currentAyah.surahName || `Surah ${currentAyah.surahNumber}`} Ayah ${currentAyah.numberInSurah}`}
+          >
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 truncate">
+                {currentAyah.surahName || `Surah ${currentAyah.surahNumber}`}
               </span>
-            )}
-          </div>
-        </button>
+              <ChevronRight size={13} className="text-emerald-500 opacity-60 group-hover/info:opacity-100 group-hover/info:translate-x-0.5 transition-all shrink-0" />
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:inline truncate">
+                • {activeReciterProfile.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 truncate font-semibold">
+                {isUrdu ? `${t('ayah', appLanguage)} ${toUrduNumerals(currentAyah.numberInSurah)}` : `Ayah ${currentAyah.numberInSurah}`}
+              </span>
+              {duration > 0 && (
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                  {Math.floor(currentTime)}s / {Math.floor(duration)}s
+                </span>
+              )}
+            </div>
+          </button>
+        </div>
 
         {/* Playback Controls */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -802,24 +875,7 @@ export default function AudioPlayer({
         </div>
       </div>
 
-      {audioSrc && (
-        <audio 
-          ref={audioRef} 
-          src={audioSrc} 
-          preload="auto"
-          onEnded={handleEnded} 
-          onError={(e) => {
-            console.warn("[QuranAudio] Primary audio load failure for:", audioSrc, e);
-            if (!fallbackAttempted) {
-              recordAudioOutcome('cdn', false);
-              setFallbackAttempted(true);
-            } else {
-              recordAudioOutcome('mirror', false);
-              pause();
-            }
-          }}
-        />
-      )}
+      {quranAudioEngine}
     </div>
   );
 }

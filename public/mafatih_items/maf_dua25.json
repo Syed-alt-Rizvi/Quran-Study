@@ -10,13 +10,23 @@
     "Namaz of Imam Mahdi (a.t.f.s)"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ OF IMAM MAHDI (A.T.F.S)\n\nThis prayer consists of two units in each of which Surah al-Faatehah is recited once but the following Ayah (verse) is repeated one hundred times:\n\nThen, Surah al-Tawheed is recited once.\n\nAfter the namaz recite Tasbih of Hazrat Fatima Zahra (s.a.) and recite the dua of Imam Mahdi (a.t.f.s.):",
-  "versesCount": 1,
+  "introduction": "NAMAZ OF IMAM MAHDI (A.T.F.S)\n\nThe established prayer of the Twelfth Holy Imam, al-Hujjah ibn al-Hasan (a.t.f.s.), traditionally offered in Masjid Jamkaran and during times of need.",
+  "versesCount": 3,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "This prayer consists of two units in each of which Surah al-Faatehah is recited once, but the following Ayah (verse) is repeated one hundred times:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "اِيَّاكَ نَعْبُدُ وَ اِيَّاكَ نَسْتَعِيْنُ",
       "translation": "You do we worship, and Yours aid we seek."
+    },
+    {
+      "index": 3,
+      "arabic": "",
+      "translation": "Then, Surah al-Tawheed is recited once.\n\nAfter the namaz recite Tasbih of Hazrat Fatima Zahra (s.a.) and recite the dua of Imam Mahdi (a.t.f.s.):"
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua25&lang=en"

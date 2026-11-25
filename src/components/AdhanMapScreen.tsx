@@ -320,7 +320,7 @@ export default function AdhanMapScreen({ onBack }: AdhanMapScreenProps) {
                     {nextPrayer.time12}
                   </span>
                   <span className="text-xs text-slate-600 dark:text-slate-400">
-                    &bull; in {nextPrayer.formattedCountdown}
+                    · in {nextPrayer.formattedCountdown}
                   </span>
                 </div>
               </div>

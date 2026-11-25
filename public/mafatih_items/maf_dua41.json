@@ -10,8 +10,8 @@
     "Dua Asharaat"
   ],
   "audioUrl": "https://www.ya-mahdi.net/apps_audio/misc/asharat_validalmazidi.m4a",
-  "introduction": "DUA ASHARAT\n\nThe Supplication of the Tens; some paragraphs of the supplication are repeated ten times each.\n\nThis supplication is excellently significant. Although there is some difference in the original copies of it, I am quoting this version from Shaykh al-Tusi’s Misbah al-Mutahajjid. It is advisable to say this supplication each morning and evening. Yet, its best time is Friday afternoon:\n\nThen, repeat the following statements ten times each:\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nSay 10 times :\n\nThe recite Surah Tawheed 10 times :\n\nYou should then say the following:\n\nThen repeat the following ten times:",
-  "versesCount": 169,
+  "introduction": "DUA ASHARAT\n\nThe Supplication of the Tens; some paragraphs of the supplication are repeated ten times each.\n\nThis supplication is excellently significant. Although there is some difference in the original copies of it, I am quoting this version from Shaykh al-Tusi’s Misbah al-Mutahajjid. It is advisable to say this supplication each morning and evening. Yet, its best time is Friday afternoon:",
+  "versesCount": 189,
   "verses": [
     {
       "index": 1,
@@ -115,7 +115,7 @@
     },
     {
       "index": 21,
-      "arabic": "سُبْحَانَ ذِي الْعِزَّةِ وَ الْجَبَرُوْتِ",
+      "arabic": "سُبْحَانَ ذِي ال��عِزَّةِ وَ الْجَبَرُوْتِ",
       "translation": "Glory be to the Lord of Majesty and Magnificence."
     },
     {
@@ -315,7 +315,7 @@
     },
     {
       "index": 61,
-      "arabic": "وَ اَشْهَدُ اَنَّ الْجَنَّةَ حَقٌّ",
+      "arabic": "وَ اَشْهَدُ اَنَّ الْجَنَّةَ حَقّ��",
       "translation": "and I witness that Paradise is true,"
     },
     {
@@ -715,146 +715,246 @@
     },
     {
       "index": 141,
-      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ وَحْدَهُ لَا شَرِيْكَ لَهُ لَهُ الْمُلْكُ وَ لَهُ الْحَمْدُ وَ هُوَ اللَّطِيْفُ الْخَبِيْرُ",
-      "translation": "There is no god save Allah; One and Only and having no partner. To Him is the Kingdom and to Him is (all) praise. He is the Knower of subtleties, the Aware."
+      "arabic": "",
+      "translation": "Then, repeat the following statements ten times each:"
     },
     {
       "index": 142,
-      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ وَحْدَهُ لَا شَرِيْكَ لَهُ لَهُ الْمُلْكُ وَ لَهُ الْحَمْدُ يُحْيِيْ وَ يُمِيْتُ وَ يُمِيْتُ وَ يُحْيِيْ وَ هُوَ حَيٌّ لَا يَمُوْتُ بِيَدِهِ الْخَيْرُ وَ هُوَ عَلٰى كُلِّ شَيْ‏ءٍ قَدِيْرٌ",
-      "translation": "There is no god save Allah; One and Only and having no partner. To Him is the Kingdom and to Him is (all) praise. He gives life and causes to die and causes to die and gives life, while He is ever-living and never dies. In His Hand is the entire goodness and He has power over all things."
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ وَحْدَهُ لَا شَرِيْكَ لَهُ لَهُ الْمُلْكُ وَ لَهُ الْحَمْدُ وَ هُوَ اللَّطِيْفُ الْخَبِيْرُ",
+      "translation": ""
     },
     {
       "index": 143,
-      "arabic": "اَسْتَغْفِرُ اللهَ الَّذِيْ لَاۤ اِلٰهَ اِلَّا هُوَ الْحَيُّ الْقَيُّوْمُ وَ اَتُوْبُ اِلَيْهِ",
-      "translation": "I pray the forgiveness of Allah; there is no god save Him, the Ever-living, the Self-subsistent, and I repent to Him."
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 144,
-      "arabic": "يَا اَللهُ يَا اَللهُ",
-      "translation": "O Allah, O Allah!"
+      "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ وَحْدَهُ لَا شَرِيْكَ لَهُ لَهُ الْمُلْكُ وَ لَهُ الْحَمْدُ يُحْيِيْ وَ يُمِيْتُ وَ يُمِيْتُ وَ يُحْيِيْ وَ هُوَ حَيٌّ لَا يَمُوْتُ بِيَدِهِ الْخَيْرُ وَ هُوَ عَلٰى كُلِّ شَيْ‏ءٍ قَدِيْرٌ",
+      "translation": "There is no god save Allah; One and Only and having no partner. To Him is the Kingdom and to Him is (all) praise. He is the Knower of subtleties, the Aware."
     },
     {
       "index": 145,
-      "arabic": "يَا رَحْمَانُ يَا رَحْمَانُ",
-      "translation": "O All-beneficent, O All-beneficent!"
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 146,
-      "arabic": "يَا رَحِيْمُ يَا رَحِيْمُ",
-      "translation": "O All-merciful, O All-merciful!"
+      "arabic": "اَسْتَغْفِرُ اللهَ الَّذِيْ لَاۤ اِلٰهَ اِلَّا هُوَ الْحَيُّ الْقَيُّوْمُ وَ اَتُوْبُ اِلَيْهِ",
+      "translation": "There is no god save Allah; One and Only and having no partner. To Him is the Kingdom and to Him is (all) praise. He gives life and causes to die and causes to die and gives life, while He is ever-living and never dies. In His Hand is the entire goodness and He has power over all things."
     },
     {
       "index": 147,
-      "arabic": "يَا بَدِيْعَ السَّمَاوَاتِ وَ الْاَرْضِ",
-      "translation": "O Fashioner of the heavens and the earth!"
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 148,
-      "arabic": "يَا ذَا الْجَلَالِ وَ الْاِكْرَامِ",
-      "translation": "O Lord of Majesty and Dignity!"
+      "arabic": "يَا اَللهُ يَا اَللهُ",
+      "translation": "I pray the forgiveness of Allah; there is no god save Him, the Ever-living, the Self-subsistent, and I repent to Him."
     },
     {
       "index": 149,
-      "arabic": "يَا حَنَّانُ يَا مَنَّانُ",
-      "translation": "O All-compassionate! O Grantor (of graces)!"
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 150,
-      "arabic": "يَا حَيُّ يَا قَيُّوْمُ",
-      "translation": "O Ever-living! O Self-Subsistent!"
+      "arabic": "يَا رَحْمَانُ يَا رَحْمَانُ",
+      "translation": "O Allah, O Allah!"
     },
     {
       "index": 151,
-      "arabic": "يَا حَيُّ لَاۤ اِلٰهَ اِلَّا اَنْتَ",
-      "translation": "O Ever-living! There is no god save You!"
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 152,
-      "arabic": "يَا اَللهُ يَا لَاۤ اِلٰهَ اِلَّا اَنْتَ",
-      "translation": "O Allah! O He save Whom there is no god!"
+      "arabic": "يَا رَحِيْمُ يَا رَحِيْمُ",
+      "translation": "O All-beneficent, O All-beneficent!"
     },
     {
       "index": 153,
-      "arabic": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
-      "translation": "In the Name of Allah, the All-beneficent, the All-merciful."
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 154,
-      "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
-      "translation": "O Allah, bless Muhammad and the Household of Muhammad."
+      "arabic": "يَا بَدِيْعَ السَّمَاوَاتِ وَ الْاَرْضِ",
+      "translation": "O All-merciful, O All-merciful!"
     },
     {
       "index": 155,
-      "arabic": "اَللّٰهُمَّ افْعَلْ بِي مَا اَنْتَ اَهْلُهُ",
-      "translation": "O Allah, do to me that which You are worthy to do."
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 156,
-      "arabic": "اٰمِيْنَ اٰمِيْنَ۔",
-      "translation": "(please do) Respond, respond."
+      "arabic": "يَا ذَا الْجَلَالِ وَ الْاِكْرَامِ",
+      "translation": "O Fashioner of the heavens and the earth!"
     },
     {
       "index": 157,
-      "arabic": "قُلْ هُوَ اللّٰهُ اَحَدٌ۔۔۔۔",
-      "translation": "Say: He, Allah, is One."
+      "arabic": "",
+      "translation": "Say 10 times :"
     },
     {
       "index": 158,
+      "arabic": "يَا حَنَّانُ يَا مَنَّانُ",
+      "translation": "O Lord of Majesty and Dignity!"
+    },
+    {
+      "index": 159,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 160,
+      "arabic": "يَا حَيُّ يَا قَيُّوْمُ",
+      "translation": "O All-compassionate! O Grantor (of graces)!"
+    },
+    {
+      "index": 161,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 162,
+      "arabic": "يَا حَيُّ لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "O Ever-living! O Self-Subsistent!"
+    },
+    {
+      "index": 163,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 164,
+      "arabic": "يَا اَللهُ يَا لَاۤ اِلٰهَ اِلَّا اَنْتَ",
+      "translation": "O Ever-living! There is no god save You!"
+    },
+    {
+      "index": 165,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 166,
+      "arabic": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
+      "translation": "O Allah! O He save Whom there is no god!"
+    },
+    {
+      "index": 167,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 168,
+      "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
+      "translation": "In the Name of Allah, the All-beneficent, the All-merciful."
+    },
+    {
+      "index": 169,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 170,
+      "arabic": "اَللّٰهُمَّ افْعَلْ بِي مَا اَنْتَ اَهْلُهُ",
+      "translation": "O Allah, bless Muhammad and the Household of Muhammad."
+    },
+    {
+      "index": 171,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 172,
+      "arabic": "اٰمِيْنَ اٰمِيْنَ۔",
+      "translation": "O Allah, do to me that which You are worthy to do."
+    },
+    {
+      "index": 173,
+      "arabic": "",
+      "translation": "Say 10 times :"
+    },
+    {
+      "index": 174,
+      "arabic": "قُلْ هُوَ اللّٰهُ اَحَدٌ۔۔۔۔",
+      "translation": "(please do) Respond, respond."
+    },
+    {
+      "index": 175,
+      "arabic": "",
+      "translation": "The recite Surah Tawheed 10 times :"
+    },
+    {
+      "index": 176,
+      "arabic": "",
+      "translation": "You should then say the following:"
+    },
+    {
+      "index": 177,
       "arabic": "اَللّٰهُمَّ اصْنَعْ بِيْ مَا اَنْتَ اَهْلُهُ",
       "translation": "O Allah, do with me that which You are worthy to do"
     },
     {
-      "index": 159,
+      "index": 178,
       "arabic": "وَ لَا تَصْنَعْ بِيْ مَا اَنَا اَهْلُهُ",
       "translation": "but do not do to me that which I deserve,"
     },
     {
-      "index": 160,
+      "index": 179,
       "arabic": "فَاِنَّكَ اَهْلُ التَّقْوٰى وَ اَهْلُ الْمَغْفِرَةِ",
       "translation": "for You are worthy to be feared and worthy to forgive,"
     },
     {
-      "index": 161,
+      "index": 180,
       "arabic": "وَ اَنَا اَهْلُ الذُّنُوْبِ وَ الْخَطَايَا",
       "translation": "while I am the one of sins and faults."
     },
     {
-      "index": 162,
+      "index": 181,
       "arabic": "فَارْحَمْنِيْ يَا مَوْلَايَ",
       "translation": "So, have mercy upon me, O my Lord,"
     },
     {
-      "index": 163,
+      "index": 182,
       "arabic": "وَ اَنْتَ اَرْحَمُ الرَّاحِمِيْنَ۔",
       "translation": "and You are the most merciful of all those who show mercy."
     },
     {
-      "index": 164,
+      "index": 183,
+      "arabic": "",
+      "translation": "Then repeat the following ten times:"
+    },
+    {
+      "index": 184,
       "arabic": "لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ",
       "translation": "There is neither power nor might save with Allah."
     },
     {
-      "index": 165,
+      "index": 185,
       "arabic": "تَوَكَّلْتُ عَلَى الْحَيِّ الَّذِيْ لَا يَمُوْتُ",
       "translation": "I trust in the Ever-living (Lord) Who never dies."
     },
     {
-      "index": 166,
-      "arabic": "وَ الْحَمْدُ لِلّٰهِ الَّذِيْ لَمْ يَتَّخِذْ وَلَدًا",
+      "index": 186,
+      "arabic": "وَ الْحَمْدُ لِلّٰهِ الَّذِيْ لَم�� يَتَّخِذْ وَلَدًا",
       "translation": "All praise be to Allah, Who begets no son,"
     },
     {
-      "index": 167,
+      "index": 187,
       "arabic": "وَ لَمْ يَكُنْ لَهُ شَرِيْكٌ فِي الْمُلْكِ",
       "translation": "and has no partner in His dominion"
     },
     {
-      "index": 168,
+      "index": 188,
       "arabic": "وَ لَمْ يَكُنْ لَهُ وَلِيٌّ مِّنَ الذُّلِّ",
       "translation": "nor needs He any to protect Him from humiliation:"
     },
     {
-      "index": 169,
+      "index": 189,
       "arabic": "وَ كَبِّرْهُ تَكْبِيْرًا۔",
       "translation": "yea, magnify Him for His greatness and glory!"
     }

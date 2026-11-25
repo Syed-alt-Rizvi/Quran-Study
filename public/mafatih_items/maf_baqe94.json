@@ -10,8 +10,8 @@
     "Namaz for fulfillment of needs (3)"
   ],
   "audioUrl": null,
-  "introduction": "ANOTHER NAMAZ FOR SETTLING THE NEEDS (3)\n\nSayyid ibn Tawus, in his book of al-Mazar, Chapter: Rites of al-Kufah Mosque, after mentioning the recommended acts at Imam Ali’s Niche (mihrab), has mentioned a special prayer for settling the needs to be offered there. This prayer consists of four units, each two alone; i.e. the Taslim statement is uttered after each two units. In the first unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated ten times. In the second unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated twenty-one times. In the third unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated thirty-one times. In the fourth unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated forty-one times. Upon uttering the Taslim statement and saying the glorification statements, you may do the following:\n\n(1) Recite Surah al-Tawheed fifty-one times,\n\n(2) utter the imploration for forgiveness (i.e. istighfar) fifty times:\n\n(3) invoke blessings upon the Holy Prophet and his Household (i.e. Salawat) fifty times:\n\n(4) repeat the following statement fifty times:\n\nand (5) say the following supplication:",
-  "versesCount": 16,
+  "introduction": "ANOTHER NAMAZ FOR SETTLING THE NEEDS (3)\n\nSayyid ibn Tawus, in his book of al-Mazar, Chapter: Rites of al-Kufah Mosque, after mentioning the recommended acts at Imam Ali’s Niche (mihrab), has mentioned a special prayer for settling the needs to be offered there. This prayer consists of four units, each two alone; i.e. the Taslim statement is uttered after each two units. In the first unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated ten times. In the second unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated twenty-one times. In the third unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated thirty-one times. In the fourth unit, Surah al-Faatehah is recited once and Surah al-Tawheed is repeated forty-one times. Upon uttering the Taslim statement and saying the glorification statements, you may do the following:\n\n(1) Recite Surah al-Tawheed fifty-one times,\n\n(2) utter the imploration for forgiveness (i.e. istighfar) fifty times:",
+  "versesCount": 18,
   "verses": [
     {
       "index": 1,
@@ -20,76 +20,86 @@
     },
     {
       "index": 2,
+      "arabic": "",
+      "translation": "(3) invoke blessings upon the Holy Prophet and his Household (i.e. Salawat) fifty times:\n\n(4) repeat the following statement fifty times:"
+    },
+    {
+      "index": 3,
       "arabic": "لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللهِ الْعَلِىِّ الْعَظِيْمِ۔",
       "translation": "There is neither might nor power except with Allah."
     },
     {
-      "index": 3,
+      "index": 4,
+      "arabic": "",
+      "translation": "and (5) say the following supplication:"
+    },
+    {
+      "index": 5,
       "arabic": "يَا اَللهُ الْمَانِعُ قُدْرَتَهُ خَلْقَهُ",
       "translation": "O Allah Who stops His power (to punish) from His creatures,"
     },
     {
-      "index": 4,
+      "index": 6,
       "arabic": "وَالْمَالِكُ بِهَا سُلْطَانَهُ",
       "translation": "Who possesses His authority through it,"
     },
     {
-      "index": 5,
+      "index": 7,
       "arabic": "وَالْمُتَسَلِّطُ بِمَافِىْ يَدَيْهِ عَلٰى كُلِّ مَوْجُوْدٍ",
       "translation": "and Who has full power over all existent beings through what He possesses!"
     },
     {
-      "index": 6,
+      "index": 8,
       "arabic": "وَ غَيْرُكَ يَخِيْبُ رَجَاۤءُ رَاجِيْهِ",
       "translation": "While all others disappoint those who put hope in them,"
     },
     {
-      "index": 7,
+      "index": 9,
       "arabic": "وَ رَاجِيْكَ مَسْرُوْرٌ لَايَخِيْبُ",
       "translation": "he who puts hope in You is pleased and never disappointed."
     },
     {
-      "index": 8,
+      "index": 10,
       "arabic": "اَسْئَلُكَ بِكُلِّ رِضىً لَكَ",
       "translation": "I beseech You in the name of all items that please You,"
     },
     {
-      "index": 9,
+      "index": 11,
       "arabic": "وَ بِكُلِّ شَىْءٍ اَنْتَ فِيْهِ",
       "translation": "all things in which You are present,"
     },
     {
-      "index": 10,
+      "index": 12,
       "arabic": "وَ بِكُلِّ شَىْءٍ تُحِبُّ اَنْ تُذْكَرَ بِهِ",
       "translation": "all things in which You like to be mentioned,"
     },
     {
-      "index": 11,
+      "index": 13,
       "arabic": "وَ بِكَ يَا اَللهُ",
       "translation": "and in Your Name, O Allah"
     },
     {
-      "index": 12,
+      "index": 14,
       "arabic": "فَلَيْسَ يَعْدِلُكَ شَىْءٌ",
       "translation": "for there is nothing to be equal to You,"
     },
     {
-      "index": 13,
+      "index": 15,
       "arabic": "اَنْ تُصَلِّىَ عَلٰى مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ",
       "translation": "(please) send blessings upon Muhammad and the Household of Muhammad,"
     },
     {
-      "index": 14,
+      "index": 16,
       "arabic": "وَّ تَحْفَظَنِىْ وَ وَلَدِىْ وَ اَهْلِىْ وَ مَالِىْ",
       "translation": "safeguard me, my sons, my wife, and my possessions,"
     },
     {
-      "index": 15,
+      "index": 17,
       "arabic": "وَ تَحْفَظَنِىْ بِحِفْظِكَ",
       "translation": "safeguard me with Your safeguarding,"
     },
     {
-      "index": 16,
+      "index": 18,
       "arabic": "وَ اَنْ تَقْضِىَ حَاجَتِىْ فِىْ كَذَا وَ كَذَا۔",
       "translation": "and settle my need, which is..."
     }

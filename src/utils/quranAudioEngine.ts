@@ -147,15 +147,17 @@ export function resolveAyahAudio(
     cdnUrl = `https://cdn.islamic.network/quran/audio/${profile.bitrate}/${profile.id}/${globalAyahNumber}.mp3`;
   }
 
-  const shouldUseMirror = forceMirrorFallback || isCdnDegraded();
-  const activeUrl = shouldUseMirror ? mirrorUrl : cdnUrl;
-  const backupUrl = shouldUseMirror ? cdnUrl : mirrorUrl;
+  // EveryAyah operates over BunnyCDN with global edge points and HTTP/2 Range support,
+  // making it connect instantly (<150ms) without the buffering hangs of standard CDNs.
+  const shouldUseBackupCdn = forceMirrorFallback || isCdnDegraded();
+  const activeUrl = shouldUseBackupCdn ? cdnUrl : mirrorUrl;
+  const backupUrl = shouldUseBackupCdn ? mirrorUrl : cdnUrl;
 
   return {
-    primaryUrl: cdnUrl,
+    primaryUrl: mirrorUrl,
     backupUrl,
     activeUrl,
-    isMirrorActive: shouldUseMirror,
+    isMirrorActive: !shouldUseBackupCdn,
     surahNumber,
     ayahInSurah,
     globalAyahNumber

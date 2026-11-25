@@ -6,7 +6,6 @@ import UpdateToast from './components/common/UpdateToast';
 import { AnimatePresence } from 'motion/react';
 import { popModal } from './utils/modalBackHandler';
 import { checkUrlForTransfer, importUserData } from './utils/dataTransfer';
-import { checkAndDispatchCalendarNotifications } from './utils/calendarNotifications';
 import { useGlobalAdhanScheduler } from './hooks/useGlobalAdhanScheduler';
 import { Loader2 } from 'lucide-react';
 import { lazyWithRetry } from './utils/lazyWithRetry';
@@ -14,6 +13,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import PermissionsModal from './components/PermissionsModal';
 import { isPermissionPromptNeeded } from './utils/permissionManager';
+import { parseCurrentRoute, updateBrowserRoute } from './utils/urlRouter';
 
 // Code-split heavy views with resilient retry and chunk refresh logic
 const WelcomeScreen = lazyWithRetry(() => import('./components/WelcomeScreen'), 'WelcomeScreen');
@@ -143,16 +143,18 @@ export default function App() {
     // Check if user opened a transfer link or sync code from primary/secondary site
     checkUrlForTransfer();
 
-    // Check today/tomorrow special Shia events and dispatch notifications if enabled
+    // Check today/tomorrow special Shia events and dispatch notifications if enabled (loaded on-demand)
     const state = useSettingsStore.getState();
     if (state.calendarNotificationSettings?.enabled) {
-      checkAndDispatchCalendarNotifications(
-        state.calendarNotificationSettings,
-        state.hijriOffset || 0,
-        (notifiedDate) => {
-          state.updateCalendarNotificationSettings({ lastNotifiedDate: notifiedDate });
-        }
-      );
+      import('./utils/calendarNotifications').then(({ checkAndDispatchCalendarNotifications }) => {
+        checkAndDispatchCalendarNotifications(
+          state.calendarNotificationSettings,
+          state.hijriOffset || 0,
+          (notifiedDate) => {
+            state.updateCalendarNotificationSettings({ lastNotifiedDate: notifiedDate });
+          }
+        );
+      }).catch(() => {});
     }
 
     // Listen for cross-window / iframe data transfer from parent window (for masked forwarding)
@@ -182,31 +184,30 @@ export default function App() {
     };
     window.addEventListener('open-app-tab', handleWidgetTab);
 
-    const hash = window.location.hash.replace(/^#/, '').trim();
-    if (!hash) return () => window.removeEventListener('message', handleMessage);
-
-    if (hash.startsWith('surah-')) {
-      const parts = hash.split('-');
-      const sId = parseInt(parts[1], 10);
-      const aIdx = hash.indexOf('-ayah-');
-      const aId = aIdx !== -1 ? parseInt(hash.substring(aIdx + 6), 10) : undefined;
-      if (!isNaN(sId) && sId >= 1 && sId <= 114) {
-        setSelectedSurah(sId);
-        if (aId && !isNaN(aId)) setTargetAyah(aId);
-      }
-    } else if (hash.startsWith('juz-')) {
-      const jId = parseInt(hash.replace('juz-', ''), 10);
-      if (!isNaN(jId) && jId >= 1 && jId <= 30) {
-        setSelectedJuz(jId);
-      }
-    } else if (hash.startsWith('mafatih-')) {
-      const mId = hash.replace('mafatih-', '');
-      if (mId) {
-        setSelectedMafatihItem(mId);
-      }
-    } else if (hash === 'settings') {
+    // Parse deep link (clean paths like /surah/1, /juz/1, /mafatih/ziyarat-ashura, /adhan or legacy #hash)
+    const initialRoute = parseCurrentRoute();
+    if (initialRoute.type === 'surah') {
+      setSelectedSurah(initialRoute.surahId);
+      if (initialRoute.targetAyah) setTargetAyah(initialRoute.targetAyah);
+      updateBrowserRoute(initialRoute, true);
+    } else if (initialRoute.type === 'juz') {
+      setSelectedJuz(initialRoute.juzId);
+      updateBrowserRoute(initialRoute, true);
+    } else if (initialRoute.type === 'mafatih-item') {
+      setSelectedMafatihItem(initialRoute.itemId);
+      useSettingsStore.getState().setCurrentAppTab('mafatih');
+      updateBrowserRoute(initialRoute, true);
+    } else if (initialRoute.type === 'home') {
+      useSettingsStore.getState().setCurrentAppTab(initialRoute.tab);
+      updateBrowserRoute(initialRoute, true);
+    } else if (initialRoute.type === 'settings') {
       handleOpenSettings();
     }
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('open-app-tab', handleWidgetTab);
+    };
   }, []);
 
   const handleSelectSurah = (id: number, ayahNumber?: number) => {
@@ -217,10 +218,7 @@ export default function App() {
     setTargetSurah(null);
     setSelectedJuz(null);
 
-    const targetHash = ayahNumber ? `#surah-${id}-ayah-${ayahNumber}` : `#surah-${id}`;
-    if (window.location.hash !== targetHash) {
-      window.history.pushState({ view: 'surah', id, ayahNumber }, '', targetHash);
-    }
+    updateBrowserRoute({ type: 'surah', surahId: Number(id), targetAyah: ayahNumber });
   };
 
   const handleSelectJuz = (id: number, ayahNumber?: number, surahNumber?: number) => {
@@ -231,10 +229,7 @@ export default function App() {
     setTargetSurah(surahNumber ? Number(surahNumber) : null);
     setSelectedSurah(null);
 
-    const targetHash = `#juz-${id}`;
-    if (window.location.hash !== targetHash) {
-      window.history.pushState({ view: 'juz', id }, '', targetHash);
-    }
+    updateBrowserRoute({ type: 'juz', juzId: Number(id) });
   };
 
   const handleSelectMafatihItem = (itemId: string) => {
@@ -246,10 +241,7 @@ export default function App() {
     setTargetAyah(null);
     setTargetSurah(null);
 
-    const targetHash = `#mafatih-${itemId}`;
-    if (window.location.hash !== targetHash) {
-      window.history.pushState({ view: 'mafatih', itemId }, '', targetHash);
-    }
+    updateBrowserRoute({ type: 'mafatih-item', itemId });
   };
 
   // Safe Back-Navigation integration for Web, iOS Safari, Android PWA, and Capacitor
@@ -290,9 +282,9 @@ export default function App() {
       setSelectedMafatihItem(null);
       setTargetAyah(null);
       setTargetSurah(null);
-      if (wasMafatih) {
-        useSettingsStore.getState().setCurrentAppTab('mafatih');
-      }
+      const targetTab = wasMafatih ? 'mafatih' : 'quran';
+      useSettingsStore.getState().setCurrentAppTab(targetTab);
+      updateBrowserRoute({ type: 'home', tab: targetTab });
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       return true;
     }
@@ -300,6 +292,7 @@ export default function App() {
     const currentTab = useSettingsStore.getState().currentAppTab;
     if (currentTab && currentTab !== 'quran') {
       useSettingsStore.getState().setCurrentAppTab('quran');
+      updateBrowserRoute({ type: 'home', tab: 'quran' });
       return true;
     }
 
@@ -308,10 +301,33 @@ export default function App() {
 
   // Listen to popstate for standard web browser and PWA standalone navigation
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      const handled = handleUniversalBack();
-      if (!handled && window.location.hash) {
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    const handlePopState = () => {
+      const route = parseCurrentRoute();
+      if (route.type === 'surah') {
+        setSelectedSurah(route.surahId);
+        setTargetAyah(route.targetAyah || null);
+        setSelectedJuz(null);
+        setSelectedMafatihItem(null);
+        updateBrowserRoute(route, true);
+      } else if (route.type === 'juz') {
+        setSelectedJuz(route.juzId);
+        setSelectedSurah(null);
+        setSelectedMafatihItem(null);
+        updateBrowserRoute(route, true);
+      } else if (route.type === 'mafatih-item') {
+        setSelectedMafatihItem(route.itemId);
+        useSettingsStore.getState().setCurrentAppTab('mafatih');
+        setSelectedSurah(null);
+        setSelectedJuz(null);
+        updateBrowserRoute(route, true);
+      } else if (route.type === 'home') {
+        setSelectedSurah(null);
+        setSelectedJuz(null);
+        setSelectedMafatihItem(null);
+        useSettingsStore.getState().setCurrentAppTab(route.tab);
+        updateBrowserRoute(route, true);
+      } else if (route.type === 'settings') {
+        handleOpenSettings();
       }
     };
 
@@ -399,6 +415,7 @@ export default function App() {
                 }
                 setSelectedSurah(null);
                 setTargetAyah(null);
+                updateBrowserRoute({ type: 'home', tab: 'quran' });
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
               }} 
             />
@@ -409,12 +426,10 @@ export default function App() {
               targetAyah={targetAyah || undefined}
               targetSurah={targetSurah || undefined}
               onBack={() => {
-                if (window.location.hash) {
-                  history.replaceState(null, '', window.location.pathname + window.location.search);
-                }
                 setSelectedJuz(null);
                 setTargetAyah(null);
                 setTargetSurah(null);
+                updateBrowserRoute({ type: 'home', tab: 'quran' });
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
               }} 
             />
@@ -423,11 +438,9 @@ export default function App() {
               key={`mafatih-view-${selectedMafatihItem}`} 
               itemId={selectedMafatihItem} 
               onBack={() => {
-                if (window.location.hash) {
-                  history.replaceState(null, '', window.location.pathname + window.location.search);
-                }
                 useSettingsStore.getState().setCurrentAppTab('mafatih');
                 setSelectedMafatihItem(null);
+                updateBrowserRoute({ type: 'home', tab: 'mafatih' });
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
               }} 
             />
@@ -471,6 +484,7 @@ export default function App() {
           onSelectJuz={handleSelectJuz}
           onSelectMafatihItem={handleSelectMafatihItem}
           selectedMafatihItem={selectedMafatihItem}
+          selectedSurah={selectedSurah}
           isOnHome={!selectedSurah && !selectedJuz && !selectedMafatihItem}
         />
       )}

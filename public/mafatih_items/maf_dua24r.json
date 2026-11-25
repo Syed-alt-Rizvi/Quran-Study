@@ -10,8 +10,14 @@
     "Namaz of Imam Hasan Askari (a)"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ OF IMAM AL-’ASKARI (A)\n\nThis prayer consists of four units in the first two of which Surah al-Faatehah is recited once and Surah al-Zalzalah (No. 99) is repeated fifteen times, and the last two of which Surah al-Faatehah is recited once and Surah al-Tawheed is repeated fifteen times. After the namaz recite the dua of Imam Askari (a.s.):",
-  "versesCount": 0,
-  "verses": [],
+  "introduction": "NAMAZ OF IMAM AL-HASAN AL-ASKARI (A.S.)\n\nA four-unit prayer transmitted from the Eleventh Imam, al-Hasan al-Askari (a.s.).",
+  "versesCount": 1,
+  "verses": [
+    {
+      "arabic": "",
+      "translation": "This prayer consists of four units (first two with Surah al-Zalzalah 15 times, second two with Surah al-Tawheed 15 times). After the prayer, recite the dua of Imam Askari (a.s.):",
+      "index": 1
+    }
+  ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua24r&lang=en"
 }

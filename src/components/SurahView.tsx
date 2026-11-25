@@ -7,11 +7,12 @@ import { fetchTafseer, clearAyahTafseerCache } from '../services/tafseerScraper'
 import { useSettingsStore } from '../store';
 import { useAudioStore } from '../audioStore';
 import Markdown from 'react-markdown';
-import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, MessageSquare, ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, Link as LinkIcon, PlayCircle, FileText, BookOpen, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, PauseCircle, MessageSquare, ZoomIn, ZoomOut, RotateCcw, AlertTriangle, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import DiscussionModal from './DiscussionModal';
 import { getArabicFontFamily } from '../utils/arabicFonts';
 import { SURAH_URDU_MAP } from '../data/surahUrduNames';
+import { DedicatedMusicPlayer } from './DedicatedMusicPlayer';
 
 interface SurahViewProps {
   key?: string;
@@ -169,9 +170,9 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
             
             <button 
               onClick={handlePlayAudio}
-              className={`p-1 rounded-full transition-colors ${
+              className={`w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full transition-colors active:scale-95 cursor-pointer ${
                 isActivePlaying 
-                  ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800' 
+                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-950/60' 
                   : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
               title={isActivePlaying && isAudioPlaying ? "Pause Audio" : "Play from this Ayah"}
@@ -185,7 +186,7 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
               <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Last Read</span>
             )}
           </div>
-          <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => {
                 const text = `Qur'an ${surah.number}:${ayah.numberInSurah}`;
@@ -195,14 +196,14 @@ const AyahCard = memo(function AyahCard({ ayah, surah, isLast }: { key?: string 
                 const event = new CustomEvent('open-discussion', { detail: { ayah, surah } });
                 window.dispatchEvent(event);
               }}
-              className="p-2 text-slate-400 hover:text-emerald-500 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 hover:text-emerald-500 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all cursor-pointer"
               title="Cite & Discuss"
             >
               <MessageSquare size={18} />
             </button>
             <button 
               onClick={toggleBookmark}
-              className="p-2 text-slate-400 hover:text-emerald-500 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 hover:text-emerald-500 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all cursor-pointer"
               title="Bookmark (or Long Press)"
             >
               {bookmarked ? <BookmarkCheck size={18} className="text-emerald-500" /> : <Bookmark size={18} />}
@@ -458,9 +459,17 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { fontSize, setFontSize, arabicFont, appLanguage } = useSettingsStore();
-  const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist } = useAudioStore();
+  const { play, pause, isPlaying, surahId: audioSurahId, setPlaylist, activeAyahNumber } = useAudioStore();
   const [discussionAyah, setDiscussionAyah] = useState<{ ayah: Ayah, surah: SurahDetail } | null>(null);
+  const viewMode = useAudioStore((s) => s.surahViewMode);
+  const setViewMode = useAudioStore((s) => s.setSurahViewMode);
   const hasScrolledTargetRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      useAudioStore.getState().setSurahViewMode('text');
+    };
+  }, [surahId]);
 
   useEffect(() => {
     // Reset scroll lock when target ayah or surah changes
@@ -617,119 +626,213 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
     );
   }
 
+  const isAudioActive = (isPlaying || isThisSurahPlaying) && audioSurahId === surah.number;
+
   return (
-    <div className="min-h-screen pb-36 sm:pb-32 pb-safe text-slate-900 dark:text-slate-100">
-      <header className="sticky top-0 z-30 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-3 shadow-xs gpu-layer">
-        <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => { hapticImpact(ImpactStyle.Light); onBack(); }}
-              className="p-2 -ml-2 text-slate-600 hover:text-emerald-600 dark:text-slate-400 rounded-full hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
-              title="Return to Quran List"
-              aria-label="Back"
-            >
-              <ArrowLeft size={22} />
-            </button>
-            <div className="min-w-0 text-left">
-              <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-tight truncate">
-                {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
-                  ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
-                  : surah.englishName}
-              </h1>
-              <p className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight truncate">{surah.name}</p>
+    <div className={`min-h-screen ${viewMode === 'player' ? 'pb-8' : isAudioActive ? 'pb-36 sm:pb-32' : 'pb-16'} pb-safe text-slate-900 dark:text-slate-100`}>
+      <header className="sticky top-0 z-30 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-2.5 shadow-xs gpu-layer">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4">
+            {/* Left: Back Button + Surah Title */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <button 
+                onClick={() => { hapticImpact(ImpactStyle.Light); onBack(); }}
+                className="p-2 -ml-1 sm:-ml-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600 rounded-xl hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors cursor-pointer shrink-0"
+                title="Return to Quran List"
+                aria-label="Back"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-snug truncate">
+                  {appLanguage === 'ur' && SURAH_URDU_MAP[surah.number]
+                    ? `${SURAH_URDU_MAP[surah.number].urduName} (${SURAH_URDU_MAP[surah.number].urduMeaning})`
+                    : surah.englishName}
+                </h1>
+                <p className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic leading-tight truncate mt-0.5">
+                  {surah.name} • {surah.numberOfAyahs} {appLanguage === 'ur' ? 'آیات' : 'Ayahs'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              {/* View Switcher: Inline on sm+ screens */}
+              <div className="hidden sm:flex items-center gap-1 p-0.5 liquid-glass rounded-full border border-white/40 dark:border-white/10 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('text'); }}
+                  className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                    viewMode === 'text'
+                      ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {appLanguage === 'ur' ? 'آیات' : 'Ayahs'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('player'); }}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                    viewMode === 'player'
+                      ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Music size={13} className={isThisSurahPlaying ? 'animate-bounce text-amber-300' : ''} />
+                  <span>{appLanguage === 'ur' ? 'پلیئر' : 'Player'}</span>
+                  {isThisSurahPlaying && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
+                </button>
+              </div>
+
+              {/* Quick Arabic Font Size Adjuster (sm+) */}
+              <div className="hidden sm:flex items-center liquid-glass rounded-full p-0.5 border border-white/40 dark:border-white/10 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    hapticImpact(ImpactStyle.Light);
+                    setFontSize(Math.max(fontSize - 3, 28));
+                  }}
+                  disabled={fontSize <= 28}
+                  title="Decrease Verse Text Size"
+                  className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+                >
+                  A-
+                </button>
+                <span className="text-[11px] font-mono font-bold px-1 text-slate-700 dark:text-slate-300 select-none">
+                  {fontSize}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    hapticImpact(ImpactStyle.Light);
+                    setFontSize(Math.min(fontSize + 3, 96));
+                  }}
+                  disabled={fontSize >= 96}
+                  title="Increase Verse Text Size"
+                  className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+                >
+                  A+
+                </button>
+              </div>
+
+              {/* Primary Play Button */}
+              <button 
+                onClick={() => { hapticImpact(ImpactStyle.Heavy); handlePlaySurah(); }}
+                className={`p-1.5 sm:p-2 rounded-xl transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium pr-3 cursor-pointer shrink-0 ${
+                  isThisSurahPlaying 
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' 
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
+                }`}
+              >
+                {isThisSurahPlaying ? (
+                  <>
+                    <PauseCircle size={18} fill="currentColor" />
+                    <span className="hidden sm:inline">Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle size={18} fill="currentColor" className="ml-0.5" />
+                    <span className="hidden sm:inline">Play</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Quick Arabic Font Size Adjuster for Older People */}
-            <div className="flex items-center liquid-glass rounded-full p-0.5 border border-white/40 dark:border-white/10 shadow-2xs">
+          {/* Mobile View Switcher Sub-Bar (sm:hidden): Guaranteed 0% overlap */}
+          <div className="flex sm:hidden items-center justify-center pt-2 mt-2 border-t border-white/20 dark:border-white/5">
+            <div className="flex items-center p-0.5 liquid-glass rounded-full border border-white/40 dark:border-white/10 shadow-2xs w-full max-w-[280px]">
               <button
                 type="button"
-                onClick={() => {
-                  hapticImpact(ImpactStyle.Light);
-                  setFontSize(Math.max(fontSize - 3, 28));
-                }}
-                disabled={fontSize <= 28}
-                title="Decrease Verse Text Size"
-                className="px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+                onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('text'); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-full text-center transition-all cursor-pointer ${
+                  viewMode === 'text'
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
-                A-
+                <BookOpen size={13} />
+                <span>{appLanguage === 'ur' ? 'آیات' : 'Ayahs'}</span>
               </button>
-              <span className="text-[12px] font-mono font-bold px-1.5 text-slate-700 dark:text-slate-300 select-none">
-                {fontSize}
-              </span>
               <button
                 type="button"
-                onClick={() => {
-                  hapticImpact(ImpactStyle.Light);
-                  setFontSize(Math.min(fontSize + 3, 96));
-                }}
-                disabled={fontSize >= 96}
-                title="Increase Verse Text Size (Extra Big for Older People)"
-                className="px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
+                onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('player'); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-full text-center transition-all cursor-pointer ${
+                  viewMode === 'player'
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
-                A+
+                <Music size={13} className={isThisSurahPlaying ? 'animate-bounce text-amber-300' : ''} />
+                <span>{appLanguage === 'ur' ? 'پلیئر' : 'Player'}</span>
+                {isThisSurahPlaying && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
               </button>
             </div>
-
-            <button 
-              onClick={() => { hapticImpact(ImpactStyle.Heavy); handlePlaySurah(); }}
-              className={`p-2 rounded-full transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium pr-3.5 cursor-pointer ${
-                isThisSurahPlaying 
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' 
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
-              }`}
-            >
-              {isThisSurahPlaying ? (
-                <>
-                  <PauseCircle size={18} fill="currentColor" />
-                  <span>Pause</span>
-                </>
-              ) : (
-                <>
-                  <PlayCircle size={18} fill="currentColor" className="ml-0.5" />
-                  <span>Play</span>
-                </>
-              )}
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Full-Width Content Container: Eliminates Wasted Empty Space */}
-      <main className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6">
-        {surah.number !== 1 && surah.number !== 9 && (
-          <div className="text-center mb-4 sm:mb-6 py-4 sm:py-6 px-4 liquid-glass-card glass-emerald-fusion border border-emerald-400/40 dark:border-emerald-500/20 rounded-2xl sm:rounded-3xl shadow-xs">
-            <h2 
-              dir="rtl"
-              lang="ar"
-              className="font-arabic text-emerald-950 dark:text-emerald-100 font-normal leading-[2.2]" 
-              style={{ 
-                fontSize: `${Math.max(Math.round(fontSize * 1.1), 32)}px`,
-                fontFamily: getArabicFontFamily(arabicFont)
-              }}
-            >
-              بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-            </h2>
-          </div>
-        )}
+      {/* Main Container with 2-Column Side-by-Side Player Layout on Desktop */}
+      <main className="w-full max-w-7xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Left Column: Quran Ayah Text Cards */}
+          <div className={`flex-1 min-w-0 w-full ${viewMode === 'player' ? 'hidden lg:block' : 'block'}`}>
+            {surah.number !== 1 && surah.number !== 9 && (
+              <div className="text-center mb-4 sm:mb-6 py-4 sm:py-6 px-4 liquid-glass-card glass-emerald-fusion border border-emerald-400/40 dark:border-emerald-500/20 rounded-2xl sm:rounded-3xl shadow-xs">
+                <h2 
+                  dir="rtl"
+                  lang="ar"
+                  className="font-arabic text-emerald-950 dark:text-emerald-100 font-normal leading-[2.2]" 
+                  style={{ 
+                    fontSize: `${Math.max(Math.round(fontSize * 1.1), 32)}px`,
+                    fontFamily: getArabicFontFamily(arabicFont)
+                  }}
+                >
+                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                </h2>
+              </div>
+            )}
 
-        <div className="flex flex-col space-y-3 sm:space-y-4">
-          {surah.ayahs.map((ayah, index) => {
-            const isLast = index === surah.ayahs.length - 1;
-            return (
-              <AyahCard 
-                key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
-                ayah={ayah} 
-                surah={surah} 
-                isLast={isLast}
-              />
-            );
-          })}
+            <div className="flex flex-col space-y-3 sm:space-y-4">
+              {surah.ayahs.map((ayah, index) => {
+                const isLast = index === surah.ayahs.length - 1;
+                return (
+                  <AyahCard 
+                    key={`ayah-s${surah.number}-a${ayah.numberInSurah}-${index}`} 
+                    ayah={ayah} 
+                    surah={surah} 
+                    isLast={isLast}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Column: Dedicated Music Player (Beside text on desktop, or full screen when viewMode === 'player') */}
+          <div className={`w-full lg:w-80 xl:w-96 shrink-0 lg:sticky lg:top-20 ${viewMode === 'player' ? 'block' : 'hidden lg:block'}`}>
+            <DedicatedMusicPlayer
+              mode="quran"
+              surahNumber={surah.number}
+              surahNameArabic={surah.name}
+              surahNameEnglish={surah.englishName}
+              revelationType={surah.revelationType}
+              ayahCount={surah.numberOfAyahs}
+              ayahs={surah.ayahs}
+              variant={viewMode === 'player' ? 'full' : 'sidebar'}
+              onScrollToActiveAyah={() => {
+                setViewMode('text');
+                const aNum = activeAyahNumber || 1;
+                const el = document.getElementById(`ayah-${aNum}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              onSwitchToTextView={() => setViewMode('text')}
+            />
+          </div>
         </div>
 
         {/* Citation Box at the bottom */}
-        <div className="mt-16 bg-emerald-50 dark:bg-emerald-900/20 border-[0.5px] border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-6">
+        <div className={`mt-16 bg-emerald-50 dark:bg-emerald-900/20 border-[0.5px] border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-6 ${viewMode === 'player' ? 'hidden lg:block' : 'block'}`}>
           <h3 className="font-semibold text-emerald-800 dark:text-emerald-400 mb-2 flex items-center gap-2">
             <LinkIcon size={18} />
             Supporting Documents & Citations
@@ -771,7 +874,7 @@ export default function SurahView({ surahId, targetAyah, onBack }: SurahViewProp
         </div>
 
         {/* Standardized Global Footer */}
-        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center">
+        <footer className={`mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center ${viewMode === 'player' ? 'hidden lg:block' : 'block'}`}>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             &copy; 2026 Shia Markaz. All Rights Reserved.
           </p>

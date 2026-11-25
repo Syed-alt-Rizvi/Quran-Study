@@ -3,6 +3,60 @@ import { persist } from 'zustand/middleware';
 import { CalendarNotificationSettings } from './types/calendar';
 import { fastStorage } from './utils/fastStorage';
 
+/**
+ * Sweeps volatile caches and legacy keys out of localStorage to prevent QuotaExceededError.
+ * Real heavy data (Tafseer, whole surahs) lives safely in IndexedDB via fastStorage.
+ */
+export function pruneLocalStorageQuota(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      // Protect essential settings
+      if (
+        k === 'quran-app-settings' || 
+        k === 'shia-quran-has-seen-welcome' || 
+        k === 'guest_device_id' ||
+        k === 'guest_profile' ||
+        k === 'shia_active_sync_code' ||
+        k === 'shia_adhan_last_played'
+      ) {
+        continue;
+      }
+
+      // Aggressively remove bulky tafseer or transient prayer caches from localStorage
+      if (
+        k.startsWith('tafseer_') ||
+        k.startsWith('shia_prayers_') ||
+        k.startsWith('draft-discussion-') ||
+        k.startsWith('prefetch_') ||
+        k.startsWith('cache_') ||
+        k.startsWith('workbox-') ||
+        k === 'shia-quran-settings' ||
+        k === 'shia_quran_settings' ||
+        k === 'quran_settings' ||
+        k === 'adhan-settings-storage'
+      ) {
+        keysToRemove.push(k);
+      }
+    }
+
+    for (const k of keysToRemove) {
+      try { localStorage.removeItem(k); } catch {}
+    }
+    return keysToRemove.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+// Proactively sweep on module initialization to free any blocked browser storage
+if (typeof localStorage !== 'undefined') {
+  pruneLocalStorageQuota();
+}
+
 interface Bookmark {
   surahId: number;
   ayahNumber: number; // ayah.numberInSurah
@@ -360,6 +414,43 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'quran-app-settings',
       version: 6,
+      partialize: (state) => ({
+        isDarkMode: state.isDarkMode,
+        fontSize: state.fontSize,
+        arabicFont: state.arabicFont,
+        englishFont: state.englishFont,
+        hasSeenWelcome: state.hasSeenWelcome,
+        bookmarks: state.bookmarks,
+        lastRead: state.lastRead,
+        habitStats: state.habitStats,
+        tafseerNotes: state.tafseerNotes,
+        showTranslation: state.showTranslation,
+        translationLanguages: state.translationLanguages,
+        tafseerLanguages: state.tafseerLanguages,
+        tafseerProvider: state.tafseerProvider,
+        tafseerZoom: state.tafseerZoom,
+        readProgress: state.readProgress,
+        reminderTime: state.reminderTime,
+        reminderSound: state.reminderSound,
+        autoScrollAudio: state.autoScrollAudio,
+        reciter: state.reciter,
+        userName: state.userName,
+        defaultAppTab: state.defaultAppTab,
+        currentAppTab: state.currentAppTab,
+        hapticsEnabled: state.hapticsEnabled,
+        mafatihFontSize: state.mafatihFontSize,
+        mafatihShowTranslation: state.mafatihShowTranslation,
+        mafatihDefaultSpeed: state.mafatihDefaultSpeed,
+        globalAudioSpeed: state.globalAudioSpeed,
+        mafatihBookmarks: state.mafatihBookmarks,
+        mafatihRecentIds: state.mafatihRecentIds,
+        hijriOffset: state.hijriOffset,
+        calendarNotificationSettings: state.calendarNotificationSettings,
+        userLocation: state.userLocation,
+        adhanSettings: state.adhanSettings,
+        qiblaCalibrationOffset: state.qiblaCalibrationOffset,
+        appLanguage: state.appLanguage,
+      }),
       migrate: (persistedState: any, version: number) => {
         const state = persistedState || {};
         // Restore standard comfortable font sizes and natural zoom
@@ -507,14 +598,32 @@ export const useSettingsStore = create<SettingsState>()(
               try {
                 localStorage.setItem(name, serialized);
               } catch (quotaErr) {
-                console.warn('[Storage] QuotaExceededError in localStorage, pruning duplicate legacy keys:', quotaErr);
-                ['shia-quran-settings', 'shia_quran_settings', 'quran_settings'].forEach((k) => {
-                  try { localStorage.removeItem(k); } catch {}
-                });
+                // Bulk-evict heavy/transient caches that leaked into localStorage
+                pruneLocalStorageQuota();
                 try {
                   localStorage.setItem(name, serialized);
                 } catch (secondErr) {
-                  console.error('[Storage] Persistent quota ceiling reached, state safely preserved in memory and IndexedDB:', secondErr);
+                  // Fallback: Store an ultra-compact essential settings snapshot in localStorage
+                  try {
+                    const lightweight = {
+                      state: {
+                        isDarkMode: value?.state?.isDarkMode,
+                        fontSize: value?.state?.fontSize,
+                        arabicFont: value?.state?.arabicFont,
+                        englishFont: value?.state?.englishFont,
+                        hasSeenWelcome: value?.state?.hasSeenWelcome,
+                        bookmarks: value?.state?.bookmarks,
+                        lastRead: value?.state?.lastRead,
+                        appLanguage: value?.state?.appLanguage,
+                        adhanSettings: value?.state?.adhanSettings,
+                        userLocation: value?.state?.userLocation,
+                      },
+                      version: value?.version
+                    };
+                    localStorage.setItem(name, JSON.stringify(lightweight));
+                  } catch (thirdErr) {
+                    console.warn('[Storage] Quota ceiling reached in localStorage, full state safely preserved in memory and IndexedDB');
+                  }
                 }
               }
 
@@ -527,7 +636,7 @@ export const useSettingsStore = create<SettingsState>()(
             // Dual-persist to IndexedDB as shadow backup (unlimited quota, crash safe)
             fastStorage.set('settings_shadow_backup', value).catch(() => {});
           } catch (e) {
-            console.error('[Storage] Serialization error in setItem:', e);
+            console.warn('[Storage] Serialization warning in setItem:', e);
           }
         },
         removeItem: (name) => {

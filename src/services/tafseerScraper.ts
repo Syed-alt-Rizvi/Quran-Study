@@ -112,18 +112,21 @@ export async function fetchTafseer(
       }
     } catch (e) {}
 
-    // 1b. Check localStorage
-    const localData = localStorage.getItem(kKey);
-    if (localData) {
-      try {
+    // 1b. Check legacy localStorage, migrate to fastStorage and purge from localStorage
+    try {
+      const localData = localStorage.getItem(kKey);
+      if (localData) {
         const parsed = JSON.parse(localData);
         if (parsed && (parsed.ur || parsed.tafseer_text)) {
           memoryCache[kKey] = parsed;
           fastStorage.set(kKey, parsed).catch(() => {});
+        }
+        localStorage.removeItem(kKey);
+        if (parsed && (parsed.ur || parsed.tafseer_text)) {
           return parsed;
         }
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
 
     // 1c. Check if preceding adjacent ayah is already cached and covers this ayah
     if (ayahNumber > 1) {
@@ -146,14 +149,11 @@ export async function fetchTafseer(
       }
     }
 
-    // Helper to store an item across memory, fastStorage, and localStorage
+    // Helper to store an item across memory and fastStorage (IndexedDB, safe from quota limits)
     const cacheKautharItem = (item: TafseerContent, targetAyah = ayahNumber) => {
       const key = `tafseer_kauthar_${surahNumber}_${targetAyah}`;
       memoryCache[key] = item;
       fastStorage.set(key, item).catch(() => {});
-      try {
-        localStorage.setItem(key, JSON.stringify(item));
-      } catch (e) {}
     };
 
     // 2a. Try static pre-bundled or cached whole-surah JSON bundle (instant 0ms offline)
@@ -305,19 +305,23 @@ export async function fetchTafseer(
     }
   } catch (e) {}
 
-  const localData = localStorage.getItem(cacheKey);
-  if (localData) {
-    try {
+  // Check legacy localStorage and migrate to fastStorage
+  try {
+    const localData = localStorage.getItem(cacheKey);
+    if (localData) {
       const parsed = JSON.parse(localData);
       if (parsed && (parsed.ur || parsed.en)) {
         memoryCache[cacheKey] = parsed;
         fastStorage.set(cacheKey, parsed).catch(() => {});
+      }
+      localStorage.removeItem(cacheKey);
+      if (parsed && (parsed.ur || parsed.en)) {
         return parsed;
       }
-    } catch (e) {}
-  }
+    }
+  } catch (e) {}
 
-  // Helper to store an entire surah's ayahs into caches simultaneously
+  // Helper to store an entire surah's ayahs into fastStorage (IndexedDB) and RAM
   const cacheSurahAyahs = (surahData: Record<number, TafseerContent>) => {
     for (const [aStr, content] of Object.entries(surahData)) {
       const aNum = Number(aStr);
@@ -325,9 +329,6 @@ export async function fetchTafseer(
         const aKey = `tafseer_${surahNumber}_${aNum}_v6`;
         memoryCache[aKey] = content;
         fastStorage.set(aKey, content).catch(() => {});
-        try {
-          localStorage.setItem(aKey, JSON.stringify(content));
-        } catch (e) {}
       }
     }
   };
@@ -437,9 +438,6 @@ export async function fetchTafseer(
     if (serverAyah && (serverAyah.ur || serverAyah.en)) {
       memoryCache[cacheKey] = serverAyah;
       fastStorage.set(cacheKey, serverAyah).catch(() => {});
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(serverAyah));
-      } catch (e) {}
       return serverAyah;
     }
   } catch (e) {}

@@ -1,5 +1,8 @@
 // Shia Ithna Ashari (Ja'fari) Prayer Times & Solar Astronomy Calculation Engine
 // Compliant with Leva Institute (Qum), Ayatollah Sistani, and AlAdhan Method 0
+import { fastStorage } from './fastStorage';
+
+const prayerTimesMemoryCache = new Map<string, ShiaPrayerTimings>();
 
 export interface ShiaPrayerTimings {
   fajr: string;       // Subh Sadiq (16.0° below horizon) - ADHAN #1
@@ -353,12 +356,29 @@ export async function getShiaPrayerTimes(
   const roundedLng = Math.round(longitude * 1000) / 1000;
   const cacheKey = `shia_prayers_${dateFormatted}_${roundedLat}_${roundedLng}`;
 
-  // Check localStorage cache first
+  // Check memory cache first (0ms instant)
+  if (prayerTimesMemoryCache.has(cacheKey)) {
+    return prayerTimesMemoryCache.get(cacheKey)!;
+  }
+
+  // Check fastStorage (IndexedDB)
+  try {
+    const fastCached = await fastStorage.get<ShiaPrayerTimings>(cacheKey);
+    if (fastCached && fastCached.fajr && fastCached.dhuhr && fastCached.maghrib) {
+      prayerTimesMemoryCache.set(cacheKey, fastCached);
+      return { ...fastCached, source: 'cached' };
+    }
+  } catch {}
+
+  // Check legacy localStorage and migrate
   try {
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
       const parsed = JSON.parse(cached);
+      localStorage.removeItem(cacheKey);
       if (parsed && parsed.fajr && parsed.dhuhr && parsed.maghrib) {
+        prayerTimesMemoryCache.set(cacheKey, parsed);
+        fastStorage.set(cacheKey, parsed).catch(() => {});
         return { ...parsed, source: 'cached' };
       }
     }
@@ -399,9 +419,8 @@ export async function getShiaPrayerTimes(
           source: 'aladhan',
           qiblaBearing: Math.round(calculateQibla(latitude, longitude) * 10) / 10
         };
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(result));
-        } catch {}
+        prayerTimesMemoryCache.set(cacheKey, result);
+        fastStorage.set(cacheKey, result).catch(() => {});
         return result;
       }
     }
@@ -445,9 +464,8 @@ export async function getShiaPrayerTimes(
           source: 'aladhan',
           qiblaBearing: Math.round(calculateQibla(latitude, longitude) * 10) / 10
         };
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(result));
-        } catch {}
+        prayerTimesMemoryCache.set(cacheKey, result);
+        fastStorage.set(cacheKey, result).catch(() => {});
         return result;
       }
     }
@@ -457,9 +475,8 @@ export async function getShiaPrayerTimes(
 
   // 3. Mathematical astronomical fallback (Works 100% offline with zero quota)
   const fallback = calculateAstronomicalShiaTimes(latitude, longitude, date);
-  try {
-    localStorage.setItem(cacheKey, JSON.stringify(fallback));
-  } catch {}
+  prayerTimesMemoryCache.set(cacheKey, fallback);
+  fastStorage.set(cacheKey, fallback).catch(() => {});
   return fallback;
 }
 

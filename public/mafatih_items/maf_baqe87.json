@@ -10,28 +10,53 @@
     "Namaz for Settling urgent Needs"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ FOR SETTLING URGENT NEEDS\n\nYou may offer a four-unit prayer with precise Qunut and other pillars (i.e. genuflection (ruku'), prostration, and the other parts of prayers). In the first unit, you may recite Surah al-Faatehah one time and repeat the following verses seventy times:\n\nIn the second unit, you may recite Surah al-Faatehah once and the following verse seven times:\n\nIn the third unit, you may recite Surah al-Faatehah once and the following verse seven times:\n\nIn the fourth unit, you may recite Surah al-Faatehah once and the following verse seven times:\n\nYou may then mention your need.",
-  "versesCount": 4,
+  "introduction": "NAMAZ FOR SETTLING URGENT NEEDS\n\nA four-unit prayer reported for seeking fulfillment of pressing legitimate desires and critical life needs.",
+  "versesCount": 9,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "You may offer a four-unit prayer with precise Qunut and pillars. In the first unit, recite Surah al-Faatehah once and repeat the following verses seventy times:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "حَسْبُنَا اللّٰهُ وَ نِعْمَ الْوَكِيْلُ۔",
       "translation": "Allah is sufficient for us and He is the most excellent Protector."
     },
     {
-      "index": 2,
+      "index": 3,
+      "arabic": "",
+      "translation": "In the second unit, you may recite Surah al-Faatehah once and the following verse seven times:"
+    },
+    {
+      "index": 4,
       "arabic": "مَاشَاۤءَاللّٰهُ لَا قُوَّةَ اِلَّا بِاللهِ اِنْ تَرَنِ اَنَا اَقَلَّ مِنْكَ مَالًا وَ وَلَدًا۔",
       "translation": "It is as Allah has pleased, there is no power save in Allah? If you consider me to be inferior to you in wealth and children."
     },
     {
-      "index": 3,
+      "index": 5,
+      "arabic": "",
+      "translation": "In the third unit, you may recite Surah al-Faatehah once and the following verse seven times:"
+    },
+    {
+      "index": 6,
       "arabic": "لَاۤ اِلٰهَ اِلَّاۤ اَنْتَ سُبْحَانَكَ اِنِّى كُنْتُ مِنَ الظَّالِمِيْنَ۔",
       "translation": "There is no god but You, glory be to You; surely I have been of the wrong."
     },
     {
-      "index": 4,
+      "index": 7,
+      "arabic": "",
+      "translation": "In the fourth unit, you may recite Surah al-Faatehah once and the following verse seven times:"
+    },
+    {
+      "index": 8,
       "arabic": "اُفَوِّضُ اَمْرِىْ اِلَى اللهِ اِنَّ اللهَ بَصِيْرٌ بِالْعِبَادِ۔",
       "translation": "And I entrust my affair to Allah. Surely, Allah sees the servants."
+    },
+    {
+      "index": 9,
+      "arabic": "",
+      "translation": "You may then mention your need."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe87&lang=en"

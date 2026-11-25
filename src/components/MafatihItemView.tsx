@@ -2,17 +2,21 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, memo } from '
 import { 
   ArrowLeft, Play, Pause, RotateCcw, RotateCw, Volume2, VolumeX,
   Copy, Check, Bookmark, BookmarkCheck, Sliders, 
-  ScrollText, ListOrdered, X, Compass, RefreshCw,
-  Repeat, Square
+  ListOrdered, X, Compass, RefreshCw,
+  Repeat, Square, BookOpen, Music
 } from 'lucide-react';
-import { MafatihDetail, fetchMafatihItem, MafatihVerse, getFullIndex } from '../mafatihApi';
+import { MafatihDetail, fetchMafatihItem, MafatihVerse, getFullIndex, cleanVirtuesDisplay } from '../mafatihApi';
 import { useSettingsStore } from '../store';
 import { useMafatihAudioStore, isSameTrack } from '../mafatihAudioStore';
+import { useAudioStore } from '../audioStore';
 import { hapticImpact, ImpactStyle } from '../utils/haptics';
 import { motion, AnimatePresence } from 'motion/react';
 import { getArabicFontFamily } from '../utils/arabicFonts';
 import { getMafatihUrduTitle, getMafatihUrduCategory, toUrduNumerals } from '../utils/mafatihUrdu';
+import { getMafatihArabicTitle, getMafatihEnglishTitle } from '../utils/mafatihArabic';
 import { t } from '../i18n';
+import { DedicatedMusicPlayer } from './DedicatedMusicPlayer';
+import { SacredAlbumArt } from './SacredAlbumArt';
 
 interface MafatihItemViewProps {
   itemId: string;
@@ -27,6 +31,7 @@ function cleanArabicText(str: string): string {
 
 function isInstructionLine(arabic?: string, translation?: string): boolean {
   if (!arabic && !translation) return false;
+  if (!arabic && !!translation) return true;
   if (arabic && typeof arabic === 'string') {
     const cleaned = cleanArabicText(arabic);
     if (
@@ -36,24 +41,46 @@ function isInstructionLine(arabic?: string, translation?: string): boolean {
       cleaned.startsWith('تكرر') ||
       cleaned.startsWith('ثم تسجد') ||
       cleaned.startsWith('ثم تركع') ||
+      cleaned.startsWith('ثم تضرب') ||
       cleaned.includes('مائة مرة') ||
       cleaned.includes('سبعين مرة') ||
-      cleaned.includes('عشر مرات')
+      cleaned.includes('عشر مرات') ||
+      cleaned.includes('ثلاث مرات')
     ) {
       return true;
     }
   }
   if (translation && typeof translation === 'string') {
-    const text = translation.toLowerCase();
+    const text = translation.toLowerCase().trim();
     if (
+      text.startsWith('method') ||
+      text.startsWith('the form of') ||
       text.startsWith('then recite') ||
       text.startsWith('then say') ||
       text.startsWith('repeat') ||
       text.startsWith('then prostrate') ||
       text.startsWith('then perform') ||
+      text.startsWith('you may then') ||
+      text.startsWith('you should then') ||
+      text.startsWith('you should also') ||
+      text.startsWith('you may now') ||
       text.includes('100 times') ||
       text.includes('70 times') ||
-      text.includes('10 times')
+      text.includes('10 times') ||
+      text.includes('1000 times') ||
+      text.includes('one thousand times') ||
+      text.includes('one hundred times') ||
+      text.includes('pat your') ||
+      text.includes('beseech almighty allah') ||
+      text.includes('prostrate yourself') ||
+      text.includes('islamic law') ||
+      text.includes('moving forward and backward') ||
+      text.includes('retrace your steps') ||
+      text.includes('consists of') ||
+      text.includes('two-unit prayer') ||
+      text.includes('four-unit prayer') ||
+      text.includes('in each unit') ||
+      text.includes('alqamah added')
     ) {
       return true;
     }
@@ -62,13 +89,13 @@ function isInstructionLine(arabic?: string, translation?: string): boolean {
 }
 
 // -------------------------------------------------------------
-// MEMOIZED MINIMALIST VERSE ROW
+// SLEEK QURAN-STYLED AYAH/VERSE CARD WITH INDIVIDUAL TRANSLATION BUTTON
 // -------------------------------------------------------------
 interface MafatihVerseRowProps {
   verse: MafatihVerse;
   arabicFont: string;
   mafatihFontSize: number;
-  mafatihShowTranslation: boolean;
+  globalShowTranslation: boolean;
   isBookmarked: boolean;
   isCopied: boolean;
   isUrdu: boolean;
@@ -81,7 +108,7 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
   verse,
   arabicFont,
   mafatihFontSize,
-  mafatihShowTranslation,
+  globalShowTranslation,
   isBookmarked,
   isCopied,
   isUrdu,
@@ -89,23 +116,39 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
   onToggleBookmark,
   registerRef
 }: MafatihVerseRowProps) {
+  // Local card translation state initialized to global preference
+  const [showCardTranslation, setShowCardTranslation] = useState<boolean>(globalShowTranslation);
+
+  // Sync when global toggle changes
+  useEffect(() => {
+    setShowCardTranslation(globalShowTranslation);
+  }, [globalShowTranslation]);
+
   const isInstruction = isInstructionLine(verse.arabic, verse.translation) || (!verse.arabic && !!verse.translation);
 
+  // Instructional rubric card (e.g. "repeat 100 times", "prostrate", "pat right thigh")
   if (isInstruction) {
     return (
       <div
         ref={(el) => registerRef(verse.index, el)}
         id={`verse-${verse.index}`}
-        className="py-3 px-4 sm:px-5 rounded-2xl liquid-glass border border-emerald-500/35 text-slate-700 dark:text-slate-300 flex items-start gap-3 text-xs shadow-2xs"
+        className="py-3 px-4 sm:px-5 rounded-2xl liquid-glass border border-amber-400/35 dark:border-amber-400/20 text-slate-800 dark:text-slate-200 flex items-start gap-3 text-xs sm:text-sm shadow-xs my-2 relative overflow-hidden bg-gradient-to-r from-amber-500/[0.04] via-emerald-500/[0.03] to-transparent"
       >
-        <Compass size={15} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-        <div className="space-y-1 flex-1">
+        <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 mt-0.5 shrink-0 flex items-center justify-center">
+          <Compass size={16} />
+        </div>
+        <div className="space-y-1.5 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+            <span>{isUrdu ? 'دستور العمل و طریقہ' : 'Recitation Rubric / Method'}</span>
+            <span className="text-amber-500/50">·</span>
+            <span className="font-mono tabular-nums">{isUrdu ? toUrduNumerals(verse.index) : verse.index}</span>
+          </div>
           {verse.arabic && (
             <p 
               dir="rtl" 
-              className="font-arabic font-medium text-right leading-[1.8]" 
+              className="font-arabic font-medium text-right leading-[1.9] text-slate-900 dark:text-slate-100" 
               style={{ 
-                fontSize: `${Math.max(17, Math.round(mafatihFontSize * 0.5))}px`, 
+                fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.5))}px`, 
                 fontFamily: getArabicFontFamily(arabicFont) 
               }}
             >
@@ -114,9 +157,9 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
           )}
           {verse.translation && (
             <p 
-              className="leading-relaxed text-slate-500 dark:text-slate-400 italic"
+              className={`leading-relaxed text-slate-700 dark:text-slate-300 font-serif italic ${isUrdu ? 'text-right font-urdu' : 'text-left'}`}
               style={{
-                fontSize: `${Math.max(13, Math.round(mafatihFontSize * 0.4))}px`
+                fontSize: `${Math.max(13, Math.round(mafatihFontSize * 0.38))}px`
               }}
             >
               {verse.translation}
@@ -127,94 +170,136 @@ const MafatihVerseRow = memo(function MafatihVerseRow({
     );
   }
 
+  // Authentic Quran-styled Ayah Card
   return (
     <div
       ref={(el) => registerRef(verse.index, el)}
       id={`verse-${verse.index}`}
-      className={`relative py-4 px-3.5 sm:px-5 transition-all rounded-2xl liquid-glass-card border shadow-xs ${
+      className={`ayah-card-render ayah-card group relative py-4 sm:py-5 px-3.5 sm:px-6 transition-all duration-200 rounded-2xl sm:rounded-3xl liquid-glass-card border ${
         isBookmarked
-          ? 'glass-emerald-fusion border-emerald-500/70 ring-1 ring-emerald-500/30 shadow-md'
-          : 'border-white/60 dark:border-white/10 hover:border-emerald-400/50'
+          ? 'glass-emerald-fusion border-emerald-500/80 ring-2 ring-emerald-500/30 shadow-lg'
+          : 'border-white/60 dark:border-white/10 hover:border-emerald-400/50 shadow-xs'
       }`}
     >
+      {/* Top Bar of Ayah Card */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-mono font-medium text-slate-400 dark:text-slate-500">
-          {isUrdu ? toUrduNumerals(verse.index) : verse.index}
-        </span>
+        <div className="flex items-center gap-3">
+          <span 
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition-colors border shadow-2xs glass-slab-tab text-slate-700 dark:text-slate-300 border-white/40 dark:border-white/15"
+          >
+            {isUrdu ? toUrduNumerals(verse.index) : verse.index}
+          </span>
+          {isBookmarked && (
+            <BookmarkCheck size={20} className="text-emerald-500" />
+          )}
+        </div>
 
         <div className="flex items-center gap-1">
           <button
+            type="button"
             onClick={() => onCopy(verse)}
-            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 hover:text-emerald-500 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all cursor-pointer"
             title={isUrdu ? 'سطر کاپی کریں' : 'Copy line'}
             aria-label="Copy"
           >
             {isCopied ? (
-              <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
+              <Check size={18} className="text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Copy size={14} />
+              <Copy size={18} />
             )}
           </button>
           <button
+            type="button"
             onClick={() => onToggleBookmark(verse.index)}
-            className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 hover:text-emerald-500 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all cursor-pointer"
             title={isBookmarked ? (isUrdu ? 'محفوظ سطر ختم کریں' : 'Remove bookmark') : (isUrdu ? 'سطر محفوظ کریں' : 'Bookmark line')}
             aria-label="Bookmark"
           >
             {isBookmarked ? (
-              <BookmarkCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+              <BookmarkCheck size={18} className="text-emerald-500" />
             ) : (
-              <Bookmark size={14} />
+              <Bookmark size={18} />
             )}
           </button>
         </div>
       </div>
 
+      {/* Sacred Arabic Text */}
       {verse.arabic && (
         <p
           dir="rtl"
           lang="ar"
-          className="font-arabic text-right leading-[2.4] text-slate-900 dark:text-slate-100 select-text mb-2"
+          className="ayah-arabic-text font-arabic text-right leading-[2.5] select-text mb-3 font-normal text-slate-900 dark:text-slate-100"
           style={{ 
             fontSize: `${mafatihFontSize}px`, 
             fontFamily: getArabicFontFamily(arabicFont),
-            wordSpacing: '0.08em'
+            unicodeBidi: 'isolate'
           }}
         >
           {verse.arabic}
         </p>
       )}
 
-      {mafatihShowTranslation && verse.translation && (
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 mt-2">
-          <p 
-            className="leading-relaxed text-slate-600 dark:text-slate-300 font-normal"
-            style={{
-              fontSize: `${Math.max(14, Math.round(mafatihFontSize * 0.44))}px`,
-              lineHeight: 1.7
-            }}
+      {/* Translation Button Below Every Ayah Card (Matching Quran Ayah Tabs) */}
+      <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+        <div className="flex-1 h-px bg-white/20 dark:bg-white/10"></div>
+        <div className="flex gap-1.5 p-1 rounded-xl liquid-glass border border-white/40 dark:border-white/10 shadow-inner">
+          <button 
+            type="button"
+            onClick={() => setShowCardTranslation((prev) => !prev)}
+            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              showCardTranslation
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
           >
-            {verse.translation}
-          </p>
+            {isUrdu ? 'ترجمہ' : 'Translation'}
+          </button>
         </div>
-      )}
+        <div className="flex-1 h-px bg-white/20 dark:bg-white/10"></div>
+      </div>
+
+      <AnimatePresence>
+        {showCardTranslation && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2 pb-1 border-t border-slate-200/50 dark:border-slate-700/50 text-slate-700 dark:text-slate-300">
+              <p 
+                className={`leading-relaxed font-normal text-sm sm:text-base ${isUrdu ? 'text-right font-urdu' : 'text-left'}`}
+                style={{
+                  fontSize: `${Math.max(14, Math.round(mafatihFontSize * 0.44))}px`,
+                  lineHeight: 1.7
+                }}
+              >
+                {verse.translation || (isUrdu ? 'اس سطر کا ترجمہ موجود نہیں ہے' : 'No translation available for this line.')}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 });
 
 // -------------------------------------------------------------
-// DEDICATED ISOLATED AUDIO PLAYER BAR
+// DEDICATED SMOOTH AUDIO PLAYER BAR
 // -------------------------------------------------------------
 interface MafatihAudioPlayerProps {
   item: MafatihDetail;
   isDarkMode: boolean;
   isUrdu: boolean;
+  onExpandPlayer?: () => void;
 }
 
 const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   item,
   isDarkMode,
   isUrdu,
+  onExpandPlayer,
 }: MafatihAudioPlayerProps) {
   const currentTrack = useMafatihAudioStore((s) => s.currentTrack);
   const isPlaying = useMafatihAudioStore((s) => s.isPlaying);
@@ -266,8 +351,9 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
   };
 
   const progressPercent = activeDuration > 0 ? Math.min(100, (activeCurrentTime / activeDuration) * 100) : 0;
-  const displayTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : item.title;
+  const displayTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : getMafatihEnglishTitle(item.id, item.title);
   const displayCategory = isUrdu ? getMafatihUrduCategory(item.mainCategory) : item.mainCategory;
+  const arTitle = getMafatihArabicTitle(item.id, item.title, item.mainCategory);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] liquid-glass-dock border-t border-white/40 dark:border-white/10 shadow-2xl gpu-layer">
@@ -304,10 +390,26 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
         {/* Controls Row */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
-            <div className={`w-2 h-2 rounded-full shrink-0 ${isThisItemPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+          <div 
+            onClick={onExpandPlayer}
+            className="flex items-center gap-2.5 min-w-0 flex-1 pr-2 cursor-pointer group"
+            title={isUrdu ? 'پلیئر کھولیں' : 'Click to open music player'}
+          >
+            {/* Unique Mini Album Art Thumbnail */}
+            <div className="shrink-0 transition-transform group-hover:scale-105">
+              <SacredAlbumArt
+                type="mafatih"
+                itemId={item.id}
+                title={item.title}
+                arabicTitle={arTitle}
+                category={item.mainCategory}
+                isPlaying={isThisItemPlaying}
+                size="sm"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-xs"
+              />
+            </div>
             <div className="truncate">
-              <span className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate block">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 {displayTitle}
               </span>
               <span className="text-[10px] text-slate-400 truncate block">
@@ -318,6 +420,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
+              type="button"
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 if (isThisItemActive) skip(-10);
@@ -330,6 +433,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
             </button>
 
             <button
+              type="button"
               onClick={handleTogglePlay}
               className="w-9 h-9 bg-gradient-to-tr from-emerald-600 to-teal-500 text-white hover:from-emerald-500 hover:to-teal-400 rounded-full transition-all shrink-0 flex items-center justify-center cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.4)]"
               title={isThisItemPlaying ? (isUrdu ? 'روکیں' : 'Pause') : (isUrdu ? 'سنیں' : 'Play')}
@@ -345,6 +449,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 if (isThisItemActive) skip(10);
@@ -358,6 +463,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
             {isThisItemActive && (
               <button
+                type="button"
                 onClick={() => {
                   hapticImpact(ImpactStyle.Light);
                   stopAudio();
@@ -373,6 +479,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
           <div className="flex items-center gap-1.5 shrink-0 justify-end flex-1 pl-2">
             <button
+              type="button"
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 toggleLoop();
@@ -389,6 +496,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 hapticImpact(ImpactStyle.Light);
                 cycleSpeed();
@@ -401,6 +509,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 
             <div className="hidden sm:flex items-center gap-1.5">
               <button
+                type="button"
                 onClick={() => {
                   hapticImpact(ImpactStyle.Light);
                   toggleMute();
@@ -430,7 +539,7 @@ const MafatihAudioPlayer = memo(function MafatihAudioPlayer({
 });
 
 // -------------------------------------------------------------
-// MAIN COMPONENT
+// MAIN MAFATIH ITEM VIEW COMPONENT
 // -------------------------------------------------------------
 export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps) {
   const [item, setItem] = useState<MafatihDetail | null>(null);
@@ -439,13 +548,17 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const [isIntroExpanded, setIsIntroExpanded] = useState(false);
   const [visibleCount, setVisibleCount] = useState(60);
 
+  const cleanedVirtuesIntro = useMemo(() => {
+    return cleanVirtuesDisplay(item?.introduction || '');
+  }, [item?.introduction]);
+
   // Settings
   const isDarkMode = useSettingsStore((s) => s.isDarkMode);
   const arabicFont = useSettingsStore((s) => s.arabicFont);
   const mafatihFontSize = useSettingsStore((s) => s.mafatihFontSize);
   const mafatihShowTranslation = useSettingsStore((s) => s.mafatihShowTranslation);
   const setMafatihFontSize = useSettingsStore((s) => s.setMafatihFontSize);
-  const setMafatihShowTranslation = useSettingsStore((s) => s.setMafatihShowTranslation);
+  const toggleMafatihShowTranslation = useSettingsStore((s) => s.toggleMafatihShowTranslation);
   const isMafatihBookmarked = useSettingsStore((s) => s.isMafatihBookmarked);
   const addMafatihBookmark = useSettingsStore((s) => s.addMafatihBookmark);
   const removeMafatihBookmark = useSettingsStore((s) => s.removeMafatihBookmark);
@@ -457,6 +570,14 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
   const [showJumpDrawer, setShowJumpDrawer] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [bookmarkedVerses, setBookmarkedVerses] = useState<Set<number>>(new Set());
+  const viewMode = useAudioStore((s) => s.mafatihViewMode);
+  const setViewMode = useAudioStore((s) => s.setMafatihViewMode);
+
+  useEffect(() => {
+    return () => {
+      useAudioStore.getState().setMafatihViewMode('text');
+    };
+  }, [itemId]);
 
   // Audio Store
   const currentTrack = useMafatihAudioStore((s) => s.currentTrack);
@@ -626,119 +747,205 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
     );
   }
 
-  const primaryTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : item.title;
+  const primaryTitle = isUrdu ? getMafatihUrduTitle(item.id, item.title) : getMafatihEnglishTitle(item.id, item.title);
+  const arTitle = getMafatihArabicTitle(item.id, item.title, item.mainCategory);
   const categoryLabel = isUrdu ? getMafatihUrduCategory(item.mainCategory) : (item.mainCategory || 'Mafatih Al Jinan');
 
   return (
     <div 
-      className={`min-h-screen text-slate-900 dark:text-slate-100 ${item.audioUrl ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200 w-full max-w-full overflow-x-hidden min-w-0`}
+      className={`min-h-screen text-slate-900 dark:text-slate-100 ${viewMode === 'player' ? 'pb-8' : (isThisItemPlaying || isThisItemBuffering) ? 'pb-32 sm:pb-28' : 'pb-16'} transition-colors duration-200 w-full max-w-full overflow-x-hidden min-w-0`}
       dir={isUrdu ? 'rtl' : 'ltr'}
     >
       {/* Top Header Bar */}
-      <header className="sticky top-0 z-40 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-3 shadow-xs gpu-layer">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-4">
-          <div className="flex items-center gap-2 min-w-0">
-            <button
-              onClick={onBack}
-              className="p-2 -ml-1 sm:-ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
-              title={t('return_to_catalog', appLanguage)}
-              aria-label="Back"
-            >
-              <ArrowLeft size={18} className={isUrdu ? 'rotate-180' : ''} />
-            </button>
-            <div className="truncate">
-              <h2 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
-                {primaryTitle}
-              </h2>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                {categoryLabel}
-              </p>
+      <header className="sticky top-0 z-40 liquid-glass border-b border-white/30 dark:border-white/10 app-header-safe pb-2.5 shadow-xs gpu-layer">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          {/* Main Header Row: Back + Title + Action Icons */}
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4">
+            {/* Left: Back Button + Supplication Title */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <button
+                type="button"
+                onClick={onBack}
+                className="p-2 -ml-1 sm:-ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer shrink-0"
+                title={t('return_to_catalog', appLanguage)}
+                aria-label="Back"
+              >
+                <ArrowLeft size={20} className={isUrdu ? 'rotate-180' : ''} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
+                  {primaryTitle}
+                </h2>
+                <p className="text-[11px] text-emerald-700 dark:text-emerald-400 truncate leading-tight mt-0.5">
+                  {categoryLabel}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              {/* View Switcher on sm+ screens */}
+              <div className="hidden sm:flex items-center gap-1 p-0.5 liquid-glass rounded-full border border-white/40 dark:border-white/10 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('text'); }}
+                  className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                    viewMode === 'text'
+                      ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {isUrdu ? 'متن' : 'Text'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('player'); }}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                    viewMode === 'player'
+                      ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Music size={13} className={isThisItemPlaying ? 'animate-bounce text-amber-300' : ''} />
+                  <span>{isUrdu ? 'پلیئر' : 'Player'}</span>
+                  {isThisItemPlaying && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
+                </button>
+              </div>
+
+              {/* Quick Audio Play Button */}
+              {(item.audioUrl || isCurrentTrackThisItem) && (
+                <button
+                  type="button"
+                  onClick={handleTogglePlay}
+                  className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                    isThisItemPlaying
+                      ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                  title={isThisItemPlaying ? t('pause_audio', appLanguage) : t('play_audio', appLanguage)}
+                  aria-label={isThisItemPlaying ? 'Pause' : 'Play'}
+                >
+                  {isThisItemBuffering ? (
+                    <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : isThisItemPlaying ? (
+                    <Pause size={17} />
+                  ) : (
+                    <Volume2 size={17} />
+                  )}
+                </button>
+              )}
+
+              {/* Quick Global Translation Button (visible on md+) */}
+              <button
+                type="button"
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  toggleMafatihShowTranslation();
+                }}
+                className={`hidden md:inline-flex px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+                  mafatihShowTranslation
+                    ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 border-white/40 dark:border-white/10'
+                }`}
+                title={isUrdu ? 'تمام تراجم ظاہر / پوشیدہ کریں' : 'Toggle all translations'}
+              >
+                {isUrdu ? 'ترجمہ' : 'Translation'}
+              </button>
+
+              {/* Jump to Line Button (visible on sm+) */}
+              {item.verses && item.verses.length > 5 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    hapticImpact(ImpactStyle.Light);
+                    setShowJumpDrawer(!showJumpDrawer);
+                    if (showSettingsDrawer) setShowSettingsDrawer(false);
+                  }}
+                  className={`hidden sm:inline-flex p-2 rounded-xl transition-colors cursor-pointer ${
+                    showJumpDrawer
+                      ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                  title={t('jump_to_line', appLanguage)}
+                  aria-label="Jump to line"
+                >
+                  <ListOrdered size={17} />
+                </button>
+              )}
+
+              {/* Bookmark Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Medium);
+                  if (isCurrentItemBookmarked) {
+                    removeMafatihBookmark(item.id);
+                  } else {
+                    addMafatihBookmark(item.id);
+                  }
+                }}
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title={isCurrentItemBookmarked ? t('remove_line_bookmark', appLanguage) : t('bookmark_line', appLanguage)}
+                aria-label="Bookmark"
+              >
+                {isCurrentItemBookmarked ? (
+                  <BookmarkCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
+                ) : (
+                  <Bookmark size={18} />
+                )}
+              </button>
+
+              {/* Reading Preferences Toggle */}
+              <button
+                type="button"
+                onClick={() => {
+                  hapticImpact(ImpactStyle.Light);
+                  setShowSettingsDrawer(!showSettingsDrawer);
+                  if (showJumpDrawer) setShowJumpDrawer(false);
+                }}
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                  showSettingsDrawer
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                title={t('reading_preferences', appLanguage)}
+                aria-label="Settings"
+              >
+                <Sliders size={18} />
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
-            {/* Quick Audio Play Button in Header */}
-            {(item.audioUrl || isCurrentTrackThisItem) && (
+          {/* Mobile View Switcher Sub-Bar (sm:hidden) */}
+          <div className="flex sm:hidden items-center justify-center pt-2 mt-2 border-t border-white/20 dark:border-white/5">
+            <div className="flex items-center p-0.5 liquid-glass rounded-full border border-white/40 dark:border-white/10 shadow-2xs w-full max-w-[280px]">
               <button
-                onClick={handleTogglePlay}
-                className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                  isThisItemPlaying
-                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                type="button"
+                onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('text'); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-full text-center transition-all cursor-pointer ${
+                  viewMode === 'text'
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
-                title={isThisItemPlaying ? t('pause_audio', appLanguage) : t('play_audio', appLanguage)}
-                aria-label={isThisItemPlaying ? 'Pause' : 'Play'}
               >
-                {isThisItemBuffering ? (
-                  <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                ) : isThisItemPlaying ? (
-                  <Pause size={17} />
-                ) : (
-                  <Volume2 size={17} />
-                )}
+                <BookOpen size={13} />
+                <span>{isUrdu ? 'متن' : 'Text'}</span>
               </button>
-            )}
-
-            {/* Jump to Line Button */}
-            {item.verses && item.verses.length > 5 && (
               <button
-                onClick={() => {
-                  hapticImpact(ImpactStyle.Light);
-                  setShowJumpDrawer(!showJumpDrawer);
-                  if (showSettingsDrawer) setShowSettingsDrawer(false);
-                }}
-                className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                  showJumpDrawer
-                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                type="button"
+                onClick={() => { hapticImpact(ImpactStyle.Light); setViewMode('player'); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-full text-center transition-all cursor-pointer ${
+                  viewMode === 'player'
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
-                title={t('jump_to_line', appLanguage)}
-                aria-label="Jump to line"
               >
-                <ListOrdered size={17} />
+                <Music size={13} className={isThisItemPlaying ? 'animate-bounce text-amber-300' : ''} />
+                <span>{isUrdu ? 'پلیئر' : 'Player'}</span>
+                {isThisItemPlaying && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
               </button>
-            )}
-
-            {/* Bookmark Button */}
-            <button
-              onClick={() => {
-                hapticImpact(ImpactStyle.Medium);
-                if (isCurrentItemBookmarked) {
-                  removeMafatihBookmark(item.id);
-                } else {
-                  addMafatihBookmark(item.id);
-                }
-              }}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              title={isCurrentItemBookmarked ? t('remove_line_bookmark', appLanguage) : t('bookmark_line', appLanguage)}
-              aria-label="Bookmark"
-            >
-              {isCurrentItemBookmarked ? (
-                <BookmarkCheck size={17} className="text-emerald-600 dark:text-emerald-400" />
-              ) : (
-                <Bookmark size={17} />
-              )}
-            </button>
-
-            {/* Reading Preferences Toggle */}
-            <button
-              onClick={() => {
-                hapticImpact(ImpactStyle.Light);
-                setShowSettingsDrawer(!showSettingsDrawer);
-                if (showJumpDrawer) setShowJumpDrawer(false);
-              }}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                showSettingsDrawer
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-              title={t('reading_preferences', appLanguage)}
-              aria-label="Settings"
-            >
-              <Sliders size={17} />
-            </button>
+            </div>
           </div>
-        </div>
 
         {/* Reading Preferences Drawer */}
         <AnimatePresence>
@@ -756,6 +963,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                   </span>
                   <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200/70 dark:border-slate-800">
                     <button
+                      type="button"
                       onClick={() => setMafatihFontSize(Math.max(mafatihFontSize - 3, 26))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
@@ -765,6 +973,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                       {isUrdu ? toUrduNumerals(mafatihFontSize) : mafatihFontSize}px
                     </span>
                     <button
+                      type="button"
                       onClick={() => setMafatihFontSize(Math.min(mafatihFontSize + 3, 96))}
                       className="px-3 py-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
@@ -778,7 +987,8 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                     {t('translation_display', appLanguage)}:
                   </span>
                   <button
-                    onClick={() => setMafatihShowTranslation(!mafatihShowTranslation)}
+                    type="button"
+                    onClick={() => toggleMafatihShowTranslation()}
                     className={`w-full py-2 rounded-xl font-medium transition-colors text-center border cursor-pointer ${
                       mafatihShowTranslation
                         ? 'bg-slate-900 text-white dark:bg-emerald-600 border-slate-900 dark:border-emerald-600'
@@ -809,6 +1019,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                     : `Jump to Line (1 - ${item.verses.length})`}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setShowJumpDrawer(false)}
                   className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 cursor-pointer"
                 >
@@ -819,6 +1030,7 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
                 {item.verses.map((v) => (
                   <button
                     key={`jump-${v.index}`}
+                    type="button"
                     onClick={() => jumpToLine(v.index)}
                     className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white dark:bg-slate-850 dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 font-mono text-xs transition-colors shrink-0 cursor-pointer tabular-nums"
                   >
@@ -829,196 +1041,234 @@ export default function MafatihItemView({ itemId, onBack }: MafatihItemViewProps
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 min-w-0 overflow-x-hidden">
-        {/* Illuminated Recitation Header with Authentic Identity */}
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-900 via-teal-950 to-slate-900 p-5 sm:p-6 text-white shadow-sm border border-emerald-800/50 min-w-0 w-full">
-          <div className="relative z-10 space-y-2.5 min-w-0">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                {categoryLabel}
-              </span>
-              <span className="text-xs font-mono text-emerald-200/90 bg-white/10 px-2.5 py-1 rounded-lg">
-                {isUrdu ? `${toUrduNumerals(item.verses?.length || 0)} سطریں` : `${item.verses?.length || 0} Lines`}
-              </span>
-            </div>
+      {/* Main Content Area with 2-Column Side-by-Side Music Player on Desktop */}
+      <main className="w-full max-w-7xl mx-auto px-2.5 sm:px-4 py-4 min-w-0 overflow-x-hidden">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Left Column: Supplication Text Cards */}
+          <div className={`flex-1 min-w-0 w-full ${viewMode === 'player' ? 'hidden lg:block' : 'block'} space-y-4`}>
+            {/* Recitation Header Card */}
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-900 via-teal-950 to-slate-900 p-5 sm:p-6 text-white shadow-sm border border-emerald-800/50 min-w-0 w-full">
+              <div className="relative z-10 space-y-2.5 min-w-0">
+                <div className="flex items-center justify-between gap-3 text-xs tracking-wider uppercase font-medium text-emerald-300/90">
+                  <div className="flex items-center gap-2">
+                    <span className="text-amber-400 font-semibold">{categoryLabel}</span>
+                    <span className="text-emerald-500/60 select-none">·</span>
+                    <span className="text-emerald-200/70 lowercase font-serif italic text-xs tracking-normal">
+                      {isUrdu ? 'مفاتیح الجنان' : 'Mafatih al-Jinan'}
+                    </span>
+                  </div>
+                  <span className="font-mono text-emerald-300/80 tracking-normal normal-case tabular-nums text-xs">
+                    {isUrdu ? `${toUrduNumerals(item.verses?.length || 0)} سطریں` : `${item.verses?.length || 0} Lines`}
+                  </span>
+                </div>
 
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white leading-snug break-words">
-                {primaryTitle}
-              </h1>
-              <p className="text-xs text-emerald-200/80 mt-1">
-                {isUrdu 
-                  ? 'مفاتیح الجنان • تالیف: ثقۃ الاسلام محدث شیخ عباس قمی (رح)' 
-                  : 'Mafatih al-Jinan • Compiled by Sheikh Abbas Qummi (r.a)'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Virtues & Context (if present) */}
-        {item.introduction && item.verses && item.verses.length > 0 && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 space-y-2.5 min-w-0 overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
-                {t('virtues_etiquette', appLanguage)}
-              </span>
-              <button
-                onClick={() => setIsIntroExpanded(!isIntroExpanded)}
-                className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
-              >
-                {isIntroExpanded ? (isUrdu ? 'مختصر کریں' : 'Show Less') : (isUrdu ? 'مکمل پڑھیں' : 'Read More')}
-              </button>
-            </div>
-            <p className={`text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line break-words min-w-0 max-w-full ${
-              isIntroExpanded ? '' : 'line-clamp-2'
-            }`}>
-              {item.introduction}
-            </p>
-          </div>
-        )}
-
-        {/* Serene Minimalist Bismillah Banner */}
-        <div className="text-center py-6 sm:py-8 px-4 rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
-          <h2 
-            dir="rtl"
-            className="font-arabic text-slate-900 dark:text-slate-100 font-normal leading-[1.8] select-text"
-            style={{ 
-              fontSize: `${Math.max(Math.round(mafatihFontSize * 1.05), 28)}px`,
-              fontFamily: getArabicFontFamily(arabicFont)
-            }}
-          >
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </h2>
-
-          <p 
-            dir="rtl" 
-            className="font-arabic text-emerald-700 dark:text-emerald-400 mt-1"
-            style={{ 
-              fontSize: `${Math.max(15, Math.round(mafatihFontSize * 0.44))}px`,
-              fontFamily: getArabicFontFamily(arabicFont)
-            }}
-          >
-            اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَآلِ مُحَمَّدٍ
-          </p>
-
-          {mafatihShowTranslation && (
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 font-serif italic">
-              {isUrdu 
-                ? 'شروع اللہ کے نام سے جو بڑا مہربان نہایت رحم والا ہے'
-                : 'In the Name of Allah, the Entirely Merciful, the Especially Merciful'}
-            </p>
-          )}
-        </div>
-
-        {/* PROSE VIEW FOR 0-VERSE ITEMS (Hajj guides, shrine guidelines, rituals) */}
-        {(!item.verses || item.verses.length === 0) ? (
-          <div className="p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                {isUrdu ? 'متن، فضائل اور احکام' : 'Text, Virtues & Guidelines'}
-              </span>
-              <button
-                onClick={() => {
-                  hapticImpact(ImpactStyle.Light);
-                  navigator.clipboard?.writeText?.(`${primaryTitle}\n\n${item.introduction}`);
-                  setCopiedIndex(9999);
-                  setTimeout(() => setCopiedIndex(null), 2000);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
-                title={t('copy_all_text', appLanguage)}
-              >
-                {copiedIndex === 9999 ? <Check size={14} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={14} />}
-                <span>{copiedIndex === 9999 ? t('line_copied', appLanguage) : t('copy_all_text', appLanguage)}</span>
-              </button>
-            </div>
-
-            <div className="space-y-4 select-text text-sm sm:text-base">
-              {item.introduction ? (
-                item.introduction.split('\n\n').filter((p) => p.trim().length > 0).map((para, idx) => {
-                  const isArabic = /[\u0600-\u06FF]/.test(para) && !/[a-zA-Z]/.test(para);
-                  return (
-                    <p
-                      key={idx}
-                      dir={isArabic ? 'rtl' : isUrdu ? 'rtl' : 'ltr'}
-                      className={`leading-[2] sm:leading-[2.2] text-slate-800 dark:text-slate-200 ${
-                        isArabic ? 'font-arabic text-right text-base sm:text-lg font-medium text-emerald-950 dark:text-emerald-100 py-1' : ''
-                      }`}
-                      style={
-                        isArabic
-                          ? { fontFamily: getArabicFontFamily(arabicFont), fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.75))}px` }
-                          : undefined
-                      }
-                    >
-                      {para}
+                <div className="min-w-0 flex flex-col md:flex-row md:items-baseline md:justify-between gap-2.5">
+                  <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white leading-snug break-words">
+                      {primaryTitle}
+                    </h1>
+                    <p className="text-xs text-emerald-200/80 mt-1">
+                      {isUrdu 
+                        ? 'مفاتیح الجنان • تالیف: ثقۃ الاسلام محدث شیخ عباس قمی (رح)' 
+                        : 'Mafatih al-Jinan • Compiled by Sheikh Abbas Qummi (r.a)'}
                     </p>
-                  );
-                })
-              ) : (
-                <p className="text-slate-500 italic">
-                  {isUrdu ? 'یہ متن مفاتیح الجنان کی مکمل جلد میں دستیاب ہے۔' : 'This supplication content is available in the complete Mafatih Al Jinan volume.'}
+                  </div>
+                  {arTitle && (
+                    <div 
+                      dir="rtl" 
+                      lang="ar"
+                      className="font-arabic text-2xl sm:text-3xl text-emerald-200 font-medium select-text drop-shadow-xs shrink-0 self-start md:self-auto"
+                      style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+                    >
+                      {arTitle}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Virtues & Context (if present) */}
+            {cleanedVirtuesIntro && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 space-y-2.5 min-w-0 overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
+                    {t('virtues_etiquette', appLanguage)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsIntroExpanded(!isIntroExpanded)}
+                    className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
+                  >
+                    {isIntroExpanded ? (isUrdu ? 'مختصر کریں' : 'Show Less') : (isUrdu ? 'مکمل پڑھیں' : 'Read More')}
+                  </button>
+                </div>
+                <p className={`text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line break-words min-w-0 max-w-full ${
+                  isIntroExpanded ? '' : 'line-clamp-2'
+                }`}>
+                  {cleanedVirtuesIntro}
+                </p>
+              </div>
+            )}
+
+            {/* Bismillah Banner */}
+            <div className="text-center py-6 sm:py-8 px-4 rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+              <h2 
+                dir="rtl"
+                className="font-arabic text-slate-900 dark:text-slate-100 font-normal leading-[1.8] select-text"
+                style={{ 
+                  fontSize: `${Math.max(Math.round(mafatihFontSize * 1.05), 28)}px`,
+                  fontFamily: getArabicFontFamily(arabicFont)
+                }}
+              >
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </h2>
+
+              <p 
+                dir="rtl" 
+                className="font-arabic text-emerald-700 dark:text-emerald-400 mt-1"
+                style={{ 
+                  fontSize: `${Math.max(15, Math.round(mafatihFontSize * 0.44))}px`,
+                  fontFamily: getArabicFontFamily(arabicFont)
+                }}
+              >
+                اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَآلِ مُحَمَّدٍ
+              </p>
+
+              {mafatihShowTranslation && (
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 font-serif italic">
+                  {isUrdu 
+                    ? 'شروع اللہ کے نام سے جو بڑا مہربان نہایت رحم والا ہے'
+                    : 'In the Name of Allah, the Entirely Merciful, the Especially Merciful'}
                 </p>
               )}
             </div>
-          </div>
-        ) : (
-          /* Progressive Verses List */
-          <div className="space-y-3">
-            {item.verses.slice(0, visibleCount).map((verse) => {
-              if (verse.index === 1 && hasFirstVerseBismillah && cleanArabicText(verse.arabic).length < 35 && !verse.translation?.trim()) {
-                return null;
-              }
 
-              return (
-                <MafatihVerseRow
-                  key={`verse-${verse.index}`}
-                  verse={verse}
-                  arabicFont={arabicFont}
-                  mafatihFontSize={mafatihFontSize}
-                  mafatihShowTranslation={mafatihShowTranslation}
-                  isBookmarked={bookmarkedVerses.has(verse.index)}
-                  isCopied={copiedIndex === verse.index}
-                  isUrdu={isUrdu}
-                  onCopy={copyVerse}
-                  onToggleBookmark={toggleBookmark}
-                  registerRef={registerVerseRef}
-                />
-              );
-            })}
+            {/* PROSE VIEW FOR 0-VERSE ITEMS (Hajj guides, shrine guidelines, rituals) */}
+            {(!item.verses || item.verses.length === 0) ? (
+              <div className="p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {isUrdu ? 'متن، فضائل اور احکام' : 'Text, Virtues & Guidelines'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      hapticImpact(ImpactStyle.Light);
+                      navigator.clipboard?.writeText?.(`${primaryTitle}\n\n${item.introduction}`);
+                      setCopiedIndex(9999);
+                      setTimeout(() => setCopiedIndex(null), 2000);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
+                    title={t('copy_all_text', appLanguage)}
+                  >
+                    {copiedIndex === 9999 ? <Check size={14} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={14} />}
+                    <span>{copiedIndex === 9999 ? t('line_copied', appLanguage) : t('copy_all_text', appLanguage)}</span>
+                  </button>
+                </div>
 
-            {visibleCount < item.verses.length && (
-              <div className="text-center pt-3 pb-6">
-                <button
-                  onClick={() => setVisibleCount(item.verses.length)}
-                  className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:border-emerald-500/40 transition-colors cursor-pointer"
-                >
-                  {isUrdu 
-                    ? `تمام ${toUrduNumerals(item.verses.length)} سطور دیکھیں (${toUrduNumerals(visibleCount)} ظاہر ہیں)`
-                    : `Load All ${item.verses.length} Verses (Showing ${visibleCount})`}
-                </button>
+                <div className="space-y-4 select-text text-sm sm:text-base">
+                  {item.introduction ? (
+                    item.introduction.split('\n\n').filter((p) => p.trim().length > 0).map((para, idx) => {
+                      const isArabic = /[\u0600-\u06FF]/.test(para) && !/[a-zA-Z]/.test(para);
+                      return (
+                        <p
+                          key={idx}
+                          dir={isArabic ? 'rtl' : isUrdu ? 'rtl' : 'ltr'}
+                          className={`leading-[2] sm:leading-[2.2] text-slate-800 dark:text-slate-200 ${
+                            isArabic ? 'font-arabic text-right text-base sm:text-lg font-medium text-emerald-950 dark:text-emerald-100 py-1' : ''
+                          }`}
+                          style={
+                            isArabic
+                              ? { fontFamily: getArabicFontFamily(arabicFont), fontSize: `${Math.max(16, Math.round(mafatihFontSize * 0.75))}px` }
+                              : undefined
+                          }
+                        >
+                          {para}
+                        </p>
+                      );
+                    })
+                  ) : (
+                    <p className="text-slate-500 italic">
+                      {isUrdu ? 'یہ متن مفاتیح الجنان کی مکمل جلد میں دستیاب ہے۔' : 'This supplication content is available in the complete Mafatih Al Jinan volume.'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Progressive Verses List Styled Exactly like Quran Ayahs */
+              <div className="space-y-3">
+                {item.verses.slice(0, visibleCount).map((verse) => {
+                  if (verse.index === 1 && hasFirstVerseBismillah && cleanArabicText(verse.arabic).length < 35 && !verse.translation?.trim()) {
+                    return null;
+                  }
+
+                  return (
+                    <MafatihVerseRow
+                      key={`verse-${verse.index}`}
+                      verse={verse}
+                      arabicFont={arabicFont}
+                      mafatihFontSize={mafatihFontSize}
+                      globalShowTranslation={mafatihShowTranslation}
+                      isBookmarked={bookmarkedVerses.has(verse.index)}
+                      isCopied={copiedIndex === verse.index}
+                      isUrdu={isUrdu}
+                      onCopy={copyVerse}
+                      onToggleBookmark={toggleBookmark}
+                      registerRef={registerVerseRef}
+                    />
+                  );
+                })}
+
+                {visibleCount < item.verses.length && (
+                  <div className="text-center pt-3 pb-6">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount(item.verses.length)}
+                      className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:border-emerald-500/40 transition-colors cursor-pointer"
+                    >
+                      {isUrdu 
+                        ? `تمام ${toUrduNumerals(item.verses.length)} سطور دیکھیں (${toUrduNumerals(visibleCount)} ظاہر ہیں)`
+                        : `Load All ${item.verses.length} Verses (Showing ${visibleCount})`}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
 
-        {/* Standardized Global Footer */}
-        <footer className="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center">
+          {/* Right Column: Dedicated Music Player (Beside text on desktop, or full screen when viewMode === 'player') */}
+          <div className={`w-full lg:w-80 xl:w-96 shrink-0 lg:sticky lg:top-20 ${viewMode === 'player' ? 'block' : 'hidden lg:block'}`}>
+            <DedicatedMusicPlayer
+              mode="mafatih"
+              item={item}
+              variant={viewMode === 'player' ? 'full' : 'sidebar'}
+              onSwitchToTextView={() => setViewMode('text')}
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 text-center ${viewMode === 'player' ? 'hidden lg:block' : 'block'}`}>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             &copy; 2026 Shia Markaz. All Rights Reserved.
           </p>
         </footer>
       </main>
 
-      {/* Docked Isolated Audio Player */}
-      {(item.audioUrl || isCurrentTrackThisItem) && (
-        <MafatihAudioPlayer
-          key={`audio-${item.id}`}
-          item={item}
-          isDarkMode={isDarkMode}
-          isUrdu={isUrdu}
-        />
+      {/* Docked Isolated Audio Player: ONLY exists in text mode while sound is playing */}
+      {viewMode === 'text' && (isThisItemPlaying || isThisItemBuffering) && (
+        <div className="block lg:hidden">
+          <MafatihAudioPlayer
+            key={`audio-${item.id}`}
+            item={item}
+            isDarkMode={isDarkMode}
+            isUrdu={isUrdu}
+            onExpandPlayer={() => setViewMode('player')}
+          />
+        </div>
       )}
     </div>
   );

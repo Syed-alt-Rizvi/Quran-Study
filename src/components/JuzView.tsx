@@ -172,9 +172,9 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
             
             <button 
               onClick={handlePlayAudio}
-              className={`p-1 rounded-full transition-colors ${
+              className={`w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full transition-colors active:scale-95 cursor-pointer ${
                 isActivePlaying 
-                  ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800' 
+                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-950/60' 
                   : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
               title={isActivePlaying && isAudioPlaying ? "Pause Audio" : "Play from this Ayah"}
@@ -188,10 +188,10 @@ const AyahCard = memo(function AyahCard({ ayah, juz, isLast }: { key?: string | 
               <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Last Read</span>
             )}
           </div>
-          <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button 
               onClick={toggleBookmark}
-              className="p-2 text-slate-400 hover:text-emerald-500 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 hover:text-emerald-500 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all cursor-pointer"
               title="Bookmark (or Long Press)"
             >
               {bookmarked ? <BookmarkCheck size={18} className="text-emerald-500" /> : <Bookmark size={18} />}

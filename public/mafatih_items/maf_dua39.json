@@ -10,8 +10,8 @@
     "Dua e Sabah"
   ],
   "audioUrl": "https://www.ya-mahdi.net/apps_audio/mohsin_farahmad/sabah_farahmand.m4a",
-  "introduction": "DUA AL SABAH\n\nThe Supplication of the Morning, as reported from Imam Ali (a.s.).\n\nThen you should prostrate yourself and say:\n\n‘Allamah al-Majlisi has mentioned this supplication in the two sections of supplications and ritual prayer in his famous book of Bihar al-Anwar. He has also recorded it at the end of the section of ritual prayer with commentary and explanation. He adds,\n\n“Although this is one of the famous supplications, I have not found it in the authoritative books except the book of al-Misbah by Sayyid Ibn Baqi - may Allah be pleased with him.”\n\nHe then says,\n\n“It is well-known that this supplication should be said after the obligatory Fajr Prayers. Yet, Sayyid Ibn Baqi has specified the time after the supererogatory (mustahab / nafilah) (mustahab / nafilah) prayer of the morning as the best time of saying this supplication. However, either of these times may be chosen.”",
-  "versesCount": 106,
+  "introduction": "DUA AL SABAH\n\nThe Supplication of the Morning, as reported from Imam Ali (a.s.).",
+  "versesCount": 108,
   "verses": [
     {
       "index": 1,
@@ -470,78 +470,88 @@
     },
     {
       "index": 92,
+      "arabic": "",
+      "translation": "Then you should prostrate yourself and say:"
+    },
+    {
+      "index": 93,
       "arabic": "اِلٰهِيْ قَلْبِيْ مَحْجُوْبٌ",
       "translation": "My God, my heart is veiled,"
     },
     {
-      "index": 93,
+      "index": 94,
       "arabic": "وَ نَفْسِيْ مَعْيُوْبٌ",
       "translation": "my soul is deficient,"
     },
     {
-      "index": 94,
+      "index": 95,
       "arabic": "وَ عَقْلِيْ مَغْلُوْبٌ",
       "translation": "my intelligence is defeated,"
     },
     {
-      "index": 95,
+      "index": 96,
       "arabic": "وَ هَوَاۤئِيْ غَالِبٌ",
       "translation": "my caprice is prevalent,"
     },
     {
-      "index": 96,
+      "index": 97,
       "arabic": "وَ طَاعَتِيْ قَلِيْلٌ",
       "translation": "my obedience is little,"
     },
     {
-      "index": 97,
+      "index": 98,
       "arabic": "وَ مَعْصِيَتِيْ كَثِيْرٌ",
       "translation": "my disobedience is much,"
     },
     {
-      "index": 98,
+      "index": 99,
       "arabic": "وَ لِسَانِيْ مُقِرٌّ بِالذُّنُوْبِ",
       "translation": "and my tongue confesses of sinning;"
     },
     {
-      "index": 99,
+      "index": 100,
       "arabic": "فَكَيْفَ حِيْلَتِيْ",
       "translation": "so, what am I to do?"
     },
     {
-      "index": 100,
+      "index": 101,
       "arabic": "يَا سَتَّارَ الْعُيُوْبِ",
       "translation": "O He Who covers defects!"
     },
     {
-      "index": 101,
+      "index": 102,
       "arabic": "وَ يَا عَلَّامَ الْغُيُوْبِ",
       "translation": "O He Who knows the unseen!"
     },
     {
-      "index": 102,
+      "index": 103,
       "arabic": "وَ يَا كَاشِفَ الْكُرُوْبِ",
       "translation": "O He Who removes troubles!"
     },
     {
-      "index": 103,
+      "index": 104,
       "arabic": "اغْفِرْ ذُنُوْبِيْ كُلَّهَا",
       "translation": "Forgive my sins, all of them,"
     },
     {
-      "index": 104,
+      "index": 105,
       "arabic": "بِحُرْمَةِ مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
       "translation": "in the name of the sacredness of Muhammad and the household of Muhammad!"
     },
     {
-      "index": 105,
+      "index": 106,
       "arabic": "يَا غَفَّارُ يَا غَفَّارُ يَا غَفَّارُ",
       "translation": "O All-forgiver! O All- forgiver! O All- forgiver!"
     },
     {
-      "index": 106,
+      "index": 107,
       "arabic": "بِرَحْمَتِكَ يَاۤ اَرْحَمَ الرَّاحِمِيْنَ۔",
       "translation": "By Your mercy, O Most Merciful of the merciful!"
+    },
+    {
+      "index": 108,
+      "arabic": "",
+      "translation": "‘Allamah al-Majlisi has mentioned this supplication in the two sections of supplications and ritual prayer in his famous book of Bihar al-Anwar. He has also recorded it at the end of the section of ritual prayer with commentary and explanation. He adds,\n\n“Although this is one of the famous supplications, I have not found it in the authoritative books except the book of al-Misbah by Sayyid Ibn Baqi - may Allah be pleased with him.”\n\nHe then says,\n\n“It is well-known that this supplication should be said after the obligatory Fajr Prayers. Yet, Sayyid Ibn Baqi has specified the time after the supererogatory (mustahab / nafilah) (mustahab / nafilah) prayer of the morning as the best time of saying this supplication. However, either of these times may be chosen.”"
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua39&lang=en"

@@ -10,71 +10,76 @@
     "Namaz for more Sustenance"
   ],
   "audioUrl": null,
-  "introduction": "PRAYER FOR MORE SUSTENANCE\n\nIt is reported that a man came to the Holy Prophet (s.a.w.a.) and said, “I have many dependants and I am suffering too much because of debts. Therefore, instruct me a supplication by which Almighty Allah will provide me sustenance so that I can settle my debts and cover the needs of my dependants.” The Holy Prophet (s.a.w.a.) taught him to do the following: You may do the ritual ablution very accurately and then offer a two unit prayer with accurate genuflection (ruku') and prostration. Upon accomplishment, you may say the following supplication:",
-  "versesCount": 13,
+  "introduction": "PRAYER FOR RELIEF FROM DEBTS AND SUSTENANCE\n\nIt is reported that a man came to the Holy Prophet (s.a.w.a.) and asked for a supplication by which Almighty Allah would expand sustenance and settle debts.",
+  "versesCount": 14,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "Do the ritual ablution accurately and offer a two-unit prayer with attentive genuflection and prostration. Upon accomplishment, say the following supplication:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "يَا مَاجِدُ يَا وَاحِدُ يَا كَرِيْمُ",
       "translation": ""
     },
     {
-      "index": 2,
+      "index": 3,
       "arabic": "اَتَوَجَّهُ اِلَيْكَ بِمُحَمَّدٍ نَبِيِّكَ نَبِىِّ الرَّحْمَةِ",
       "translation": ""
     },
     {
-      "index": 3,
+      "index": 4,
       "arabic": "صَلَّى اللّٰهُ عَلَيْهِ وَ اٰلِهٖ",
       "translation": ""
     },
     {
-      "index": 4,
+      "index": 5,
       "arabic": "يَا مُحَمَّدُ يَا رَسُوْلَاللّٰهِ",
       "translation": ""
     },
     {
-      "index": 5,
+      "index": 6,
       "arabic": "اِنِّى اَتَوَجَّهُ بِكَ اِلَى اللّٰهِ",
       "translation": ""
     },
     {
-      "index": 6,
+      "index": 7,
       "arabic": "رَبِّىْ وَ رَبِّكَ وَ رَبِّ كُلِّ شَيْئٍ",
       "translation": ""
     },
     {
-      "index": 7,
+      "index": 8,
       "arabic": "وَ اَسْئَلُكَ اللّٰهُمَّ اَنْ تُصَلِّىَ عَلٰى مُحَمَّدٍ وَّ اَهْلِ بَيْتِهِ",
       "translation": ""
     },
     {
-      "index": 8,
+      "index": 9,
       "arabic": "وَ اَسْئَلُكَ نَفْحَةً كَرِيْمَةً مِنْ نَفَحَاتِكَ",
       "translation": ""
     },
     {
-      "index": 9,
+      "index": 10,
       "arabic": "وَ فَتْحًا يَّسِيْرًا",
       "translation": ""
     },
     {
-      "index": 10,
+      "index": 11,
       "arabic": "وَ رِزْقًا وَاسِعًا",
       "translation": ""
     },
     {
-      "index": 11,
+      "index": 12,
       "arabic": "اَلُمُّ بِهِ شَعَثِىْ",
       "translation": ""
     },
     {
-      "index": 12,
+      "index": 13,
       "arabic": "وَ اَقْضِىْ بِهِ دَيْنِىْ",
       "translation": ""
     },
     {
-      "index": 13,
+      "index": 14,
       "arabic": "وَاَسْتَعِيْنُ بِهِ عَلٰى عِيَالِىْ۔",
       "translation": ""
     }

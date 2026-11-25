@@ -10,28 +10,38 @@
     "Namaz of Imam Muhammad Baqir (a.s.)"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ OF IMAM AL-BAQIR (A)\n\nThis prayer consists of two units in each of which Surah al-Faatehah is recited once and the following litany is repeated one hundred times:\n\nAfter the namaz recite the dua of Imam Al Baqir (a.s.):",
-  "versesCount": 4,
+  "introduction": "NAMAZ OF IMAM AL-BAQIR (A)\n\nA sacred two-unit prayer transmitted from Imam Muhammad al-Baqir (a.s.) with great spiritual rewards.",
+  "versesCount": 6,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "This prayer consists of two units in each of which Surah al-Faatehah is recited once and the following litany is repeated one hundred times:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "سُبْحَانَ اللّٰهِ",
       "translation": "All glory be to Allah,"
     },
     {
-      "index": 2,
+      "index": 3,
       "arabic": "وَ الْحَمْدُ لِلّٰهِ",
       "translation": "all praise be to Allah,"
     },
     {
-      "index": 3,
+      "index": 4,
       "arabic": "وَ لَاۤ اِلٰهَ اِلَّا اللهُ",
       "translation": "there is no god save Allah,"
     },
     {
-      "index": 4,
+      "index": 5,
       "arabic": "وَ اللهُ اَكْبَرُ۔",
       "translation": "and Allah is the Greatest."
+    },
+    {
+      "index": 6,
+      "arabic": "",
+      "translation": "After the namaz recite the dua of Imam Al Baqir (a.s.):"
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua24f&lang=en"

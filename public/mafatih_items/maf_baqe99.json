@@ -10,18 +10,33 @@
     "Namaz for Seeking (divine) help."
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ FOR SEEKING (DIVINE) HELP\n\nAs quoted from Makarim al-Akhlaq\n\nWhen you go to sleep at night, you may put close to the side of your head a clean vessel full of pure water and covered by a clean piece of cloth. When you wake up to offer the Night Prayer, you may drink three doses of that water and perform the ritual ablution (wudu’ ) with the rest of it. You may then turn your face towards the kiblah direction, recite the adhan and iqamah statements, and offer a two-unit prayer, reciting whatever Surah you would like to recite. While genuflecting, you may repeat the following supplicatory statement twenty-five times:\n\nWhen you stand erect again after the genuflection (ruku'), you may repeat the same statement twenty-five times. In the two prostrations of the prayer and the position of sitting between them, you may repeat the same statement twenty-five each. When you stand up for offering the second unit, you may do the same thing as exactly as you have done in the first unit. By this, you have repeated this statement three hundred times. You may then finish your prayer after uttering the statements of tashahhud and Taslim. Keeping yourself in the position of the prayer (i.e. sitting), you may raise your head towards the sky and repeat the following statement thirty times:\n\nYou may then submit your request, and the response will come very shortly, by the permission of Almighty Allah.",
-  "versesCount": 2,
+  "introduction": "NAMAZ FOR SEEKING (DIVINE) HELP\n\nAs quoted from Makarim al-Akhlaq: A blessed prayer for divine assistance in distress, traditionally offered in the tranquility of the night.",
+  "versesCount": 5,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "When you wake up to offer the Night Prayer, turn toward the kiblah, recite adhan and iqamah, and offer a two-unit prayer. While genuflecting (ruku'), repeat the following supplicatory statement twenty-five times:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "يَا غِيَاثَ الْمُسْتَغِيْثِيْنَ۔",
       "translation": ""
     },
     {
-      "index": 2,
+      "index": 3,
+      "arabic": "",
+      "translation": "When you stand erect again after the genuflection (ruku'), you may repeat the same statement twenty-five times. In the two prostrations of the prayer and the position of sitting between them, you may repeat the same statement twenty-five each. When you stand up for offering the second unit, you may do the same thing as exactly as you have done in the first unit. By this, you have repeated this statement three hundred times. You may then finish your prayer after uttering the statements of tashahhud and Taslim. Keeping yourself in the position of the prayer (i.e. sitting), you may raise your head towards the sky and repeat the following statement thirty times:"
+    },
+    {
+      "index": 4,
       "arabic": "مِنَ الْعَبْدِ الذَّلِيْلِ اِلَى الْمَوْلَى الْجَلِيْلِ۔",
       "translation": ""
+    },
+    {
+      "index": 5,
+      "arabic": "",
+      "translation": "You may then submit your request, and the response will come very shortly, by the permission of Almighty Allah."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe99&lang=en"

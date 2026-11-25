@@ -202,7 +202,7 @@ export default function HomeTafseerWidget({ onOpenSurahTafseer }: HomeTafseerWid
             <span className="font-semibold text-slate-700 dark:text-slate-300">Themes:</span>
             {item.tafseerNamoona.keyThemes.map((theme, idx) => (
               <React.Fragment key={`theme-${idx}`}>
-                {idx > 0 && <span aria-hidden="true">&bull;</span>}
+                {idx > 0 && <span aria-hidden="true" className="text-slate-400/80">·</span>}
                 <span>{theme}</span>
               </React.Fragment>
             ))}

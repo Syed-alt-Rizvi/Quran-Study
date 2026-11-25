@@ -222,7 +222,7 @@ async function startServer() {
   const prayerTimesCache = new Map<string, any>();
 
   const getMapsApiKey = () => {
-    return process.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCztQlQZWeWLux5dyPZJOcLtGmb-7VIthU";
+    return process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || "";
   };
 
   // 1. AlAdhan Shia Ithna Ashari (Method 0) Prayer Times Proxy
@@ -273,6 +273,10 @@ async function startServer() {
       }
 
       const apiKey = getMapsApiKey();
+      if (!apiKey) {
+        return res.json({ status: 'ZERO_RESULTS', results: [] });
+      }
+
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
       const response = await fetch(url);
       const data = await response.json();
@@ -305,6 +309,10 @@ async function startServer() {
       }
 
       const apiKey = getMapsApiKey();
+      if (!apiKey) {
+        return res.json({ status: 'ZERO_RESULTS', results: [] });
+      }
+
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${encodeURIComponent(cacheKey)}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
       const response = await fetch(url);
       const data = await response.json();
@@ -338,6 +346,10 @@ async function startServer() {
       }
 
       const apiKey = getMapsApiKey();
+      if (!apiKey) {
+        return res.json({ status: 'OK', timeZoneId: 'UTC', rawOffset: 0, dstOffset: 0 });
+      }
+
       const url = `https://maps.googleapis.com/maps/api/timezone/json?location=${encodeURIComponent(cacheKey)}&timestamp=${timestamp}&key=${apiKey}&solution_id=gmp_mcp_codeassist_v1_aistudio`;
       const response = await fetch(url);
       const data = await response.json();
@@ -1209,6 +1221,133 @@ async function startServer() {
     next();
   });
 
+  // Load Surahs metadata for server-side dynamic SEO and rich Schema.org JSON-LD
+  let cachedSurahs: any[] = [];
+  try {
+    const surahsPath = path.join(process.cwd(), 'src', 'surahList.json');
+    if (fs.existsSync(surahsPath)) {
+      cachedSurahs = JSON.parse(fs.readFileSync(surahsPath, 'utf8'));
+    }
+  } catch (e) {}
+
+  const injectPageMetadata = (html: string, req: express.Request): string => {
+    const host = req.get('host') || 'shiamarkaz.org';
+    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const currentOrigin = `${protocol}://${host}`;
+    const pathname = req.path.replace(/\/+$/, '') || '/';
+    const canonicalUrl = `${currentOrigin}${pathname === '/' ? '' : pathname}`;
+
+    let pageTitle = "Shia Markaz: Holy Quran, Shia Tafseer & Mafatih Al Jinan";
+    let pageDesc = "Explore the Holy Quran with authentic Shia Tafseer (Namoona & Al-Kauthar), Mafatih Al Jinan supplications, Shia prayer times, Adhan, and Ahlulbayt insights.";
+    let schemaJson: any = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Shia Markaz",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "All",
+      "description": pageDesc,
+      "url": canonicalUrl,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    };
+
+    if (pathname.startsWith('/surah/')) {
+      const sId = parseInt(pathname.replace('/surah/', ''), 10);
+      const surah = cachedSurahs.find((s: any) => s.number === sId);
+      if (surah) {
+        pageTitle = `Surah ${surah.englishName} (${surah.englishNameTranslation}) - Holy Quran & Shia Tafseer - Shia Markaz`;
+        pageDesc = `Read and listen to Surah ${surah.englishName} (${surah.name}) with authentic Shia Tafseer (Tafseer-e-Namoona & Al-Kauthar), word-by-word translations, and high-speed audio recitations.`;
+        schemaJson = {
+          "@context": "https://schema.org",
+          "@type": "Chapter",
+          "name": `Surah ${surah.englishName}`,
+          "headline": `Surah ${surah.englishName} (${surah.englishNameTranslation})`,
+          "description": pageDesc,
+          "inLanguage": ["ar", "en", "ur"],
+          "url": canonicalUrl,
+          "isPartOf": {
+            "@type": "Book",
+            "name": "The Holy Quran"
+          }
+        };
+      }
+    } else if (pathname.startsWith('/juz/')) {
+      const jId = parseInt(pathname.replace('/juz/', ''), 10);
+      if (!isNaN(jId) && jId >= 1 && jId <= 30) {
+        pageTitle = `Juz ${jId} - Holy Quran Recitation - Shia Markaz`;
+        pageDesc = `Read and listen to Juz ${jId} of the Holy Quran with verse-by-verse recitation and authentic Shia commentary.`;
+        schemaJson = {
+          "@context": "https://schema.org",
+          "@type": "Chapter",
+          "name": `Juz ${jId}`,
+          "description": pageDesc,
+          "url": canonicalUrl,
+          "isPartOf": {
+            "@type": "Book",
+            "name": "The Holy Quran"
+          }
+        };
+      }
+    } else if (pathname.startsWith('/mafatih/')) {
+      const itemId = pathname.replace('/mafatih/', '').trim();
+      const formatted = itemId.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      pageTitle = `${formatted} - Mafatih al-Jinan - Shia Markaz`;
+      pageDesc = `Recite ${formatted} with authentic Arabic text, Urdu and English translations, step-by-step reading methods, and audio recitations from Mafatih al-Jinan.`;
+      schemaJson = {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "name": formatted,
+        "headline": `${formatted} (Mafatih al-Jinan)`,
+        "description": pageDesc,
+        "inLanguage": ["ar", "en", "ur"],
+        "url": canonicalUrl,
+        "author": {
+          "@type": "Person",
+          "name": "Sheikh Abbas Qummi"
+        }
+      };
+    } else if (pathname === '/mafatih') {
+      pageTitle = "Mafatih al-Jinan - Shia Duas, Ziyarats & A'mal - Shia Markaz";
+      pageDesc = "Comprehensive digital edition of Mafatih al-Jinan by Sheikh Abbas Qummi featuring Daily Duas, Munajat, Ziyarat of Ahlulbayt (a.s), and A'mal for holy months.";
+    } else if (pathname === '/adhan' || pathname === '/prayer-times') {
+      pageTitle = "Shia Adhan & Prayer Times (Leap Year Accurate) - Shia Markaz";
+      pageDesc = "Precise Shia prayer times calculated according to the Leva Institute, Qum with GPS location tracking, monthly timetables, and automated Adhan reminders.";
+    } else if (pathname === '/calendar' || pathname === '/events') {
+      pageTitle = "Shia Islamic Hijri Calendar & Ahlulbayt Events - Shia Markaz";
+      pageDesc = "Complete Shia Hijri Calendar tracking Wiladat, Shahadat, and sacred Islamic historical events with dynamic moon-sighting offset adjustments.";
+    } else if (pathname === '/qibla') {
+      pageTitle = "Qibla Finder & Kaaba Compass - Shia Markaz";
+      pageDesc = "Accurate real-time Kaaba direction and compass using device GPS and magnetic sensors.";
+    } else if (pathname === '/discussions' || pathname === '/discuss') {
+      pageTitle = "Global Shia Community Discussions - Shia Markaz";
+      pageDesc = "Connect, ask spiritual questions, and engage in meaningful theological reflections with the global Shia community.";
+    }
+
+    const safeTitle = pageTitle.replace(/"/g, '&quot;');
+    const safeDesc = pageDesc.replace(/"/g, '&quot;');
+
+    html = html.replace(/<title>[^<]*<\/title>/i, `<title>${safeTitle}</title>`);
+    html = html.replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i, `<meta name="description" content="${safeDesc}" />`);
+    html = html.replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${safeTitle}" />`);
+    html = html.replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${safeDesc}" />`);
+    html = html.replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${safeTitle}" />`);
+    html = html.replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${safeDesc}" />`);
+    html = html.replace(/<link\s+id="canonical-url"[^>]*\/?>/i, `<link id="canonical-url" rel="canonical" href="${canonicalUrl}" />`);
+    html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${canonicalUrl}$2`);
+
+    const scriptTag = `  <script type="application/ld+json">\n${JSON.stringify(schemaJson, null, 2)}\n  </script>\n`;
+    if (html.includes('application/ld+json')) {
+      html = html.replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/i, scriptTag.trim());
+    } else {
+      html = html.replace('</head>', `${scriptTag}</head>`);
+    }
+
+    return html;
+  };
+
   // Vite middleware for development
   if (!isProd) {
     const { createServer: createViteServer } = await import("vite");
@@ -1220,6 +1359,35 @@ async function startServer() {
       },
       appType: "spa",
     });
+
+    // In dev mode, intercept HTML navigation requests to inject dynamic SEO metadata and Schema.org
+    app.use(async (req, res, next) => {
+      if (
+        req.method === 'GET' &&
+        (req.headers.accept?.includes('text/html') || !path.extname(req.path)) &&
+        !req.path.startsWith('/api/') &&
+        !req.path.startsWith('/@') &&
+        !req.path.startsWith('/src/') &&
+        !req.path.startsWith('/node_modules/') &&
+        !req.path.startsWith('/tafseer_') &&
+        !req.path.startsWith('/mafatih_')
+      ) {
+        try {
+          const templatePath = path.join(process.cwd(), 'index.html');
+          if (fs.existsSync(templatePath)) {
+            let template = fs.readFileSync(templatePath, 'utf8');
+            template = await vite.transformIndexHtml(req.url, template);
+            const finalHtml = injectPageMetadata(template, req);
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.send(finalHtml);
+          }
+        } catch (e) {
+          console.warn("Dev HTML transform error:", e);
+        }
+      }
+      next();
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
@@ -1267,19 +1435,10 @@ async function startServer() {
 
       for (const p of candidatePaths) {
         if (fs.existsSync(p)) {
-          let html = fs.readFileSync(p, 'utf8');
-          const host = req.get('host') || 'shiamarkaz.org';
-          const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-          const currentOrigin = `${protocol}://${host}`;
-          const canonicalUrl = `${currentOrigin}${req.path === '/' ? '' : req.path}`;
-          
-          html = html.replace(/<link id="canonical-url"[^>]*>/i, `<link id="canonical-url" rel="canonical" href="${canonicalUrl}" />`);
-          html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${canonicalUrl}$2`);
-          if (!html.includes('property="og:url"')) {
-            html = html.replace('</head>', `  <meta property="og:url" content="${canonicalUrl}" />\n  </head>`);
-          }
+          const html = fs.readFileSync(p, 'utf8');
+          const finalHtml = injectPageMetadata(html, req);
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          return res.send(html);
+          return res.send(finalHtml);
         }
       }
 

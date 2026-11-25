@@ -10,8 +10,8 @@
     "3rd Ziyarat of Imam Mahdi (a.t.f.s.) (Haqq al Jadeed)"
   ],
   "audioUrl": null,
-  "introduction": "3RD ZIYARAT OF IMAM E ASR (A.T.F.S.) (HAQQ AL JADEED)\n\nThe following form of ziyarah has been reported by Sayyid Ibn Tawus:\n\nYou may then offer the twelve-unit prayer of ziyarah, separating between each two units with a Taslim statement (i.e. the last part of prayers). You may then utter the (famous) Tasbih al-Zahra’ litany and provide all that as present to the Imam. Upon accomplishment, you may say the following supplicatory prayer:",
-  "versesCount": 89,
+  "introduction": "3RD ZIYARAT OF IMAM E ASR (A.T.F.S.) (HAQQ AL JADEED)\n\nThe following form of ziyarah has been reported by Sayyid Ibn Tawus:",
+  "versesCount": 90,
   "verses": [
     {
       "index": 1,
@@ -280,181 +280,186 @@
     },
     {
       "index": 54,
+      "arabic": "",
+      "translation": "You may then offer the twelve-unit prayer of ziyarah, separating between each two units with a Taslim statement (i.e. the last part of prayers). You may then utter the (famous) Tasbih al-Zahra’ litany and provide all that as present to the Imam. Upon accomplishment, you may say the following supplicatory prayer:"
+    },
+    {
+      "index": 55,
       "arabic": "اللّٰهُمَّ صَلِّ عَلٰى حُجَّتِكَ فِيۤ اَرْضِكَ،",
       "translation": ""
     },
     {
-      "index": 55,
+      "index": 56,
       "arabic": "وَ خَلِيْفَتِكَ فِيْ بِلَادِكَ،",
       "translation": ""
     },
     {
-      "index": 56,
+      "index": 57,
       "arabic": "الدَّاعِيۤ اِلٰى سَبِيْلِكَ،",
       "translation": ""
     },
     {
-      "index": 57,
+      "index": 58,
       "arabic": "وَ الْقَاۤئِمِ بِقِسْطِكَ،",
       "translation": ""
     },
     {
-      "index": 58,
+      "index": 59,
       "arabic": "وَ الْفَاۤئِزِ بِاَمْرِكَ،",
       "translation": ""
     },
     {
-      "index": 59,
+      "index": 60,
       "arabic": "وَلِيِّ الْمُؤْمِنِينَ",
       "translation": ""
     },
     {
-      "index": 60,
+      "index": 61,
       "arabic": "وَ مُبِيْرِ الْكَافِرِيْنَ،",
       "translation": ""
     },
     {
-      "index": 61,
+      "index": 62,
       "arabic": "وَ مُجَلِّي الظُّلْمَةِ",
       "translation": ""
     },
     {
-      "index": 62,
+      "index": 63,
       "arabic": "وَ مُنِيْرِ الْحَقِّ،‏",
       "translation": ""
     },
     {
-      "index": 63,
+      "index": 64,
       "arabic": "وَ الصَّادِعِ بِالْحِكْمَةِ",
       "translation": ""
     },
     {
-      "index": 64,
+      "index": 65,
       "arabic": "وَ الْمَوْعِظَةِ الْحَسَنَةِ وَ الصِّدْقِ،",
       "translation": ""
     },
     {
-      "index": 65,
+      "index": 66,
       "arabic": "وَ كَلِمَتِكَ وَ عَيْبَتِكَ",
       "translation": ""
     },
     {
-      "index": 66,
+      "index": 67,
       "arabic": "وَ عَيْنِكَ فِيۤ اَرْضِكَ،",
       "translation": ""
     },
     {
-      "index": 67,
+      "index": 68,
       "arabic": "الْمُتَرَقِّبِ الْخَاۤئِفِ،",
       "translation": ""
     },
     {
-      "index": 68,
+      "index": 69,
       "arabic": "الْوَلِيِّ النَّاصِحِ،",
       "translation": ""
     },
     {
-      "index": 69,
+      "index": 70,
       "arabic": "سَفِيْنَةِ النَّجَاةِ،",
       "translation": ""
     },
     {
-      "index": 70,
+      "index": 71,
       "arabic": "وَ عَلَمِ الْهُدٰى،",
       "translation": ""
     },
     {
-      "index": 71,
+      "index": 72,
       "arabic": "وَ نُوْرِ اَبْصَارِ الْوَرٰى،",
       "translation": ""
     },
     {
-      "index": 72,
+      "index": 73,
       "arabic": "وَ خَيْرِ مَنْ تَقَمَّصَ وَ ارْتَدٰى،",
       "translation": ""
     },
     {
-      "index": 73,
+      "index": 74,
       "arabic": "وَ الْوِتْرِ الْمَوْتُوْرِ،",
       "translation": ""
     },
     {
-      "index": 74,
+      "index": 75,
       "arabic": "وَ مُفَرِّجِ الْكَرْبِ،",
       "translation": ""
     },
     {
-      "index": 75,
+      "index": 76,
       "arabic": "وَ مُزِيْلِ الْهَمِّ،",
       "translation": ""
     },
     {
-      "index": 76,
+      "index": 77,
       "arabic": "وَ كَاشِفِ الْبَلْوٰى،",
       "translation": ""
     },
     {
-      "index": 77,
+      "index": 78,
       "arabic": "صَلَوَاتُ اللّٰهِ عَلَيْهِ",
       "translation": ""
     },
     {
-      "index": 78,
+      "index": 79,
       "arabic": "وَ عَلٰى اٰبَاۤئِهِ، الْاَئِمَّةِ الْهَادِيْنَ،",
       "translation": ""
     },
     {
-      "index": 79,
+      "index": 80,
       "arabic": "وَ الْقَادَةِ الْمَيَامِيْنِ،",
       "translation": ""
     },
     {
-      "index": 80,
+      "index": 81,
       "arabic": "مَا طَلَعَتْ كَوَاكِبُ الْاَسْحَارِ،",
       "translation": ""
     },
     {
-      "index": 81,
+      "index": 82,
       "arabic": "وَ اَوْرَقَتِ الْاَشْجَارُ،",
       "translation": ""
     },
     {
-      "index": 82,
+      "index": 83,
       "arabic": "وَ اَيْنَعَتِ الْاَثْمَارُ،",
       "translation": ""
     },
     {
-      "index": 83,
+      "index": 84,
       "arabic": "وَ اخْتَلَفَ اللَّيْلُ وَ النَّهَارُ،",
       "translation": ""
     },
     {
-      "index": 84,
+      "index": 85,
       "arabic": "وَ غَرَّدَتِ الْاَطْيَارُ.",
       "translation": ""
     },
     {
-      "index": 85,
+      "index": 86,
       "arabic": "اَللّٰهُمَّ انْفَعْنَا بِحُبِّهِ،",
       "translation": ""
     },
     {
-      "index": 86,
+      "index": 87,
       "arabic": "وَ احْشُرْنَا فِيْ زُمْرَتِهِ،",
       "translation": ""
     },
     {
-      "index": 87,
+      "index": 88,
       "arabic": "وَ تَحْتَ لِوَاۤئِهِ،",
       "translation": ""
     },
     {
-      "index": 88,
+      "index": 89,
       "arabic": "اِلٰهَ الْحَقِّ، اٰمِيْنَ",
       "translation": ""
     },
     {
-      "index": 89,
+      "index": 90,
       "arabic": "رَبَّ الْعَالَمِيْنَ۔",
       "translation": ""
     }

@@ -11,11 +11,16 @@
     "Recommendations of Mina"
   ],
   "audioUrl": null,
-  "introduction": "RECOMMENDATIONS OF MINA\n\n1. One should remain in Mina during the days of Tashreeq i.e., eleventh, twelfth and thirteenth of Zilhajj. It is better than going to Mecca and performing recommended circumambulations.\n\n2. It is recommended for a pilgrim to say the following takbeer after fifteen prayers in Mina and ten outside Mina out of which Zuhr prayers after Eid prayers is the first:",
-  "versesCount": 1,
+  "introduction": "RECOMMENDATIONS OF MINA\n\n1. One should remain in Mina during the days of Tashreeq i.e., eleventh, twelfth and thirteenth of Zilhajj. It is better than going to Mecca and performing recommended circumambulations.",
+  "versesCount": 2,
   "verses": [
     {
       "index": 1,
+      "arabic": "",
+      "translation": "2. It is recommended for a pilgrim to say the following takbeer after fifteen prayers in Mina and ten outside Mina out of which Zuhr prayers after Eid prayers is the first:"
+    },
+    {
+      "index": 2,
       "arabic": "اَﷲُ اَكْبَرُ اَﷲُ اَكْبَرُ لَا اِلٰهَ اِلَّا اﷲُ وَ اﷲُ اَكْبَرُ اَﷲُ اَكْبَرُ وَ لِلّٰهِ الْحَمْدُ اَﷲُ اَكْبَرُ عَلٰی مَا هَدَانَا اَﷲُ اَكْبَرُ عَلٰی مَا رَزَقْنَا مِنْ بَهِیْمَۃِ الْاَنْعَامِ وَ الْحَمْدُ لِلّٰهِ عَلٰی مَا اَبْلَانَا۔",
       "translation": ""
     }

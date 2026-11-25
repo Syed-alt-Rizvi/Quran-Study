@@ -10,48 +10,73 @@
     "Namaz e Kamilah"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ E KAMILAH\n\nTwentieth: Excluding the Friday supererogatory (mustahab / nafilah) (mustahab / nafilah) Prayer (Nafilat al-Jumu’ah), many other optional prayers are reported to be offered on Fridays. Although the majority of these prayers are not dedicated to Fridays, it is highly recommended to offer them on Fridays.\n\nOne of these prayers is al-Salat al-Kamilah (The Perfect Prayer) that has been mentioned by many master scholars through numerous authentic series of reporters from Imam Ja’far al-Sadiq on the authority of his honorable fathers on the authority of the Holy Prophet - Allah’s peace and blessings be upon them all. In this connection, the Holy Prophet (s.a.w.a.) is reported to have said: As for anyone who, before midday (zohr) on Fridays, offers a four-unit prayer and recites the following in each unit: (1) Surah al-Faatehah ten times, (2) Surah al-Nas (No. 114) ten times, (3) Surah al-Falaq (No. 113) ten times, (4) Surah al-Tawheed (No. 112) ten times, (5) Surah al-Kafirun (No. 109) ten times, (6) Ayah al-Kursi (2:155) ten times, [And, according to another narration, (7) Surah al-Qadr (No. 97) ten times, (8) Ayat Shahidallah (3:18-19) ten times,] and, after the accomplishment of the prayer,\n\n(1) repeats the following statement one hundred times:\n\n(2) repeats the following litany one hundred times:\n\n(3) repeats the following invocation one hundred times:\n\nAs for him who offers this prayer, Almighty Allah will save him from the evils of the inhabitants of the heavens, the inhabitants of the earth, the devil, and all unjust rulers.\n\nANOTHER PRAYER\n\nIt has been narrated on the authority of al-Harith al-HaMadani that Imam AliAmeer al-Momineen(a.s.) said: If possible, offer on Fridays ten units of prayer with perfect genuflection (ruku') and prostration (sujud) repeating the following litany one hundred times between each couple (i.e. two) of units:\n\nTo offer this prayer brings about a great reward.\n\nA THIRD PRAYER\n\nIt has been authentically narrated that Imam al-Sadiq(a.s.) said, “One who recites Surahs Ibrahim (No. 14) and al-Hijr (No. 15) altogether in a two-unit prayer on Fridays will be saved from poverty, insanity, and misfortunes forever.”",
-  "versesCount": 8,
+  "introduction": "SUPPLICATION FOR DELIVERANCE\n\nA revered litany reported from the Holy Ahlulbayt (a.s.) for divine protection and relief from hardship.",
+  "versesCount": 13,
   "verses": [
     {
-      "index": 1,
+      "arabic": "",
+      "translation": "You may repeat the following statement one hundred times:",
+      "index": 1
+    },
+    {
+      "index": 2,
       "arabic": "اَستَغفِرُاللهَ",
       "translation": "I implore for Allah’s forgiveness."
     },
     {
-      "index": 2,
+      "index": 3,
+      "arabic": "",
+      "translation": "(2) repeats the following litany one hundred times:"
+    },
+    {
+      "index": 4,
       "arabic": "سُبْحَانَ اللهِ",
       "translation": "All glory be to Allah;"
     },
     {
-      "index": 3,
+      "index": 5,
       "arabic": "وَالْحَمْدُ لِلّٰهِ",
       "translation": "all praise be to Allah;"
     },
     {
-      "index": 4,
+      "index": 6,
       "arabic": "وَ لَاۤ اِلٰهَ اِلَّا اللهُ",
       "translation": "there is no god save Allah;"
     },
     {
-      "index": 5,
+      "index": 7,
       "arabic": "وَاللهُ اَكْبَرُ",
       "translation": "Allah is the Greatest;"
     },
     {
-      "index": 6,
+      "index": 8,
       "arabic": "وَ لَا حَوْلَ وَلَا قُوَّةَ اِلَّا بِاللهِ الْعَلِیِّ الْعَظِیْمِ۔",
       "translation": "and there is no power and no might save with Allah, the All-high, the All-Great."
     },
     {
-      "index": 7,
+      "index": 9,
+      "arabic": "",
+      "translation": "(3) repeats the following invocation one hundred times:"
+    },
+    {
+      "index": 10,
       "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ",
       "translation": "O Allah, (please) bless Muhammad and the Household of Muhammad."
     },
     {
-      "index": 8,
+      "index": 11,
+      "arabic": "",
+      "translation": "As for him who offers this prayer, Almighty Allah will save him from the evils of the inhabitants of the heavens, the inhabitants of the earth, the devil, and all unjust rulers.\n\nANOTHER PRAYER\n\nIt has been narrated on the authority of al-Harith al-HaMadani that Imam AliAmeer al-Momineen(a.s.) said: If possible, offer on Fridays ten units of prayer with perfect genuflection (ruku') and prostration (sujud) repeating the following litany one hundred times between each couple (i.e. two) of units:"
+    },
+    {
+      "index": 12,
       "arabic": "سُبْحَانَ اللهِ وَ بِحَمْدِهِ۔",
       "translation": "All glory be to Allah and with the Praising of Him."
+    },
+    {
+      "index": 13,
+      "arabic": "",
+      "translation": "To offer this prayer brings about a great reward.\n\nA THIRD PRAYER\n\nIt has been authentically narrated that Imam al-Sadiq(a.s.) said, “One who recites Surahs Ibrahim (No. 14) and al-Hijr (No. 15) altogether in a two-unit prayer on Fridays will be saved from poverty, insanity, and misfortunes forever.”"
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_dua20&lang=en"

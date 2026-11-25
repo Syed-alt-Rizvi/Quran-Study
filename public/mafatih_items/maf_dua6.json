@@ -9,8 +9,8 @@
     "Taqibaat e Namaz e Fajr (1)"
   ],
   "audioUrl": null,
-  "introduction": "TAQIBAAT E NAMAZ E FAJR\n\nAs quoted from Misbah al-Mutahajjid\n\nSubsequent to the dawn (fajr) (fajr) Prayer, say the following supplicatory prayer, as quoted from Misbah al-Mutahajjid:\n\nAgain, repeat the following invocation ten times:\n\nThis invocation of God’s blessings upon the Holy Prophet and his Household has been also reported to be said on Fridays with a great reward.\n\nAlso, say the following:\n\nAlso, repeat each of the following statements one hundred times:\n\n(7) Surah al-Tawhid\n\nYou may then say the following:\n\nThis supplication, which is reported from Imam AliAmeer al-Momineen(a.s.) at the Night of Mabit, is advisably said each morning and evening.\n\nIn Tahdhib al-Ahkam (by Shaykh al-Tusi), it is reported that whoever repeats the following litany ten times after the dawn (fajr) Prayers, Almighty Allah will save him from blindness, insanity, leprosy, poverty, and (house) demolition or dotage:\n\nShaykh al-Kulayni reports Imam Ja’far al-Sadiq(a.s.) as saying: Whoever repeats the following litany seven times after the dawn (fajr) and Sunset Prayers, Almighty Allah will saved him from seventy kinds of misfortune the least of which are flatulence, leprosy, and insanity; and his name will be erased from the list of the condemned ones, if it was listed there, and will be added to the list of the happy ones:\n\nImam Ja’far al-Sadiq(a.s.) is also reported to have said that one who desires to enjoy both the worldly life and the Next World, and one who has eye ache, should utter the following supplicatory prayer after the dawn (fajr) and Sunset Prayers:\n\nIn ‘Uddat al-Dai, Shaykh Ibn Fahad reports Imam Ali ibn Musa al-Rida(a.s.) to have said: Whoever says the following statement after the dawn (fajr) Prayer, will have all his requests made easy-to-gain for him and will be saved by Almighty Allah against every thing that aggrieves him:",
-  "versesCount": 86,
+  "introduction": "TAQIBAAT E NAMAZ E FAJR\n\nAs quoted from Misbah al-Mutahajjid\n\nSubsequent to the dawn (fajr) (fajr) Prayer, say the following supplicatory prayer, as quoted from Misbah al-Mutahajjid:",
+  "versesCount": 95,
   "verses": [
     {
       "index": 1,
@@ -29,416 +29,461 @@
     },
     {
       "index": 4,
+      "arabic": "",
+      "translation": "Again, repeat the following invocation ten times:"
+    },
+    {
+      "index": 5,
       "arabic": "اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
       "translation": "O Allah, bless Muhammad and the Household of Muhammad,"
     },
     {
-      "index": 5,
+      "index": 6,
       "arabic": "۟اِلْاَوْصِيَاۤءِ الرَّاضِيْنَ الْمَرْضِيِّيْنَ",
       "translation": "the consenting and pleased Successors,"
     },
     {
-      "index": 6,
+      "index": 7,
       "arabic": "بِاَفْضَلِ صَلَوَاتِكَ",
       "translation": "with the best of Your blessings,"
     },
     {
-      "index": 7,
+      "index": 8,
       "arabic": "وَ بَارِكْ عَلَيْهِمْ بِاَفْضَلِ بَرَكَاتِكَ",
       "translation": "and confer upon them the best of your favors."
     },
     {
-      "index": 8,
+      "index": 9,
       "arabic": "وَ السَّلَامُ عَلَيْهِمْ",
       "translation": "Peace be upon them"
     },
     {
-      "index": 9,
+      "index": 10,
       "arabic": "وَ عَلٰى اَرْوَاحِهِمْ وَ اَجْسَادِهِمْ",
       "translation": "and their souls and bodies."
     },
     {
-      "index": 10,
+      "index": 11,
       "arabic": "وَ رَحْمَةُ اللّٰهِ وَ بَرَكَاتُهُ ۔",
       "translation": "Allah’s mercy and blessings be upon them."
     },
     {
-      "index": 11,
+      "index": 12,
+      "arabic": "",
+      "translation": "This invocation of God’s blessings upon the Holy Prophet and his Household has been also reported to be said on Fridays with a great reward.\n\nAlso, say the following:"
+    },
+    {
+      "index": 13,
       "arabic": "اَللّٰهُمَّ اَحْيِنِيْ عَلٰى مَاۤ اَحْيَيْتَ عَلَيْهِ عَلِيَّ بْنَ اَبِي طَالِبٍ",
       "translation": "O Allah, (please) make me live carrying the conducts on which You made 'Ali the son of Abu-Talib live"
     },
     {
-      "index": 12,
+      "index": 14,
       "arabic": "وَ اَمِتْنِيْ عَلٰى مَا مَاتَ عَلَيْهِ عَلِيُّ بْنُ اَبِي طَالِبٍ عَلَيْهِ السَّلَامُ۔",
       "translation": "and make me die on the principles for which 'Ali the son of Abu-Talib—peace be upon him—died."
     },
     {
-      "index": 13,
+      "index": 15,
+      "arabic": "",
+      "translation": "Also, repeat each of the following statements one hundred times:"
+    },
+    {
+      "index": 16,
       "arabic": "اَسْتَغْفِرُ اللهَ وَ اَتُوْبُ اِلَيْهِ",
       "translation": "(1) I pray the forgiveness of Allah and I repent before Him."
     },
     {
-      "index": 14,
+      "index": 17,
       "arabic": "اَسْاَلُ اللهَ الْعَافِيَةَ",
       "translation": "(2) I beseech Allah for good health."
     },
     {
-      "index": 15,
+      "index": 18,
       "arabic": "اَسْتَجِيْرُ بِاللّٰهِ مِنَ النَّارِ",
       "translation": "(3) I seek Allah’s protection against Hellfire."
     },
     {
-      "index": 16,
+      "index": 19,
       "arabic": "وَ اَسْاَلُهُ الْجَنَّةَ",
       "translation": "(4) I ask Him for Paradise."
     },
     {
-      "index": 17,
+      "index": 20,
       "arabic": "اَسْاَلُ اللهَ الْحُوْرَ الْعِيْنَ۔",
       "translation": "(5) I ask Allah for the Paradisiacal Women."
     },
     {
-      "index": 18,
+      "index": 21,
       "arabic": "لَاۤ اِلٰهَ اِلَّا اللهُ الْمَلِكُ الْحَقُّ الْمُبِيْنُ",
       "translation": "(6) There is no god save Allah the King and evident Truth."
     },
     {
-      "index": 19,
+      "index": 22,
+      "arabic": "",
+      "translation": "(7) Surah al-Tawhid"
+    },
+    {
+      "index": 23,
       "arabic": "صَلَّى اللهُ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
       "translation": "(8) May Allah send blessings to Muhammad and the Household of Muhammad."
     },
     {
-      "index": 20,
+      "index": 24,
       "arabic": "سُبْحَانَ اللّٰهِ",
       "translation": "(9) All glory be to Allah,"
     },
     {
-      "index": 21,
+      "index": 25,
       "arabic": "وَ الْحَمْدُ لِلّٰهِ",
       "translation": "all praise be to Allah,"
     },
     {
-      "index": 22,
+      "index": 26,
       "arabic": "وَ لَاۤ اِلٰهَ اِلَّا اللهُ",
       "translation": "there is no god save Allah,"
     },
     {
-      "index": 23,
+      "index": 27,
       "arabic": "وَ اللهُ اَكْبَرُ",
       "translation": "Allah is the Greatest,"
     },
     {
-      "index": 24,
+      "index": 28,
       "arabic": "وَ لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ۔",
       "translation": "and there is neither might nor power save with Allah, the All- high and All-great."
     },
     {
-      "index": 25,
+      "index": 29,
       "arabic": "مَا شَاۤءَ اللهُ كَانَ وَ لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ۔",
       "translation": "(10) Only that which Allah wills shall come to pass and there is neither might nor power save with Allah, the All-high and All¬great."
     },
     {
-      "index": 26,
+      "index": 30,
+      "arabic": "",
+      "translation": "You may then say the following:"
+    },
+    {
+      "index": 31,
       "arabic": "اَصْبَحْتُ اَللّٰهُمَّ مُعْتَصِمًا بِذِمَامِكَ الْمَنِيْعِ",
       "translation": "O Allah, I have begun this morning seeking refuge with Your invulnerable security"
     },
     {
-      "index": 27,
+      "index": 32,
       "arabic": "الَّذِيْ لَا يُطَاوَلُ وَ لَا يُحَاوَلُ",
       "translation": "that is neither touched nor caught"
     },
     {
-      "index": 28,
+      "index": 33,
       "arabic": "مِنْ شَرِّ كُلِّ غَاشِمٍ وَ طَارِقٍ",
       "translation": "against the evil of all oppressive and domineering ones"
     },
     {
-      "index": 29,
+      "index": 34,
       "arabic": "مِنْ سَاۤئِرِ مَنْ خَلَقْتَ وَ مَا خَلَقْتَ",
       "translation": "from among all Your animate and inanimate creatures"
     },
     {
-      "index": 30,
+      "index": 35,
       "arabic": "مِنْ خَلْقِكَ الصَّامِتِ وَ النَّاطِقِ",
       "translation": "both the silent and the speaking;"
     },
     {
-      "index": 31,
+      "index": 36,
       "arabic": "فِي جُنَّةٍ مِنْ كُلِّ مَخُوْفٍ",
       "translation": "and being in protection against all terrifying things;"
     },
     {
-      "index": 32,
+      "index": 37,
       "arabic": "بِلِبَاسٍ سَابِغَةٍ",
       "translation": "and being in the complete garb"
     },
     {
-      "index": 33,
+      "index": 38,
       "arabic": "وَلَاۤءِ اَهْلِ بَيْتِ نَبِيِّكَ",
       "translation": "of my loyalty to the Household of Your Prophet;"
     },
     {
-      "index": 34,
+      "index": 39,
       "arabic": "مُحْتَجِبًا مِنْ كُلِّ قَاصِدٍ لِيْ اِلٰى اَذِيَّةٍ",
       "translation": "and veiling myself against all those who intend harm to me,"
     },
     {
-      "index": 35,
+      "index": 40,
       "arabic": "بِجِدَارٍ حَصِيْنٍ",
       "translation": "behind an impervious wall,"
     },
     {
-      "index": 36,
+      "index": 41,
       "arabic": "الْاِخْلَاصِ فِي الْاِعْتِرَافِ بِحَقِّهِمْ",
       "translation": "which is my sincerity in the profession of their (Divinely commissioned) right (of leadership)"
     },
     {
-      "index": 37,
+      "index": 42,
       "arabic": "وَ التَّمَسُّكِ بِحَبْلِهِمْ",
       "translation": "and my adherence to their Rope,"
     },
     {
-      "index": 38,
+      "index": 43,
       "arabic": "مُوْقِنًا اَنَّ الْحَقَّ لَهُمْ وَ مَعَهُمْ",
       "translation": "and bearing with certainty that the Right is theirs, with them,"
     },
     {
-      "index": 39,
+      "index": 44,
       "arabic": "وَ فِيْهِمْ وَ بِهِمْ",
       "translation": "in them, and amid them."
     },
     {
-      "index": 40,
+      "index": 45,
       "arabic": "اُوَالِيْ مَنْ وَالَوْا",
       "translation": "I thus accede to those whom they accept"
     },
     {
-      "index": 41,
+      "index": 46,
       "arabic": "وَ اُجَانِبُ مَنْ جَانَبُوْا",
       "translation": "and depart those whom they depart."
     },
     {
-      "index": 42,
+      "index": 47,
       "arabic": "فَاَعِذْنِي اَللّٰهُمَّ بِهِمْ",
       "translation": "O Allah, protect me, in the names of them,"
     },
     {
-      "index": 43,
+      "index": 48,
       "arabic": "مِنْ شَرِّ كُلِّ مَا اَتَّقِيْهِ يَا عَظِيْمُ",
       "translation": "against the evil of all that which I fear, O All-great."
     },
     {
-      "index": 44,
+      "index": 49,
       "arabic": "حَجَزْتُ الْاَعَادِيَ عَنِّي بِبَدِيْعِ السَّمَاوَاتِ وَ الْاَرْضِ",
       "translation": "I am restraining the enemies against me through the Originator of the heavens and the earth;"
     },
     {
-      "index": 45,
+      "index": 50,
       "arabic": "اِنَّا جَعَلْنَا مِنْ بَيْنِ اَيْدِيْهِمْ سَدًّا",
       "translation": "“And We have set a bar before them"
     },
     {
-      "index": 46,
+      "index": 51,
       "arabic": "وَ مِنْ خَلْفِهِمْ سَدًّا",
       "translation": "and a bar behind them,"
     },
     {
-      "index": 47,
+      "index": 52,
       "arabic": "فَاَغْشَيْنَاهُمْ فَهُمْ لَا يُبْصِرُوْنَ ۔",
       "translation": "and (thus) have covered them so that they see not.”"
     },
     {
-      "index": 48,
+      "index": 53,
+      "arabic": "",
+      "translation": "This supplication, which is reported from Imam AliAmeer al-Momineen(a.s.) at the Night of Mabit, is advisably said each morning and evening.\n\nIn Tahdhib al-Ahkam (by Shaykh al-Tusi), it is reported that whoever repeats the following litany ten times after the dawn (fajr) Prayers, Almighty Allah will save him from blindness, insanity, leprosy, poverty, and (house) demolition or dotage:"
+    },
+    {
+      "index": 54,
       "arabic": "سُبْحَانَ اللّٰهِ الْعَظِيْمِ وَ بِحَمْدِهِ",
       "translation": "All glory be to Allah, the All-great and in praise of Him;"
     },
     {
-      "index": 49,
+      "index": 55,
       "arabic": "وَ لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ",
       "translation": "and there is neither might nor power save with Allah, the All- high and All-great."
     },
     {
-      "index": 50,
+      "index": 56,
+      "arabic": "",
+      "translation": "Shaykh al-Kulayni reports Imam Ja’far al-Sadiq(a.s.) as saying: Whoever repeats the following litany seven times after the dawn (fajr) and Sunset Prayers, Almighty Allah will saved him from seventy kinds of misfortune the least of which are flatulence, leprosy, and insanity; and his name will be erased from the list of the condemned ones, if it was listed there, and will be added to the list of the happy ones:"
+    },
+    {
+      "index": 57,
       "arabic": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
       "translation": "In the Name of Allah the All- compassionate, the All-merciful;"
     },
     {
-      "index": 51,
+      "index": 58,
       "arabic": "لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ",
       "translation": "there is neither might nor power save with Allah, the All-high and All-great."
     },
     {
-      "index": 52,
+      "index": 59,
+      "arabic": "",
+      "translation": "Imam Ja’far al-Sadiq(a.s.) is also reported to have said that one who desires to enjoy both the worldly life and the Next World, and one who has eye ache, should utter the following supplicatory prayer after the dawn (fajr) and Sunset Prayers:"
+    },
+    {
+      "index": 60,
       "arabic": "اَللّٰهُمَّ اِنِّي اَسْاَلُكَ بِحَقِّ مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ عَلَيْكَ",
       "translation": "O Allah, I do beseech You, in the name of the right of Muhammad and the Household of Muhammad that is incumbent upon You"
     },
     {
-      "index": 53,
+      "index": 61,
       "arabic": "صَلِّ عَلٰى مُحَمَّدٍ وَ اٰلِ مُحَمَّدٍ",
       "translation": "to send blessings to Muhammad and the Household of Muhammad"
     },
     {
-      "index": 54,
+      "index": 62,
       "arabic": "وَ اجْعَلِ النُّوْرَ فِي بَصَرِيْ",
       "translation": "and to make light in my sight,"
     },
     {
-      "index": 55,
+      "index": 63,
       "arabic": "وَ الْبَصِيْرَةَ فِي دِيْنِيْ",
       "translation": "discerning in my religion,"
     },
     {
-      "index": 56,
+      "index": 64,
       "arabic": "وَ الْيَقِيْنَ فِي قَلْبِيْ",
       "translation": "conviction in my heart,"
     },
     {
-      "index": 57,
+      "index": 65,
       "arabic": "وَ الْاِخْلَاصَ فِي عَمَلِيْ",
       "translation": "sincerity in my deeds,"
     },
     {
-      "index": 58,
+      "index": 66,
       "arabic": "وَ السَّلَامَةَ فِي نَفْسِيْ",
       "translation": "safety in my self,"
     },
     {
-      "index": 59,
+      "index": 67,
       "arabic": "وَ السَّعَةَ فِي رِزْقِي",
       "translation": "richness in my sustenance,"
     },
     {
-      "index": 60,
+      "index": 68,
       "arabic": "وَ الشُّكْرَ لَكَ اَبَدًا مَا اَبْقَيْتَنِيْ",
       "translation": "and perpetual thankfulness for You as long as you keep me alive."
     },
     {
-      "index": 61,
+      "index": 69,
+      "arabic": "",
+      "translation": "In ‘Uddat al-Dai, Shaykh Ibn Fahad reports Imam Ali ibn Musa al-Rida(a.s.) to have said: Whoever says the following statement after the dawn (fajr) Prayer, will have all his requests made easy-to-gain for him and will be saved by Almighty Allah against every thing that aggrieves him:"
+    },
+    {
+      "index": 70,
       "arabic": "بِسْمِ اللّٰهِ",
       "translation": "In the Name of Allah."
     },
     {
-      "index": 62,
+      "index": 71,
       "arabic": "وَ صَلَّى اللهُ عَلٰى مُحَمَّدٍ وَ اٰلِهِ",
       "translation": "May Allah bless Muhammad and his Household."
     },
     {
-      "index": 63,
+      "index": 72,
       "arabic": "وَ اُفَوِّضُ اَمْرِيْ اِلَى اللّٰهِ",
       "translation": "“I confide my cause unto Allah."
     },
     {
-      "index": 64,
+      "index": 73,
       "arabic": "اِنَّ اللهَ بَصِيرٌ بِالْعِبَادِ",
       "translation": "Surely, Allah is Seer of His slaves."
     },
     {
-      "index": 65,
+      "index": 74,
       "arabic": "فَوَقَاهُ اللهُ سَيِّئَاتِ مَا مَكَرُوْا",
       "translation": "So, Allah warded off from him the evils which they plotted.”"
     },
     {
-      "index": 66,
+      "index": 75,
       "arabic": "لَاۤ اِلٰهَ اِلَّا اَنْتَ سُبْحَانَكَ",
       "translation": "“There is no god save You. Be You Glorified!"
     },
     {
-      "index": 67,
+      "index": 76,
       "arabic": "اِنِّي كُنْتُ مِنَ الظَّالِمِيْنَ",
       "translation": "Lo! I have been a wrongdoer."
     },
     {
-      "index": 68,
+      "index": 77,
       "arabic": "فَاسْتَجَبْنَا لَهُ وَ نَجَّيْنَاهُ مِنَ الْغَمِّ",
       "translation": "Then, We heard his prayer and saved him from the anguish."
     },
     {
-      "index": 69,
+      "index": 78,
       "arabic": "وَ كَذٰلِكَ نُنْجِي الْمُؤْمِنِيْنَ",
       "translation": "Thus do We save the believers.”"
     },
     {
-      "index": 70,
+      "index": 79,
       "arabic": "حَسْبُنَا اللهُ وَ نِعْمَ الْوَكِيْلُ",
       "translation": "“Allah is Sufficient for us! Most Excellent is He in Whom we trust."
     },
     {
-      "index": 71,
+      "index": 80,
       "arabic": "فَانْقَلَبُوْا بِنِعْمَةٍ مِنَ اللّٰهِ وَ فَضْلٍ",
       "translation": "So, they returned with grace and favor from Allah,"
     },
     {
-      "index": 72,
+      "index": 81,
       "arabic": "لَّمْ يَمْسَسْهُمْ سُوۤءٌ",
       "translation": "and no harm touched them.”"
     },
     {
-      "index": 73,
+      "index": 82,
       "arabic": "مَا شَاۤءَ اللهُ",
       "translation": "Only that which Allah wills shall come to pass."
     },
     {
-      "index": 74,
+      "index": 83,
       "arabic": "لَا حَوْلَ وَ لَا قُوَّةَ اِلَّا بِاللّٰهِ",
       "translation": "There is neither strength nor power save with Allah."
     },
     {
-      "index": 75,
+      "index": 84,
       "arabic": "مَا شَاۤءَ اللهُ لَا مَا شَاۤءَ النَّاسُ،",
       "translation": "Only that which Allah, but not people, wills shall come to pass."
     },
     {
-      "index": 76,
+      "index": 85,
       "arabic": "مَا شَاۤءَ اللهُ وَ اِنْ كَرِهَ النَّاسُ",
       "translation": "Only that which Allah wills shall come to pass even if people detest it."
     },
     {
-      "index": 77,
+      "index": 86,
       "arabic": "حَسْبِيَ الرَّبُّ مِنَ الْمَرْبُوْبِيْنَ",
       "translation": "Sufficient for me is the Lord against the lorded."
     },
     {
-      "index": 78,
+      "index": 87,
       "arabic": "حَسْبِيَ الْخَالِقُ مِنَ الْمَخْلُوْقِيْنَ",
       "translation": "Sufficient for me is the Creator against the creatures."
     },
     {
-      "index": 79,
+      "index": 88,
       "arabic": "حَسْبِيَ الرَّازِقُ مِنَ الْمَرْزُوْقِيْنَ",
       "translation": "Sufficient for me is the Sustainer against the sustained."
     },
     {
-      "index": 80,
+      "index": 89,
       "arabic": "حَسْبِيَ اللهُ رَبُّ الْعَالَمِيْنَ",
       "translation": "Sufficient for me is Allah, the Lord of the worlds."
     },
     {
-      "index": 81,
+      "index": 90,
       "arabic": "حَسْبِيْ مَنْ هُوَ حَسْبِيْ",
       "translation": "Sufficient for me is He Who is sufficient for me."
     },
     {
-      "index": 82,
+      "index": 91,
       "arabic": "حَسْبِيْ مَنْ لَمْ يَزَلْ حَسْبِيْ",
       "translation": "Sufficient for me is He Who has been always sufficient for me."
     },
     {
-      "index": 83,
+      "index": 92,
       "arabic": "حَسْبِيْ مَنْ كَانَ مُذْ كُنْتُ لَمْ يَزَلْ حَسْبِيْ",
       "translation": "Sufficient for me is He Who had been since eternity and still sufficient for me."
     },
     {
-      "index": 84,
+      "index": 93,
       "arabic": "حَسْبِيَ اللهُ لَاۤ اِلٰهَ اِلَّا هُوَ",
       "translation": "“Allah suffices me. There is no god save Him."
     },
     {
-      "index": 85,
+      "index": 94,
       "arabic": "عَلَيْهِ تَوَكَّلْتُ",
       "translation": "In Him have I put my trust,"
     },
     {
-      "index": 86,
+      "index": 95,
       "arabic": "وَ هُوَ رَبُّ الْعَرْشِ الْعَظِيْمِ۔",
       "translation": "and He is the Lord of the Tremendous Throne.”"
     }

@@ -10,8 +10,8 @@
     "Namaz for fulfillment of needs (5)"
   ],
   "audioUrl": null,
-  "introduction": "ANOTHER NAMAZ FOR SETTLING THE NEEDS\n\nThis prayer has been reported by a big number of scholars, such as Shaykh al-Mufid, al-Tusi, Sayyid Ibn Tawus, and many others, from Imam al-Sadiq(a.s.). However, according to the report of Sayyid Ibn Tawus, the way of offering this prayer is as follows:\n\nWhen you have an urgent need and you wish Almighty Allah to grant it for you, you may observe fasting on three successive days; Wednesday, Thursday, and Friday. On Friday, you may bathe yourself, dress yourself with a new, clean costume, go up to the highest point in your house, and offer a two-unit prayer. Then, you may raise your hands towards the sky and say the following supplication:\n\nYou should now mention your problem and then keep on, saying:\n\nYou may then put your face on the ground and say the following supplication:\n\nImam al-Sadiq(a.s.) said, “Many times, I had many needs to be settled by Almighty Allah. I therefore said this supplication and came back having my need settled for me.”",
-  "versesCount": 32,
+  "introduction": "ANOTHER NAMAZ FOR SETTLING THE NEEDS\n\nThis prayer has been reported by a big number of scholars, such as Shaykh al-Mufid, al-Tusi, Sayyid Ibn Tawus, and many others, from Imam al-Sadiq(a.s.). However, according to the report of Sayyid Ibn Tawus, the way of offering this prayer is as follows:\n\nWhen you have an urgent need and you wish Almighty Allah to grant it for you, you may observe fasting on three successive days; Wednesday, Thursday, and Friday. On Friday, you may bathe yourself, dress yourself with a new, clean costume, go up to the highest point in your house, and offer a two-unit prayer. Then, you may raise your hands towards the sky and say the following supplication:",
+  "versesCount": 35,
   "verses": [
     {
       "index": 1,
@@ -50,128 +50,143 @@
     },
     {
       "index": 8,
+      "arabic": "",
+      "translation": "You should now mention your problem and then keep on, saying:"
+    },
+    {
+      "index": 9,
       "arabic": "وَ اَنْتَ بِكَشْفِهِ عَالِمٌ غَيْرُ مُعَلَّمٍ",
       "translation": ""
     },
     {
-      "index": 9,
+      "index": 10,
       "arabic": "وَاسِعٌ غَيْرُ مُتَكَلِّفٍ",
       "translation": ""
     },
     {
-      "index": 10,
+      "index": 11,
       "arabic": "فَاَسْئَلُكَ بِاسْمِكَ الَّذِىْ وَضَعْتَهُ عَلَى الْجِبَالِ فَنُسِفَتْ",
       "translation": ""
     },
     {
-      "index": 11,
+      "index": 12,
       "arabic": "وَ وَضَعْتَهُ عَلَى السَّمٰوَاتِ فَانْشَقَّتْ",
       "translation": ""
     },
     {
-      "index": 12,
+      "index": 13,
       "arabic": "وَ عَلَى النُّجُوْمِ فَانْتَثَرَتْ",
       "translation": ""
     },
     {
-      "index": 13,
+      "index": 14,
       "arabic": "وَ عَلَى الْاَرْضِ فَسُطِحَتْ",
       "translation": ""
     },
     {
-      "index": 14,
+      "index": 15,
       "arabic": "وَ اَسْئَلُكَ بِالْحَقِّ الَّذِىْ جَعَلْتَهُ عِنْدَ مُحَمَّدٍ",
       "translation": ""
     },
     {
-      "index": 15,
+      "index": 16,
       "arabic": "صَلَّى اللّٰهُ عَلَيْهِ وَ اٰلِهٖ",
       "translation": ""
     },
     {
-      "index": 16,
+      "index": 17,
       "arabic": "وَ عِنْدَ عَلِىٍّ وَّ الْحَسَنِ وَالْحُسَيْنِ",
       "translation": ""
     },
     {
-      "index": 17,
+      "index": 18,
       "arabic": "وَ عَلِىٍّ وَّ مُحَمَّدٍ وَّ جَعْفَرٍ",
       "translation": ""
     },
     {
-      "index": 18,
+      "index": 19,
       "arabic": "وَّ مُوْسٰى وَ عَلِىٍّ وَّ مُحَمَّدٍ",
       "translation": ""
     },
     {
-      "index": 19,
+      "index": 20,
       "arabic": "وَّ عَلِىٍّ وَّالْحَسَنِ وَ الْحُجَّةِ عَلَيْهِمُ السَّلَامُ",
       "translation": ""
     },
     {
-      "index": 20,
+      "index": 21,
       "arabic": "اَنْ تُصَلِّىَ عَلٰى مُحَمَّدٍ وَّ اَهْلِ بَيْتِهِ",
       "translation": ""
     },
     {
-      "index": 21,
+      "index": 22,
       "arabic": "وَ اَنْ تَقْضِىَ لِىْ حَاجَتِىْ",
       "translation": ""
     },
     {
-      "index": 22,
+      "index": 23,
       "arabic": "وَ تُيَسِّرَلِىْ عَسِيْرَهَا",
       "translation": ""
     },
     {
-      "index": 23,
+      "index": 24,
       "arabic": "وَ تَكْفِيَنِىْ مُهِمَّهَا",
       "translation": ""
     },
     {
-      "index": 24,
+      "index": 25,
       "arabic": "فَاِنْ فَعَلْتَ فَلَكَ الْحَمْدُ",
       "translation": ""
     },
     {
-      "index": 25,
+      "index": 26,
       "arabic": "وَ اِنْ لَمْ تَفْعَلْ فَلَكَ الْحَمْدُ",
       "translation": ""
     },
     {
-      "index": 26,
+      "index": 27,
       "arabic": "غَيْرُ جَاۤئِرٍ فِىْ حُكْمِكَ",
       "translation": ""
     },
     {
-      "index": 27,
+      "index": 28,
       "arabic": "وَلَا مُتَّهَمٍ فِىْ قَضَاۤئِكَ",
       "translation": ""
     },
     {
-      "index": 28,
+      "index": 29,
       "arabic": "وَلَاحَاۤئِفٍ فِىْ عَدْلِكَ۔",
       "translation": ""
     },
     {
-      "index": 29,
+      "index": 30,
+      "arabic": "",
+      "translation": "You may then put your face on the ground and say the following supplication:"
+    },
+    {
+      "index": 31,
       "arabic": "اَللّٰهُمَّ اِنَّ يُوْنُسَ بْنَ مَتّٰى عَبْدُكَ",
       "translation": ""
     },
     {
-      "index": 30,
+      "index": 32,
       "arabic": "دَعَاكَ فِىْ بَطْنِ الْحُوْتِ",
       "translation": ""
     },
     {
-      "index": 31,
+      "index": 33,
       "arabic": "وَ هُوَ عَبْدُكَ فَاسْتَجَبْتَ لَهُ",
       "translation": ""
     },
     {
-      "index": 32,
+      "index": 34,
       "arabic": "وَ اَنَا عَبْدُكَ اَدْعُوْكَ فَاسْتَجِبْ لِىْ۔",
       "translation": ""
+    },
+    {
+      "index": 35,
+      "arabic": "",
+      "translation": "Imam al-Sadiq(a.s.) said, “Many times, I had many needs to be settled by Almighty Allah. I therefore said this supplication and came back having my need settled for me.”"
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_baqe97&lang=en"

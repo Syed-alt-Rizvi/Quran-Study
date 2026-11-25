@@ -11,8 +11,8 @@
     "Namaz e Hajat (Wish fulfillment prayer) at the place of Nuh (a)"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ E HAJAT (WISH FULFILLMENT PRAYER) AT THE PLACE OF NUH (A)\n\nThereafter recite 4 rakats of Namaz-e-Hajat. There is no stipulation of reciting any particular surah therein. After the namaz recite the Tasbeeh of Fatemah Zahra (s.a.) and then recite the following dua:\n\nAfterwards go into the Sajdah and recite as follows:\n\nThen place your right cheek on the ground and recite the following dua:\n\nPut your left cheek on the ground and say:\n\nThen again place your forehead on the ground and recite this dua.",
-  "versesCount": 5,
+  "introduction": "NAMAZ E HAJAT (WISH FULFILLMENT PRAYER) AT THE PLACE OF NUH (A)",
+  "versesCount": 10,
   "verses": [
     {
       "index": 1,
@@ -21,23 +21,48 @@
     },
     {
       "index": 2,
+      "arabic": "",
+      "translation": "Thereafter recite 4 rakats of Namaz-e-Hajat. There is no stipulation of reciting any particular surah therein. After the namaz recite the Tasbeeh of Fatemah Zahra (s.a.) and then recite the following dua:"
+    },
+    {
+      "index": 3,
       "arabic": "اِلٰھِیْ قَدْ عَلِمْتَ حَوَآئِجِیْ فَصَلِّ عَلٰی مُحَمَّدٍ وَّ اٰلِ مُحَمَّدٍ وَّ اقْضِھَا وَ قَدْ اَحْصَیْتَ ذُنُوْبِیْ فَصَلِّ عَلٰی مُحَمَّدٍ وَّ اٰلِهٖ وَ اغْفِرْھَا یَا كَرِیْمُ۔",
       "translation": ""
     },
     {
-      "index": 3,
+      "index": 4,
+      "arabic": "",
+      "translation": "Afterwards go into the Sajdah and recite as follows:"
+    },
+    {
+      "index": 5,
       "arabic": "اِنْ كُنْتُ بِئْسَ الْعَبْدُ فَاَنْتَ نِعْمَ الرَّبُّ افْعَلْ بِیْ مَا اَنْتَ اَھْلُهٗ وَ لَا تَفْعَلْ بِیْ مَا اَنَا اَھْلُهٗ یَا اَرْحَمَ الرَّاحِمِیْنَ۔",
       "translation": ""
     },
     {
-      "index": 4,
+      "index": 6,
+      "arabic": "",
+      "translation": "Then place your right cheek on the ground and recite the following dua:"
+    },
+    {
+      "index": 7,
       "arabic": "اَللّٰھُمَّ اِنْ عَظُمَ الذَّنْبُ مِنْ عَبْدِكَ فَلْیَحْسُنِ الْعَفْوُ مِنْ عِنْدِكَ یَا كَرِیْمُ۔",
       "translation": ""
     },
     {
-      "index": 5,
+      "index": 8,
+      "arabic": "",
+      "translation": "Put your left cheek on the ground and say:"
+    },
+    {
+      "index": 9,
       "arabic": "اِرْحَمْ مَنْ اَسَآءَ وَ اقْتَرَفَ وَ اسْتَكَانَ وَ اعْتَرَفَ۔",
       "translation": ""
+    },
+    {
+      "index": 10,
+      "arabic": "",
+      "translation": "Then again place your forehead on the ground and recite this dua."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=kufa13&lang=en"

@@ -10,8 +10,8 @@
     "Dua e Nudbah"
   ],
   "audioUrl": "https://www.ya-mahdi.net/apps_audio/mahdi_mirdamad/nodbeh_mirdamad.m4a",
-  "introduction": "DUA E NUDBAH\n\nIt is recommended to say this supplication on the four feast days; namely, the ‘Id al-Fitr day (1st of Shawwal), the ‘Id al-Azha day (10th of Dhu’l-Hijjah), the ‘Id al-Ghadir day (18th of Du’l-Hijjah), and Fridays.\n\nThis supplication is as follows:\n\nYou may then offer the prayer of ziyarah, as has been previously described. After that, you may pray Almighty Allah for any thing you wish, and it will be granted for you, Allah willing.",
-  "versesCount": 362,
+  "introduction": "DUA E NUDBAH\n\nIt is recommended to say this supplication on the four feast days; namely, the ‘Id al-Fitr day (1st of Shawwal), the ‘Id al-Azha day (10th of Dhu’l-Hijjah), the ‘Id al-Ghadir day (18th of Du’l-Hijjah), and Fridays.\n\nThis supplication is as follows:",
+  "versesCount": 363,
   "verses": [
     {
       "index": 1,
@@ -225,7 +225,7 @@
     },
     {
       "index": 43,
-      "arabic": "وَ لِئَلَّا یَزُوْلَ الْحَقُّ عَنْ مَقَرِّهٖ",
+      "arabic": "وَ لِئَلَّ�� یَزُوْلَ الْحَقُّ عَنْ مَقَرِّهٖ",
       "translation": ""
     },
     {
@@ -630,7 +630,7 @@
     },
     {
       "index": 124,
-      "arabic": "مُبْیَضَّۃً وُجُوْھُھُمْ حَوْلِیْ فِی الْجَنَّۃِ",
+      "arabic": "مُبْیَضَّۃً وُجُوْھُھُمْ حَوْلِیْ ��ِی الْجَنَّۃِ",
       "translation": ""
     },
     {
@@ -1400,7 +1400,7 @@
     },
     {
       "index": 278,
-      "arabic": "ھَلْ مِنْ جَزُوْعٍ فَاُسَاعِدَ جَزَعَهٗ اِذَا خَلَا",
+      "arabic": "ھَلْ مِنْ جَزُوْعٍ فَاُسَاعِدَ جَزَ��َهٗ اِذَا خَلَا",
       "translation": ""
     },
     {
@@ -1785,7 +1785,7 @@
     },
     {
       "index": 355,
-      "arabic": "ثُمَّ لَا تَصْرِفْھَا عَنَّا بِجُوْدِكَ",
+      "arabic": "ثُمَّ لَا تَصْرِفْھَا عَنَّا ب��جُوْدِكَ",
       "translation": ""
     },
     {
@@ -1822,6 +1822,11 @@
       "index": 362,
       "arabic": "یَاۤ اَرْحَمَ الرَّاحِمِیْنَ۔",
       "translation": ""
+    },
+    {
+      "index": 363,
+      "arabic": "",
+      "translation": "You may then offer the prayer of ziyarah, as has been previously described. After that, you may pray Almighty Allah for any thing you wish, and it will be granted for you, Allah willing."
     }
   ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=maf_ziy126a&lang=en"

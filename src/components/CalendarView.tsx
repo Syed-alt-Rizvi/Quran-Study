@@ -17,6 +17,7 @@ import {
 } from '../utils/calendarNotifications';
 import { ShiaCalendarEvent, CalendarDay } from '../types/calendar';
 import { getMafatihUrduTitle } from '../utils/mafatihUrdu';
+import { getMafatihEnglishTitle } from '../utils/mafatihArabic';
 import { normalizeSearchQuery, matchesSearch } from '../utils/arabicSearch';
 
 interface CalendarViewProps {
@@ -413,7 +414,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                       <span>
                         {isUrdu
                           ? getMafatihUrduTitle(todayData.events[0].recommendedDuas[0].mafatihId || '', todayData.events[0].recommendedDuas[0].title)
-                          : todayData.events[0].recommendedDuas[0].title}
+                          : getMafatihEnglishTitle(todayData.events[0].recommendedDuas[0].mafatihId || '', todayData.events[0].recommendedDuas[0].title)}
                       </span>
                     </button>
                   )}
@@ -966,7 +967,7 @@ export default function CalendarView({ onSelectMafatihItem }: CalendarViewProps)
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedEvent.recommendedDuas.map((dua, dIdx) => {
-                      const duaTitle = isUrdu ? getMafatihUrduTitle(dua.mafatihId || '', dua.title) : dua.title;
+                      const duaTitle = isUrdu ? getMafatihUrduTitle(dua.mafatihId || '', dua.title) : getMafatihEnglishTitle(dua.mafatihId || '', dua.title);
                       return (
                         <button
                           key={`dua-btn-${dIdx}`}

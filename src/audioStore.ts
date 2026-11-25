@@ -24,6 +24,10 @@ interface AudioState {
   setIsLoopingAyah: (looping: boolean) => void;
   toggleLoopAyah: () => void;
   setPlaybackSpeed: (speed: number) => void;
+  surahViewMode: 'text' | 'player';
+  setSurahViewMode: (mode: 'text' | 'player') => void;
+  mafatihViewMode: 'text' | 'player';
+  setMafatihViewMode: (mode: 'text' | 'player') => void;
   stop: () => void;
 }
 
@@ -48,6 +52,10 @@ export const useAudioStore = create<AudioState>((set, get) => {
     surahId: null,
     activeAyahNumber: null,
     activeSurahNumber: null,
+    surahViewMode: 'text',
+    setSurahViewMode: (mode: 'text' | 'player') => set({ surahViewMode: mode }),
+    mafatihViewMode: 'text',
+    setMafatihViewMode: (mode: 'text' | 'player') => set({ mafatihViewMode: mode }),
 
     setPlaylist: (surahId, playlist, startIndex = 0) => {
       const healedPlaylist = playlist.map(a => ({

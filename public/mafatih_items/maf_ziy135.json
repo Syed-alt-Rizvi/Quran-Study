@@ -10,8 +10,8 @@
     "Supplications after the Ziyarat"
   ],
   "audioUrl": null,
-  "introduction": "SUPPLICATIONS AFTER THE ZIYARAH\n\nSayyid Ibn Tawus has stated that it is recommended to say the following supplicatory prayer immediately after performing the rites of visitation to the Holy Imams (‘a):\n\nYou may now kiss the holy tomb, put your two cheeks on it, and say the following words:\n\nYou may now offer the prayer of ziyarah. If you intend to bid farewell to the visited holy person and leave, you may say the following words:\n\nShaykh al-Mufid has also mentioned these words, but he added: After the statement, you may say the following words:\n\nA visitor of any of the holy shrines, or any suppliant wherever he may be and whatever prayer he may say, is highly recommended to begin with praying Almighty Allah for the good of Imam al-Mahdi, Almighty Allah’s argument in this age and the patron of the divine mission. Although this issue is of great importance and brings about many significant advantages, it seems unsuitable to refer to this importance or mention these advantages in this place.\n\nHowever, Shaykh al-Nuri, in Chapter Ten of his book of al-Najm al-Thaqib, has discussed this issue in details and mentioned some supplications in this regard. It is thus recommended to refer to this chapter. The briefest supplication in this connection has been previously cited in this book within the recommended acts at the twenty-third night of Ramazan. It is the following supplication:\n\nWithin the etiquettes of visiting Imam al-Husayn (‘a), I have mentioned another supplication that can be said at all of the holy shrines. The supplication begins with the following statement:",
-  "versesCount": 77,
+  "introduction": "SUPPLICATIONS AFTER THE ZIYARAH\n\nSayyid Ibn Tawus has stated that it is recommended to say the following supplicatory prayer immediately after performing the rites of visitation to the Holy Imams (‘a):",
+  "versesCount": 82,
   "verses": [
     {
       "index": 1,
@@ -165,236 +165,261 @@
     },
     {
       "index": 31,
+      "arabic": "",
+      "translation": "You may now kiss the holy tomb, put your two cheeks on it, and say the following words:"
+    },
+    {
+      "index": 32,
       "arabic": "اَللّٰهُمَّ اِنَّ هٰذَا مَشْهَدٌ لَا يَرْجُوْ مَنْ فَاتَتْهُ فِيْهِ رَحْمَتُكَ",
       "translation": ""
     },
     {
-      "index": 32,
+      "index": 33,
       "arabic": "اَنْ يَّنَالَهَا فِي غَيْرِهِ",
       "translation": ""
     },
     {
-      "index": 33,
+      "index": 34,
       "arabic": "وَ لَاۤ اَحَدٌ اَشْقٰى مِنِ امْرِئٍ قَصَدَهُ مُؤَمِّلًا فَاٰبَ عَنْهُ خَاۤئِبًا",
       "translation": ""
     },
     {
-      "index": 34,
+      "index": 35,
       "arabic": "اَللّٰهُمَّ اِنِّيۤ اَعُوْذُ بِكَ مِنْ شَرِّ الْاِيَابِ",
       "translation": ""
     },
     {
-      "index": 35,
+      "index": 36,
       "arabic": "وَ خَيْبَةِ الْمُنْقَلَبِ",
       "translation": ""
     },
     {
-      "index": 36,
+      "index": 37,
       "arabic": "وَ الْمُنَاقَشَةِ عِنْدَ الْحِسَابِ",
       "translation": ""
     },
     {
-      "index": 37,
+      "index": 38,
       "arabic": "وَ حَاشَاكَ يَا رَبِّ اَنْ تَقْرِنَ طَاعَةَ وَلِيِّكَ بِطَاعَتِكَ",
       "translation": ""
     },
     {
-      "index": 38,
+      "index": 39,
       "arabic": "وَ مُوَالَاتَهُ بِمُوَالَاتِكَ",
       "translation": ""
     },
     {
-      "index": 39,
+      "index": 40,
       "arabic": "وَ مَعْصِيَتَهُ بِمَعْصِيَتِكَ",
       "translation": ""
     },
     {
-      "index": 40,
+      "index": 41,
       "arabic": "ثُمَّ تُؤْيِسَ زَاۤئِرَهُ",
       "translation": ""
     },
     {
-      "index": 41,
+      "index": 42,
       "arabic": "وَ الْمُتَحَمِّلَ مِنْ بُعْدِ الْبِلَادِ اِلٰى قَبْرِهِ",
       "translation": ""
     },
     {
-      "index": 42,
+      "index": 43,
       "arabic": "وَ عِزَّتِكَ يَا رَبِّ",
       "translation": ""
     },
     {
-      "index": 43,
+      "index": 44,
       "arabic": "لَا يَنْعَقِدُ عَلٰى ذَالِكَ ضَمِيْرِيْ",
       "translation": ""
     },
     {
-      "index": 44,
+      "index": 45,
       "arabic": "اِذْ كَانَتِ الْقُلُوْبُ اِلَيْكَ بِالْجَمِيْلِ تُشِيْرُ",
       "translation": ""
     },
     {
-      "index": 45,
+      "index": 46,
+      "arabic": "",
+      "translation": "You may now offer the prayer of ziyarah. If you intend to bid farewell to the visited holy person and leave, you may say the following words:"
+    },
+    {
+      "index": 47,
       "arabic": "اَلسَّلَامُ عَلَيْكُمْ يَا اَهْلَ بَيْتِ النُّبُوَّةِ",
       "translation": ""
     },
     {
-      "index": 46,
+      "index": 48,
       "arabic": "وَ مَعْدِنَ الرِّسَالَةِ",
       "translation": ""
     },
     {
-      "index": 47,
+      "index": 49,
       "arabic": "سَلَامَ مُوَدِّعٍ لَا سَئِمٍ وَ لَا قَالٍ",
       "translation": ""
     },
     {
-      "index": 48,
+      "index": 50,
       "arabic": "وَ رَحْمَةُ اللّٰهِ وَ بَرَكَاتُهُ۔",
       "translation": ""
     },
     {
-      "index": 49,
+      "index": 51,
+      "arabic": "",
+      "translation": "Shaykh al-Mufid has also mentioned these words, but he added: After the statement, you may say the following words:"
+    },
+    {
+      "index": 52,
       "arabic": "يَا وَلِيَّ اللّٰهِ",
       "translation": ""
     },
     {
-      "index": 50,
+      "index": 53,
       "arabic": "اِنَّ بَيْنِيْ وَ بَيْنَ اللّٰهِ عَزَّ وَ جَلَّ ذُنُوْبًا",
       "translation": ""
     },
     {
-      "index": 51,
+      "index": 54,
       "arabic": "لَا يَأْتِيْ عَلَيْهَاۤ اِلَّا رِضَاكَ",
       "translation": ""
     },
     {
-      "index": 52,
+      "index": 55,
       "arabic": "فَبِحَقِّ مَنِ ائْتَمَنَكَ عَلٰى سِرِّهِ",
       "translation": ""
     },
     {
-      "index": 53,
+      "index": 56,
       "arabic": "وَ اسْتَرْعَاكَ اَمْرَ خَلْقِهِ",
       "translation": ""
     },
     {
-      "index": 54,
+      "index": 57,
       "arabic": "وَ قَرَنَ طَاعَتَكَ بِطَاعَتِهِ",
       "translation": ""
     },
     {
-      "index": 55,
+      "index": 58,
       "arabic": "وَ مُوَالَاتَكَ بِمُوَالَاتِهِ",
       "translation": ""
     },
     {
-      "index": 56,
+      "index": 59,
       "arabic": "تَوَلَّ صَلَاحَ حَالِى مَعَ اللّٰهِ عَزَّ وَ جَلَّ",
       "translation": ""
     },
     {
-      "index": 57,
+      "index": 60,
       "arabic": "وَ اجْعَلْ حَظِّيْ مِنْ زِيَارَتِكَ",
       "translation": ""
     },
     {
-      "index": 58,
+      "index": 61,
       "arabic": "تَخْلِيْطِيْ بِخَالِصِيْ زُوَّارِكَ",
       "translation": ""
     },
     {
-      "index": 59,
+      "index": 62,
       "arabic": "الَّذِيْنَ تَسْاَلُ اللّٰهَ عَزَّ وَ جَلَّ فِي عِتْقِ رِقَابِهِمْ",
       "translation": ""
     },
     {
-      "index": 60,
+      "index": 63,
       "arabic": "وَ تَرْغَبُ اِلَيْهِ فِيْ حُسْنِ ثَوَابِهِمْ",
       "translation": ""
     },
     {
-      "index": 61,
+      "index": 64,
       "arabic": "وَ هَاۤ اَنَا الْيَوْمَ بِقَبْرِكَ لَاۤئِذٌ",
       "translation": ""
     },
     {
-      "index": 62,
+      "index": 65,
       "arabic": "وَ بِحُسْنِ دِفَاعِكَ عَنِّيْ عَاۤئِذٌ",
       "translation": ""
     },
     {
-      "index": 63,
+      "index": 66,
       "arabic": "فَتَلَافَنِيْ يَا مَوْلَايَ وَ اَدْرِكْنِيْ",
       "translation": ""
     },
     {
-      "index": 64,
+      "index": 67,
       "arabic": "وَ اَسْاَلِ اللّٰهَ عَزَّ وَ جَلَّ فِيۤ اَمْرِيْ",
       "translation": ""
     },
     {
-      "index": 65,
+      "index": 68,
       "arabic": "فَاِنَّ لَكَ عِنْدَ اللّٰهِ مَقَامًا كَرِيْمًا",
       "translation": ""
     },
     {
-      "index": 66,
+      "index": 69,
       "arabic": "وَ جَاهًا عَظِيْمًا",
       "translation": ""
     },
     {
-      "index": 67,
+      "index": 70,
       "arabic": "صَلَّى اللّٰهُ عَلَيْكَ وَ سَلَّمَ تَسْلِيْمًا۔",
       "translation": ""
     },
     {
-      "index": 68,
+      "index": 71,
+      "arabic": "",
+      "translation": "A visitor of any of the holy shrines, or any suppliant wherever he may be and whatever prayer he may say, is highly recommended to begin with praying Almighty Allah for the good of Imam al-Mahdi, Almighty Allah’s argument in this age and the patron of the divine mission. Although this issue is of great importance and brings about many significant advantages, it seems unsuitable to refer to this importance or mention these advantages in this place.\n\nHowever, Shaykh al-Nuri, in Chapter Ten of his book of al-Najm al-Thaqib, has discussed this issue in details and mentioned some supplications in this regard. It is thus recommended to refer to this chapter. The briefest supplication in this connection has been previously cited in this book within the recommended acts at the twenty-third night of Ramazan. It is the following supplication:"
+    },
+    {
+      "index": 72,
       "arabic": "اَللّٰهُمَّ كُنْ لِوَلِيِّكَ الْحُجَّةِ بْنِ الْحَسَنِ",
       "translation": ""
     },
     {
-      "index": 69,
+      "index": 73,
       "arabic": "صَلَوَاتُكَ عَلَيْهِ وَعَلٰى اٰبَاۤئِه",
       "translation": ""
     },
     {
-      "index": 70,
+      "index": 74,
       "arabic": "فِىْ هٰذِهِ السَّاعَةِ وَ فِىْ كُلِّ سَاعَةٍ",
       "translation": ""
     },
     {
-      "index": 71,
+      "index": 75,
       "arabic": "وَلِيًّا وَّ حَافِظًا",
       "translation": ""
     },
     {
-      "index": 72,
+      "index": 76,
       "arabic": "وَّ قَاۤئِدًا وَّ نَاصِرًا",
       "translation": ""
     },
     {
-      "index": 73,
+      "index": 77,
       "arabic": "وَّ دَلِيْلًا وَّ عَيْنًا",
       "translation": ""
     },
     {
-      "index": 74,
+      "index": 78,
       "arabic": "حَتّٰى تُسْكِنَهُ اَرْضَكَ طَوْعًا",
       "translation": ""
     },
     {
-      "index": 75,
+      "index": 79,
       "arabic": "وَتُمَتِّعَهُ فِيْهَا طَوِيْلًا۔",
       "translation": ""
     },
     {
-      "index": 76,
+      "index": 80,
+      "arabic": "",
+      "translation": "Within the etiquettes of visiting Imam al-Husayn (‘a), I have mentioned another supplication that can be said at all of the holy shrines. The supplication begins with the following statement:"
+    },
+    {
+      "index": 81,
       "arabic": "اَللّٰهُمَّ قَدْ تَرَيٰ مَكَانِيْ",
       "translation": ""
     },
     {
-      "index": 77,
+      "index": 82,
       "arabic": "وَتَسْمَعُ كَلَامِيْ۔۔۔",
       "translation": ""
     }

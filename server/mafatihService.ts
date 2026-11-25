@@ -256,6 +256,187 @@ export function getMafatihItemsList(params: {
   };
 }
 
+function cleanVirtuesDisplay(intro: string): string {
+  if (!intro || typeof intro !== "string") return "";
+  const lines = intro.split(/\r?\n/);
+  const filteredLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (filteredLines.length > 0 && filteredLines[filteredLines.length - 1] !== "") {
+        filteredLines.push("");
+      }
+      continue;
+    }
+
+    if (
+      /^\s*METHOD:?\s*$/i.test(trimmed) ||
+      /^\s*The form of (?:ziyarah|ziyarat|supplication|prayer).*is as follow:?\s*$/i.test(trimmed) ||
+      /^(?:you may then|then|you should then|you should also)\s+repeat/i.test(trimmed) ||
+      /^(?:you may then|then|you should then)\s+say the following/i.test(trimmed) ||
+      /^(?:you may then|then|you should then)\s+prostrate/i.test(trimmed) ||
+      /^(?:you may now|now)\s+(?:say|recite|prostrate)/i.test(trimmed) ||
+      /one hundred times|100 times|70 times|seventy times/i.test(trimmed) ||
+      /prostrate yourself and say/i.test(trimmed) ||
+      /pat your (?:right )?thigh/i.test(trimmed) ||
+      /^‘?Alqamah added: Imam al-Baqir/i.test(trimmed) ||
+      /^Then go back to your place where you are standing/i.test(trimmed) ||
+      /^\d+\.\s+(?:Recite|Say|Take|Remember|It is recommended to invoke Almighty Allah to lay curse)/i.test(trimmed)
+    ) {
+      continue;
+    }
+
+    filteredLines.push(trimmed);
+  }
+
+  return filteredLines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function isInstructionText(str: string): boolean {
+  if (!str) return false;
+  const t = str.trim();
+  if (/^\s*METHOD:?\s*$/i.test(t)) return true;
+  if (/^\s*The form of (?:ziyarah|ziyarat|supplication|prayer).*is as follow:?\s*$/i.test(t)) return true;
+  if (/^\s*Method of (?:reciting|offering|the)\b/i.test(t)) return true;
+  if (/^\s*Method:?\s+/i.test(t)) return true;
+  if (/^\s*Islamic Law No\.\s*\d+/i.test(t)) return true;
+  if (/^(?:you may then|then|you should then|you should also)\s+repeat/i.test(t)) return true;
+  if (/^(?:you may then|then|you should then)\s+say the following/i.test(t)) return true;
+  if (/^(?:you may then|then|you should then)\s+prostrate/i.test(t)) return true;
+  if (/^(?:you may now|now)\s+(?:say|recite|prostrate)/i.test(t)) return true;
+  if (/prostrate yourself/i.test(t)) return true;
+  if (/pat your (?:right )?thigh/i.test(t)) return true;
+  if (/moving forward and backward/i.test(t)) return true;
+  if (/take a few steps forward/i.test(t)) return true;
+  if (/one hundred times|100 times|70 times|seventy times|1000 times|one thousand times/i.test(t) && /(?:repeat|say|recite|invoke|curse)/i.test(t)) return true;
+  if (/^‘?Alqamah added: Imam al-Baqir/i.test(t)) return true;
+  if (/^Then go back to your place where you are standing/i.test(t)) return true;
+  if (/^(?:in the (?:first|second|third|fourth) unit|in each unit),?\s+after Surah/i.test(t)) return true;
+  if (/^upon accomplishment,? (?:you may|one may) say/i.test(t)) return true;
+  if (/^when you finish saying the tashahhud and taslim/i.test(t)) return true;
+  if (/^after accomplishment of tasbih al-zahra/i.test(t)) return true;
+  if (/^this prayer consists of (?:two|four) units/i.test(t)) return true;
+  if (/^offer a (?:two|four)[-\s]unit prayer/i.test(t)) return true;
+  if (/^when you wake up at night, it is recommended to prostrate/i.test(t)) return true;
+  if (/^\d+\.\s+(?:Recite|Say|Take|Remember|It is recommended|A great reward)/i.test(t)) return true;
+  return false;
+}
+
+function normalizeServerMafatihDetail(detail: MafatihDetail): MafatihDetail {
+  if (!detail) return detail;
+  if (!Array.isArray(detail.verses)) {
+    detail.verses = [];
+  }
+
+  if (typeof detail.introduction === "string" && detail.introduction.length > 0) {
+    const rawIntro = detail.introduction;
+    const paras = rawIntro.split(/\n\n+/);
+    const cleanParas: string[] = [];
+    const extractedRubrics: string[] = [];
+
+    for (const p of paras) {
+      const trimmed = p.trim();
+      if (!trimmed) continue;
+      if (isInstructionText(trimmed)) {
+        extractedRubrics.push(trimmed);
+      } else {
+        cleanParas.push(trimmed);
+      }
+    }
+
+    detail.introduction = cleanVirtuesDisplay(cleanParas.join("\n\n"));
+
+    if (detail.verses.length === 0 && extractedRubrics.length > 0) {
+      detail.verses = extractedRubrics.map((rubric, idx) => ({
+        index: idx + 1,
+        arabic: "",
+        translation: rubric,
+      }));
+      detail.versesCount = detail.verses.length;
+      return detail;
+    }
+
+    const isAshura =
+      detail.id === "maf_ziy86" ||
+      detail.id === "ashura" ||
+      detail.id === "ziyarat-ashura" ||
+      (detail.title && detail.title.toLowerCase().includes("ashura") && !detail.title.toLowerCase().includes("aamal"));
+
+    if (isAshura && detail.verses.length > 4) {
+      const hasMethod = detail.verses.some((v, idx) => idx < 10 && v.translation && /METHOD|The form of ziyarah of/i.test(v.translation));
+      if (!hasMethod) {
+        detail.verses.splice(4, 0, {
+          index: 0,
+          arabic: "",
+          translation: "METHOD\n\nThe form of ziyarah of 'Ashura' is as follows:",
+        });
+      }
+    }
+
+    if (extractedRubrics.length > 0 && detail.verses.length > 0) {
+      const verses = [...detail.verses];
+
+      for (const rubric of extractedRubrics) {
+        const snippet = rubric.substring(0, 30).toLowerCase();
+        const alreadyInVerses = verses.some((v) => (v.translation || "").toLowerCase().includes(snippet));
+        if (alreadyInVerses) continue;
+
+        let inserted = false;
+        if (/pat your (?:right )?thigh/i.test(rubric)) {
+          const idx = verses.findIndex((v) => (v.arabic || "").includes("اَلْعَجَلَ") || (v.arabic || "").includes("العجل"));
+          if (idx !== -1) {
+            verses.splice(idx, 0, { index: 0, arabic: "", translation: rubric });
+            inserted = true;
+          }
+        } else if (/prostrate yourself/i.test(rubric)) {
+          const idx = verses.findIndex(
+            (v) =>
+              (v.arabic || "").includes("اَللّٰهُمَّ لَكَ الْحَمْدُ") ||
+              (v.arabic || "").includes("اللهم لك الحمد") ||
+              (v.arabic || "").includes("سُبْحَانَ رَبِّيَ") ||
+              (v.arabic || "").includes("سجدت")
+          );
+          if (idx !== -1) {
+            verses.splice(idx, 0, { index: 0, arabic: "", translation: rubric });
+            inserted = true;
+          }
+        } else if (/moving forward and backward/i.test(rubric)) {
+          const idx = verses.findIndex((v) => (v.arabic || "").includes("اِنَّا لِلّٰهِ وَ اِنَّا اِلَيْهِ رَاجِعُوْنَ"));
+          if (idx !== -1) {
+            verses.splice(idx, 0, { index: 0, arabic: "", translation: rubric });
+            inserted = true;
+          }
+        } else if (/curse on the slayers.*one thousand times/i.test(rubric)) {
+          const idx = verses.findIndex((v) => (v.arabic || "").includes("اَللّٰهُمَّ الْعَنْ قَتَلَةَ الْحُسَيْنِ"));
+          if (idx !== -1) {
+            verses.splice(idx, 0, { index: 0, arabic: "", translation: rubric });
+            inserted = true;
+          }
+        } else if (/‘?Alqamah added/i.test(rubric)) {
+          verses.push({ index: 0, arabic: "", translation: rubric });
+          inserted = true;
+        } else if (/consists of|two-unit|in each unit|when you wake up at night|offer a/i.test(rubric)) {
+          verses.unshift({ index: 0, arabic: "", translation: rubric });
+          inserted = true;
+        }
+
+        if (!inserted) {
+          verses.unshift({ index: 0, arabic: "", translation: rubric });
+        }
+      }
+
+      verses.forEach((v, idx) => {
+        v.index = idx + 1;
+      });
+      detail.verses = verses;
+      detail.versesCount = verses.length;
+    }
+  }
+
+  return detail;
+}
+
 /**
  * Parse ya-mahdi.net view HTML into a structured MafatihDetail object
  */
@@ -311,6 +492,35 @@ export function parseMafatihHtml(html: string, id: string, metaFallback?: Mafati
   const contentLines: string[] = [];
   const verses: MafatihVerse[] = [];
   let pendingArabic = "";
+  let pendingTranslation = "";
+  let pendingRubric: string[] = [];
+  let state: "BEFORE_FIRST_ARABIC" | "IN_VERSES" = "BEFORE_FIRST_ARABIC";
+
+  const flushRubric = () => {
+    if (pendingRubric.length > 0) {
+      const text = pendingRubric.join("\n\n").trim();
+      if (text) {
+        verses.push({
+          index: verses.length + 1,
+          arabic: "",
+          translation: text,
+        });
+      }
+      pendingRubric = [];
+    }
+  };
+
+  const flushVerse = () => {
+    if (pendingArabic) {
+      verses.push({
+        index: verses.length + 1,
+        arabic: pendingArabic,
+        translation: pendingTranslation,
+      });
+      pendingArabic = "";
+      pendingTranslation = "";
+    }
+  };
 
   const duaCard = $(".dua-card");
   if (duaCard.length > 0) {
@@ -320,45 +530,51 @@ export function parseMafatihHtml(html: string, id: string, metaFallback?: Mafati
       const text = $el.text().trim();
       if (!text) return;
 
-      if (cls.includes("content-line")) {
-        contentLines.push(text);
-      } else if (cls.includes("arabic-line")) {
-        if (pendingArabic) {
-          verses.push({
-            index: verses.length + 1,
-            arabic: pendingArabic,
-            translation: "",
-          });
-        }
+      if (cls.includes("arabic-line")) {
+        state = "IN_VERSES";
+        flushRubric();
+        flushVerse();
         pendingArabic = text;
       } else if (cls.includes("translation-line")) {
-        verses.push({
-          index: verses.length + 1,
-          arabic: pendingArabic,
-          translation: text,
-        });
-        pendingArabic = "";
+        pendingTranslation = text;
+        flushRubric();
+        flushVerse();
+      } else if (cls.includes("content-line")) {
+        if (state === "BEFORE_FIRST_ARABIC") {
+          if (isInstructionText(text)) {
+            flushVerse();
+            pendingRubric.push(text);
+          } else {
+            contentLines.push(text);
+          }
+        } else {
+          flushVerse();
+          pendingRubric.push(text);
+        }
       }
     });
 
-    if (pendingArabic) {
-      verses.push({
-        index: verses.length + 1,
-        arabic: pendingArabic,
-        translation: "",
-      });
-    }
+    flushRubric();
+    flushVerse();
   } else {
     // Fallback: extract from general paragraphs/lines
     $("p, div.line").each((_, el) => {
       const text = $(el).text().trim();
       if (text) {
-        contentLines.push(text);
+        if (isInstructionText(text)) {
+          verses.push({
+            index: verses.length + 1,
+            arabic: "",
+            translation: text,
+          });
+        } else {
+          contentLines.push(text);
+        }
       }
     });
   }
 
-  return {
+  const baseDetail: MafatihDetail = {
     id,
     code: metaFallback?.code || id,
     title,
@@ -366,11 +582,13 @@ export function parseMafatihHtml(html: string, id: string, metaFallback?: Mafati
     mainCategoryCode: metaFallback?.mainCategoryCode || "general",
     categoryChain: metaFallback?.categoryChain || [title],
     audioUrl,
-    introduction: contentLines.join("\n\n"),
+    introduction: cleanVirtuesDisplay(contentLines.join("\n\n")),
     versesCount: verses.length,
     verses,
     sourceUrl: `${ROOT_URL}view.php?cat=${encodeURIComponent(id)}&lang=en`,
   };
+
+  return normalizeServerMafatihDetail(baseDetail);
 }
 
 /**

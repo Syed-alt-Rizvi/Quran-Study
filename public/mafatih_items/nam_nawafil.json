@@ -10,8 +10,34 @@
     "Namaz e Nawafil"
   ],
   "audioUrl": null,
-  "introduction": "NAMAZ E NAWAFIL\n\nNAFILAH OF FAJR\n\nMethod: It is 2 rak'at Namaz. To be prayed when dawn (fajr) falls.\n\nLike the Morning Prayers.\n\nNAFILAH OF ZOHR\n\nMethod: It is 8 rak'at Namaz. To be prayed from the beginning of Zawal till before zohr.\n\nLike the Morning Prayers, in units of 2 rak'ats.\n\nNAFILAH OF ASR\n\nMethod: It is 8 rak'at Namaz. To be prayed before Asr.\n\nLike the Morning Prayers, in units of 2 rak'ats.\n\nNAFILAH OF MAGHRIB\n\nMethod: It is 4 rak'at Namaz. To be prayed after Namaz-e-Maghrib\n\nIn units of 2 rak'ats each like the morning prayers.\n\nNAFILAH OF ISHA\n\nMethod: It is 2 rak'at Namaz. To be prayed after Namaz-e-Isha\n\nLike the morning prayers, in sitting position.",
-  "versesCount": 0,
-  "verses": [],
+  "introduction": "NAMAZ E NAWAFIL\n\nDaily Supererogatory (Mustahab) Prayers: Recommended Nawafil prayers associated with each of the five daily obligatory prayers, establishing deep spiritual proximity and immense divine reward.",
+  "versesCount": 5,
+  "verses": [
+    {
+      "index": 1,
+      "arabic": "",
+      "translation": "NAFILAH OF FAJR (2 Rak'ats):\n\nMethod: It is a 2-rak'at prayer to be prayed when dawn (fajr) falls, before the obligatory Fajr prayer, prayed like the Morning Prayers."
+    },
+    {
+      "index": 2,
+      "arabic": "",
+      "translation": "NAFILAH OF ZOHR (8 Rak'ats):\n\nMethod: It is an 8-rak'at prayer to be prayed from the beginning of Zawal till before Zohr, offered in four prayers of 2 rak'ats each like the Morning Prayers."
+    },
+    {
+      "index": 3,
+      "arabic": "",
+      "translation": "NAFILAH OF ASR (8 Rak'ats):\n\nMethod: It is an 8-rak'at prayer to be prayed before the obligatory Asr prayer, offered in four prayers of 2 rak'ats each like the Morning Prayers."
+    },
+    {
+      "index": 4,
+      "arabic": "",
+      "translation": "NAFILAH OF MAGHRIB (4 Rak'ats):\n\nMethod: It is a 4-rak'at prayer to be prayed after Namaz-e-Maghrib, offered in two prayers of 2 rak'ats each like the Morning Prayers."
+    },
+    {
+      "index": 5,
+      "arabic": "",
+      "translation": "NAFILAH OF ISHA (2 Rak'ats - Watirah):\n\nMethod: It is a 2-rak'at prayer to be prayed after Namaz-e-Isha, recited in a sitting position like the Morning Prayers."
+    }
+  ],
   "sourceUrl": "https://www.ya-mahdi.net/view.php?cat=nam_nawafil&lang=en"
 }

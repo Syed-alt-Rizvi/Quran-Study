@@ -243,7 +243,7 @@ class ShiaAdhanPlayerService {
 
   private loadAdhanVoice() {
     try {
-      const stored = localStorage.getItem('adhan-settings-storage');
+      const stored = localStorage.getItem('quran-app-settings') || localStorage.getItem('adhan-settings-storage');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed?.state?.adhanSettings?.adhanVoice) {
